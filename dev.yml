@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    build: .
+    image: comses/skopeui/dev:latest
+    volumes:
+      - ./app:/code
+      - /code/node_modules
