@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app light>
     <v-navigation-drawer
       :mini-variant="miniVariant"
       :clipped="clipped"
@@ -78,9 +78,11 @@
     </v-navigation-drawer>
     <v-footer
       :fixed="fixed"
+      class="pa-3"
       app
     >
-      <span>&copy; 2017</span>
+      <v-spacer/>
+      <div>&copy; {{ currentYear }}</div>
     </v-footer>
   </v-app>
 </template>
@@ -92,6 +94,7 @@ export default {
       clipped: false,
       drawer: true,
       fixed: false,
+      currentYear: new Date().getFullYear(),
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' }
