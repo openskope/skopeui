@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app light>
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -79,10 +79,23 @@
       </v-list>
     </v-navigation-drawer>
     <v-footer
-      :fixed="fixed"
+      light
+      height="auto"
       app
     >
-      <span>&copy; 2019</span>
+      <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
+        <v-card-text>
+          <v-btn v-for="icon in icons" :key="icon" class="mx-3 white--text" icon>
+            <v-icon size="24px">
+              {{ icon }}
+            </v-icon>
+          </v-btn>
+        </v-card-text>
+        <v-divider />
+        <v-card-text class="white--text">
+          <span>&copy; 2016 - {{ new Date().getFullYear() }}</span>
+        </v-card-text>
+      </v-card>
     </v-footer>
   </v-app>
 </template>
@@ -106,6 +119,7 @@ export default {
           to: '/inspire'
         }
       ],
+      icons: ['fab fa-github', 'fab fa-twitter'],
       miniVariant: false,
       right: true,
       rightDrawer: false,
