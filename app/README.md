@@ -1,6 +1,6 @@
 # skopeui
 
-> UI for the OpenSKOPE project (https://www.openskope.org)
+> SkopeUI v2 with VueJS, Nuxt, and Vuetify
 
 ## Build Setup
 
