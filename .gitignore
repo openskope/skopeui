@@ -1,3 +1,6 @@
+# backups
+*~
+docker-compose.yml
 # Logs
 logs
 *.log
