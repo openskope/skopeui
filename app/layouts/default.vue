@@ -9,7 +9,7 @@
     >
       <v-list>
         <v-list-tile
-          v-for="(item, i) in items"
+          v-for="(item, i) in navDrawItems"
           :key="i"
           :to="item.to"
           router
@@ -57,7 +57,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <v-container>
+      <v-container max-width="1200px">
         <nuxt />
       </v-container>
     </v-content>
@@ -107,15 +107,15 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      items: [
+      navDrawItems: [
         {
           icon: 'apps',
-          title: 'Welcome',
+          title: 'Discover',
           to: '/'
         },
         {
           icon: 'bubble_chart',
-          title: 'Inspire',
+          title: 'Models',
           to: '/inspire'
         }
       ],
@@ -123,7 +123,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'SKOPE'
     }
   }
 }
