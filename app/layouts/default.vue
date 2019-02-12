@@ -57,7 +57,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <v-container max-width="1200px">
+      <v-container fluid>
         <nuxt />
       </v-container>
     </v-content>
