@@ -8,9 +8,9 @@
     <v-flex xs9>
       <div class="pr-3">
         <h2>
-          <a class="pink accent-1" :href="url">
+          <nuxt-link class="pink accent-1" :to="url">
             {{ title }}
-          </a>
+          </nuxt-link>
         </h2>
         <p class="font-weight-light">
           {{ region.name }} at {{ region.resolution }}
