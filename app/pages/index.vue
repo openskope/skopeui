@@ -9,7 +9,7 @@
       sm8
       md6
     >
-      <v-card min-width='900px'>
+      <v-card min-width="900px">
         <v-toolbar color="cyan" dark>
           <v-toolbar-side-icon />
           <v-toolbar-title>Datasets</v-toolbar-title>
@@ -25,6 +25,8 @@
             router
             exact
           >
+            <dataset :key="dataset.id" v-bind="dataset" />
+          <!--
             <v-list-tile :key="dataset.title">
               <v-list-tile-content>
                 <v-list-tile-title v-html="dataset.title" />
@@ -39,6 +41,7 @@
                 Continue
               </v-btn>
             </v-list-tile>
+          -->
           </template>
         </v-list>
       </v-card>
@@ -47,6 +50,7 @@
 </template>
 
 <script>
+import Dataset from '~/components/Dataset.vue'
 /*
 import Logo from '~/components/Logo.vue'
 import VuetifyLogo from '~/components/VuetifyLogo.vue'
@@ -59,21 +63,27 @@ export default {
 }
 */
 export default {
+  components: {
+    Dataset
+  },
   data() {
     return {
       datasets: [
         {
           title: 'LBDA V2',
+          id: '1',
           description: 'A recalibrated reconstruction.',
           to: '/datasets/lbda'
         },
         {
           title: 'SRTM',
+          id: '2',
           description: 'Digital elevation data',
           to: '/datasets/srtm'
         },
         {
           title: 'PaleoCAR',
+          id: '1',
           description: 'High spatial resolution',
           to: '/datasets/paleocar'
         }
