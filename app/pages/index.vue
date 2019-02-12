@@ -73,6 +73,7 @@ export default {
               lte: '2017'
             }
           },
+          variables: [],
           url: '/datasets/lbda'
         },
         {
