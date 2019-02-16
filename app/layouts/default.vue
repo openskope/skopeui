@@ -82,8 +82,9 @@
       light
       height="auto"
       app
+      absolute
     >
-      <v-card flat tile class="indigo lighten-1 white--text text-xs-center">
+      <v-card flat tile class="flex indigo lighten-1 white--text text-xs-center">
         <v-card-text>
           <v-btn v-for="icon in icons" :key="icon" class="mx-3 white--text" icon>
             <v-icon size="24px">
@@ -93,7 +94,7 @@
         </v-card-text>
         <v-divider />
         <v-card-text class="white--text">
-          <span>&copy; 2016 - {{ new Date().getFullYear() }}</span>
+          <div>&copy; 2016 - {{ new Date().getFullYear() }}</div>
         </v-card-text>
       </v-card>
     </v-footer>
