@@ -18,18 +18,18 @@
           {{ timespan.name }}
         </p>
         <vue-markdown>{{ description }}</vue-markdown>
-        <div>
+        <div v-if="variables.length > 0">
           <h3>Variables</h3>
-          <ul v-if="variables.length > 0">
+          <ul>
             <li v-for="variable in variables" :key="variable.name">
               {{ variable.name }}
             </li>
           </ul>
-          <div v-else>
-            <v-alert :value="true" type="info">
-              No variables defined
-            </v-alert>
-          </div>
+        </div>
+        <div v-else>
+          <v-alert :value="true" type="info">
+            No variables defined
+          </v-alert>
         </div>
       </div>
     </v-flex>
