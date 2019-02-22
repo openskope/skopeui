@@ -24,7 +24,7 @@
               router
               exact
             >
-              <dataset :key="dataset.id" v-bind="dataset" />
+              <Dataset :key="dataset.id" v-bind="dataset" />
             </template>
           </v-list>
         </v-responsive>
