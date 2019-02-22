@@ -1,6 +1,5 @@
 // state function returns objet
 export const state = () => ({
-
   // datasets array
   all: [
     {
@@ -101,3 +100,9 @@ export const state = () => ({
     }
   ]
 })
+
+export const getters = {
+  datasets: state => {
+    return state.all
+  }
+}
