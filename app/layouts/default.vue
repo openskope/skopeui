@@ -7,22 +7,95 @@
       fixed
       app
     >
-      <v-list>
-        <v-list-tile
-          v-for="(item, i) in navDrawItems"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
+      <v-toolbar flat class="transparent">
+        <v-list>
           <v-list-tile-content>
-            <v-list-tile-title v-text="item.title" />
+            <v-layout row>
+              <v-flex shrink style="width: 45px">
+                <v-text-field
+                  v-model="value3[0]"
+                  hide-details
+                  type="number"
+                />
+              </v-flex>
+
+              <v-flex style="width: 175px">
+                <v-range-slider
+                  v-model="value3[0]"
+                  :max="600"
+                  :min="20"
+                  :step="1"
+                />
+              </v-flex>
+
+              <v-flex shrink style="width: 45px">
+                <v-text-field
+                  v-model="value3[1]"
+                  hide-details
+                  type="number"
+                />
+              </v-flex>
+            </v-layout>
           </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+
+          <v-divider />
+
+          <v-list-tile-content>
+            <v-list-tile-title>Variables</v-list-tile-title>
+          </v-list-tile-content>
+
+          <v-list-tile avatar @click="toggle('variable1')">
+            <v-list-tile-action>
+              <v-checkbox
+                v-model="checkedVariables['variable1']"
+                :label="`Variable 1`"
+              />
+            </v-list-tile-action>
+          </v-list-tile>
+
+          <v-list-tile avatar @click="toggle('variable2')">
+            <v-list-tile-action>
+              <v-checkbox
+                v-model="checkedVariables['variable2']"
+                :label="`Variable 2`"
+              />
+            </v-list-tile-action>
+          </v-list-tile>
+
+          <v-list-tile avatar @click="toggle('variable3')">
+            <v-list-tile-action>
+              <v-checkbox
+                v-model="checkedVariables['variable3']"
+                :label="`Variable 3`"
+              />
+            </v-list-tile-action>
+          </v-list-tile>
+
+          <v-list-tile avatar @click="toggle('variable4')">
+            <v-list-tile-action>
+              <v-checkbox
+                v-model="checkedVariables['variable4']"
+                :label="`Variable 4`"
+              />
+            </v-list-tile-action>
+          </v-list-tile>
+
+          <v-divider />
+
+          <v-list-tile-content>
+            <v-list-tile-title>Radio Selections</v-list-tile-title>
+          </v-list-tile-content>
+
+          <v-radio-group v-model="radioGroup">
+            <v-radio
+              v-for="n in 4"
+              :key="n"
+              :label="`Radio ${n}`"
+              :value="n"
+            />
+          </v-radio-group>
+        </v-list>
+      </v-toolbar>
     </v-navigation-drawer>
     <v-toolbar
       :clipped-left="clipped"
@@ -30,54 +103,22 @@
       app
     >
       <v-toolbar-side-icon @click="drawer = !drawer" />
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
-      >
-        <v-icon>{{ `chevron_${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="clipped = !clipped"
-      >
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>remove</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>menu</v-icon>
-      </v-btn>
+      <v-toolbar-title>SKOPE</v-toolbar-title>
+      <v-spacer />
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-btn flat to="/">
+          Datasets
+        </v-btn>
+        <v-btn flat to="/inspire">
+          Interactive Map
+        </v-btn>
+      </v-toolbar-items>
     </v-toolbar>
     <v-content>
       <v-container fluid>
         <nuxt />
       </v-container>
     </v-content>
-    <v-navigation-drawer
-      v-model="rightDrawer"
-      :right="right"
-      temporary
-      fixed
-    >
-      <v-list>
-        <v-list-tile @click.native="right = !right">
-          <v-list-tile-action>
-            <v-icon light>
-              compare_arrows
-            </v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
     <v-footer
       light
       height="auto"
@@ -111,12 +152,12 @@ export default {
       navDrawItems: [
         {
           icon: 'apps',
-          title: 'Discover',
+          title: 'Datasets',
           to: '/'
         },
         {
-          icon: 'bubble_chart',
-          title: 'Models',
+          icon: 'my_location',
+          title: 'Map',
           to: '/inspire'
         }
       ],
@@ -124,7 +165,16 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'SKOPE'
+      title: 'SKOPE',
+      value3: [1, 440],
+      checkedVariables: ['variable1', 'variable2', 'variable3', 'variable4'],
+      radioGroup: 1
+    }
+  },
+
+  methods: {
+    toggle: function(name) {
+      this.checkVariables[name] = !this.checkedVariables[name]
     }
   }
 }

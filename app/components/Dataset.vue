@@ -52,7 +52,7 @@ import Component from 'vue-class-component'
 import VueMarkdown from 'vue-markdown'
 // import L from 'vue2-leaflet'
 
-let leaflet1
+var leaflet1 // eslint-disable-line
 
 @Component({
   props: {

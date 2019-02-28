@@ -1,19 +1,17 @@
 <template>
   <v-layout>
     <v-flex text-xs-center>
-      <img
-        src="/v.png"
-        alt="Vuetify.js"
-        class="mb-5"
-      >
-      <blockquote class="blockquote">
-        &#8220;First, solve the problem. Then, write the code.&#8221;
-        <footer>
-          <small>
-            <em>&mdash;John Johnson</em>
-          </small>
-        </footer>
-      </blockquote>
+      <div style="height: 600px">
+        <no-ssr>
+          <l-map
+            :zoom="4"
+            :min-zoom="4"
+            :center="[38.63,-90.23]"
+          >
+            <l-tile-layer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" :draggable="false" />
+          </l-map>
+        </no-ssr>
+      </div>
     </v-flex>
   </v-layout>
 </template>
