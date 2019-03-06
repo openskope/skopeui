@@ -2,7 +2,7 @@
   <aside class="main-sidebar">
     <section class="sidebar">
       <div class="title-panel">
-        <p>SKOPE </p>
+        <p>SKOPE</p>
       </div>
 
       <!-- search form -->
@@ -25,13 +25,19 @@
         </div>
       </form>
       <!-- end search form -->
+      <!-- sidebar sort -->
+      <side-bar-sort />
+      <!-- end sidebar sort -->
     </section>
   </aside>
 </template>
 
 <script>
+import SideBarSort from './SideBarSort'
+
 export default {
-  name: 'SideBar'
+  name: 'SideBar',
+  components: { SideBarSort }
 }
 </script>
 
