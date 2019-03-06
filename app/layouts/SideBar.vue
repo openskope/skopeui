@@ -6,34 +6,34 @@
       </div>
 
       <!-- search form -->
-      <form v-on:submit.prevent class="sidebar-form" id="searchForm">
-        <div class="input-group" id="searchContainer">
-      <span class="input-group-btn">
-        <input type="text"
-               name="search"
-               id="search"
-               class="search form-control"
-               data-toggle="hideseek"
-               placeholder="Search datatsets"
-               data-list=".sidebar-menu">
-        <button type="submit" name="search" id="search-btn" class="btn btn-flat">
-          <i class="fa fa-search"></i>
-        </button>
-      </span>
+      <form id="searchForm" class="sidebar-form" @submit.prevent>
+        <div id="searchContainer" class="input-group">
+          <span class="input-group-btn">
+            <input
+              id="search"
+              type="text"
+              name="search"
+              class="search form-control"
+              data-toggle="hideseek"
+              placeholder="Search datatsets"
+              data-list=".sidebar-menu"
+            >
+            <button id="search-btn" type="submit" name="search" class="btn btn-flat">
+              <i class="fa fa-search" />
+            </button>
+          </span>
         </div>
       </form>
       <!-- end search form -->
-
     </section>
   </aside>
 </template>
 
 <script>
-  export default {
-    name: "SideBar"
-  }
+export default {
+  name: 'SideBar'
+}
 </script>
 
 <style scoped>
-
 </style>
