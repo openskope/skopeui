@@ -1,0 +1,33 @@
+<template>
+  <v-toolbar
+    :clipped-left="clipped"
+    app
+    fixed
+  >
+    <v-toolbar-side-icon @click="drawer = !drawer" />
+    <v-toolbar-title>SKOPE</v-toolbar-title>
+    <v-spacer />
+    <v-toolbar-items class="hidden-sm-and-down">
+      <v-btn flat to="/">
+        Datasets
+      </v-btn>
+      <v-btn flat to="/inspire">
+        Interactive Map
+      </v-btn>
+    </v-toolbar-items>
+  </v-toolbar>
+  <v-content>
+    <v-container fluid>
+      <nuxt />
+    </v-container>
+  </v-content>
+</template>
+<script>
+    export default {
+        name: "Header"
+    }
+</script>
+
+<style scoped>
+
+</style>

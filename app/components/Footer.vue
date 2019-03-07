@@ -1,4 +1,5 @@
 <template>
+  <!-- footer -->
   <v-footer
     light
     height="auto"
@@ -19,6 +20,7 @@
       </v-card-text>
     </v-card>
   </v-footer>
+  <!-- end footer -->
 </template>
 
 <script>
