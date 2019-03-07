@@ -16,18 +16,12 @@
       </v-btn>
     </v-toolbar-items>
   </v-toolbar>
-  <v-content>
-    <v-container fluid>
-      <nuxt />
-    </v-container>
-  </v-content>
 </template>
 <script>
-    export default {
-        name: "Header"
-    }
+export default {
+  name: 'Header'
+}
 </script>
 
 <style scoped>
-
 </style>
