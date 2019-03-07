@@ -1,7 +1,5 @@
 <template>
-  <v-list>
-
-  </v-list>
+  <v-list />
 </template>
 <script>
 export default {
