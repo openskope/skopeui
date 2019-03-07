@@ -1,6 +1,9 @@
 # backups
 *~
+# docker generated things
+secrets/
 docker-compose.yml
+docker/
 # Logs
 logs
 *.log

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+inv -r /code pgpass 2> /dev/null;

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Convenience script for creating local docker-compose
+DOCKER_COMPOSE_ENV=${1:-dev} # prod | staging | dev
+
+case "${DOCKER_COMPOSE_ENV}" in
+    prod)
+        docker-compose -f base.yml -f staging.yml -f ${DOCKER_COMPOSE_ENV}.yml config > docker-compose.yml
+        ;;
+    staging)
+        docker-compose -f base.yml -f staging.yml config > docker-compose.yml
+        ;;
+    dev)
+        docker-compose -f base.yml -f dev.yml config > docker-compose.yml
+        ;;
+    *)
+        echo $"Usage: $0 {dev|staging|prod}, invalid environment given: ${DOCKER_COMPOSE_ENV}"
+        exit 1
+esac

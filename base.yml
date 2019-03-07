@@ -1,0 +1,24 @@
+version: '3'
+services:
+  web:
+    build: app
+    image: comses/skopeui/dev:latest
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./app:/code
+      - /code/node_modules
+  django:
+    build: django
+    depends_on:
+      - db
+    volumes:
+      - ./secrets:/run/secrets
+  db:
+    image: comses/postgis:10
+    volumes:
+      - ./docker/shared/pgdata:/var/lib/postgresql/data
+      - ./secrets:/run/secrets
+    environment:
+      POSTGRES_PASSWORD_FILE: "/run/secrets/postgres-passwd"
+      POSTGRES_DB: "skope"

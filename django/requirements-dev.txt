@@ -1,0 +1,8 @@
+-r requirements.txt
+# dev requirements
+coverage
+coveralls
+django-debug-toolbar
+django-debug-toolbar-request-history
+django-fixture-magic
+pgcli
