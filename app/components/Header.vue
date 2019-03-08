@@ -19,7 +19,14 @@
 </template>
 <script>
 export default {
-  name: 'Header'
+  name: 'Header',
+  data() {
+    return {
+      clipped: false,
+      drawer: false,
+      fixed: false
+    }
+  }
 }
 </script>
 

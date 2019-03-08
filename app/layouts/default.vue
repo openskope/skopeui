@@ -18,42 +18,12 @@ import SideBar from '../components/SideBar'
 import Footer from '../components/Footer'
 
 export default {
+  name: 'SKOPE',
+  title: 'SKOPE',
   components: {
     Header,
     SideBar,
     Footer
-  },
-  data() {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      navDrawItems: [
-        {
-          icon: 'apps',
-          title: 'Datasets',
-          to: '/'
-        },
-        {
-          icon: 'my_location',
-          title: 'Map',
-          to: '/inspire'
-        }
-      ],
-      icons: ['fab fa-github', 'fab fa-twitter'],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'SKOPE',
-      value3: [1, 440],
-      checkedVariables: ['variable1', 'variable2', 'variable3', 'variable4'],
-      radioGroup: 1
-    }
-  },
-  methods: {
-    toggle: function(name) {
-      this.checkVariables[name] = !this.checkedVariables[name]
-    }
   }
 }
 </script>
