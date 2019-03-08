@@ -1,10 +1,13 @@
 <template>
-  <aside class="main-sidebar">
+  <v-navigation-drawer
+    fixed
+    v-model="drawer"
+    app
+  >
     <section class="sidebar">
       <div class="title-panel">
         <p>SKOPE</p>
       </div>
-
       <!-- search form -->
       <form id="searchForm" class="sidebar-form" @submit.prevent>
         <div id="searchContainer" class="input-group">
@@ -26,20 +29,34 @@
       </form>
       <!-- end search form -->
       <!-- sidebar sort -->
-      <side-bar-sort />
       <!-- end sidebar sort -->
     </section>
-  </aside>
+  </v-navigation-drawer>
 </template>
 
 <script>
-import SideBarSort from './SideBarSort'
-
 export default {
-  name: 'SideBar',
-  components: { SideBarSort }
+  name: 'SideBar'
 }
 </script>
 
 <style scoped>
+#searchForm {
+  padding-left: 0em;
+  padding-right: 0em;
+}
+
+#searchContainer {
+  height: 100%;
+  padding-bottom: 0em;
+}
+
+#search {
+  width: 80%;
+  float: right;
+}
+
+#search-btn {
+  width: 20%;
+}
 </style>
