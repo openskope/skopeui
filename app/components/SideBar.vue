@@ -25,15 +25,22 @@
         </div>
       </form>
       <!-- end search form -->
+      <v-spacer />
       <!-- sidebar sort -->
+      <side-bar-sort />
       <!-- end sidebar sort -->
     </section>
   </v-navigation-drawer>
 </template>
 
 <script>
+import SideBarSort from '../components/SideBarSort'
+
 export default {
-  name: 'SideBar'
+  name: 'SideBar',
+  components: {
+    SideBarSort
+  }
 }
 </script>
 

@@ -4,7 +4,6 @@
     app
     fixed
   >
-    <v-toolbar-side-icon @click="drawer = !drawer" />
     <v-toolbar-title>SKOPE</v-toolbar-title>
     <v-spacer />
     <v-toolbar-items class="hidden-sm-and-down">
@@ -29,6 +28,5 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 </style>
