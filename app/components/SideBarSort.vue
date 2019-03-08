@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <ul
+    <v-list
+      dense
+      :class="{fix: fix, closer: closer}"
       v-for="variable in variables"
       :key="variable">
       <v-checkbox
@@ -8,10 +10,12 @@
         value="variable.name"
         :label="variable.name"
       />
-    </ul>
+    </v-list>
+    <!-- spacing between sorting methods -->
     <v-spacer />
     <v-divider />
     <v-spacer />
+    <!-- end spacing between sorting methods -->
     <v-radio-group v-model="radioSelect">
       <v-radio
         v-for="i in 5"
@@ -20,9 +24,11 @@
         :value="i"
       />
     </v-radio-group>
+    <!-- spacing between sorting methods -->
     <v-spacer />
     <v-divider />
     <v-spacer />
+    <!-- end spacing between sorting methods -->
   </div>
 </template>
 <script>
