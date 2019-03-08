@@ -5,9 +5,6 @@
     app
   >
     <section class="sidebar">
-      <div class="title-panel">
-        <p>SKOPE</p>
-      </div>
       <!-- search form -->
       <form id="searchForm" class="sidebar-form" @submit.prevent>
         <div id="searchContainer" class="input-group">
