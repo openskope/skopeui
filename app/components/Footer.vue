@@ -28,7 +28,8 @@ export default {
   name: 'Footer',
   data() {
     return {
-      year: new Date().getFullYear()
+      year: new Date().getFullYear(),
+      icons: ['fab fa-github', 'fab fa-twitter']
     }
   }
 }
