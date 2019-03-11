@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-<<<<<<< HEAD
+    <v-subheader>Range Slider</v-subheader>
     <v-layout row>
       <v-flex
         shrink
@@ -14,12 +14,13 @@
           type="number"
         />
       </v-flex>
+      <v-spacer />
       <v-flex class="px-3">
         <v-range-slider
           v-model="bounds"
           :max="2019"
           :min="1"
-          :step="1"
+          :step="20"
         />
       </v-flex>
       <v-flex>
@@ -32,13 +33,14 @@
         />
       </v-flex>
     </v-layout>
-=======
->>>>>>> origin/master
+    <v-spacer />
+    <v-subheader>Variables</v-subheader>
     <v-list
       dense
       :class="{fix: fix, closer: closer}"
       v-for="variable in variables"
-      :key="variable">
+      :key="variable"
+    >
       <v-checkbox
         v-model="variable.checked"
         value="variable.name"
@@ -50,6 +52,7 @@
     <v-divider />
     <v-spacer />
     <!-- end spacing between sorting methods -->
+    <v-subheader>Radio Button</v-subheader>
     <v-radio-group v-model="radioSelect">
       <v-radio
         v-for="i in 5"
