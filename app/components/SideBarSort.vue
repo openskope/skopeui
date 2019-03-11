@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+<<<<<<< HEAD
     <v-layout row>
       <v-flex
         shrink
@@ -31,6 +32,8 @@
         />
       </v-flex>
     </v-layout>
+=======
+>>>>>>> origin/master
     <v-list
       dense
       :class="{fix: fix, closer: closer}"
