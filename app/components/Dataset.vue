@@ -6,11 +6,18 @@
           <l-map
             :min-zoom="13"
             :max-zoom="13"
-            :zoom="13"
-            :center="[38.63,-90.23]"
+            :zoom="zoom"
+            :center="center"
           >
-            <l-tile-layer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" :draggable="false" />
-            <l-marker :lat-lng="[47.413220, -1.219482]" />
+            <l-control-layers />
+            <l-lwms-tile-layer 
+              v-for="layer in layers"
+              :key="layer.name"
+              :base-url="baseUrl" 
+              :draggable="false" 
+              :visible="layer.visible"
+              :name="layer.name"
+            />
           </l-map>
         </no-ssr>
       </div>
@@ -18,7 +25,7 @@
     <v-flex xs9>
       <div class="pr-3">
         <h2>
-          <nuxt-link :to="url">
+          <nuxt-link :to="absolute_url">
             {{ title }}
           </nuxt-link>
         </h2>
@@ -50,9 +57,6 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import VueMarkdown from 'vue-markdown'
-// import L from 'vue2-leaflet'
-
-var leaflet1 // eslint-disable-line
 
 @Component({
   props: {
@@ -64,7 +68,7 @@ var leaflet1 // eslint-disable-line
     description: String,
     variables: Array,
     id: String,
-    url: String,
+    absolute_url: String,
     lowerBound: Object,
     upperBound: Object
   },
@@ -72,20 +76,30 @@ var leaflet1 // eslint-disable-line
   // data properties
   data() {
     return {
-      map: null,
-      titleLayer: null,
-      layers: []
+      zoom: 4,
+      center: [35, -105], // FIXME: needs to be updated dynamically
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      baseUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
+      layers: [
+        {
+          name: 'PaleoCAR PPT',
+          visible: true,
+          layers: 'SKOPE:paleocar_ppt_0001-01-01',
+          transparent: true,
+          overlay: true
+        },
+        {
+          name: 'PaleoCAR GDD',
+          visible: true,
+          transparent: true,
+          overlay: true,
+          layers: 'SKOPE:paleocar_gdd_0001-01-01'
+        }
+      ]
     }
   },
   // when app is mounted
-  mounted() {
-    //
-    this.$nextTick(() => {
-      // leaflet1 = this.$L
-      console.log(leaflet1) // eslint-disable-line
-    })
-    // console.alert('done here')
-  },
+  mounted() {},
   // app specific functions
   methods: {
     initMap() {
@@ -101,13 +115,6 @@ var leaflet1 // eslint-disable-line
       // this.tileLayer.addTo(this.map)
     },
     initLayers() {}
-  },
-  computed: {
-    dataset() {
-      // accesses store, navigates to state, goes to datasets module, get all datasets
-      // that live in "all" property
-      return this.$store.state.datasets.all
-    }
   }
 })
 export default class Dataset extends Vue {}
