@@ -1,7 +1,6 @@
 <template>
   <v-navigation-drawer
     fixed
-    v-model="drawer"
     app
   >
     <section class="sidebar">
@@ -38,6 +37,13 @@ import SideBarSort from '../components/SideBarSort'
 
 export default {
   name: 'SideBar',
+  data() {
+    return {
+      clipped: false,
+      drawer: false,
+      fixed: false
+    }
+  },
   components: {
     SideBarSort
   }
