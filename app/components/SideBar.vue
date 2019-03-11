@@ -37,15 +37,15 @@ import SideBarSort from '../components/SideBarSort'
 
 export default {
   name: 'SideBar',
+  components: {
+    SideBarSort
+  },
   data() {
     return {
       clipped: false,
       drawer: false,
       fixed: false
     }
-  },
-  components: {
-    SideBarSort
   }
 }
 </script>

@@ -36,10 +36,10 @@
     <v-spacer />
     <v-subheader>Variables</v-subheader>
     <v-list
-      dense
-      :class="{fix: fix, closer: closer}"
       v-for="variable in variables"
       :key="variable"
+      dense
+      :class="{fix: fix, closer: closer}"
     >
       <v-checkbox
         v-model="variable.checked"
