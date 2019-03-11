@@ -3,11 +3,13 @@
     <v-app light />
     <Header />
     <side-bar />
-    <v-content>
-      <v-container fluid>
-        <nuxt />
-      </v-container>
-    </v-content>
+    <div>
+      <v-content>
+        <v-container fluid>
+          <nuxt />
+        </v-container>
+      </v-content>
+    </div>
     <Footer />
   </div>
 </template>
