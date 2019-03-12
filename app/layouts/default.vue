@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <v-app light />
+  <v-app light>
     <Header />
     <side-bar />
     <div>
@@ -11,7 +10,7 @@
       </v-content>
     </div>
     <Footer />
-  </div>
+  </v-app>
 </template>
 
 <script>
