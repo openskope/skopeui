@@ -36,10 +36,9 @@
     <v-spacer />
     <v-subheader>Variables</v-subheader>
     <v-list
-      v-for="variable in variables"
-      :key="variable"
+      v-for="variable of variables"
+      :key="variable.name"
       dense
-      :class="{fix: fix, closer: closer}"
     >
       <v-checkbox
         v-model="variable.checked"
@@ -57,7 +56,7 @@
       <v-radio
         v-for="i in 5"
         :key="i"
-        :label="`Radio ${ i } `"
+        :label="`Radio ${ i }`"
         :value="i"
       />
     </v-radio-group>
