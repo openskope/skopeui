@@ -1,7 +1,7 @@
 <template>
   <v-layout class="pb-3" row justify-around>
     <v-flex xs3>
-      <div style="height: 100%">
+      <div id="mapStyle">
         <no-ssr>
           <l-map
             :min-zoom="13"
@@ -119,3 +119,11 @@ import VueMarkdown from 'vue-markdown'
 })
 export default class Dataset extends Vue {}
 </script>
+
+<style>
+#mapStyle {
+  height: 100%;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+</style>
