@@ -7,8 +7,8 @@
         style="width: 60px"
       >
         <v-text-field
+          style="width: 50px"
           v-model="bounds[0]"
-          class="mt-0"
           hide-details
           single-line
           type="number"
@@ -20,13 +20,12 @@
           v-model="bounds"
           :max="2019"
           :min="1"
-          :step="20"
+          :step="1"
         />
       </v-flex>
       <v-flex>
         <v-text-field
           v-model="bounds[1]"
-          class="mt-0"
           hide-details
           single-line
           type="number"
