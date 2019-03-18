@@ -1,15 +1,16 @@
 <template>
-  <v-layout class="pb-3" row justify-around>
-    <v-flex xs3>
-      <div id="mapStyle">
+  <v-layout pa-3 mb-2 align-start justify-center>
+    <v-flex xs4>
+      <div class="map">
         <no-ssr>
           <l-map
-            :min-zoom="13"
-            :max-zoom="13"
             :zoom="zoom"
             :center="center"
+            style="height: 90%"
           >
             <l-control-layers />
+            <l-tile-layer :url="url" />
+          <!--
             <l-lwms-tile-layer 
               v-for="layer in layers"
               :key="layer.name"
@@ -18,11 +19,12 @@
               :visible="layer.visible"
               :name="layer.name"
             />
+          -->
           </l-map>
         </no-ssr>
       </div>
     </v-flex>
-    <v-flex xs9>
+    <v-flex xs8>
       <div class="pr-3">
         <h2>
           <nuxt-link :to="absolute_url">
@@ -119,11 +121,10 @@ import VueMarkdown from 'vue-markdown'
 })
 export default class Dataset extends Vue {}
 </script>
-
 <style>
-#mapStyle {
+.map {
   height: 100%;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-right: 1em;
+  margin-left: 1em;
 }
 </style>

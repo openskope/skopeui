@@ -7,8 +7,8 @@
         style="width: 60px"
       >
         <v-text-field
-          style="width: 50px"
           v-model="bounds[0]"
+          style="width: 50px"
           hide-details
           single-line
           type="number"

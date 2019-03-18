@@ -41,7 +41,10 @@ module.exports = {
   /*
   ** Plugins to load before mounting the App
   */
-  plugins: ['@/plugins/vuetify'],
+  plugins: [
+    '@/plugins/vuetify',
+    { src: '~/plugins/nuxt-leaflet.js', ssr: false }
+  ],
 
   /*
   ** Nuxt.js modules
@@ -49,8 +52,7 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/pwa',
-    'nuxt-leaflet'
+    '@nuxtjs/pwa'
   ],
   /*
   ** Axios module configuration
