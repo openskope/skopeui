@@ -29,7 +29,8 @@ export const mutations = {
         region: {
           resolution: '.5 degree',
           name: 'Continental U.S. at .5 degree',
-          extents: [-124.5, 24, -67, 49]
+          style: { color: 'blue', weight: 2 },
+          extents: [[49, -124.5], [24, -67]]
         },
         timespan: {
           name: '1-2017CE annually',
@@ -58,7 +59,8 @@ export const mutations = {
         region: {
           resolution: '250m',
           name: 'Continental US at 250m',
-          extents: [-125, 25, -65, 50]
+          style: { color: 'gray', weight: 2 },
+          extents: [[50, -125], [25, -65]]
         },
         timespan: {
           name: 'version 4.1',
@@ -89,7 +91,8 @@ export const mutations = {
         region: {
           resolution: '800m',
           name: 'Southwestern USA at 800m',
-          extents: [-115, 31, -102, 43]
+          style: { color: 'red', weight: 1 },
+          extents: [[43, -115], [31, -102]]
         },
 
         timespan: {

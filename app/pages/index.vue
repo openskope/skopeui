@@ -20,12 +20,12 @@
           </v-card-title>
           <v-list>
             <template
-              v-for="dataset in datasets"
+              v-for="(dataset, index) in datasets"
               router
               exact
             >
               <Dataset :key="dataset.absolute_url" v-bind="dataset" />
-              <v-divider inset :key="dataset.absolute_url" />
+              <v-divider :key="index" inset />
             </template>
           </v-list>
         </v-responsive>

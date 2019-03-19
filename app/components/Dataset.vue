@@ -11,11 +11,13 @@
       <div class="map px-2">
         <no-ssr>
           <l-map
-            :min-zoom="4"
+            :min-zoom="2"
+            :max-zoom="8"
             :zoom="zoom"
             :center="center"
           >
             <l-tile-layer :url="url" />
+            <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
         </no-ssr>
       </div>
@@ -74,8 +76,8 @@ import VueMarkdown from 'vue-markdown'
   // data properties
   data() {
     return {
-      zoom: 4,
-      center: [35, -105], // FIXME: needs to be updated dynamically
+      zoom: 2,
+      center: [35, -105], // FIXME: should be generated dynamically
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       baseUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
       layers: [
