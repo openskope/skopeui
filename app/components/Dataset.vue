@@ -25,33 +25,34 @@
     <v-flex xs8>
       <div class="px-2">
         <v-card>
-          <v-card-title>
-            <h2 class='headline'>
+          <v-card-title class="pb-0">
+            <h2 class="headline">
               <nuxt-link :to="absolute_url" class="blue--text">
                 {{ title }}
               </nuxt-link>
             </h2>
-            <v-subheader class='subheading'>
-              {{ region.name }} at {{ region.resolution }}
-              |
-              {{ timespan.name }}
-            </v-subheader>
           </v-card-title>
-          <v-card-text>
-            <vue-markdown class='body'>{{ description }}</vue-markdown>
-            <div v-if="variables.length > 0">
-              <h3>Variables</h3>
-              <ul>
-                <li v-for="variable in variables" :key="variable.name">
-                  {{ variable.name }}
-                </li>
-              </ul>
-            </div>
-            <div v-else>
-              <v-alert :value="true" type="info">
-                No variables defined
-              </v-alert>
-            </div>
+          <v-subheader class="subheading">
+            {{ region.name }} at {{ region.resolution }}
+            |
+            {{ timespan.name }}
+          </v-subheader>
+          <v-card-text class="body">
+            <vue-markdown class="body">{{ description }}</vue-markdown>
+            <v-list dense light>
+              <v-subheader class="title">
+                Variables
+              </v-subheader>
+              <v-list-tile v-for="(variable, index) in variables" :key="index">
+                <v-list-tile-content>
+                  <v-list-tile-title>
+                    <v-chip small color="secondary">
+                      {{ variable.class }}
+                    </v-chip> {{ variable.name }}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
             <div class="py-3 citation">
               <em class="font-weight-bold">
                 Source:

@@ -30,7 +30,7 @@ export const mutations = {
           zoom: 2,
           center: [36.5, -95.75],
           resolution: '.5 degree',
-          name: 'Continental U.S. at .5 degree',
+          name: 'Continental USA',
           style: { color: 'blue', weight: 2 },
           extents: [[49, -124.5], [24, -67]]
         },
@@ -64,7 +64,7 @@ export const mutations = {
           zoom: 2,
           center: [37.5, -95],
           resolution: '250m',
-          name: 'Continental US at 250m',
+          name: 'Continental USA',
           style: { color: 'gray', weight: 2 },
           extents: [[50, -125], [25, -65]]
         },
@@ -99,7 +99,7 @@ export const mutations = {
           zoom: 4,
           center: [37, -108.5],
           resolution: '800m',
-          name: 'Southwestern USA at 800m',
+          name: 'Southwestern USA',
           style: { color: 'red', weight: 1 },
           extents: [[43, -115], [31, -102]]
         },
