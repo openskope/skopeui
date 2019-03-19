@@ -10,7 +10,7 @@
       <v-btn flat to="/">
         Datasets
       </v-btn>
-      <v-btn flat to="/inspire">
+      <v-btn flat to="/map">
         Interactive Map
       </v-btn>
     </v-toolbar-items>

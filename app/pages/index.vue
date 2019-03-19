@@ -25,6 +25,7 @@
               exact
             >
               <Dataset :key="dataset.absolute_url" v-bind="dataset" />
+              <v-divider inset :key="dataset.absolute_url" />
             </template>
           </v-list>
         </v-responsive>

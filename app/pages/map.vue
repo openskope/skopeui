@@ -4,7 +4,7 @@
       <div style="height: 600px">
         <no-ssr>
           <l-map
-            :center="[38.63,-90.23]"
+            :center="[35,-105]"
             :min-zoom="4"
             :zoom="4"
           >

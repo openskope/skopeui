@@ -1,31 +1,27 @@
 <template>
-  <v-layout pa-3 mb-2 align-start justify-center>
+  <v-layout
+    row
+    pa-2
+    mb-2 
+    align-content-start 
+    justify-space-around 
+    fill-height
+  >
     <v-flex xs4>
-      <div class="map">
+      <div class="map px-2">
         <no-ssr>
           <l-map
+            :min-zoom="4"
             :zoom="zoom"
             :center="center"
-            style="height: 90%"
           >
-            <l-control-layers />
             <l-tile-layer :url="url" />
-          <!--
-            <l-lwms-tile-layer 
-              v-for="layer in layers"
-              :key="layer.name"
-              :base-url="baseUrl" 
-              :draggable="false" 
-              :visible="layer.visible"
-              :name="layer.name"
-            />
-          -->
           </l-map>
         </no-ssr>
       </div>
     </v-flex>
     <v-flex xs8>
-      <div class="pr-3">
+      <div class="px-2">
         <h2>
           <nuxt-link :to="absolute_url">
             {{ title }}
@@ -124,7 +120,5 @@ export default class Dataset extends Vue {}
 <style>
 .map {
   height: 100%;
-  margin-right: 1em;
-  margin-left: 1em;
 }
 </style>
