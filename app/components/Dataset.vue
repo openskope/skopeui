@@ -24,30 +24,43 @@
     </v-flex>
     <v-flex xs8>
       <div class="px-2">
-        <h2>
-          <nuxt-link :to="absolute_url">
-            {{ title }}
-          </nuxt-link>
-        </h2>
-        <p class="font-weight-light">
-          {{ region.name }} at {{ region.resolution }}
-          |
-          {{ timespan.name }}
-        </p>
-        <vue-markdown>{{ description }}</vue-markdown>
-        <div v-if="variables.length > 0">
-          <h3>Variables</h3>
-          <ul>
-            <li v-for="variable in variables" :key="variable.name">
-              {{ variable.name }}
-            </li>
-          </ul>
-        </div>
-        <div v-else>
-          <v-alert :value="true" type="info">
-            No variables defined
-          </v-alert>
-        </div>
+        <v-card>
+          <v-card-title>
+            <h2 class='headline'>
+              <nuxt-link :to="absolute_url" class="blue--text">
+                {{ title }}
+              </nuxt-link>
+            </h2>
+            <v-subheader class='subheading'>
+              {{ region.name }} at {{ region.resolution }}
+              |
+              {{ timespan.name }}
+            </v-subheader>
+          </v-card-title>
+          <v-card-text>
+            <vue-markdown class='body'>{{ description }}</vue-markdown>
+            <div v-if="variables.length > 0">
+              <h3>Variables</h3>
+              <ul>
+                <li v-for="variable in variables" :key="variable.name">
+                  {{ variable.name }}
+                </li>
+              </ul>
+            </div>
+            <div v-else>
+              <v-alert :value="true" type="info">
+                No variables defined
+              </v-alert>
+            </div>
+            <div class="py-3 citation">
+              <em class="font-weight-bold">
+                Source:
+              </em> <nuxt-link class="font-weight-thin" :to="source_url">
+                {{ source_url }}
+              </nuxt-link>
+            </div>
+          </v-card-text>
+        </v-card>
       </div>
     </v-flex>
   </v-layout>
@@ -69,8 +82,7 @@ import VueMarkdown from 'vue-markdown'
     variables: Array,
     id: String,
     absolute_url: String,
-    lowerBound: Object,
-    upperBound: Object
+    source_url: String
   },
   components: { VueMarkdown },
   // data properties

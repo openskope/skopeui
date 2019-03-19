@@ -48,13 +48,15 @@ export const mutations = {
             name: 'Palmer Modified Drought Index'
           }
         ],
-        absolute_url: '/datasets/lbda'
+        absolute_url: '/datasets/lbda',
+        source_url: 'https://www.ncdc.noaa.gov/paleo-search/study/22454'
       },
       {
-        title: 'SRTM',
+        title: 'SRTM 90m Digital Elevation Model V4.1',
         description:
           'Digital elevation data at 3 arc second (approx. 90m) horizontal resolution and less than 16m vertical resolution. The data are provided by the NASA Shuttle Radar Topographic Mission (SRTM) and the International Centre for Tropical Agriculture (CIAT), and are currently distributed free of charge by USGS and available for download through CGIAR at http://srtm.csi.cgiar.org/.',
         absolute_url: '/datasets/srtm',
+        source_url: 'http://srtm.csi.cgiar.org',
         type: 'dataset',
         status: 'Published',
         revised: '2009-06-14',
@@ -82,12 +84,13 @@ export const mutations = {
         ]
       },
       {
-        title: 'PaleoCAR',
+        title: 'PaleoCAR: SW USA Paleoclimatic Reconstruction',
         description:
           'High spatial resolution (30 arc-second, ~800 m) Southwestern United States tree-ring reconstructions of ' +
           ' May-Sept growing degree days (GDD), net water-year precipitation (previous Oct–Sept), and the direct precipitation maize ' +
           ' farming niche (>= 1800 growing Season F GDD & >= 300 mm water-year precipitation).',
         absolute_url: '/datasets/paleocar',
+        source_url: 'https://www.ncdc.noaa.gov/paleo/study/19783',
         type: 'dataset',
         status: 'Published',
         revised: '2016-04-01',
