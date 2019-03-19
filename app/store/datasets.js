@@ -27,6 +27,8 @@ export const mutations = {
         status: 'Published',
         revised: '2017-08-03',
         region: {
+          zoom: 2,
+          center: [36.5, -95.75],
           resolution: '.5 degree',
           name: 'Continental U.S. at .5 degree',
           style: { color: 'blue', weight: 2 },
@@ -57,6 +59,8 @@ export const mutations = {
         status: 'Published',
         revised: '2009-06-14',
         region: {
+          zoom: 2,
+          center: [37.5, -95],
           resolution: '250m',
           name: 'Continental US at 250m',
           style: { color: 'gray', weight: 2 },
@@ -89,6 +93,8 @@ export const mutations = {
         revised: '2016-04-01',
 
         region: {
+          zoom: 4,
+          center: [37, -108.5],
           resolution: '800m',
           name: 'Southwestern USA at 800m',
           style: { color: 'red', weight: 1 },

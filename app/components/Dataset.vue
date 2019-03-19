@@ -13,8 +13,8 @@
           <l-map
             :min-zoom="2"
             :max-zoom="8"
-            :zoom="zoom"
-            :center="center"
+            :zoom="region.zoom"
+            :center="region.center"
           >
             <l-tile-layer :url="url" />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
