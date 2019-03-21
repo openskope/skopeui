@@ -22,24 +22,24 @@ export const mutations = {
       {
         title: 'Living Blended Drought Atlas (LBDA) Version 2',
         description:
-          'A recalibrated reconstruction of United States Summer PMDI over the last 2000 years. Updated half degree gridded Jun-Aug PMDI reconstructions from Cook et al. (2010).',
+          'A recalibrated reconstruction of United States Summer PMDI over the last 2000 years. Updated half degree gridded Jun-Aug PMDI reconstructions from Cook et al. (2010). LBDA data in netCDF format are available from the [NOAA study page](https://www.ncdc.noaa.gov/paleo-search/study/22454).',
         type: 'dataset',
         status: 'Published',
         revised: '2017-08-03',
         region: {
           zoom: 2,
           center: [36.5, -95.75],
-          resolution: '.5 degree',
+          resolution: '.5 degree (~55.5km)',
           name: 'Continental USA',
           style: { color: 'blue', weight: 2 },
           extents: [[49, -124.5], [24, -67]]
         },
         timespan: {
-          name: '1-2017CE annually',
-          resolution: 'year',
+          resolution: 'annually',
           period: {
             gte: '0001',
-            lte: '2017'
+            lte: '2017',
+            suffix: 'CE'
           }
         },
         variables: [
@@ -69,11 +69,11 @@ export const mutations = {
           extents: [[50, -125], [25, -65]]
         },
         timespan: {
-          name: 'version 4.1',
-          resolution: 'year',
+          resolution: '',
           period: {
             gte: '2009',
-            lte: '2009'
+            lte: '2009',
+            suffix: 'CE'
           }
         },
         variables: [
@@ -105,11 +105,11 @@ export const mutations = {
         },
 
         timespan: {
-          name: '1-2000CE annually',
-          resolution: 'year',
+          resolution: 'annually',
           period: {
             gte: '0001',
-            lte: '2000'
+            lte: '2000',
+            suffix: 'CE'
           }
         },
 
