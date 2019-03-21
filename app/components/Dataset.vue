@@ -16,7 +16,8 @@
             :zoom="region.zoom"
             :center="region.center"
           >
-            <l-tile-layer :url="url" />
+            <l-control-scale />
+            <l-tile-layer :url="url" :attribution="attribution" />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
         </no-ssr>
@@ -38,21 +39,23 @@
             {{ timespan.name }}
           </v-subheader>
           <v-card-text class="body">
-            <vue-markdown class="body">{{ description }}</vue-markdown>
-            <v-list dense light>
-              <v-subheader class="title">
-                Variables
-              </v-subheader>
-              <v-list-tile v-for="(variable, index) in variables" :key="index">
-                <v-list-tile-content>
-                  <v-list-tile-title>
-                    <v-chip small color="secondary">
-                      {{ variable.class }}
-                    </v-chip> {{ variable.name }}
-                  </v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
+            <vue-markdown :source="description" />
+          </v-card-text>
+          <v-list dense light>
+            <v-subheader class="title">
+              Variables
+            </v-subheader>
+            <v-list-tile v-for="(variable, index) in variables" :key="index" avatar>
+              <v-list-tile-content>
+                <v-list-tile-title class="variable">
+                  <v-chip small color="secondary">
+                    {{ variable.class }}
+                  </v-chip> {{ variable.name }}
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+          <v-card-text>
             <div class="py-3 citation">
               <em class="font-weight-bold">
                 Source:
@@ -89,9 +92,9 @@ import VueMarkdown from 'vue-markdown'
   // data properties
   data() {
     return {
-      zoom: 2,
-      center: [35, -105], // FIXME: should be generated dynamically
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      attribution:
+        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors",
       baseUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
       layers: [
         {
@@ -115,18 +118,7 @@ import VueMarkdown from 'vue-markdown'
   mounted() {},
   // app specific functions
   methods: {
-    initMap() {
-      // this.map = L.map('map').setView([38.63, -90.23], 12)
-      // this.tileLayer = L.tileLayer(
-      //   'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
-      //   {
-      //     maxZoom: 18,
-      //     attribution:
-      //       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
-      //   }
-      // )
-      // this.tileLayer.addTo(this.map)
-    },
+    initMap() {},
     initLayers() {}
   }
 })
@@ -135,5 +127,8 @@ export default class Dataset extends Vue {}
 <style>
 .map {
   height: 100%;
+}
+.variable {
+  height: 3em;
 }
 </style>
