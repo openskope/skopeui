@@ -28,7 +28,7 @@
         <v-card>
           <v-card-title class="pb-0">
             <h2 class="headline">
-              <nuxt-link :to="absolute_url" class="blue--text">
+              <nuxt-link :to="absoluteUrl" class="blue--text">
                 {{ title }}
               </nuxt-link>
             </h2>
@@ -85,7 +85,6 @@ import VueMarkdown from 'vue-markdown'
     description: String,
     variables: Array,
     id: String,
-    absolute_url: String,
     source_url: String
   },
   components: { VueMarkdown },
@@ -114,15 +113,19 @@ import VueMarkdown from 'vue-markdown'
       ]
     }
   },
-  // when app is mounted
-  mounted() {},
   // app specific functions
   methods: {
     initMap() {},
     initLayers() {}
   }
 })
-export default class Dataset extends Vue {}
+export default class Dataset extends Vue {
+  // when app is mounted
+  mounted() {}
+  get absoluteUrl() {
+    return '/dataset/' + this.id
+  }
+}
 </script>
 <style>
 .map {

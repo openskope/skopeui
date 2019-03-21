@@ -15,10 +15,15 @@ export default {
     dataset() {
       // accesses store, navigates to state, goes to datasets module, get all datasets
       // that live in "all" property
-      return this.$store.state.datasets.all.find(
-        dataset => dataset.id === this.id
-      )
+      const id = this.$route.params.id
+      return this.$store.state.datasets.list.find(dataset => dataset.id === id)
     }
+  },
+  created() {
+    this.$store.dispatch('datasets/load')
+  },
+  validate({ params }) {
+    return /^\w+$/.test(params.id)
   }
 }
 </script>
