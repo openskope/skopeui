@@ -4,7 +4,11 @@
     app
     fixed
   >
-    <v-toolbar-title>SKOPE</v-toolbar-title>
+    <v-toolbar-title>
+      <nuxt-link class="display-1 skope-title" to="/">
+        SKOPE: Synthesizing Knowledge of Past Environments
+      </nuxt-link>
+    </v-toolbar-title>
     <v-spacer />
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn flat to="/">
@@ -29,4 +33,8 @@ export default {
 }
 </script>
 <style scoped>
+.skope-title {
+  text-decoration: none !important;
+  font-family: 'Source Sans Pro', Helvetica, sans-serif;
+}
 </style>
