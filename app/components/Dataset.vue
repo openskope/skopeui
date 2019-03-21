@@ -57,8 +57,8 @@
             <div class="py-3 citation">
               <em class="font-weight-bold">
                 Source:
-              </em> <nuxt-link class="font-weight-thin" :to="source_url">
-                {{ source_url }}
+              </em> <nuxt-link class="font-weight-thin" :to="sourceUrl">
+                {{ sourceUrl }}
               </nuxt-link>
             </div>
           </v-card-text>
@@ -83,7 +83,7 @@ import VueMarkdown from 'vue-markdown'
     description: String,
     variables: Array,
     id: String,
-    source_url: String
+    sourceUrl: String
   },
   components: { VueMarkdown },
   // data properties
