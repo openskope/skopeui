@@ -91,24 +91,7 @@ import VueMarkdown from 'vue-markdown'
     return {
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       attribution:
-        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors",
-      baseUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
-      layers: [
-        {
-          name: 'PaleoCAR PPT',
-          visible: true,
-          layers: 'SKOPE:paleocar_ppt_0001-01-01',
-          transparent: true,
-          overlay: true
-        },
-        {
-          name: 'PaleoCAR GDD',
-          visible: true,
-          transparent: true,
-          overlay: true,
-          layers: 'SKOPE:paleocar_gdd_0001-01-01'
-        }
-      ]
+        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
     }
   },
   // app specific functions
