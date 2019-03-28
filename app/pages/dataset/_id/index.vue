@@ -1,6 +1,42 @@
 <template>
   <v-layout row>
     <v-flex md12>
+      <v-layout row wrap class="nav">
+        <v-btn flat icon to="/" class="arrow_back">
+          <v-icon color="grey darken-2">
+            arrow_back
+          </v-icon>
+        </v-btn>
+        <v-stepper alt-labels non-linear class="stepper">
+          <v-stepper-header>
+            <v-stepper-step
+              editable
+              step="1"
+            >
+              Datasets
+            </v-stepper-step>
+            <v-divider />
+            <v-stepper-step
+              editable
+              step="2"
+            >
+              Info
+            </v-stepper-step>
+            <v-divider />
+            <v-stepper-step
+              step="3"
+              editable
+            >
+              Map
+            </v-stepper-step>
+          </v-stepper-header>
+        </v-stepper>
+        <v-btn flat icon to="/map" class="arrow_forward">
+          <v-icon color="grey darken-2">
+            arrow_forward
+          </v-icon>
+        </v-btn>
+      </v-layout>
       <v-card>
         <v-container fill-width fluid>
           <Dataset v-bind="dataset" />
@@ -26,9 +62,9 @@
                 base-url="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WmsServer?"
                 layers="0"
                 layer-type="base"
-                overlay=false
+                overlay="false"
                 fmt="image/png"
-                transparent=true
+                transparent="true"
               />
               <l-wms-tile-layer
                 v-for="layer in layers"
@@ -112,3 +148,28 @@ export default {
   }
 }
 </script>
+
+<style>
+.page {
+  position: absolute;
+  height: 100%;
+}
+#p {
+  left: 1%;
+}
+#p:target {
+  transform: translateX(-190%);
+  transition-delay: 0.4s !important;
+}
+.arrow_back {
+}
+.arrow_forward {
+  bottom: 0;
+  right: 0;
+}
+.nav {
+}
+.stepper {
+  width: 75%;
+}
+</style>
