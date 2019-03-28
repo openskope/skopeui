@@ -23,11 +23,21 @@
               <l-control-layers />
               <l-control-scale />
               <l-wms-tile-layer
+                base-url="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WmsServer?"
+                layers="0"
+                layer-type="base"
+                overlay=false
+                fmt="image/png"
+                transparent=true
+              />
+              <l-wms-tile-layer
                 v-for="layer in layers"
                 :key="layer.name"
                 :base-url="baseUrl"
                 :name="layer.name"
-                layer-type="base"
+                :transparent="layer.transparent"
+                :overlay="layer.overlay"
+                :fmt="layer.fmt"
               />
             </l-map>
           </div>
@@ -72,14 +82,16 @@ export default {
           visible: true,
           layers: 'SKOPE:paleocar_ppt_0001-01-01',
           transparent: true,
-          overlay: true
+          overlay: true,
+          fmt: 'image/png'
         },
         {
           name: 'PaleoCAR GDD',
           visible: true,
           transparent: true,
           overlay: true,
-          layers: 'SKOPE:paleocar_gdd_0001-01-01'
+          layers: 'SKOPE:paleocar_gdd_0001-01-01',
+          fmt: 'image/png'
         }
       ]
     }
