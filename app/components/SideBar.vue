@@ -67,4 +67,8 @@ export default {
 #search-btn {
   width: 20%;
 }
+
+.sidebar {
+  padding-top: 30px;
+}
 </style>
