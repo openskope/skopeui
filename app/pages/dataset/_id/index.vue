@@ -53,38 +53,48 @@
       </v-card>
       <v-divider />
       <v-card>
-        <v-card-text>
-          <div style="height: 400px">
-            <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
-              <l-control-layers />
-              <l-control-scale />
-              <l-wms-tile-layer
-                base-url="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WmsServer?"
-                layers="0"
-                layer-type="base"
-                overlay="false"
-                fmt="image/png"
-                transparent="true"
-              />
-              <l-wms-tile-layer
-                v-for="layer in layers"
-                :key="layer.name"
-                :base-url="baseUrl"
-                :name="layer.name"
-                :transparent="layer.transparent"
-                :overlay="layer.overlay"
-                :fmt="layer.fmt"
-              />
-            </l-map>
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-layout align-center justify-center>
-            <v-icon>play_circle_filled</v-icon>
-            <v-icon>pause</v-icon>
-            <v-icon>stop</v-icon>
+        <v-container grid-list-md fill-height fill-width>
+          <v-layout column align-center justify-center>
+            <v-flex xs12>
+              <v-card-text>
+                <div style="height: 600px; width: 600px;">
+                  <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
+                    <l-control-layers />
+                    <l-control-scale />
+                    <l-wms-tile-layer
+                      base-url="http://ows.mundialis.de/services/service?"
+                      layers="TOPO-OSM-WMS"
+                      layer-type="base"
+                      format="image/png"
+                      name="Mundialis TOPO-OSM-WMS"
+                      :transparent="true"
+                      :overlay="false"
+                      :control="false"
+                    />
+                    <l-wms-tile-layer
+                      v-for="layer in wmsLayers"
+                      :key="layer.name"
+                      :base-url="skopeWmsUrl"
+                      :name="layer.name"
+                      :transparent="layer.transparent"
+                      :layers="layer.layers"
+                      :overlay="layer.overlay"
+                      :format="layer.fmt"
+                      :version="layer.version"
+                    />
+                  </l-map>
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-layout align-center justify-center>
+                  <v-icon>play_circle_filled</v-icon>
+                  <v-icon>pause</v-icon>
+                  <v-icon>stop</v-icon>
+                </v-layout>
+              </v-card-actions>
+            </v-flex>
           </v-layout>
-        </v-card-actions>
+        </v-container>
       </v-card>
     </v-flex>
   </v-layout>
@@ -111,12 +121,13 @@ export default {
         methodSummary: 'Method Summary',
         references: 'References'
       },
-      baseUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
-      layers: [
+      skopeWmsUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
+      wmsLayers: [
         {
           name: 'PaleoCAR PPT',
           visible: true,
           layers: 'SKOPE:paleocar_ppt_0001-01-01',
+          version: '1.3.0',
           transparent: true,
           overlay: true,
           fmt: 'image/png'
@@ -125,6 +136,7 @@ export default {
           name: 'PaleoCAR GDD',
           visible: true,
           transparent: true,
+          version: '1.3.0',
           overlay: true,
           layers: 'SKOPE:paleocar_gdd_0001-01-01',
           fmt: 'image/png'
