@@ -164,9 +164,13 @@ export default {
 </script>
 
 <style>
+.arrow_back {
+  padding-top: 40px;
+}
 .arrow_forward {
   bottom: 0;
   right: 0;
+  padding-top: 40px;
 }
 .nav {
   padding-left: 400px;
