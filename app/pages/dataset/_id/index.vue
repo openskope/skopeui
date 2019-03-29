@@ -2,8 +2,11 @@
   <v-layout row>
     <v-flex md12>
       <v-card flat tile>
-        <v-window v-model="onboarding">
-          <v-window-item>
+        <v-window v-model="onboarding" >
+          <v-window-item
+            v-for="n in length"
+            :key="`card-${n}`"
+          >
             <v-container fill-width fluid>
               <Dataset v-bind="dataset" />
               <v-layout fill-height>
@@ -122,6 +125,16 @@ export default {
   },
   created() {
     this.$store.dispatch('datasets/load')
+  },
+  methods: {
+    next() {
+      this.onboarding =
+        this.onboarding + 1 === this.length ? 0 : this.onboarding + 1
+    },
+    prev() {
+      this.onboarding =
+        this.onboarding - 1 < 0 ? this.length - 1 : this.onboarding - 1
+    }
   },
   validate({ params }) {
     return /^\w+$/.test(params.id)
