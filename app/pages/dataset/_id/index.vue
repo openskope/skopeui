@@ -2,7 +2,7 @@
   <v-layout row>
     <v-flex md12>
       <v-card flat tile>
-        <v-window v-model="onboarding" >
+        <v-window v-model="onboarding">
           <v-window-item
             v-for="n in length"
             :key="`card-${n}`"
@@ -29,9 +29,9 @@
                         <l-control-layers />
                         <l-control-scale />
                         <l-wms-tile-layer
-                          :base-url="this.$defaultBaseMapEndpoint.url"
-                          :layers="this.$defaultBaseMapEndpoint.layer"
-                          :name="this.$defaultBaseMapEndpoint.name"
+                          :base-url="$defaultBaseMapEndpoint.url"
+                          :layers="$defaultBaseMapEndpoint.layer"
+                          :name="$defaultBaseMapEndpoint.name"
                           :transparent="true"
                           :overlay="false"
                           :control="false"
