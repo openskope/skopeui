@@ -9,9 +9,9 @@
               <v-layout fill-height>
                 <v-card-text>
                   <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                <span class="font-weight-bold">
-                  {{ label }}:
-                </span> <vue-markdown>{{ dataset[attr] }}</vue-markdown>
+                    <span class="font-weight-bold">
+                      {{ label }}:
+                    </span> <vue-markdown>{{ dataset[attr] }}</vue-markdown>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -26,25 +26,14 @@
                         <l-control-layers />
                         <l-control-scale />
                         <l-wms-tile-layer
-                          base-url="http://ows.mundialis.de/services/service?"
-                          layers="TOPO-OSM-WMS"
-                          layer-type="base"
-                          format="image/png"
-                          name="Mundialis TOPO-OSM-WMS"
+                          :base-url="this.$defaultBaseMapEndpoint.url"
+                          :layers="this.$defaultBaseMapEndpoint.layer"
+                          :name="this.$defaultBaseMapEndpoint.name"
                           :transparent="true"
                           :overlay="false"
                           :control="false"
-                        />
-                        <l-wms-tile-layer
-                          v-for="layer in wmsLayers"
-                          :key="layer.name"
-                          :base-url="skopeWmsUrl"
-                          :name="layer.name"
-                          :transparent="layer.transparent"
-                          :layers="layer.layers"
-                          :overlay="layer.overlay"
-                          :format="layer.fmt"
-                          :version="layer.version"
+                          layer-type="base"
+                          format="image/png"
                         />
                       </l-map>
                     </div>
@@ -83,7 +72,9 @@
                 icon
                 @click="toggle"
               >
-                <v-icon color="black">fiber_manual_record</v-icon>
+                <v-icon color="black">
+                  fiber_manual_record
+                </v-icon>
               </v-btn>
             </v-item>
           </v-item-group>
@@ -118,28 +109,7 @@ export default {
         methodSummary: 'Method Summary',
         references: 'References',
         contactInformation: 'Contact Information'
-      },
-      skopeWmsUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
-      wmsLayers: [
-        {
-          name: 'PaleoCAR PPT',
-          visible: true,
-          layers: 'SKOPE:paleocar_ppt_0001-01-01',
-          version: '1.3.0',
-          transparent: true,
-          overlay: true,
-          fmt: 'image/png'
-        },
-        {
-          name: 'PaleoCAR GDD',
-          visible: true,
-          transparent: true,
-          version: '1.3.0',
-          overlay: true,
-          layers: 'SKOPE:paleocar_gdd_0001-01-01',
-          fmt: 'image/png'
-        }
-      ]
+      }
     }
   },
   computed: {
