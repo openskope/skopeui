@@ -8,9 +8,10 @@
               arrow_back
             </v-icon>
           </v-btn>
-          <v-stepper alt-labels non-linear class="stepper">
+          <v-stepper v-model="e1" alt-labels non-linear class="stepper">
             <v-stepper-header>
               <v-stepper-step
+                complete
                 editable
                 step="1"
               >
@@ -19,6 +20,7 @@
               <v-divider />
               <v-stepper-step
                 editable
+                :complete="e1 > 2"
                 step="2"
               >
                 Info
@@ -113,6 +115,7 @@ export default {
   },
   data() {
     return {
+      e1: 0,
       metadataAttributes: {
         originator: 'Originator',
         uncertainty: 'Uncertainty',
