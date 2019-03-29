@@ -57,7 +57,7 @@ export const mutations = {
           {
             class: 'Precipitation',
             name: 'Palmer Modified Drought Index',
-            wmsLayers: ['SKOPE:pmdi_{YYYY}-01-01'],
+            wmsLayer: 'SKOPE:pmdi_{YYYY}-01-01',
             min: -6.0,
             max: 6.0,
             styles: ['default'],
@@ -106,7 +106,7 @@ export const mutations = {
           {
             class: 'Elevation',
             name: 'Elevation (m)',
-            wmsLayers: ['SKOPE:srtm'],
+            wmsLayer: 'SKOPE:srtm',
             min: 0.0,
             max: 4500.0,
             styles: ['default']
@@ -159,7 +159,7 @@ export const mutations = {
             class: 'Temperature',
             name: 'Growing Degree Days (F, May-Sept)',
             timeseriesServiceUri: 'paleocar_2/growing_degree_days',
-            wmsLayers: ['SKOPE:paleocar_ppt_{YYYY}-01-01'],
+            wmsLayer: 'SKOPE:paleocar_ppt_{YYYY}-01-01',
             min: 0.0,
             max: 10.0,
             styles: ['default', 'raster']
@@ -168,7 +168,7 @@ export const mutations = {
             class: 'Precipitation',
             name: 'Water-year (Oct-Sept) Precipitation (mm)',
             timeseriesServiceUri: 'paleocar_2/water_year_precipitation',
-            wmsLayers: ['SKOPE:paleocar_gdd_{YYYY}-01-01'],
+            wmsLayer: 'SKOPE:paleocar_gdd_{YYYY}-01-01',
             min: 0.0,
             max: 10.0,
             styles: ['default', 'raster']
@@ -177,7 +177,7 @@ export const mutations = {
             class: 'Crop Niche',
             name: 'Maize Farming Niche (Direct Precip.)',
             timeseriesServiceUri: 'paleocar_2/maize_farming_niche',
-            wmsLayers: ['SKOPE:niche_{YYYY}'],
+            wmsLayer: 'SKOPE:niche_{YYYY}',
             min: 0.0,
             max: 1.0,
             styles: ['default']
