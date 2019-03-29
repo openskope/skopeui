@@ -36,8 +36,10 @@ export const mutations = {
           extents: [[49, -124.5], [24, -67]]
         },
         timespan: {
-          resolution: 'annually',
+          resolution: 'year',
+          resolutionLabel: 'annually',
           period: {
+            timeZero: 0,
             gte: '0001',
             lte: '2017',
             suffix: 'CE'
@@ -50,11 +52,16 @@ export const mutations = {
           'Cook, E.R., Seager, R., Heim, R.R., Vose, R.S., Herweijer, C., and Woodhouse, C. 2010. Megadroughts in North America: Placing IPCC projections of hydroclimatic change in a long-term paleoclimate context. Journal of Quaternary Science, 25(1), 48-61. [doi: 10.1002/jqs.1303](https://doi.org/10.1002/jqs.1303)',
         originator: 'Gille, E.P.; Wahl, E.R.; Vose, R.S.; Cook, E.R.',
         contactInformation:
-          'DOC/NOAA/NESDIS/NCEI\n    National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n    325 Broadway, E/NE31     \nBoulder, CO 80305-3328\n    USA\n\n    https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n    email: paleo@noaa.gov\n    phone: 303-497-6280\n    fax: 303-497-6513',
+          '> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513',
         variables: [
           {
             class: 'Precipitation',
             name: 'Palmer Modified Drought Index',
+            wmsLayers: ['SKOPE:pmdi_{YYYY}-01-01'],
+            min: -6.0,
+            max: 6.0,
+            styles: ['default'],
+            timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
             description:
               'Palmer’s Modified Drought Index: Jun–Aug.; <=-4.00 extreme drought; -3.00 to-3.99 severe drought; -2.00 to -2.99 moderate dought, -1.99 to 1.99 midrange; 2.00 to 2.99 moderately moist; 3.00 to 3.99 very moist; >=4.00 extremely moist.'
           }
@@ -64,8 +71,16 @@ export const mutations = {
       {
         id: 'srtm',
         title: 'SRTM 90m Digital Elevation Model V4.1',
+        originator: 'NASA Shuttle Radar Topographic Mission (SRTM)',
+        references:
+          'Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data Version 4, available from the CGIAR-CSI SRTM 90m Database: http://srtm.csi.cgiar.org/.\n\nReuter H.I, A. Nelson, A. Jarvis, 2007, An evaluation of void filling interpolation methods for SRTM data, International Journal of Geographic Information Science, 21:9, 983-1008.',
+        contactInformation:
+          'For technical correspondence regarding the SRTM 90m Digital Elevation Data, contact:\n\n> Andy Jarvis, Ph.D.\n> Program Leader --- Decision and Policy Analysis\n> International Centre for Tropical Agriculture (CIAT)\n> Email: a.jarvis@cgiar.org',
         description:
           'Digital elevation data at 3 arc second (approx. 90m) horizontal resolution and less than 16m vertical resolution. The data are provided by the NASA Shuttle Radar Topographic Mission (SRTM) and the International Centre for Tropical Agriculture (CIAT), and are currently distributed free of charge by USGS and available for download through CGIAR at http://srtm.csi.cgiar.org/.',
+        methodSummary:
+          'These data are provided by the Consortium for Spatial Information (CGIAR-CSI) of the Consultative Group for International Agricultural Research (CGIAR). The data are post-processed 3-arc second DEM data for the globe. The original SRTM (v1) data has been subjected to a number of processing steps to provide seamless and complete elevational surfaces for the globe. In its original release, SRTM data contained regions of no-data, specifically over water bodies (lakes and rivers), and in areas where insufficient textural detail was available in the original radar images to produce three-dimensional elevational data. The CGIAR-CSI SRTM data product applies a hole-filling algorithm to provide continuous elevational surfaces.',
+        uncertainty: '< 16m vertical error',
         sourceUrl: 'http://srtm.csi.cgiar.org',
         type: 'dataset',
         status: 'Published',
@@ -80,6 +95,7 @@ export const mutations = {
         },
         timespan: {
           resolution: '',
+          resolutionLabel: '',
           period: {
             gte: '2009',
             lte: '2009',
@@ -89,13 +105,26 @@ export const mutations = {
         variables: [
           {
             class: 'Elevation',
-            name: 'Elevation (m)'
+            name: 'Elevation (m)',
+            wmsLayers: ['SKOPE:srtm'],
+            min: 0.0,
+            max: 4500.0,
+            styles: ['default']
           }
         ]
       },
       {
         id: 'paleocar',
         title: 'PaleoCAR: SW USA Paleoclimatic Reconstruction',
+        originator: 'Bocinsky, R.K.; Kohler, T.A.',
+        references:
+          'Bocinsky, R. Kyle, and Timothy A. Kohler. 2014. A 2,000-year reconstruction of the rain-fed maize agricultural niche in the US Southwest. Nature Communications 5:5618. [doi: 10.1038/ncomms6618](https://doi.org/10.1038/ncomms6618).',
+        contactInformation:
+          '> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513',
+        uncertainty:
+          "The uncertainty for GDD and Precipitation that is available on the graph and in the graph data download csv represents the predicted residual error sum of squares (PRESS) statistic for each cell's reconstruction. [add uncertainty for maize farming niche]",
+        methodSummary:
+          'For each pixel, for each year, the model selects the tree ring chronologies (within a 10-degree buffer of the Four Corners states; from the National Tree Ring Database) that best predict PRISM data for that location and uses linear regression to estimate the paleoenvironmental variable for that date and location.\n\nBecause the Maize Farming Niche is based on direct precipitation, maize farming may be possible if other water sources are utilized (e.g. spring or rivers) or if precipitation is concentrated on fields through water diversion structures (e.g. ak chin fields) or geologically (e.g. sand dune fields).',
         description:
           'High spatial resolution (30 arc-second, ~800 m) Southwestern United States tree-ring reconstructions of ' +
           ' May-Sept growing degree days (GDD), net water-year precipitation (previous Oct–Sept), and the direct precipitation maize ' +
@@ -115,8 +144,10 @@ export const mutations = {
         },
 
         timespan: {
-          resolution: 'annually',
+          resolution: 'year',
+          resolutionLabel: 'annually',
           period: {
+            timeZero: 1,
             gte: '0001',
             lte: '2000',
             suffix: 'CE'
@@ -126,15 +157,30 @@ export const mutations = {
         variables: [
           {
             class: 'Temperature',
-            name: 'Growing Degree Days (F, May-Sept)'
+            name: 'Growing Degree Days (F, May-Sept)',
+            timeseriesServiceUri: 'paleocar_2/growing_degree_days',
+            wmsLayers: ['SKOPE:paleocar_ppt_{YYYY}-01-01'],
+            min: 0.0,
+            max: 10.0,
+            styles: ['default', 'raster']
           },
           {
             class: 'Precipitation',
-            name: 'Water-year (Oct-Sept) Precipitation (mm)'
+            name: 'Water-year (Oct-Sept) Precipitation (mm)',
+            timeseriesServiceUri: 'paleocar_2/water_year_precipitation',
+            wmsLayers: ['SKOPE:paleocar_gdd_{YYYY}-01-01'],
+            min: 0.0,
+            max: 10.0,
+            styles: ['default', 'raster']
           },
           {
             class: 'Crop Niche',
-            name: 'Maize Farming Niche (Direct Precip.)'
+            name: 'Maize Farming Niche (Direct Precip.)',
+            timeseriesServiceUri: 'paleocar_2/maize_farming_niche',
+            wmsLayers: ['SKOPE:niche_{YYYY}'],
+            min: 0.0,
+            max: 1.0,
+            styles: ['default']
           }
         ]
       }
@@ -142,10 +188,3 @@ export const mutations = {
     state.loading = false
   }
 }
-/*
-export const getters = {
-  datasets: state => {
-    return state.all
-  }
-}
-*/

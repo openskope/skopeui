@@ -104,13 +104,13 @@ export default class Dataset extends Vue {
   // when app is mounted
   mounted() {}
   get spatialCoverage() {
-    return `${this.region.name} at ${this.region.resolution}`
+    return `${this.region.name} at ${this.region.resolutionLabel}`
   }
   get temporalCoverage() {
     const period = this.timespan.period
     const timespan =
       period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`
-    return `${timespan}${period.suffix} ${this.timespan.resolution}`
+    return `${timespan}${period.suffix} ${this.timespan.resolutionLabel}`
   }
   get absoluteUrl() {
     return '/dataset/' + this.id

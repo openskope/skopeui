@@ -120,7 +120,8 @@ export default {
         originator: 'Originator',
         uncertainty: 'Uncertainty',
         methodSummary: 'Method Summary',
-        references: 'References'
+        references: 'References',
+        contactInformation: 'Contact Information'
       },
       skopeWmsUrl: 'https://app.openskope.org/geoserver/SKOPE/wms?',
       wmsLayers: [
