@@ -1,104 +1,99 @@
 <template>
   <v-layout row>
     <v-flex md12>
-      <div class="nav">
-        <v-layout row wrap>
-          <v-btn flat icon to="/" class="arrow_back">
-            <v-icon color="grey darken-2">
-              arrow_back
-            </v-icon>
-          </v-btn>
-          <v-stepper v-model="e1" alt-labels non-linear class="stepper">
-            <v-stepper-header>
-              <v-stepper-step
-                complete
-                editable
-                step="1"
-              >
-                Datasets
-              </v-stepper-step>
-              <v-divider />
-              <v-stepper-step
-                editable
-                :complete="e1 > 2"
-                step="2"
-              >
-                Info
-              </v-stepper-step>
-              <v-divider />
-              <v-stepper-step
-                step="3"
-                editable
-              >
-                Map
-              </v-stepper-step>
-            </v-stepper-header>
-          </v-stepper>
-          <v-btn flat icon to="/map" class="arrow_forward">
-            <v-icon color="grey darken-2">
-              arrow_forward
-            </v-icon>
-          </v-btn>
-        </v-layout>
-      </div>
-      <v-card>
-        <v-container fill-width fluid>
-          <Dataset v-bind="dataset" />
-          <v-layout fill-height>
-            <v-card-text>
-              <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
+      <v-card flat tile>
+        <v-window v-model="onboarding">
+          <v-window-item>
+            <v-container fill-width fluid>
+              <Dataset v-bind="dataset" />
+              <v-layout fill-height>
+                <v-card-text>
+                  <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
                 <span class="font-weight-bold">
                   {{ label }}:
                 </span> <vue-markdown>{{ dataset[attr] }}</vue-markdown>
-              </div>
-            </v-card-text>
-          </v-layout>
-        </v-container>
-      </v-card>
-      <v-divider />
-      <v-card>
-        <v-container grid-list-md fill-height fill-width>
-          <v-layout column align-center justify-center>
-            <v-flex xs12>
-              <v-card-text>
-                <div style="height: 600px; width: 600px;">
-                  <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
-                    <l-control-layers />
-                    <l-control-scale />
-                    <l-wms-tile-layer
-                      base-url="http://ows.mundialis.de/services/service?"
-                      layers="TOPO-OSM-WMS"
-                      layer-type="base"
-                      format="image/png"
-                      name="Mundialis TOPO-OSM-WMS"
-                      :transparent="true"
-                      :overlay="false"
-                      :control="false"
-                    />
-                    <l-wms-tile-layer
-                      v-for="layer in wmsLayers"
-                      :key="layer.name"
-                      :base-url="skopeWmsUrl"
-                      :name="layer.name"
-                      :transparent="layer.transparent"
-                      :layers="layer.layers"
-                      :overlay="layer.overlay"
-                      :format="layer.fmt"
-                      :version="layer.version"
-                    />
-                  </l-map>
-                </div>
-              </v-card-text>
-              <v-card-actions>
-                <v-layout align-center justify-center>
-                  <v-icon>play_circle_filled</v-icon>
-                  <v-icon>pause</v-icon>
-                  <v-icon>stop</v-icon>
-                </v-layout>
-              </v-card-actions>
-            </v-flex>
-          </v-layout>
-        </v-container>
+                  </div>
+                </v-card-text>
+              </v-layout>
+            </v-container>
+            <v-divider />
+            <v-container grid-list-md fill-height fill-width>
+              <v-layout column align-center justify-center>
+                <v-flex xs12>
+                  <v-card-text>
+                    <div style="height: 600px; width: 600px;">
+                      <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
+                        <l-control-layers />
+                        <l-control-scale />
+                        <l-wms-tile-layer
+                          base-url="http://ows.mundialis.de/services/service?"
+                          layers="TOPO-OSM-WMS"
+                          layer-type="base"
+                          format="image/png"
+                          name="Mundialis TOPO-OSM-WMS"
+                          :transparent="true"
+                          :overlay="false"
+                          :control="false"
+                        />
+                        <l-wms-tile-layer
+                          v-for="layer in wmsLayers"
+                          :key="layer.name"
+                          :base-url="skopeWmsUrl"
+                          :name="layer.name"
+                          :transparent="layer.transparent"
+                          :layers="layer.layers"
+                          :overlay="layer.overlay"
+                          :format="layer.fmt"
+                          :version="layer.version"
+                        />
+                      </l-map>
+                    </div>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-layout align-center justify-center>
+                      <v-icon>play_circle_filled</v-icon>
+                      <v-icon>pause</v-icon>
+                      <v-icon>stop</v-icon>
+                    </v-layout>
+                  </v-card-actions>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-window-item>
+        </v-window>
+        <v-card-actions class="justify-space-between">
+          <v-btn
+            flat
+            @click="prev"
+          >
+            <v-icon>chevron_left</v-icon>
+          </v-btn>
+          <v-item-group
+            v-model="onboarding"
+            class="text-xs-center"
+            manadatory
+          >
+            <v-item
+              v-for="n in length"
+              :key="`btn-${n}`"
+            >
+              <v-btn
+                slot-scope="{ active, toggle }"
+                :input-value="active"
+                icon
+                @click="toggle"
+              >
+                <v-icon color="black">fiber_manual_record</v-icon>
+              </v-btn>
+            </v-item>
+          </v-item-group>
+          <v-btn
+            flat
+            @click="next"
+          >
+            <v-icon>chevron_right</v-icon>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-flex>
   </v-layout>
@@ -115,7 +110,8 @@ export default {
   },
   data() {
     return {
-      e1: 0,
+      length: 3,
+      onboarding: 0,
       metadataAttributes: {
         originator: 'Originator',
         uncertainty: 'Uncertainty',
@@ -162,21 +158,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.arrow_back {
-  padding-top: 40px;
-}
-.arrow_forward {
-  bottom: 0;
-  right: 0;
-  padding-top: 40px;
-}
-.nav {
-  padding-left: 400px;
-  padding-bottom: 50px;
-}
-.stepper {
-  width: 75%;
-}
-</style>
