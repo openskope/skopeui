@@ -69,6 +69,11 @@ module.exports = {
     deployHostUrl: 'https://app.openskope.org/',
     wmsServerUri: 'geoserver/SKOPE/wms?',
     timeseriesServiceUri: 'timeseries-service/api/v1/timeseries/',
+    baseMap: {
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      attribution:
+        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
+    },
     baseMapWmsServers: [
       {
         name: 'Mundialis TOPO-OSM-WMS',

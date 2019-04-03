@@ -17,7 +17,7 @@
             :center="region.center"
           >
             <l-control-scale />
-            <l-tile-layer :url="url" :attribution="attribution" />
+            <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
         </no-ssr>
@@ -88,11 +88,7 @@ import VueMarkdown from 'vue-markdown'
   components: { VueMarkdown },
   // data properties
   data() {
-    return {
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-      attribution:
-        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
-    }
+    return {}
   },
   // app specific functions
   methods: {

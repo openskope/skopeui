@@ -55,6 +55,7 @@ export const mutations = {
           '> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513',
         variables: [
           {
+            id: 'lbda_precitation',
             class: 'Precipitation',
             name: 'Palmer Modified Drought Index',
             wmsLayer: 'SKOPE:pmdi_${year}-01-01',
@@ -104,6 +105,7 @@ export const mutations = {
         },
         variables: [
           {
+            id: 'srtm_elevation',
             class: 'Elevation',
             name: 'Elevation (m)',
             wmsLayer: 'SKOPE:srtm',

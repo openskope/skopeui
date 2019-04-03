@@ -6,5 +6,7 @@ Vue.prototype.$skopeWmsEndpoint = `${process.env.deployHostUrl}${
 Vue.prototype.$timeseriesEndpoint = `${process.env.deployHostUrl}${
   process.env.timeseriesServiceUri
 }`
-Vue.prototype.$defaultBaseMapEndpoint = process.env.baseMapWmsServers[0]
+Vue.prototype.$defaultWmsBaseMapEndpoint = process.env.baseMapWmsServers[0]
 Vue.prototype.$baseMapEndpoints = process.env.baseMapWmsServers
+Vue.prototype.$defaultBaseMap = process.env.baseMap
+Vue.prototype.$defaultMapAttribution = process.env.baseMapAttribution

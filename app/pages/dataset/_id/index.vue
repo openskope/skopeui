@@ -28,24 +28,18 @@
                       <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
                         <l-control-layers />
                         <l-control-scale />
-                        <l-wms-tile-layer
-                          :base-url="$defaultBaseMapEndpoint.url"
-                          :layers="$defaultBaseMapEndpoint.layer"
-                          :name="$defaultBaseMapEndpoint.name"
-                          :transparent="true"
-                          :overlay="false"
-                          :control="false"
-                          layer-type="base"
-                          format="image/png"
-                        />
+                        <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
                         <l-wms-tile-layer
                           v-for="variable in dataset.variables"
-                          :key="variable.id"
+                          :key="variable.wmsLayer"
                           :base-url="$skopeWmsEndpoint"
                           :layers="fillTemplateYear(variable.wmsLayer)"
                           :name="variable.name"
                           :visible="true"
                           :styles="variable.styles"
+                          layer-type="base"
+                          srs="EPSG:4326"
+                          version="1.3.0"
                           format="image/png"
                         />
                       </l-map>
