@@ -38,6 +38,16 @@
                           layer-type="base"
                           format="image/png"
                         />
+                        <l-wms-tile-layer
+                          v-for="variable in dataset.variables"
+                          :key="variable.id"
+                          :base-url="$skopeWmsEndpoint"
+                          :layers="fillTemplateYear(variable.wmsLayer)"
+                          :name="variable.name"
+                          :visible="true"
+                          :styles="variable.styles"
+                          format="image/png"
+                        />
                       </l-map>
                     </div>
                   </v-card-text>
@@ -96,6 +106,7 @@
 <script>
 import Dataset from '~/components/Dataset.vue'
 import VueMarkdown from 'vue-markdown'
+const fillTemplate = require('es6-dynamic-template')
 
 export default {
   components: {
@@ -134,6 +145,16 @@ export default {
     prev() {
       this.onboarding =
         this.onboarding - 1 < 0 ? this.length - 1 : this.onboarding - 1
+    },
+    fillTemplateYear(templateString, year) {
+      // FIXME: year should be injected from data slider
+      if (year === undefined) {
+        year = '1'
+      }
+      const layer = fillTemplate(templateString, {
+        year: year.padStart(4, '0')
+      })
+      return layer
     }
   },
   validate({ params }) {

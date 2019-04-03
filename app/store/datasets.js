@@ -57,10 +57,10 @@ export const mutations = {
           {
             class: 'Precipitation',
             name: 'Palmer Modified Drought Index',
-            wmsLayer: 'SKOPE:pmdi_{YYYY}-01-01',
+            wmsLayer: 'SKOPE:pmdi_${year}-01-01',
             min: -6.0,
             max: 6.0,
-            styles: ['default'],
+            styles: 'default',
             timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
             description:
               'Palmer’s Modified Drought Index: Jun–Aug.; <=-4.00 extreme drought; -3.00 to-3.99 severe drought; -2.00 to -2.99 moderate dought, -1.99 to 1.99 midrange; 2.00 to 2.99 moderately moist; 3.00 to 3.99 very moist; >=4.00 extremely moist.'
@@ -109,7 +109,7 @@ export const mutations = {
             wmsLayer: 'SKOPE:srtm',
             min: 0.0,
             max: 4500.0,
-            styles: ['default']
+            styles: 'default'
           }
         ]
       },
@@ -156,31 +156,34 @@ export const mutations = {
 
         variables: [
           {
+            id: 'paleocar_temperature',
             class: 'Temperature',
             name: 'Growing Degree Days (F, May-Sept)',
             timeseriesServiceUri: 'paleocar_2/growing_degree_days',
-            wmsLayer: 'SKOPE:paleocar_ppt_{YYYY}-01-01',
+            wmsLayer: 'SKOPE:paleocar_ppt_${year}-01-01',
             min: 0.0,
             max: 10.0,
-            styles: ['default', 'raster']
+            styles: 'default,raster'
           },
           {
+            id: 'paleocar_precipitation',
             class: 'Precipitation',
             name: 'Water-year (Oct-Sept) Precipitation (mm)',
             timeseriesServiceUri: 'paleocar_2/water_year_precipitation',
-            wmsLayer: 'SKOPE:paleocar_gdd_{YYYY}-01-01',
+            wmsLayer: 'SKOPE:paleocar_gdd_${year}-01-01',
             min: 0.0,
             max: 10.0,
-            styles: ['default', 'raster']
+            styles: 'default,raster'
           },
           {
+            id: 'paleocar_crop_niche',
             class: 'Crop Niche',
             name: 'Maize Farming Niche (Direct Precip.)',
             timeseriesServiceUri: 'paleocar_2/maize_farming_niche',
-            wmsLayer: 'SKOPE:niche_{YYYY}',
+            wmsLayer: 'SKOPE:niche_${year}',
             min: 0.0,
             max: 1.0,
-            styles: ['default']
+            styles: 'default'
           }
         ]
       }
