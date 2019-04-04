@@ -8,13 +8,13 @@
             :key="`card-${n}`"
           >
             <v-container fill-width fluid>
-              <Dataset v-bind="dataset" />
+              <Dataset v-bind="selectedDataset" />
               <v-layout fill-height>
                 <v-card-text>
                   <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
                     <span class="font-weight-bold">
                       {{ label }}:
-                    </span> <vue-markdown>{{ dataset[attr] }}</vue-markdown>
+                    </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -25,24 +25,29 @@
                 <v-flex xs12>
                   <v-card-text>
                     <div style="height: 600px; width: 600px;">
-                      <l-map :zoom="dataset.region.zoom" :center="dataset.region.center" style="height: 100%">
-                        <l-control-layers />
-                        <l-control-scale />
-                        <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
-                        <l-wms-tile-layer
-                          v-for="variable in dataset.variables"
-                          :key="variable.wmsLayer"
-                          :base-url="$skopeWmsEndpoint"
-                          :layers="fillTemplateYear(variable.wmsLayer)"
-                          :name="variable.name"
-                          :visible="true"
-                          :styles="variable.styles"
-                          layer-type="base"
-                          srs="EPSG:4326"
-                          version="1.3.0"
-                          format="image/png"
-                        />
-                      </l-map>
+                      <no-ssr>
+                        <l-map
+                          :zoom="selectedDataset.region.zoom"
+                          :center="selectedDataset.region.center"
+                          style="height: 100%"
+                        >
+                          <l-control-layers />
+                          <l-control-scale />
+                          <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
+                          <l-wms-tile-layer
+                            v-for="variable in selectedDataset.variables"
+                            :key="variable.wmsLayer"
+                            :base-url="$skopeWmsEndpoint"
+                            :layers="fillTemplateYear(variable.wmsLayer)"
+                            :name="variable.name"
+                            :visible="false"
+                            :styles="variable.styles"
+                            layer-type="base"
+                            version="1.3.0"
+                            format="image/png"
+                          />
+                        </l-map>
+                      </no-ssr>
                     </div>
                   </v-card-text>
                   <v-card-actions>
@@ -121,7 +126,10 @@ export default {
     }
   },
   computed: {
-    dataset() {
+    crs() {
+      return this.$L.CRS.EPSG4326
+    },
+    selectedDataset() {
       // retrieve the dataset corresponding to the given route params id in the datastore
       // FIXME: needs error checking 404 if the dataset doesn't exist
       const id = this.$route.params.id
