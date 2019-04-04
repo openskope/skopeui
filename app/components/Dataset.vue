@@ -100,7 +100,7 @@ export default class Dataset extends Vue {
   // when app is mounted
   mounted() {}
   get spatialCoverage() {
-    return `${this.region.name} at ${this.region.resolutionLabel}`
+    return `${this.region.name} at ${this.region.resolution}`
   }
   get temporalCoverage() {
     const period = this.timespan.period
