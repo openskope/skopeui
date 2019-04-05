@@ -12,7 +12,10 @@ RUN apt-get update && \
 EXPOSE 3000
 
 WORKDIR /code
-COPY . /code
+
+COPY package.json /code
 RUN yarn install
+
+COPY . /code
 
 CMD ["yarn", "dev"]
