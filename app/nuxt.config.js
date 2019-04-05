@@ -43,7 +43,6 @@ module.exports = {
   */
   plugins: [
     '@/plugins/vuetify',
-    '~/plugins/endpoints.js',
     { src: '~/plugins/nuxt-leaflet.js', ssr: false }
   ],
 
@@ -63,25 +62,9 @@ module.exports = {
   },
 
   /*
-  ** environment variables for WMS and time series endpoint services
+  ** process environment variables
   */
-  env: {
-    deployHostUrl: 'https://app.openskope.org/',
-    wmsServerUri: 'geoserver/SKOPE/wms?',
-    timeseriesServiceUri: 'timeseries-service/api/v1/timeseries/',
-    baseMap: {
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-      attribution:
-        "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
-    },
-    baseMapWmsServers: [
-      {
-        name: 'Mundialis TOPO-OSM-WMS',
-        url: 'http://ows.mundialis.de/services/service?',
-        layer: 'TOPO-OSM-WMS'
-      }
-    ]
-  },
+  env: {},
 
   /*
   ** Build configuration

@@ -33,7 +33,10 @@
                         >
                           <l-control-layers />
                           <l-control-scale />
-                          <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
+                          <l-wms-tile-layer 
+                            :base-url="defaultBaseMap.url"
+                            :attribution="defaultBaseMap.attribution"
+                          />
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
                             :key="variable.wmsLayer"
@@ -105,6 +108,7 @@
 <script>
 import Dataset from '~/components/Dataset.vue'
 import VueMarkdown from 'vue-markdown'
+import { BaseMapEndpoints } from '~/store/constants.js'
 const fillTemplate = require('es6-dynamic-template')
 
 export default {
@@ -133,7 +137,10 @@ export default {
       // retrieve the dataset corresponding to the given route params id in the datastore
       // FIXME: needs error checking 404 if the dataset doesn't exist
       const id = this.$route.params.id
-      return this.$store.state.datasets.list.find(dataset => dataset.id === id)
+      return this.$store.state.datasets.all.find(dataset => dataset.id === id)
+    },
+    defaultBaseMap() {
+      return BaseMapEndpoints.default
     }
   },
   created() {

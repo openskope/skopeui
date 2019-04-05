@@ -1,4 +1,3 @@
-// state function returns objet
 export const state = () => ({
   // datasets array
   list: [],
@@ -18,7 +17,8 @@ export const actions = {
 export const mutations = {
   load(state) {
     state.loading = true
-    state.list = [
+    // FIXME: ideally this should get loaded from the backend from an async call
+    state.all = [
       {
         id: 'lbda',
         title: 'Living Blended Drought Atlas (LBDA) Version 2',

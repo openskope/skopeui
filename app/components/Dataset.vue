@@ -17,7 +17,7 @@
             :center="region.center"
           >
             <l-control-scale />
-            <l-tile-layer :url="$defaultBaseMap.url" :attribution="$defaultBaseMap.attribution" />
+            <l-tile-layer :url="defaultBaseMap.url" :attribution="defaultBaseMap.attribution" />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
         </no-ssr>
@@ -71,6 +71,7 @@
 <script>
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { BaseMapEndpoints } from '~/store/constants.js'
 import VueMarkdown from 'vue-markdown'
 
 @Component({
@@ -86,10 +87,6 @@ import VueMarkdown from 'vue-markdown'
     sourceUrl: String
   },
   components: { VueMarkdown },
-  // data properties
-  data() {
-    return {}
-  },
   // app specific functions
   methods: {
     initMap() {},
@@ -99,6 +96,9 @@ import VueMarkdown from 'vue-markdown'
 export default class Dataset extends Vue {
   // when app is mounted
   mounted() {}
+  get defaultBaseMap() {
+    return BaseMapEndpoints.default
+  }
   get spatialCoverage() {
     return `${this.region.name} at ${this.region.resolution}`
   }
