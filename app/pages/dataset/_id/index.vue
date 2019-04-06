@@ -33,14 +33,14 @@
                         >
                           <l-control-layers />
                           <l-control-scale />
-                          <l-wms-tile-layer 
-                            :base-url="defaultBaseMap.url"
+                          <l-tile-layer 
+                            :url="defaultBaseMap.url"
                             :attribution="defaultBaseMap.attribution"
                           />
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
                             :key="variable.wmsLayer"
-                            :base-url="$skopeWmsEndpoint"
+                            :base-url="skopeWmsUrl"
                             :layers="fillTemplateYear(variable.wmsLayer)"
                             :name="variable.name"
                             :visible="false"
@@ -108,7 +108,7 @@
 <script>
 import Dataset from '~/components/Dataset.vue'
 import VueMarkdown from 'vue-markdown'
-import { BaseMapEndpoints } from '~/store/constants.js'
+import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 const fillTemplate = require('es6-dynamic-template')
 
 export default {
@@ -120,6 +120,7 @@ export default {
     return {
       length: 3,
       onboarding: 0,
+      skopeWmsUrl: SKOPE_WMS_ENDPOINT,
       metadataAttributes: {
         originator: 'Originator',
         uncertainty: 'Uncertainty',
