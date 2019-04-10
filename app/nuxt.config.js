@@ -1,7 +1,7 @@
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const pkg = require('./package')
 
-export default {
+module.exports = {
   mode: 'universal',
 
   /*
