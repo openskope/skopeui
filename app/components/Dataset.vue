@@ -70,9 +70,9 @@
 
 <script>
 import Vue from 'vue'
-import Component from 'vue-class-component'
-import { BaseMapEndpoints } from '~/store/constants.js'
 import VueMarkdown from 'vue-markdown'
+import Component from 'nuxt-class-component'
+import { BaseMapEndpoints } from '~/store/constants.js'
 
 @Component({
   props: {
