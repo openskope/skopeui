@@ -25,10 +25,10 @@
                 <v-flex xs12>
                   <v-card-text>
                     <div style="height: 600px; width: 600px;">
-                      <no-ssr>
+                      <no-ssr placeholder="Loading...">
                         <l-map
                           :zoom="selectedDataset.region.zoom"
-                          :center="selectedDataset.region.center"
+                          :center="transformCoordinates(selectedDataset.region.center)"
                           :crs="defaultCrs"
                           style="height: 100%"
                         >
@@ -110,8 +110,8 @@
 
 <script>
 import Dataset from '~/components/Dataset.vue'
-import VueMarkdown from 'vue-markdown'
 import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
+import VueMarkdown from 'vue-markdown'
 const fillTemplate = require('es6-dynamic-template')
 
 export default {
@@ -122,15 +122,7 @@ export default {
   data() {
     return {
       length: 3,
-      onboarding: 0,
-      skopeWmsUrl: SKOPE_WMS_ENDPOINT,
-      metadataAttributes: {
-        originator: 'Originator',
-        uncertainty: 'Uncertainty',
-        methodSummary: 'Method Summary',
-        references: 'References',
-        contactInformation: 'Contact Information'
-      }
+      onboarding: 0
     }
   },
   computed: {
@@ -140,24 +132,42 @@ export default {
       const id = this.$route.params.id
       return this.$store.state.datasets.all.find(dataset => dataset.id === id)
     },
+    skopeWmsUrl() {
+      return SKOPE_WMS_ENDPOINT
+    },
+    metadataAttributes() {
+      return {
+        originator: 'Originator',
+        uncertainty: 'Uncertainty',
+        methodSummary: 'Method Summary',
+        references: 'References',
+        contactInformation: 'Contact Information'
+      }
+    },
     defaultBaseMap() {
       return BaseMapEndpoints.default
     },
     defaultCrs() {
-      return this.$L.CRS.EPSG4326
+      if (this.$L) {
+        return this.$L.CRS.EPSG4326
+      }
+      return ''
     }
   },
   created() {
     this.$store.dispatch('datasets/load')
   },
+  head() {
+    return {
+      title: this.selectedDataset.title
+    }
+  },
   methods: {
     next() {
-      this.onboarding =
-        this.onboarding + 1 === this.length ? 0 : this.onboarding + 1
+      this.onboarding = (this.onboarding + 1) % this.length
     },
     prev() {
-      this.onboarding =
-        this.onboarding - 1 < 0 ? this.length - 1 : this.onboarding - 1
+      this.onboarding = (this.onboarding - 1 + this.length) % this.length
     },
     fillTemplateYear(templateString, year) {
       // FIXME: year should be injected from data slider
@@ -168,6 +178,9 @@ export default {
         year: year.padStart(4, '0')
       })
       return layer
+    },
+    transformCoordinates(coordinates, crs) {
+      return coordinates
     }
   },
   validate({ params }) {
