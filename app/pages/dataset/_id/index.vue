@@ -29,6 +29,7 @@
                         <l-map
                           :zoom="selectedDataset.region.zoom"
                           :center="selectedDataset.region.center"
+                          :crs="defaultCrs"
                           style="height: 100%"
                         >
                           <l-control-layers />
@@ -36,6 +37,7 @@
                           <l-tile-layer 
                             :url="defaultBaseMap.url"
                             :attribution="defaultBaseMap.attribution"
+                            :cross-origin="true"
                           />
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
@@ -45,6 +47,7 @@
                             :name="variable.name"
                             :visible="false"
                             :styles="variable.styles"
+                            :cross-origin="true"
                             layer-type="base"
                             version="1.3.0"
                             format="image/png"
@@ -131,9 +134,6 @@ export default {
     }
   },
   computed: {
-    crs() {
-      return this.$L.CRS.EPSG4326
-    },
     selectedDataset() {
       // retrieve the dataset corresponding to the given route params id in the datastore
       // FIXME: needs error checking 404 if the dataset doesn't exist
@@ -142,6 +142,9 @@ export default {
     },
     defaultBaseMap() {
       return BaseMapEndpoints.default
+    },
+    defaultCrs() {
+      return this.$L.CRS.EPSG4326
     }
   },
   created() {
