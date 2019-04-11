@@ -28,16 +28,16 @@
                       <no-ssr placeholder="Loading...">
                         <l-map
                           :zoom="selectedDataset.region.zoom"
-                          :center="transformCoordinates(selectedDataset.region.center)"
+                          :center="transformedCenterCoordinates"
                           :crs="defaultCrs"
                           style="height: 100%"
                         >
-                          <l-control-layers />
                           <l-control-scale />
                           <l-tile-layer 
                             :url="defaultBaseMap.url"
                             :attribution="defaultBaseMap.attribution"
                             :cross-origin="true"
+                            :transparent="false"
                           />
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
@@ -45,6 +45,7 @@
                             :base-url="skopeWmsUrl"
                             :layers="fillTemplateYear(variable.wmsLayer)"
                             :name="variable.name"
+                            :transparent="true"
                             :visible="false"
                             :styles="variable.styles"
                             :cross-origin="true"
@@ -152,6 +153,10 @@ export default {
         return this.$L.CRS.EPSG4326
       }
       return ''
+    },
+    transformedCenterCoordinates() {
+      const coordinates = this.selectedDataset.region.center
+      return [coordinates[1], coordinates[0]]
     }
   },
   created() {
@@ -178,9 +183,6 @@ export default {
         year: year.padStart(4, '0')
       })
       return layer
-    },
-    transformCoordinates(coordinates, crs) {
-      return coordinates
     }
   },
   validate({ params }) {

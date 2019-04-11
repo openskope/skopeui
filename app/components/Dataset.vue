@@ -15,6 +15,7 @@
             :max-zoom="8"
             :zoom="region.zoom"
             :center="region.center"
+            :crs="defaultCrs"
           >
             <l-control-scale />
             <l-tile-layer :url="defaultBaseMap.url" :attribution="defaultBaseMap.attribution" />
@@ -88,7 +89,14 @@ import { BaseMapEndpoints } from '~/store/constants.js'
   },
   components: { VueMarkdown },
   // app specific functions
-  computed: {},
+  computed: {
+    defaultCrs() {
+      if (this.$L) {
+        return this.$L.CRS.EPSG4326
+      }
+      return ''
+    }
+  },
   methods: {
     initMap() {},
     initLayers() {}
