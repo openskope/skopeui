@@ -15,7 +15,6 @@
             :max-zoom="8"
             :zoom="region.zoom"
             :center="region.center"
-            :crs="defaultCrs"
           >
             <l-control-scale />
             <l-tile-layer :url="defaultBaseMap.url" :attribution="defaultBaseMap.attribution" />

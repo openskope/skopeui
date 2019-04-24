@@ -33,6 +33,7 @@
                           style="height: 100%"
                         >
                           <l-control-scale />
+                          <l-control-layers />
                           <l-tile-layer 
                             :url="defaultBaseMap.url"
                             :attribution="defaultBaseMap.attribution"
@@ -46,9 +47,9 @@
                             :layers="fillTemplateYear(variable.wmsLayer)"
                             :name="variable.name"
                             :transparent="true"
-                            :visible="false"
-                            :styles="variable.styles"
+                            :visible="true"
                             :cross-origin="true"
+                            :uppercase="true"
                             layer-type="base"
                             version="1.3.0"
                             format="image/png"
@@ -156,7 +157,7 @@ export default {
     },
     transformedCenterCoordinates() {
       const coordinates = this.selectedDataset.region.center
-      return [coordinates[1], coordinates[0]]
+      return coordinates
     }
   },
   created() {
