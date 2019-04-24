@@ -29,7 +29,6 @@
                         <l-map
                           :zoom="selectedDataset.region.zoom"
                           :center="transformedCenterCoordinates"
-                          :crs="defaultCrs"
                           style="height: 100%"
                         >
                           <l-control-scale />
@@ -43,6 +42,7 @@
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
                             :key="variable.wmsLayer"
+                            :crs="defaultCrs"
                             :base-url="skopeWmsUrl"
                             :layers="fillTemplateYear(variable.wmsLayer)"
                             :name="variable.name"
