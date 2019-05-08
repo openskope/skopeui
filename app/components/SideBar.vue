@@ -5,19 +5,19 @@
   >
     <section class="sidebar">
       <!-- sidebar sort -->
-      <side-bar-sort />
+      <discover-side-bar />
       <!-- end sidebar sort -->
     </section>
   </v-navigation-drawer>
 </template>
 
 <script>
-import SideBarSort from '../components/SideBarSort'
+import DiscoverSideBar from '../components/DiscoverSideBar'
 
 export default {
   name: 'SideBar',
   components: {
-    SideBarSort
+    DiscoverSideBar
   },
   data() {
     return {

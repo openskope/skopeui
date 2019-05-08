@@ -10,7 +10,7 @@
             name="search"
             class="search form-control"
             data-toggle="hideseek"
-            placeholder="Search datatsets"
+            placeholder="Search datasets"
             data-list=".sidebar-menu"
             @keydown.enter="search"
           >
@@ -65,60 +65,28 @@
     <!-- variable checkbox selector -->
     <v-subheader>Variables</v-subheader>
     <v-list
-      v-for="(variable, index) in variables"
+      v-for="(variable, index) in variableClasses"
       :key="index"
-      dense
     >
       <v-checkbox
         v-model="variable.checked"
         value="variable.name"
         :label="variable.name"
-        :change="getFilteredDatasets"
+        :change="filterDatasets"
       />
     </v-list>
     <!-- end variable checkbox selector -->
-
-    <!-- spacing between sorting methods -->
-    <v-spacer />
-    <v-divider />
-    <v-spacer />
-    <!-- end spacing between sorting methods -->
-    <v-subheader>Radio Button</v-subheader>
-    <v-radio-group v-model="radioSelect">
-      <v-radio
-        v-for="i in 5"
-        :key="i"
-        :label="`Radio ${ i }`"
-        :value="i"
-      />
-    </v-radio-group>
-    <!-- spacing between sorting methods -->
-    <v-spacer />
-    <v-divider />
-    <v-spacer />
-    <!-- end spacing between sorting methods -->
   </div>
 </template>
 <script>
 export default {
-  name: 'SideBarSort',
+  name: 'DiscoverSideBar',
   data() {
     return {
-      filteredDatasets: [],
-      filteredByVariables: [],
-      datasets: [],
       search: '',
-      bounds: [1, 2019],
-      variables: [
-        // populate this programmatically
-        { name: 'variable1', checked: false },
-        { name: 'variable2', checked: false },
-        { name: 'variable3', checked: false }
-      ],
-      radioSelect: 1
+      bounds: [1, 2019]
     }
   },
-
   computed: {
     selectedVariableFilters() {
       let checkedVariableFilters = []
@@ -129,35 +97,33 @@ export default {
       })
       return variableFilters
     },
-    defaultDataset() {
-      return this.$store.datasets
-    }
-  },
-  mounted() {
-    this.setVariablesArray()
-  },
-  methods: {
-    getFilteredDatasets() {
-      // filter checked variable filters
-      if (this.selectedVariableFilters.length > 0) {
-        this.filteredByVariables = this.filteredDatasets.filter(obj =>
-          this.selectedVariableFilters.every(
-            val => obj.variable.indexOf(val) >= 0
-          )
-        )
-        this.filteredDatasets = this.filteredByVariables
+    variableClasses() {
+      const datasets = this.$store.state.datasets.all
+      const variableClassSet = new Set()
+      for (const dataset of datasets) {
+        for (const variable of dataset.variables) {
+          variableClassSet.add(variable.class)
+        }
       }
-    },
-    setVariablesArray() {
-      this.variables = []
-      this.datasets = this.defaultDataset
-      for (let i = 0; i < this.datasets.length; i++) {
-        this.variables.push({
-          name: this.datasets.variables.name,
+      const variableClasses = []
+      for (const variableClass of variableClassSet) {
+        variableClasses.push({
+          name: variableClass,
           checked: false
         })
       }
-      return this.variables
+      return variableClasses
+    }
+  },
+  created() {
+    this.$store.dispatch('datasets/load')
+  },
+  mounted() {},
+  methods: {
+    filterDatasets() {
+      // FIXME: something magical happens to the store
+      // based on the criteria / parameterizations set on this component,
+      // update the store so that pages/index.vue can properly filter its datasets
     }
   }
 }
