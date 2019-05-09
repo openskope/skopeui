@@ -1,4 +1,4 @@
-<template>
+fjkfjkdjtjklfjjtjfndkljt<template>
   <div class="container">
     <!-- search form -->
     <form id="searchForm" class="sidebar-form" @submit.prevent>
@@ -63,7 +63,7 @@
     <v-spacer />
 
     <!-- variable checkbox selector -->
-    <v-subheader>Variables</v-subheader>
+    <v-subheader>Variable Classes</v-subheader>
     <v-list
       v-for="(variable, index) in variableClasses"
       :key="index"
