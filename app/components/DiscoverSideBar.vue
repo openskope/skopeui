@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <span class="title">Dataset Filters</span>
-    <v-spacer class="spacing"/>
+    <v-spacer class="spacing" />
     <!-- search form -->
     <form id="searchForm" class="sidebar-form" @submit.prevent>
       <div id="searchContainer" class="input-group">
@@ -65,10 +65,10 @@
       :key="index"
     >
       <v-checkbox
-        v-model="variable.checked"
-        value="variable.name"
+        v-model="selectedVariableClasses"
+        :value="variable.name"
         :label="variable.name"
-        :onclick="filterDatasets()"
+        @change="filterDatasets"
       />
     </v-list>
     <!-- end variable checkbox selector -->
@@ -81,19 +81,10 @@ export default {
     return {
       search: '',
       bounds: [1, 2019],
-      checkedVariables: []
+      selectedVariableClasses: []
     }
   },
   computed: {
-    // selectedVariableFilters() {
-    //   let checkedVariableFilters = []
-    //   const variableFilters = []
-    //   checkedVariableFilters = this.variables.filter(obj => obj.checked)
-    //   checkedVariableFilters.forEach(element => {
-    //     variableFilters.push(element.name)
-    //   })
-    //   return variableFilters
-    // },
     variableClasses() {
       const datasets = this.$store.state.datasets.all
       const variableClassSet = new Set()
@@ -110,14 +101,6 @@ export default {
         })
       }
       return variableClasses
-    },
-    selected: {
-      get() {
-        return this.$store.state.datasets.selected
-      },
-      set(value) {
-        this.$store.commit('UPDATE_SELECTED', value)
-      }
     }
   },
   created() {
@@ -129,7 +112,13 @@ export default {
       // FIXME: something magical happens to the store
       // based on the criteria / parameterizations set on this component,
       // update the store so that pages/index.vue can properly filter its datasets
-      console.log('print console')
+      console.log(this.selectedVariableClasses)
+      this.$store.dispatch('datasets/filter', {
+        selectedVariableClasses: this.selectedVariableClasses,
+        yearStart: 1,
+        yearEnd: 2019,
+        query: 'Word'
+      })
     }
   }
 }

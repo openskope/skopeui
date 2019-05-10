@@ -53,7 +53,7 @@ export default {
   },
   computed: {
     datasets() {
-      return this.$store.state.datasets.all
+      return this.$store.getters['datasets/filteredDatasets']
     }
   },
   created() {
