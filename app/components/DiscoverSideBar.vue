@@ -1,5 +1,7 @@
-fjkfjkdjtjklfjjtjfndkljt<template>
+<template>
   <div class="container">
+    <span class="title">Dataset Filters</span>
+    <v-spacer class="spacing"/>
     <!-- search form -->
     <form id="searchForm" class="sidebar-form" @submit.prevent>
       <div id="searchContainer" class="input-group">
@@ -21,9 +23,7 @@ fjkfjkdjtjklfjjtjfndkljt<template>
       </div>
     </form>
     <!-- end search form -->
-    <v-spacer />
-    <v-divider />
-    <v-spacer />
+    <v-divider class="dividerPadding" />
     <!-- time range slider -->
     <v-subheader>Range Slider</v-subheader>
     <v-layout row>
@@ -39,7 +39,6 @@ fjkfjkdjtjklfjjtjfndkljt<template>
           type="number"
         />
       </v-flex>
-      <v-spacer />
       <v-flex class="px-3">
         <v-range-slider
           v-model="bounds"
@@ -58,12 +57,9 @@ fjkfjkdjtjklfjjtjfndkljt<template>
       </v-flex>
     </v-layout>
     <!-- end time range slider -->
-    <v-spacer />
-    <v-divider />
-    <v-spacer />
-
+    <v-divider class="dividerPadding" />
     <!-- variable checkbox selector -->
-    <v-subheader>Variable Classes</v-subheader>
+    <v-subheader>Variables</v-subheader>
     <v-list
       v-for="(variable, index) in variableClasses"
       :key="index"
@@ -72,7 +68,7 @@ fjkfjkdjtjklfjjtjfndkljt<template>
         v-model="variable.checked"
         value="variable.name"
         :label="variable.name"
-        :change="filterDatasets"
+        :onclick="filterDatasets()"
       />
     </v-list>
     <!-- end variable checkbox selector -->
@@ -84,19 +80,20 @@ export default {
   data() {
     return {
       search: '',
-      bounds: [1, 2019]
+      bounds: [1, 2019],
+      checkedVariables: []
     }
   },
   computed: {
-    selectedVariableFilters() {
-      let checkedVariableFilters = []
-      const variableFilters = []
-      checkedVariableFilters = this.variables.filter(obj => obj.checked)
-      checkedVariableFilters.forEach(element => {
-        variableFilters.push(element.name)
-      })
-      return variableFilters
-    },
+    // selectedVariableFilters() {
+    //   let checkedVariableFilters = []
+    //   const variableFilters = []
+    //   checkedVariableFilters = this.variables.filter(obj => obj.checked)
+    //   checkedVariableFilters.forEach(element => {
+    //     variableFilters.push(element.name)
+    //   })
+    //   return variableFilters
+    // },
     variableClasses() {
       const datasets = this.$store.state.datasets.all
       const variableClassSet = new Set()
@@ -113,17 +110,26 @@ export default {
         })
       }
       return variableClasses
+    },
+    selected: {
+      get() {
+        return this.$store.state.datasets.selected
+      },
+      set(value) {
+        this.$store.commit('UPDATE_SELECTED', value)
+      }
     }
   },
   created() {
     this.$store.dispatch('datasets/load')
   },
-  mounted() {},
+  // mounted() {},
   methods: {
     filterDatasets() {
       // FIXME: something magical happens to the store
       // based on the criteria / parameterizations set on this component,
       // update the store so that pages/index.vue can properly filter its datasets
+      console.log('print console')
     }
   }
 }
@@ -146,5 +152,17 @@ export default {
 
 #search-btn {
   width: 20%;
+}
+
+.dividerPadding {
+  padding-bottom: 3em;
+}
+
+.title {
+  font-size: 18px;
+}
+
+.spacing {
+  padding-bottom: 2em;
 }
 </style>

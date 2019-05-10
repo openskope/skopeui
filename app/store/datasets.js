@@ -1,6 +1,7 @@
 export const state = () => ({
   // datasets array
   list: [],
+  selected: [],
   loading: false
 })
 
@@ -191,5 +192,8 @@ export const mutations = {
       }
     ]
     state.loading = false
+  },
+  UPDATE_SELECTED: (state, value) => {
+    state.selected.push(value)
   }
 }
