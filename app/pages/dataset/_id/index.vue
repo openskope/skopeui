@@ -28,7 +28,7 @@
                       <no-ssr placeholder="Loading...">
                         <l-map
                           :zoom="selectedDataset.region.zoom"
-                          :center="transformedCenterCoordinates"
+                          :center="selectedDataset.region.center"
                           style="height: 100%"
                         >
                           <l-control-scale />
@@ -117,6 +117,7 @@ import VueMarkdown from 'vue-markdown'
 const fillTemplate = require('es6-dynamic-template')
 
 export default {
+  layout: 'dataset',
   components: {
     Dataset,
     VueMarkdown
@@ -131,8 +132,7 @@ export default {
     selectedDataset() {
       // retrieve the dataset corresponding to the given route params id in the datastore
       // FIXME: needs error checking 404 if the dataset doesn't exist
-      const id = this.$route.params.id
-      return this.$store.state.datasets.all.find(dataset => dataset.id === id)
+      return this.$store.state.datasets.selectedDataset
     },
     skopeWmsUrl() {
       return SKOPE_WMS_ENDPOINT
@@ -154,14 +154,11 @@ export default {
         return this.$L.CRS.EPSG4326
       }
       return ''
-    },
-    transformedCenterCoordinates() {
-      const coordinates = this.selectedDataset.region.center
-      return coordinates
     }
   },
   created() {
     this.$store.dispatch('datasets/load')
+    this.$store.commit('datasets/selectDataset', this.$route.params.id)
   },
   head() {
     return {

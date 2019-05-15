@@ -4,9 +4,7 @@
     app
   >
     <section class="sidebar">
-      <!-- sidebar sort -->
       <discover-side-bar />
-      <!-- end sidebar sort -->
     </section>
   </v-navigation-drawer>
 </template>
@@ -18,11 +16,6 @@ export default {
   name: 'SideBar',
   components: {
     DiscoverSideBar
-  },
-  data() {
-    return {
-      fixed: false
-    }
   }
 }
 </script>

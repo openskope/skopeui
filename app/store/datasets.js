@@ -1,5 +1,6 @@
 export const state = () => ({
   loading: false,
+  selectedDataset: {},
   filterCriteria: {
     selectedVariableClasses: [],
     yearStart: 0,
@@ -219,6 +220,9 @@ export const mutations = {
     // FIXME: ideally this should get loaded from the backend from an async call
     state.all = ALL_DATA
     state.loading = false
+  },
+  selectDataset(state, id) {
+    state.selectedDataset = state.all.find(dataset => dataset.id === id)
   },
   applyFilterCriteria(state, filterCriteria) {
     console.log('Filter criteria')
