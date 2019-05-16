@@ -120,8 +120,8 @@ export default {
       console.log(this.selectedVariableClasses)
       this.$store.dispatch('datasets/filter', {
         selectedVariableClasses: this.selectedVariableClasses,
-        yearStart: payload[0],
-        yearEnd: payload[1],
+        yearStart: this.bounds[0],
+        yearEnd: this.bounds[1],
         query: 'Word'
       })
     }
