@@ -3,7 +3,7 @@ export const state = () => ({
   selectedDataset: {},
   filterCriteria: {
     selectedVariableClasses: [],
-    yearStart: 0,
+    yearStart: 1,
     yearEnd: 2019,
     query: ''
   }
@@ -14,9 +14,31 @@ export const getters = {
     return state.all.filter(dataset => {
       const selectedVariableClasses =
         state.filterCriteria.selectedVariableClasses
+      const yearStart = state.filterCriteria.yearStart
+      const yearEnd = state.filterCriteria.yearEnd
+      const query = state.filterCriteria.query
       if (selectedVariableClasses.length === 0) {
         return true
       }
+      // !x will be true for '', null, undefined, 0, NaN, false
+      if (!yearStart || !yearEnd) {
+        return true
+      }
+
+      if (!query) {
+        return true
+      }
+
+      // filtering datasets by time range
+      // for (const timespan of dataset.timespan) {
+      //   if (
+      //     yearStart >= timespan.period.gte &&
+      //     yearEnd <= timespan.period.lte
+      //   ) {
+      //     return true
+      //   }
+      // }
+
       for (const selectedVariableClass of selectedVariableClasses) {
         for (const variable of dataset.variables) {
           if (variable.class === selectedVariableClass) {
@@ -24,8 +46,8 @@ export const getters = {
           }
         }
       }
-    })
-  }
+    }) // end return filteredDatasets
+  } // end filteredDatasets
 }
 
 export const actions = {

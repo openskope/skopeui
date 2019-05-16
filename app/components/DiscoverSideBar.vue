@@ -15,6 +15,7 @@
             placeholder="Search datasets"
             data-list=".sidebar-menu"
             @keydown.enter="search"
+            @change="filterDatasets"
           >
           <button id="search-btn" type="submit" name="search" class="btn btn-flat" @click="search">
             <i class="fa fa-search" />
@@ -42,9 +43,11 @@
       <v-flex class="px-3">
         <v-range-slider
           v-model="bounds"
+          :value="bounds"
           :max="2019"
           :min="1"
           :step="1"
+          @change="filterDatasets"
         />
       </v-flex>
       <v-flex>
@@ -81,7 +84,9 @@ export default {
     return {
       search: '',
       bounds: [1, 2019],
-      selectedVariableClasses: []
+      selectedVariableClasses: [],
+      yearStart: 1,
+      yearEnd: 2019
     }
   },
   computed: {
@@ -108,15 +113,15 @@ export default {
   },
   // mounted() {},
   methods: {
-    filterDatasets() {
+    filterDatasets(payload) {
       // FIXME: something magical happens to the store
       // based on the criteria / parameterizations set on this component,
       // update the store so that pages/index.vue can properly filter its datasets
       console.log(this.selectedVariableClasses)
       this.$store.dispatch('datasets/filter', {
         selectedVariableClasses: this.selectedVariableClasses,
-        yearStart: 1,
-        yearEnd: 2019,
+        yearStart: payload[0],
+        yearEnd: payload[1],
         query: 'Word'
       })
     }
