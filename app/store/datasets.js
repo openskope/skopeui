@@ -140,6 +140,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:pmdi_${year}-01-01',
         min: -6.0,
         max: 6.0,
+        visible: true,
         styles: 'default',
         timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
         description:
@@ -188,6 +189,7 @@ const ALL_DATA = [
         class: 'Elevation',
         name: 'Elevation (m)',
         wmsLayer: 'SKOPE:srtm',
+        visible: true,
         min: 0.0,
         max: 4500.0,
         styles: 'default'
@@ -244,6 +246,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:paleocar_ppt_${year}-01-01',
         min: 0.0,
         max: 10.0,
+        visible: false,
         styles: 'default,raster'
       },
       {
@@ -254,6 +257,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:paleocar_gdd_${year}-01-01',
         min: 0.0,
         max: 10.0,
+        visible: false,
         styles: 'default,raster'
       },
       {
@@ -264,6 +268,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:niche_${year}',
         min: 0.0,
         max: 1.0,
+        visible: false,
         styles: 'default'
       }
     ]
