@@ -9,7 +9,7 @@
         Variable(s) to display
       </v-subheader>
       <v-list
-        v-for="(variable, index) in variables"
+        v-for="(variable, index) in dataset.variables"
         :key="index"
       >  
         <v-checkbox
@@ -64,18 +64,26 @@
   </v-navigation-drawer>
 </template>
 <script>
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapGetters } = createNamespacedHelpers('datasets')
+
 export default {
   name: 'DatasetControls',
   data: function() {
     return {
       selectedVariables: [],
-      temporalRange: [1, 2019]
+      temporalRange: []
     }
   },
   computed: {
-    variables() {
-      return this.$store.state.datasets.selectedDataset.variables
-    }
+    ...mapState({
+      dataset: 'selectedDataset'
+    }),
+    ...mapGetters(['selectedDatasetTimespan'])
+  },
+  created: function() {
+    this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
+    this.temporalRange = this.selectedDatasetTimespan
   }
 }
 </script>

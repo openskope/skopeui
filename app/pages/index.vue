@@ -35,26 +35,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Dataset from '~/components/Dataset.vue'
-/*
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
 
-export default {
-  components: {
-    Logo,
-    VuetifyLogo
-  }
-}
-*/
 export default {
   components: {
     Dataset
   },
   computed: {
-    datasets() {
-      return this.$store.getters['datasets/filteredDatasets']
-    }
+    ...mapGetters({
+      datasets: 'datasets/filteredDatasets'
+    })
   },
   created() {
     this.$store.dispatch('datasets/load')

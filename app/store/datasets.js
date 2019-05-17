@@ -1,5 +1,6 @@
 export const state = () => ({
   loading: false,
+  all: [],
   selectedDataset: {},
   filterCriteria: {
     selectedVariableClasses: [],
@@ -10,6 +11,14 @@ export const state = () => ({
 })
 
 export const getters = {
+  selectedDatasetTimespan(state) {
+    const dataset = state.selectedDataset
+    if (dataset.id) {
+      return [dataset.timespan.period.gte, dataset.timespan.period.lte]
+    }
+    console.log('No selected dataset, returning default year range')
+    return [1, new Date().getFullYear()]
+  },
   filteredDatasets(state) {
     return state.all.filter(dataset => {
       const selectedVariableClasses =
@@ -51,15 +60,40 @@ export const getters = {
 }
 
 export const actions = {
-  load(context) {
-    if (context.state.loading) {
+  load({ state, commit }) {
+    if (state.loading) {
       console.debug('already loading - ignoring request')
     } else {
-      context.commit('load')
+      commit('load')
     }
   },
   filter(context, filterCriteria) {
     context.commit('applyFilterCriteria', filterCriteria)
+  },
+  loadDataset({ state, commit }, id) {
+    if (state.selectedDataset.id !== id) {
+      if (state.all === undefined || state.all.length === 0) {
+        commit('load')
+      }
+      commit('selectDataset', id)
+    }
+  }
+}
+
+export const mutations = {
+  load(state) {
+    state.loading = true
+    // FIXME: eventually this should get loaded from the backend from an async call
+    state.all = ALL_DATA
+    state.loading = false
+  },
+  selectDataset(state, id) {
+    state.selectedDataset = state.all.find(dataset => dataset.id === id)
+  },
+  applyFilterCriteria(state, filterCriteria) {
+    console.log('Filter criteria')
+    console.log(filterCriteria)
+    state.filterCriteria = filterCriteria
   }
 }
 
@@ -235,20 +269,3 @@ const ALL_DATA = [
     ]
   }
 ]
-
-export const mutations = {
-  load(state) {
-    state.loading = true
-    // FIXME: ideally this should get loaded from the backend from an async call
-    state.all = ALL_DATA
-    state.loading = false
-  },
-  selectDataset(state, id) {
-    state.selectedDataset = state.all.find(dataset => dataset.id === id)
-  },
-  applyFilterCriteria(state, filterCriteria) {
-    console.log('Filter criteria')
-    console.log(filterCriteria)
-    state.filterCriteria = filterCriteria
-  }
-}

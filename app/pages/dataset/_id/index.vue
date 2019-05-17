@@ -9,18 +9,25 @@
           >
             <v-container fill-width fluid>
               <Dataset v-bind="selectedDataset" />
-              <v-layout fill-height>
-                <v-card-text>
-                  <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                    <span class="font-weight-bold">
-                      {{ label }}:
-                    </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
-                  </div>
-                </v-card-text>
-              </v-layout>
-            </v-container>
-            <v-divider />
-            <v-container grid-list-md fill-height fill-width>
+              <v-expansion-panel light>
+                <v-expansion-panel-content>
+                  <template v-slot:header>
+                    <div class="title">
+                      Detailed Metadata
+                    </div>
+                  </template>
+                  <v-layout fill-height>
+                    <v-card-text>
+                      <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
+                        <span class="font-weight-bold">
+                          {{ label }}:
+                        </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+                      </div>
+                    </v-card-text>
+                  </v-layout>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-divider />
               <v-layout column align-center justify-center>
                 <v-flex xs12>
                   <v-card-text>
@@ -41,6 +48,7 @@
                           />
                           <l-wms-tile-layer
                             v-for="variable in selectedDataset.variables"
+                            ref="wmsLayers"
                             :key="variable.wmsLayer"
                             :crs="defaultCrs"
                             :base-url="skopeWmsUrl"
@@ -49,7 +57,6 @@
                             :transparent="true"
                             :visible="true"
                             :cross-origin="true"
-                            :uppercase="true"
                             layer-type="base"
                             version="1.3.0"
                             format="image/png"
@@ -57,6 +64,37 @@
                         </l-map>
                       </no-ssr>
                     </div>
+                    <v-subheader class="title">
+                      Date range (year)
+                    </v-subheader>
+                    <v-layout row align-center justify-center>
+                      <v-flex shrink style="width: 60px">
+                        <v-text-field
+                          v-model="temporalRange[0]" 
+                          style="width: 50px"
+                          hide-details
+                          single-line
+                          type="number"
+                        />
+                      </v-flex>
+                      <v-flex class="px-3">
+                        <v-range-slider
+                          v-model="temporalRange"
+                          :max="2019"
+                          :min="1"
+                          :step="1"
+                        />
+                      </v-flex>
+                      <v-flex>
+                        <v-text-field
+                          v-model="temporalRange[1]"
+                          style="width: 50px"
+                          hide-details
+                          single-line
+                          type="number"
+                        />
+                      </v-flex>
+                    </v-layout>
                   </v-card-text>
                   <v-card-actions>
                     <v-layout align-center justify-center>
@@ -111,10 +149,12 @@
 </template>
 
 <script>
-import Dataset from '~/components/Dataset.vue'
-import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import VueMarkdown from 'vue-markdown'
+import { createNamespacedHelpers } from 'vuex'
+import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
+import Dataset from '~/components/Dataset.vue'
 const fillTemplate = require('es6-dynamic-template')
+const { mapState, mapGetters } = createNamespacedHelpers('datasets')
 
 export default {
   layout: 'dataset',
@@ -125,17 +165,32 @@ export default {
   data() {
     return {
       length: 3,
-      onboarding: 0
+      onboarding: 0,
+      temporalRange: []
     }
   },
   computed: {
-    selectedDataset() {
-      // retrieve the dataset corresponding to the given route params id in the datastore
-      // FIXME: needs error checking 404 if the dataset doesn't exist
-      return this.$store.state.datasets.selectedDataset
-    },
+    // retrieve the dataset corresponding to the given route params id in the datastore
+    // FIXME: needs error checking 404 if the dataset doesn't exist
+    ...mapState(['selectedDataset']),
+    ...mapGetters(['selectedDatasetTimespan']),
+    // FIXME: lift these into a store instead
     skopeWmsUrl() {
       return SKOPE_WMS_ENDPOINT
+    },
+    fillTemplateYear() {
+      return templateString => {
+        const year = this.temporalRange[0].toString()
+        const layer = fillTemplate(templateString, {
+          year: year.padStart(4, '0')
+        })
+        console.log('layer')
+        console.log(layer)
+        return layer
+      }
+    },
+    defaultBaseMap() {
+      return BaseMapEndpoints.default
     },
     metadataAttributes() {
       return {
@@ -146,9 +201,6 @@ export default {
         contactInformation: 'Contact Information'
       }
     },
-    defaultBaseMap() {
-      return BaseMapEndpoints.default
-    },
     defaultCrs() {
       if (this.$L) {
         return this.$L.CRS.EPSG4326
@@ -157,8 +209,9 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('datasets/load')
-    this.$store.commit('datasets/selectDataset', this.$route.params.id)
+    this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
+    this.temporalRange = this.selectedDatasetTimespan
+    console.log(this.selectedDataset.variables)
   },
   head() {
     return {
@@ -171,16 +224,6 @@ export default {
     },
     prev() {
       this.onboarding = (this.onboarding - 1 + this.length) % this.length
-    },
-    fillTemplateYear(templateString, year) {
-      // FIXME: year should be injected from data slider
-      if (year === undefined) {
-        year = '1'
-      }
-      const layer = fillTemplate(templateString, {
-        year: year.padStart(4, '0')
-      })
-      return layer
     }
   },
   validate({ params }) {
