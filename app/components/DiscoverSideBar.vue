@@ -12,6 +12,7 @@
             name="search"
             class="search form-control"
             data-toggle="hideseek"
+            v-model="search"
             placeholder="Search datasets"
             data-list=".sidebar-menu"
             @keydown.enter="search"
@@ -122,7 +123,7 @@ export default {
         selectedVariableClasses: this.selectedVariableClasses,
         yearStart: this.bounds[0],
         yearEnd: this.bounds[1],
-        query: 'Word'
+        query: this.search
       })
     }
   }
