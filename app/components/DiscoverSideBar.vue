@@ -8,11 +8,11 @@
         <span class="input-group-btn">
           <input
             id="search"
+            v-model="search"
             type="text"
             name="search"
             class="search form-control"
             data-toggle="hideseek"
-            v-model="search"
             placeholder="Search datasets"
             data-list=".sidebar-menu"
             @keydown.enter="search"

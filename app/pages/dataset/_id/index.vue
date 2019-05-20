@@ -38,7 +38,6 @@
                       <l-tile-layer 
                         :url="defaultBaseMap.url"
                         :attribution="defaultBaseMap.attribution"
-                        :cross-origin="true"
                         :transparent="false"
                       />
                       <l-wms-tile-layer
@@ -51,7 +50,7 @@
                         :name="variable.name"
                         :transparent="true"
                         :visible="variable.visible"
-                        :cross-origin="true"
+                        :opacity="0.5"
                         layer-type="base"
                         version="1.3.0"
                         format="image/png"
