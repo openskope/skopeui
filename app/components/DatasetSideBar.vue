@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer
-    fixed
+    absolute
     clipped
     app
   >

@@ -124,6 +124,8 @@ export default class Dataset extends Vue {
 <style>
 .map {
   height: 100%;
+  position: relative;
+  z-index: 1;
 }
 .variable {
   height: 3em;
