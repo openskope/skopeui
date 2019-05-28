@@ -32,7 +32,7 @@
                       ref="layerMap"
                       :zoom="selectedDataset.region.zoom"
                       :center="selectedDataset.region.center"
-                      style="height: 100%"
+                      style="height: 100%; z-index: 1;"
                     >
                       <l-control-scale />
                       <l-control-layers />
@@ -164,7 +164,8 @@ export default {
       temporalRange: [],
       selectedLayer: undefined,
       legendControl: undefined,
-      legendImage: undefined
+      legendImage: undefined,
+      legendPosition: 'bottomleft'
     }
   },
   computed: {
@@ -242,7 +243,7 @@ export default {
       const L = this.$L
       const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
       if (this.legendControl === undefined) {
-        const legend = L.control({ position: 'bottomright' })
+        const legend = L.control({ position: this.legendPosition })
         console.log(map)
         legend.onAdd = map => {
           const controlCss = 'leaflet-control-wms-legend'
