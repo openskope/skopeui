@@ -29,6 +29,7 @@
                 <div style="height: 600px; width: 600px;">
                   <no-ssr placeholder="Loading...">
                     <l-map
+                      ref="layerMap"
                       :zoom="selectedDataset.region.zoom"
                       :center="selectedDataset.region.center"
                       style="height: 100%"
@@ -41,7 +42,7 @@
                         :transparent="false"
                       />
                       <l-wms-tile-layer
-                        v-for="variable in selectedDataset.variables"
+                        v-for="variable of selectedDataset.variables"
                         ref="wmsLayers"
                         :key="variable.wmsLayer"
                         :crs="defaultCrs"
@@ -144,6 +145,7 @@
 <script>
 import VueMarkdown from 'vue-markdown'
 import { createNamespacedHelpers } from 'vuex'
+import { stringify } from 'query-string'
 import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import Dataset from '~/components/Dataset.vue'
 const fillTemplate = require('es6-dynamic-template')
@@ -159,7 +161,10 @@ export default {
     return {
       length: 3,
       onboarding: 0,
-      temporalRange: []
+      temporalRange: [],
+      selectedLayer: undefined,
+      legendControl: undefined,
+      legendImage: undefined
     }
   },
   computed: {
@@ -194,6 +199,16 @@ export default {
     this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
     this.temporalRange = this.selectedDatasetTimespan
   },
+  mounted() {
+    this.$nextTick(() => {
+      console.log(this.$refs.layerMap.mapObject)
+      this.$refs.layerMap.mapObject.on('layeradd', event => {
+        console.log(event)
+        this.selectedLayer = event.layer
+        this.updateWmsLegend(event.target, this.selectedLayer.wmsParams.layers)
+      })
+    })
+  },
   head() {
     return {
       title: this.selectedDataset.title
@@ -206,6 +221,46 @@ export default {
     prev() {
       this.onboarding = (this.onboarding - 1 + this.length) % this.length
     },
+    setLegendImage(htmlElement) {
+      this.legendImage = htmlElement
+    },
+    generateWmsLegendUrl(layerName) {
+      const query = {
+        REQUEST: 'GetLegendGraphic',
+        VERSION: '1.0.0',
+        FORMAT: 'image/png',
+        LAYER: layerName,
+        LEGEND_OPTIONS: 'layout:vertical;dx:10'
+      }
+      const queryString = stringify(query)
+      console.log(queryString)
+      const legendUrl = this.skopeWmsUrl + queryString
+      console.log(legendUrl)
+      return legendUrl
+    },
+    updateWmsLegend(map, layerName) {
+      const L = this.$L
+      const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
+      if (this.legendControl === undefined) {
+        const legend = L.control({ position: 'bottomright' })
+        console.log(map)
+        legend.onAdd = map => {
+          const controlCss = 'leaflet-control-wms-legend'
+          const legendCss = 'wms-legend'
+          const div = L.DomUtil.create('div', controlCss)
+          const legendImage = L.DomUtil.create('img', legendCss, div)
+          legendImage.src = wmsLegendUrl
+          this.setLegendImage(legendImage)
+          return div
+        }
+        legend.addTo(map)
+        this.legendControl = legend
+      }
+      if (this.legendImage !== undefined) {
+        console.log(this.legendImage)
+        this.legendImage.src = wmsLegendUrl
+      }
+    },
     fillTemplateYear(templateString) {
       const year = this.temporalRange[0].toString()
       const layer = fillTemplate(templateString, {
@@ -213,13 +268,25 @@ export default {
       })
       return layer
     },
-    updateWmsLayer() {
-      for (const wmsLayer of this.$refs.wmsLayers) {
-        const layerTemplateString = wmsLayer.$vnode.data.key
-        wmsLayer.mapObject.setParams(
-          { layers: this.fillTemplateYear(layerTemplateString) },
-          false
-        )
+    updateWmsLayer(event) {
+      if (this.selectedLayer !== undefined) {
+        for (const wmsLayerRef of this.$refs.wmsLayers) {
+          const wmsLayer = wmsLayerRef.mapObject
+          if (wmsLayer === this.selectedLayer) {
+            console.log(wmsLayer)
+            const layerTemplateString = wmsLayerRef.$vnode.data.key
+            const layerName = this.fillTemplateYear(layerTemplateString)
+            // programmatically add the legend to the mapObject
+            this.updateWmsLegend(
+              wmsLayerRef.parentContainer.mapObject,
+              layerName
+            )
+            wmsLayer.setParams(
+              { layers: this.fillTemplateYear(layerName) },
+              false
+            )
+          }
+        }
       }
     }
   },
