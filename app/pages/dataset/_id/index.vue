@@ -1,6 +1,6 @@
 <template>
   <v-layout row>
-    <v-flex md12>
+    <v-flex>
       <v-card flat tile>
         <v-container fill-width fluid>
           <v-layout
@@ -9,90 +9,49 @@
             mb-2
             align-content-start
             justify-space-around
-            fill-height
+            wrap
           >
-            <v-flex xs6>
-              <v-card-text>
-                <div style="height: 500px;">
-                  <no-ssr placeholder="Loading...">
-                    <l-map
-                      ref="layerMap"
-                      :zoom="selectedDataset.region.zoom"
-                      :center="selectedDataset.region.center"
-                      style="z-index: 1"
-                    >
-                      <l-control-scale />
-                      <l-control-layers />
-                      <l-tile-layer
-                        :url="defaultBaseMap.url"
-                        :attribution="defaultBaseMap.attribution"
-                        :transparent="false"
-                      />
-                      <l-wms-tile-layer
-                        v-for="variable of selectedDataset.variables"
-                        ref="wmsLayers"
-                        :key="variable.wmsLayer"
-                        :crs="defaultCrs"
-                        :base-url="skopeWmsUrl"
-                        :layers="fillTemplateYear(variable.wmsLayer)"
-                        :name="variable.name"
-                        :transparent="true"
-                        :visible="variable.visible"
-                        :opacity="0.5"
-                        layer-type="base"
-                        version="1.3.0"
-                        format="image/png"
-                      />
-                    </l-map>
-                  </no-ssr>
-                </div>
-                <v-subheader class="title">
-                  Date range (year)
-                </v-subheader>
-                <v-layout row align-center justify-center>
-                  <v-flex shrink style="width: 60px">
-                    <v-text-field
-                      v-model="temporalRange[0]"
-                      style="width: 50px"
-                      hide-details
-                      single-line
-                      type="number"
+            <v-flex xs12 md6 id="map-flex">
+              <div class="map px-2">
+                <no-ssr placeholder="Loading...">
+                  <l-map
+                    ref="layerMap"
+                    :zoom="selectedDataset.region.zoom"
+                    :center="selectedDataset.region.center"
+                    style="z-index: 2"
+                  >
+                    <l-control-scale />
+                    <l-control-layers />
+                    <l-tile-layer
+                      :url="defaultBaseMap.url"
+                      :attribution="defaultBaseMap.attribution"
+                      :transparent="false"
                     />
-                  </v-flex>
-                  <v-flex class="px-3">
-                    <v-range-slider
-                      v-model="temporalRange"
-                      :max="2019"
-                      :min="1"
-                      :step="1"
-                      @change="updateWmsLayer"
+                    <l-wms-tile-layer
+                      v-for="variable of selectedDataset.variables"
+                      ref="wmsLayers"
+                      :key="variable.wmsLayer"
+                      :crs="defaultCrs"
+                      :base-url="skopeWmsUrl"
+                      :layers="fillTemplateYear(variable.wmsLayer)"
+                      :name="variable.name"
+                      :transparent="true"
+                      :visible="variable.visible"
+                      :opacity="0.5"
+                      layer-type="base"
+                      version="1.3.0"
+                      format="image/png"
                     />
-                  </v-flex>
-                  <v-flex>
-                    <v-text-field
-                      v-model="temporalRange[1]"
-                      style="width: 50px"
-                      hide-details
-                      single-line
-                      type="number"
-                    />
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-              <v-card-actions>
-                <v-layout align-center justify-center>
-                  <v-icon>play_circle_filled</v-icon>
-                  <v-icon>pause</v-icon>
-                  <v-icon>stop</v-icon>
-                </v-layout>
-              </v-card-actions>
+                  </l-map>
+                </no-ssr>
+              </div>
             </v-flex>
-            <v-flex xs6>
+            <v-flex xs12 md6>
               <div class="px-2">
                 <v-card>
                   <v-card-title class="pb-0">
                     <h2 class="headline">
-                        {{ selectedDataset.title }}
+                      {{ selectedDataset.title }}
                     </h2>
                   </v-card-title>
                   <v-subheader class="subheading">
@@ -101,10 +60,51 @@
                   <v-card-text class="body">
                     <vue-markdown :source="selectedDataset.description" />
                   </v-card-text>
-                  <v-list dense light>
-                    <v-subheader class="title">
-                      Variables
+                  <v-card-text class="pb-0 pt-0">
+                    <v-subheader class="title pa-0">
+                      Date range (year)
                     </v-subheader>
+                    <v-layout row align-center justify-center>
+                      <v-flex shrink style="width: 60px">
+                        <v-text-field
+                          v-model="temporalRange[0]"
+                          style="width: 50px"
+                          hide-details
+                          single-line
+                          type="number"
+                        />
+                      </v-flex>
+                      <v-flex class="px-3">
+                        <v-range-slider
+                          v-model="temporalRange"
+                          :max="2019"
+                          :min="1"
+                          :step="1"
+                          @change="updateWmsLayer"
+                        />
+                      </v-flex>
+                      <v-flex>
+                        <v-text-field
+                          v-model="temporalRange[1]"
+                          style="width: 50px"
+                          hide-details
+                          single-line
+                          type="number"
+                        />
+                      </v-flex>
+                    </v-layout>
+                    <v-card-actions>
+                      <v-layout align-center justify-center>
+                        <v-icon>play_circle_filled</v-icon>
+                        <v-icon>pause</v-icon>
+                        <v-icon>stop</v-icon>
+                      </v-layout>
+                    </v-card-actions>
+                  </v-card-text>
+                  <v-subheader class="title">
+                    Variables
+                  </v-subheader>
+                  <v-list dense light>
                     <v-list-tile v-for="(variable, index) in selectedDataset.variables" :key="index" avatar>
                       <v-list-tile-content>
                         <v-list-tile-title class="variable">
@@ -308,3 +308,26 @@ export default class DatasetDetail extends Vue {
   }
 }
 </script>
+<style>
+@media all and (max-width: 960px) {
+  #map-flex {
+    height: 500px;
+  }
+}
+
+@media all and (max-width: 600px) {
+  #map-flex {
+    height: 350px;
+  }
+}
+
+.map {
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.variable {
+  height: 3em;
+}
+</style>
