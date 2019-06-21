@@ -102,8 +102,6 @@ import { BaseMapEndpoints } from '~/store/constants.js'
   }
 })
 export default class Dataset extends Vue {
-  // when app is mounted
-  mounted() {}
   get defaultBaseMap() {
     return BaseMapEndpoints.default
   }

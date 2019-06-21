@@ -1,7 +1,6 @@
 <template>
   <v-app light>
     <Header />
-    <dataset-side-bar />
     <v-content>
       <v-container fluid>
         <nuxt />
@@ -13,7 +12,6 @@
 
 <script>
 import Header from '../components/Header'
-import DatasetSideBar from '../components/DatasetSideBar'
 import Footer from '../components/Footer'
 
 export default {
@@ -21,7 +19,6 @@ export default {
   title: 'SKOPE',
   components: {
     Header,
-    DatasetSideBar,
     Footer
   }
 }
