@@ -92,9 +92,7 @@
                 <v-card>
                   <v-card-title class="pb-0">
                     <h2 class="headline">
-                      <nuxt-link :to="absoluteUrl" class="blue--text">
                         {{ selectedDataset.title }}
-                      </nuxt-link>
                     </h2>
                   </v-card-title>
                   <v-subheader class="subheading">
@@ -126,21 +124,16 @@
                       </nuxt-link>
                     </div>
                   </v-card-text>
+                  <v-card-text>
+                    <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
+                      <span class="font-weight-bold">
+                        {{ label }}:
+                      </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+                    </div>
+                  </v-card-text>
                 </v-card>
               </div>
             </v-flex>
-          </v-layout>
-          <div class="title">
-            Detailed Metadata
-          </div>
-          <v-layout fill-height>
-            <v-card-text>
-              <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                <span class="font-weight-bold">
-                  {{ label }}:
-                </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
-              </div>
-            </v-card-text>
           </v-layout>
         </v-container>
       </v-card>
