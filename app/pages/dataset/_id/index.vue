@@ -1,144 +1,138 @@
 <template>
-  <v-layout row>
-    <v-flex>
-      <v-card flat tile>
-        <v-container fill-width fluid>
-          <v-layout
-            row
-            pa-2
-            mb-2
-            align-content-start
-            justify-space-around
-            wrap
-          >
-            <v-flex xs12 md6 id="map-flex">
-              <div class="map px-2">
-                <no-ssr placeholder="Loading...">
-                  <l-map
-                    ref="layerMap"
-                    :zoom="selectedDataset.region.zoom"
-                    :center="selectedDataset.region.center"
-                    style="z-index: 2"
-                  >
-                    <l-control-scale />
-                    <l-control-layers />
-                    <l-tile-layer
-                      :url="defaultBaseMap.url"
-                      :attribution="defaultBaseMap.attribution"
-                      :transparent="false"
-                    />
-                    <l-wms-tile-layer
-                      v-for="variable of selectedDataset.variables"
-                      ref="wmsLayers"
-                      :key="variable.wmsLayer"
-                      :crs="defaultCrs"
-                      :base-url="skopeWmsUrl"
-                      :layers="fillTemplateYear(variable.wmsLayer)"
-                      :name="variable.name"
-                      :transparent="true"
-                      :visible="variable.visible"
-                      :opacity="0.5"
-                      layer-type="base"
-                      version="1.3.0"
-                      format="image/png"
-                    />
-                  </l-map>
-                </no-ssr>
+  <v-container fill-width fluid>
+    <v-layout
+      row
+      pa-2
+      mb-2
+      align-content-start
+      justify-space-around
+      wrap
+    >
+      <v-flex xs12 md6 id="map-flex">
+        <div class="map px-2">
+          <no-ssr placeholder="Loading...">
+            <l-map
+              ref="layerMap"
+              :zoom="selectedDataset.region.zoom"
+              :center="selectedDataset.region.center"
+              style="z-index: 2"
+            >
+              <l-control-scale />
+              <l-control-layers />
+              <l-tile-layer
+                :url="defaultBaseMap.url"
+                :attribution="defaultBaseMap.attribution"
+                :transparent="false"
+              />
+              <l-wms-tile-layer
+                v-for="variable of selectedDataset.variables"
+                ref="wmsLayers"
+                :key="variable.wmsLayer"
+                :crs="defaultCrs"
+                :base-url="skopeWmsUrl"
+                :layers="fillTemplateYear(variable.wmsLayer)"
+                :name="variable.name"
+                :transparent="true"
+                :visible="variable.visible"
+                :opacity="0.5"
+                layer-type="base"
+                version="1.3.0"
+                format="image/png"
+              />
+            </l-map>
+          </no-ssr>
+        </div>
+      </v-flex>
+      <v-flex xs12 md6>
+        <div class="px-2">
+          <v-card>
+            <v-card-title class="pb-0">
+              <h2 class="headline">
+                {{ selectedDataset.title }}
+              </h2>
+            </v-card-title>
+            <v-subheader class="subheading">
+              {{ spatialCoverage }} | {{ temporalCoverage }}
+            </v-subheader>
+            <v-card-text class="body">
+              <vue-markdown :source="selectedDataset.description" />
+            </v-card-text>
+            <v-card-text class="pb-0 pt-0">
+              <v-subheader class="title pa-0">
+                Date range (year)
+              </v-subheader>
+              <v-layout row align-center justify-center>
+                <v-flex shrink style="width: 60px">
+                  <v-text-field
+                    v-model="temporalRange[0]"
+                    style="width: 50px"
+                    hide-details
+                    single-line
+                    type="number"
+                  />
+                </v-flex>
+                <v-flex class="px-3">
+                  <v-range-slider
+                    v-model="temporalRange"
+                    :max="2019"
+                    :min="1"
+                    :step="1"
+                    @change="updateWmsLayer"
+                  />
+                </v-flex>
+                <v-flex>
+                  <v-text-field
+                    v-model="temporalRange[1]"
+                    style="width: 50px"
+                    hide-details
+                    single-line
+                    type="number"
+                  />
+                </v-flex>
+              </v-layout>
+              <v-card-actions>
+                <v-layout align-center justify-center>
+                  <v-icon>play_circle_filled</v-icon>
+                  <v-icon>pause</v-icon>
+                  <v-icon>stop</v-icon>
+                </v-layout>
+              </v-card-actions>
+            </v-card-text>
+            <v-subheader class="title">
+              Variables
+            </v-subheader>
+            <v-list dense light>
+              <v-list-tile v-for="(variable, index) in selectedDataset.variables" :key="index" avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title class="variable">
+                    <v-chip small color="secondary">
+                      {{ variable.class }}
+                    </v-chip> {{ variable.name }}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+            <v-card-text>
+              <div class="py-3 citation">
+                <em class="font-weight-bold">
+                  Source:
+                </em> <nuxt-link class="font-weight-thin" :to="selectedDataset.sourceUrl">
+                  {{ selectedDataset.sourceUrl }}
+                </nuxt-link>
               </div>
-            </v-flex>
-            <v-flex xs12 md6>
-              <div class="px-2">
-                <v-card>
-                  <v-card-title class="pb-0">
-                    <h2 class="headline">
-                      {{ selectedDataset.title }}
-                    </h2>
-                  </v-card-title>
-                  <v-subheader class="subheading">
-                    {{ spatialCoverage }} | {{ temporalCoverage }}
-                  </v-subheader>
-                  <v-card-text class="body">
-                    <vue-markdown :source="selectedDataset.description" />
-                  </v-card-text>
-                  <v-card-text class="pb-0 pt-0">
-                    <v-subheader class="title pa-0">
-                      Date range (year)
-                    </v-subheader>
-                    <v-layout row align-center justify-center>
-                      <v-flex shrink style="width: 60px">
-                        <v-text-field
-                          v-model="temporalRange[0]"
-                          style="width: 50px"
-                          hide-details
-                          single-line
-                          type="number"
-                        />
-                      </v-flex>
-                      <v-flex class="px-3">
-                        <v-range-slider
-                          v-model="temporalRange"
-                          :max="2019"
-                          :min="1"
-                          :step="1"
-                          @change="updateWmsLayer"
-                        />
-                      </v-flex>
-                      <v-flex>
-                        <v-text-field
-                          v-model="temporalRange[1]"
-                          style="width: 50px"
-                          hide-details
-                          single-line
-                          type="number"
-                        />
-                      </v-flex>
-                    </v-layout>
-                    <v-card-actions>
-                      <v-layout align-center justify-center>
-                        <v-icon>play_circle_filled</v-icon>
-                        <v-icon>pause</v-icon>
-                        <v-icon>stop</v-icon>
-                      </v-layout>
-                    </v-card-actions>
-                  </v-card-text>
-                  <v-subheader class="title">
-                    Variables
-                  </v-subheader>
-                  <v-list dense light>
-                    <v-list-tile v-for="(variable, index) in selectedDataset.variables" :key="index" avatar>
-                      <v-list-tile-content>
-                        <v-list-tile-title class="variable">
-                          <v-chip small color="secondary">
-                            {{ variable.class }}
-                          </v-chip> {{ variable.name }}
-                        </v-list-tile-title>
-                      </v-list-tile-content>
-                    </v-list-tile>
-                  </v-list>
-                  <v-card-text>
-                    <div class="py-3 citation">
-                      <em class="font-weight-bold">
-                        Source:
-                      </em> <nuxt-link class="font-weight-thin" :to="selectedDataset.sourceUrl">
-                        {{ selectedDataset.sourceUrl }}
-                      </nuxt-link>
-                    </div>
-                  </v-card-text>
-                  <v-card-text>
-                    <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                      <span class="font-weight-bold">
-                        {{ label }}:
-                      </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
-                    </div>
-                  </v-card-text>
-                </v-card>
+            </v-card-text>
+            <v-card-text>
+              <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
+                <span class="font-weight-bold">
+                  {{ label }}:
+                </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
               </div>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-card>
-    </v-flex>
-  </v-layout>
+            </v-card-text>
+          </v-card>
+        </div>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
