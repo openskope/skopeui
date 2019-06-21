@@ -97,6 +97,9 @@ module.exports = {
           exclude: /(node_modules)/
         })
       }
+      if (ctx.isClient) {
+        config.devtool = '#source-map'
+      }
     }
   }
 }
