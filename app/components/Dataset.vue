@@ -119,7 +119,7 @@ export default class Dataset extends Vue {
   }
 }
 </script>
-<style>
+<style scoped>
 .map {
   height: 100%;
   position: relative;

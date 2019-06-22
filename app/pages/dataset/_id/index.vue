@@ -42,6 +42,37 @@
             </l-map>
           </no-ssr>
         </div>
+        <v-form>
+          <v-container py-0>
+            <v-layout align-center justify-space-between row>
+              <v-subheader class="pa-0">
+                Date range (year)
+              </v-subheader>
+              <div>
+                <v-icon>play_circle_filled</v-icon>
+                <v-icon>pause</v-icon>
+                <v-icon>stop</v-icon>
+              </div>
+            </v-layout>
+            <v-slider
+              :value="year"
+              :max="maxYear"
+              :min="minYear"
+              :thumb-size="30"
+              thumb-label
+              @change="updateYear"
+              class="mt-0"
+            >
+              <template v-slot:prepend>
+                {{ minYear }}
+              </template>
+              <template v-slot:append>
+                {{ maxYear }}
+              </template>
+            </v-slider>
+          </v-container>
+
+        </v-form>
       </v-flex>
       <v-flex xs12 md6>
         <div class="px-2">
@@ -56,47 +87,6 @@
             </v-subheader>
             <v-card-text class="body">
               <vue-markdown :source="selectedDataset.description" />
-            </v-card-text>
-            <v-card-text class="pb-0 pt-0">
-              <v-subheader class="title pa-0">
-                Date range (year)
-              </v-subheader>
-              <v-layout row align-center justify-center>
-                <v-flex shrink style="width: 60px">
-                  <v-text-field
-                    v-model="temporalRange[0]"
-                    style="width: 50px"
-                    hide-details
-                    single-line
-                    type="number"
-                  />
-                </v-flex>
-                <v-flex class="px-3">
-                  <v-range-slider
-                    v-model="temporalRange"
-                    :max="2019"
-                    :min="1"
-                    :step="1"
-                    @change="updateWmsLayer"
-                  />
-                </v-flex>
-                <v-flex>
-                  <v-text-field
-                    v-model="temporalRange[1]"
-                    style="width: 50px"
-                    hide-details
-                    single-line
-                    type="number"
-                  />
-                </v-flex>
-              </v-layout>
-              <v-card-actions>
-                <v-layout align-center justify-center>
-                  <v-icon>play_circle_filled</v-icon>
-                  <v-icon>pause</v-icon>
-                  <v-icon>stop</v-icon>
-                </v-layout>
-              </v-card-actions>
             </v-card-text>
             <v-subheader class="title">
               Variables
@@ -156,15 +146,24 @@ export default class DatasetDetail extends Vue {
   length = 3
   onboarding = 0
   temporalRange = []
-  selectedLayer = undefined
-  legendControl = undefined
-  legendImage = undefined
+  selectedLayer = null
+  legendControl = null
+  legendImage = null
   legendPosition = 'bottomleft'
+  year = null
 
   @Datasets.State('selectedDataset')
   selectedDataset
   @Datasets.Getter('selectedDatasetTimespan')
   selectedDatasetTimespan
+
+  get minYear() {
+    return parseInt(this.selectedDatasetTimespan[0])
+  }
+
+  get maxYear() {
+    return parseInt(this.selectedDatasetTimespan[1])
+  }
 
   get skopeWmsUrl() {
     return SKOPE_WMS_ENDPOINT
@@ -180,11 +179,11 @@ export default class DatasetDetail extends Vue {
   }
 
   get temporalCoverage() {
-    const period = this.selectedDataset.timespan.period
+    const ts = this.selectedDataset.timespan
+    const period = ts.period
     const timespan =
       period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`
-    return `${timespan}${period.suffix}
-     ${this.selectedDataset.timespan.resolutionLabel}`
+    return `${timespan}${period.suffix} ${ts.resolutionLabel}`
   }
 
   get metadataAttributes() {
@@ -211,6 +210,22 @@ export default class DatasetDetail extends Vue {
   created() {
     this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
     this.temporalRange = this.selectedDatasetTimespan
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.layerMap.mapObject.eachLayer(l => {
+        const isSkopeLayer = (l.options.layers || '').startsWith('SKOPE')
+        if (isSkopeLayer) {
+          this.selectedLayer = l
+        }
+      })
+      this.$refs.layerMap.mapObject.on('layeradd', event => {
+        console.log(event)
+        this.selectedLayer = event.layer
+        this.updateWmsLegend(event.target, this.selectedLayer.wmsParams.layers)
+      })
+    })
   }
 
   head() {
@@ -264,22 +279,27 @@ export default class DatasetDetail extends Vue {
       legend.addTo(map)
       this.legendControl = legend
     }
-    if (this.legendImage !== undefined) {
+    if (this.legendImage !== null) {
       console.log(this.legendImage)
       this.legendImage.src = wmsLegendUrl
     }
   }
 
   fillTemplateYear(templateString) {
-    const year = this.temporalRange[0].toString()
+    const year = (this.year || this.maxYear).toString()
     const layer = fillTemplate(templateString, {
       year: year.padStart(4, '0')
     })
     return layer
   }
 
+  updateYear(event) {
+    this.year = event
+    this.updateWmsLayer(event)
+  }
+
   updateWmsLayer(event) {
-    if (this.selectedLayer !== undefined) {
+    if (this.selectedLayer !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         const wmsLayer = wmsLayerRef.mapObject
         if (wmsLayer === this.selectedLayer) {
@@ -303,6 +323,10 @@ export default class DatasetDetail extends Vue {
 }
 </script>
 <style>
+#map-flex {
+  height: 800px;
+}
+
 @media all and (max-width: 960px) {
   #map-flex {
     height: 500px;
