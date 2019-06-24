@@ -222,21 +222,12 @@ class DatasetDetail extends Vue {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
       const L = this.$L
-      map.eachLayer(l => {
-        const isSkopeLayer = (l.options.layers || '').startsWith('SKOPE')
-        if (isSkopeLayer) {
-          this.selectedLayer = l
-        }
-      })
       map.on('layeradd', event => {
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
           this.selectedLayer = layer
-          this.updateWmsLegend(
-            event.target,
-            this.selectedLayer.wmsParams.layers
-          )
+          this.updateWmsLegend(map, this.selectedLayer.wmsParams.layers)
         }
       })
       const drawnItems = new L.FeatureGroup()
@@ -278,18 +269,15 @@ class DatasetDetail extends Vue {
       LEGEND_OPTIONS: 'layout:vertical;dx:10'
     }
     const queryString = stringify(query)
-    console.log(queryString)
     const legendUrl = this.skopeWmsUrl + queryString
-    console.log(legendUrl)
     return legendUrl
   }
 
   updateWmsLegend(map, layerName) {
     const L = this.$L
     const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
-    if (this.legendControl === undefined) {
+    if (this.legendControl === null) {
       const legend = L.control({ position: this.legendPosition })
-      console.log(map)
       legend.onAdd = map => {
         const controlCss = 'leaflet-control-wms-legend'
         const legendCss = 'wms-legend'
@@ -303,6 +291,7 @@ class DatasetDetail extends Vue {
       this.legendControl = legend
     }
     if (this.legendImage !== null) {
+      console.log('Updating legend image src: ')
       console.log(this.legendImage)
       this.legendImage.src = wmsLegendUrl
     }
@@ -316,21 +305,22 @@ class DatasetDetail extends Vue {
     return layer
   }
 
-  updateYear(event) {
-    this.year = event
-    this.updateWmsLayer(event)
+  updateYear(year) {
+    this.year = year
+    this.updateWmsLayer()
   }
 
-  updateWmsLayer(event) {
+  updateWmsLayer() {
+    // hairy bit of code to:
+    // 1. pull out the currently selected layer's layer template string
+    // 2. update it with the current year
+    // 3. reset the params on the currently selected layer to request the new layer from GeoServer
     if (this.selectedLayer !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         const wmsLayer = wmsLayerRef.mapObject
         if (wmsLayer === this.selectedLayer) {
-          console.log(wmsLayer)
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
-          // programmatically add the legend to the mapObject
-          this.updateWmsLegend(wmsLayerRef.parentContainer.mapObject, layerName)
           wmsLayer.setParams(
             { layers: this.fillTemplateYear(layerName) },
             false
