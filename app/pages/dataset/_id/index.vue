@@ -1,298 +1,351 @@
 <template>
-  <v-layout row>
-    <v-flex md12>
-      <v-card flat tile>
-        <v-container fill-width fluid>
-          <Dataset v-bind="selectedDataset" />
-          <v-expansion-panel light>
-            <v-expansion-panel-content>
-              <template v-slot:header>
-                <div class="title">
-                  Detailed Metadata
-                </div>
-              </template>
-              <v-layout fill-height>
-                <v-card-text>
-                  <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                    <span class="font-weight-bold">
-                      {{ label }}:
-                    </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
-                  </div>
-                </v-card-text>
-              </v-layout>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-divider />
-          <v-layout column align-center justify-center>
-            <v-flex xs12>
-              <v-card-text>
-                <div style="height: 600px; width: 600px;">
-                  <no-ssr placeholder="Loading...">
-                    <l-map
-                      ref="layerMap"
-                      :zoom="selectedDataset.region.zoom"
-                      :center="selectedDataset.region.center"
-                      style="height: 100%; z-index: 1;"
-                    >
-                      <l-control-scale />
-                      <l-control-layers />
-                      <l-tile-layer 
-                        :url="defaultBaseMap.url"
-                        :attribution="defaultBaseMap.attribution"
-                        :transparent="false"
-                      />
-                      <l-wms-tile-layer
-                        v-for="variable of selectedDataset.variables"
-                        ref="wmsLayers"
-                        :key="variable.wmsLayer"
-                        :crs="defaultCrs"
-                        :base-url="skopeWmsUrl"
-                        :layers="fillTemplateYear(variable.wmsLayer)"
-                        :name="variable.name"
-                        :transparent="true"
-                        :visible="variable.visible"
-                        :opacity="0.5"
-                        layer-type="base"
-                        version="1.3.0"
-                        format="image/png"
-                      />
-                    </l-map>
-                  </no-ssr>
-                </div>
-                <v-subheader class="title">
-                  Date range (year)
-                </v-subheader>
-                <v-layout row align-center justify-center>
-                  <v-flex shrink style="width: 60px">
-                    <v-text-field
-                      v-model="temporalRange[0]" 
-                      style="width: 50px"
-                      hide-details
-                      single-line
-                      type="number"
-                    />
-                  </v-flex>
-                  <v-flex class="px-3">
-                    <v-range-slider
-                      v-model="temporalRange"
-                      :max="2019"
-                      :min="1"
-                      :step="1"
-                      @change="updateWmsLayer"
-                    />
-                  </v-flex>
-                  <v-flex>
-                    <v-text-field
-                      v-model="temporalRange[1]"
-                      style="width: 50px"
-                      hide-details
-                      single-line
-                      type="number"
-                    />
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-              <v-card-actions>
-                <v-layout align-center justify-center>
-                  <v-icon>play_circle_filled</v-icon>
-                  <v-icon>pause</v-icon>
-                  <v-icon>stop</v-icon>
-                </v-layout>
-              </v-card-actions>
-            </v-flex>
-          </v-layout>
-        </v-container>
-        <v-card-actions class="justify-space-between">
-          <v-btn
-            flat
-            @click="prev"
-          >
-            <v-icon>chevron_left</v-icon>
-          </v-btn>
-          <v-item-group
-            v-model="onboarding"
-            class="text-xs-center"
-            manadatory
-          >
-            <v-item
-              v-for="n in length"
-              :key="`btn-${n}`"
+  <v-container fill-width fluid>
+    <v-layout
+      row
+      pa-2
+      mb-2
+      align-content-start
+      justify-space-around
+      wrap
+    >
+      <v-flex xs12 md6 id="map-flex">
+        <div class="map px-2">
+          <no-ssr placeholder="Loading...">
+            <l-map
+              ref="layerMap"
+              :zoom="selectedDataset.region.zoom"
+              :center="selectedDataset.region.center"
+              style="z-index: 2"
             >
-              <v-btn
-                slot-scope="{ active, toggle }"
-                :input-value="active"
-                icon
-                @click="toggle"
-              >
-                <v-icon color="black">
-                  fiber_manual_record
-                </v-icon>
-              </v-btn>
-            </v-item>
-          </v-item-group>
-          <v-btn
-            flat
-            @click="next"
-          >
-            <v-icon>chevron_right</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-flex>
-  </v-layout>
+              <l-control-scale />
+              <l-control-layers />
+              <l-tile-layer
+                :url="defaultBaseMap.url"
+                :attribution="defaultBaseMap.attribution"
+                :transparent="false"
+              />
+              <l-wms-tile-layer
+                v-for="variable of selectedDataset.variables"
+                ref="wmsLayers"
+                :key="variable.wmsLayer"
+                :crs="defaultCrs"
+                :base-url="skopeWmsUrl"
+                :layers="fillTemplateYear(variable.wmsLayer)"
+                :name="variable.name"
+                :transparent="true"
+                :visible="variable.visible"
+                :opacity="0.5"
+                layer-type="base"
+                version="1.3.0"
+                format="image/png"
+              />
+            </l-map>
+          </no-ssr>
+        </div>
+        <v-form>
+          <v-container py-0>
+            <v-layout align-center justify-space-between row>
+              <v-subheader class="pa-0">
+                Date range (year)
+              </v-subheader>
+              <div>
+                <v-icon>play_circle_filled</v-icon>
+                <v-icon>pause</v-icon>
+                <v-icon>stop</v-icon>
+              </div>
+            </v-layout>
+            <v-slider
+              :value="year"
+              :max="maxYear"
+              :min="minYear"
+              :thumb-size="30"
+              thumb-label
+              @change="updateYear"
+              class="mt-0"
+            >
+              <template v-slot:prepend>
+                {{ minYear }}
+              </template>
+              <template v-slot:append>
+                {{ maxYear }}
+              </template>
+            </v-slider>
+          </v-container>
+
+        </v-form>
+      </v-flex>
+      <v-flex xs12 md6>
+        <div class="px-2">
+          <v-card>
+            <v-card-title class="pb-0">
+              <h2 class="headline">
+                {{ selectedDataset.title }}
+              </h2>
+            </v-card-title>
+            <v-subheader class="subheading">
+              {{ spatialCoverage }} | {{ temporalCoverage }}
+            </v-subheader>
+            <v-card-text class="body">
+              <vue-markdown :source="selectedDataset.description" />
+            </v-card-text>
+            <v-subheader class="title">
+              Variables
+            </v-subheader>
+            <v-list dense light>
+              <v-list-tile v-for="(variable, index) in selectedDataset.variables" :key="index" avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title class="variable">
+                    <v-chip small color="secondary">
+                      {{ variable.class }}
+                    </v-chip> {{ variable.name }}
+                  </v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+            <v-card-text>
+              <div class="py-3 citation">
+                <em class="font-weight-bold">
+                  Source:
+                </em> <nuxt-link class="font-weight-thin" :to="selectedDataset.sourceUrl">
+                  {{ selectedDataset.sourceUrl }}
+                </nuxt-link>
+              </div>
+            </v-card-text>
+            <v-card-text>
+              <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
+                <span class="font-weight-bold">
+                  {{ label }}:
+                </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+              </div>
+            </v-card-text>
+          </v-card>
+        </div>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
 import VueMarkdown from 'vue-markdown'
-import { createNamespacedHelpers } from 'vuex'
 import { stringify } from 'query-string'
 import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
-import Dataset from '~/components/Dataset.vue'
-const fillTemplate = require('es6-dynamic-template')
-const { mapState, mapGetters } = createNamespacedHelpers('datasets')
+import Component from 'nuxt-class-component'
+import { namespace } from 'vuex-class'
+import Vue from 'vue'
 
-export default {
+const fillTemplate = require('es6-dynamic-template')
+const Datasets = namespace('datasets')
+
+@Component({
   layout: 'dataset',
   components: {
-    Dataset,
     VueMarkdown
-  },
-  data() {
+  }
+})
+export default class DatasetDetail extends Vue {
+  length = 3
+  onboarding = 0
+  temporalRange = []
+  selectedLayer = null
+  legendControl = null
+  legendImage = null
+  legendPosition = 'bottomleft'
+  year = null
+
+  @Datasets.State('selectedDataset')
+  selectedDataset
+  @Datasets.Getter('selectedDatasetTimespan')
+  selectedDatasetTimespan
+
+  get minYear() {
+    return parseInt(this.selectedDatasetTimespan[0])
+  }
+
+  get maxYear() {
+    return parseInt(this.selectedDatasetTimespan[1])
+  }
+
+  get skopeWmsUrl() {
+    return SKOPE_WMS_ENDPOINT
+  }
+
+  get defaultBaseMap() {
+    return BaseMapEndpoints.default
+  }
+
+  get spatialCoverage() {
+    return `${this.selectedDataset.region.name} at
+     ${this.selectedDataset.region.resolution}`
+  }
+
+  get temporalCoverage() {
+    const ts = this.selectedDataset.timespan
+    const period = ts.period
+    const timespan =
+      period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`
+    return `${timespan}${period.suffix} ${ts.resolutionLabel}`
+  }
+
+  get metadataAttributes() {
     return {
-      length: 3,
-      onboarding: 0,
-      temporalRange: [],
-      selectedLayer: undefined,
-      legendControl: undefined,
-      legendImage: undefined,
-      legendPosition: 'bottomleft'
+      originator: 'Originator',
+      uncertainty: 'Uncertainty',
+      methodSummary: 'Method Summary',
+      references: 'References',
+      contactInformation: 'Contact Information'
     }
-  },
-  computed: {
-    // retrieve the dataset corresponding to the given route params id in the datastore
-    // FIXME: needs error checking 404 if the dataset doesn't exist
-    ...mapState(['selectedDataset']),
-    ...mapGetters(['selectedDatasetTimespan']),
-    // FIXME: lift these into a store instead
-    skopeWmsUrl() {
-      return SKOPE_WMS_ENDPOINT
-    },
-    defaultBaseMap() {
-      return BaseMapEndpoints.default
-    },
-    metadataAttributes() {
-      return {
-        originator: 'Originator',
-        uncertainty: 'Uncertainty',
-        methodSummary: 'Method Summary',
-        references: 'References',
-        contactInformation: 'Contact Information'
-      }
-    },
-    defaultCrs() {
-      if (this.$L) {
-        return this.$L.CRS.EPSG4326
-      }
-      return ''
+  }
+
+  get defaultCrs() {
+    if (this.$L) {
+      return this.$L.CRS.EPSG4326
     }
-  },
+    return ''
+  }
+
+  get absoluteUrl() {
+    return '/dataset/' + this.selectedDataset.id
+  }
+
   created() {
     this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
     this.temporalRange = this.selectedDatasetTimespan
-  },
+  }
+
   mounted() {
     this.$nextTick(() => {
-      console.log(this.$refs.layerMap.mapObject)
+      this.$refs.layerMap.mapObject.eachLayer(l => {
+        const isSkopeLayer = (l.options.layers || '').startsWith('SKOPE')
+        if (isSkopeLayer) {
+          this.selectedLayer = l
+        }
+      })
       this.$refs.layerMap.mapObject.on('layeradd', event => {
         console.log(event)
         this.selectedLayer = event.layer
         this.updateWmsLegend(event.target, this.selectedLayer.wmsParams.layers)
       })
     })
-  },
+  }
+
   head() {
     return {
       title: this.selectedDataset.title
     }
-  },
-  methods: {
-    next() {
-      this.onboarding = (this.onboarding + 1) % this.length
-    },
-    prev() {
-      this.onboarding = (this.onboarding - 1 + this.length) % this.length
-    },
-    setLegendImage(htmlElement) {
-      this.legendImage = htmlElement
-    },
-    generateWmsLegendUrl(layerName) {
-      const query = {
-        REQUEST: 'GetLegendGraphic',
-        VERSION: '1.0.0',
-        FORMAT: 'image/png',
-        LAYER: layerName,
-        LEGEND_OPTIONS: 'layout:vertical;dx:10'
+  }
+
+  next() {
+    this.onboarding = (this.onboarding + 1) % this.length
+  }
+
+  prev() {
+    this.onboarding = (this.onboarding - 1 + this.length) % this.length
+  }
+
+  setLegendImage(htmlElement) {
+    this.legendImage = htmlElement
+  }
+
+  generateWmsLegendUrl(layerName) {
+    const query = {
+      REQUEST: 'GetLegendGraphic',
+      VERSION: '1.0.0',
+      FORMAT: 'image/png',
+      LAYER: layerName,
+      LEGEND_OPTIONS: 'layout:vertical;dx:10'
+    }
+    const queryString = stringify(query)
+    console.log(queryString)
+    const legendUrl = this.skopeWmsUrl + queryString
+    console.log(legendUrl)
+    return legendUrl
+  }
+
+  updateWmsLegend(map, layerName) {
+    const L = this.$L
+    const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
+    if (this.legendControl === undefined) {
+      const legend = L.control({ position: this.legendPosition })
+      console.log(map)
+      legend.onAdd = map => {
+        const controlCss = 'leaflet-control-wms-legend'
+        const legendCss = 'wms-legend'
+        const div = L.DomUtil.create('div', controlCss)
+        const legendImage = L.DomUtil.create('img', legendCss, div)
+        legendImage.src = wmsLegendUrl
+        this.setLegendImage(legendImage)
+        return div
       }
-      const queryString = stringify(query)
-      console.log(queryString)
-      const legendUrl = this.skopeWmsUrl + queryString
-      console.log(legendUrl)
-      return legendUrl
-    },
-    updateWmsLegend(map, layerName) {
-      const L = this.$L
-      const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
-      if (this.legendControl === undefined) {
-        const legend = L.control({ position: this.legendPosition })
-        console.log(map)
-        legend.onAdd = map => {
-          const controlCss = 'leaflet-control-wms-legend'
-          const legendCss = 'wms-legend'
-          const div = L.DomUtil.create('div', controlCss)
-          const legendImage = L.DomUtil.create('img', legendCss, div)
-          legendImage.src = wmsLegendUrl
-          this.setLegendImage(legendImage)
-          return div
-        }
-        legend.addTo(map)
-        this.legendControl = legend
-      }
-      if (this.legendImage !== undefined) {
-        console.log(this.legendImage)
-        this.legendImage.src = wmsLegendUrl
-      }
-    },
-    fillTemplateYear(templateString) {
-      const year = this.temporalRange[0].toString()
-      const layer = fillTemplate(templateString, {
-        year: year.padStart(4, '0')
-      })
-      return layer
-    },
-    updateWmsLayer(event) {
-      if (this.selectedLayer !== undefined) {
-        for (const wmsLayerRef of this.$refs.wmsLayers) {
-          const wmsLayer = wmsLayerRef.mapObject
-          if (wmsLayer === this.selectedLayer) {
-            console.log(wmsLayer)
-            const layerTemplateString = wmsLayerRef.$vnode.data.key
-            const layerName = this.fillTemplateYear(layerTemplateString)
-            // programmatically add the legend to the mapObject
-            this.updateWmsLegend(
-              wmsLayerRef.parentContainer.mapObject,
-              layerName
-            )
-            wmsLayer.setParams(
-              { layers: this.fillTemplateYear(layerName) },
-              false
-            )
-          }
+      legend.addTo(map)
+      this.legendControl = legend
+    }
+    if (this.legendImage !== null) {
+      console.log(this.legendImage)
+      this.legendImage.src = wmsLegendUrl
+    }
+  }
+
+  fillTemplateYear(templateString) {
+    const year = (this.year || this.maxYear).toString()
+    const layer = fillTemplate(templateString, {
+      year: year.padStart(4, '0')
+    })
+    return layer
+  }
+
+  updateYear(event) {
+    this.year = event
+    this.updateWmsLayer(event)
+  }
+
+  updateWmsLayer(event) {
+    if (this.selectedLayer !== null) {
+      for (const wmsLayerRef of this.$refs.wmsLayers) {
+        const wmsLayer = wmsLayerRef.mapObject
+        if (wmsLayer === this.selectedLayer) {
+          console.log(wmsLayer)
+          const layerTemplateString = wmsLayerRef.$vnode.data.key
+          const layerName = this.fillTemplateYear(layerTemplateString)
+          // programmatically add the legend to the mapObject
+          this.updateWmsLegend(wmsLayerRef.parentContainer.mapObject, layerName)
+          wmsLayer.setParams(
+            { layers: this.fillTemplateYear(layerName) },
+            false
+          )
         }
       }
     }
-  },
+  }
+
   validate({ params }) {
     return /^\w+$/.test(params.id)
   }
 }
 </script>
+<style>
+#map-flex {
+  height: 800px;
+}
+
+@media all and (max-width: 960px) {
+  #map-flex {
+    height: 500px;
+  }
+}
+
+@media all and (max-width: 600px) {
+  #map-flex {
+    height: 350px;
+  }
+}
+
+.map {
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.variable {
+  height: 3em;
+}
+</style>
