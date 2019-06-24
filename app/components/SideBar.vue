@@ -1,8 +1,5 @@
 <template>
-  <v-navigation-drawer
-    absolute
-    app
-  >
+  <v-navigation-drawer absolute app>
     <section class="sidebar">
       <discover-side-bar />
     </section>

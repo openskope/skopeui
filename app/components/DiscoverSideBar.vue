@@ -17,8 +17,14 @@
             data-list=".sidebar-menu"
             @keydown.enter="search"
             @change="filterDatasets"
+          />
+          <button
+            id="search-btn"
+            type="submit"
+            name="search"
+            class="btn btn-flat"
+            @click="search"
           >
-          <button id="search-btn" type="submit" name="search" class="btn btn-flat" @click="search">
             <i class="fa fa-search" />
           </button>
         </span>
@@ -29,10 +35,7 @@
     <!-- time range slider -->
     <v-subheader>Range Slider</v-subheader>
     <v-layout row>
-      <v-flex
-        shrink
-        style="width: 60px"
-      >
+      <v-flex shrink style="width: 60px">
         <v-text-field
           v-model="bounds[0]"
           style="width: 50px"
@@ -64,10 +67,7 @@
     <v-divider class="dividerPadding" />
     <!-- variable checkbox selector -->
     <v-subheader>Variables</v-subheader>
-    <v-list
-      v-for="(variable, index) in variableClasses"
-      :key="index"
-    >
+    <v-list v-for="(variable, index) in variableClasses" :key="index">
       <v-checkbox
         v-model="selectedVariableClasses"
         :value="variable.name"
@@ -114,7 +114,7 @@ export default {
   },
   // mounted() {},
   methods: {
-    filterDatasets(payload) {
+    filterDatasets() {
       // FIXME: something magical happens to the store
       // based on the criteria / parameterizations set on this component,
       // update the store so that pages/index.vue can properly filter its datasets

@@ -1,17 +1,10 @@
 <template>
-  <v-navigation-drawer
-    absolute
-    clipped
-    app
-  >
+  <v-navigation-drawer absolute clipped app>
     <div class="container">
       <v-subheader class="title">
         Variable(s) to display
       </v-subheader>
-      <v-list
-        v-for="(variable, index) in dataset.variables"
-        :key="index"
-      >  
+      <v-list v-for="(variable, index) in dataset.variables" :key="index">
         <v-checkbox
           v-model="selectedVariables"
           :value="variable.name"
@@ -24,10 +17,7 @@
       </v-subheader>
       <v-subheader>Date range (year)</v-subheader>
       <v-layout row>
-        <v-flex
-          shrink
-          style="width: 60px"
-        >
+        <v-flex shrink style="width: 60px">
           <v-text-field
             v-model="temporalRange[0]"
             style="width: 50px"

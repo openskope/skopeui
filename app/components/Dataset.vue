@@ -1,12 +1,5 @@
 <template>
-  <v-layout
-    row
-    pa-2
-    mb-2 
-    align-content-start 
-    justify-space-around 
-    fill-height
-  >
+  <v-layout row pa-2 mb-2 align-content-start justify-space-around fill-height>
     <v-flex xs4>
       <div class="map px-2">
         <no-ssr>
@@ -17,7 +10,10 @@
             :center="region.center"
           >
             <l-control-scale />
-            <l-tile-layer :url="defaultBaseMap.url" :attribution="defaultBaseMap.attribution" />
+            <l-tile-layer
+              :url="defaultBaseMap.url"
+              :attribution="defaultBaseMap.attribution"
+            />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
         </no-ssr>
@@ -43,12 +39,17 @@
             <v-subheader class="title">
               Variables
             </v-subheader>
-            <v-list-tile v-for="(variable, index) in variables" :key="index" avatar>
+            <v-list-tile
+              v-for="(variable, index) in variables"
+              :key="index"
+              avatar
+            >
               <v-list-tile-content>
                 <v-list-tile-title class="variable">
                   <v-chip small color="secondary">
                     {{ variable.class }}
-                  </v-chip> {{ variable.name }}
+                  </v-chip>
+                  {{ variable.name }}
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -57,7 +58,8 @@
             <div class="py-3 citation">
               <em class="font-weight-bold">
                 Source:
-              </em> <nuxt-link class="font-weight-thin" :to="sourceUrl">
+              </em>
+              <nuxt-link class="font-weight-thin" :to="sourceUrl">
                 {{ sourceUrl }}
               </nuxt-link>
             </div>
@@ -101,7 +103,7 @@ import { BaseMapEndpoints } from '~/store/constants.js'
     initLayers() {}
   }
 })
-export default class Dataset extends Vue {
+class Dataset extends Vue {
   get defaultBaseMap() {
     return BaseMapEndpoints.default
   }
@@ -118,6 +120,7 @@ export default class Dataset extends Vue {
     return '/dataset/' + this.id
   }
 }
+export default Dataset
 </script>
 <style scoped>
 .map {

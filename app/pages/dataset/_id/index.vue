@@ -1,20 +1,14 @@
 <template>
   <v-container fill-width fluid>
-    <v-layout
-      row
-      pa-2
-      mb-2
-      align-content-start
-      justify-space-around
-      wrap
-    >
-      <v-flex xs12 md6 id="map-flex">
+    <v-layout row pa-2 mb-2 align-content-start justify-space-around wrap>
+      <v-flex id="map-flex" xs12 md6>
         <div class="map px-2">
-          <no-ssr placeholder="Loading...">
+          <no-ssr placeholder="Loading map, please wait...">
             <l-map
               ref="layerMap"
               :zoom="selectedDataset.region.zoom"
               :center="selectedDataset.region.center"
+              :draw-control="true"
               style="z-index: 2"
             >
               <l-control-scale />
@@ -60,8 +54,8 @@
               :min="minYear"
               :thumb-size="30"
               thumb-label
-              @change="updateYear"
               class="mt-0"
+              @change="updateYear"
             >
               <template v-slot:prepend>
                 {{ minYear }}
@@ -71,7 +65,6 @@
               </template>
             </v-slider>
           </v-container>
-
         </v-form>
       </v-flex>
       <v-flex xs12 md6>
@@ -92,12 +85,17 @@
               Variables
             </v-subheader>
             <v-list dense light>
-              <v-list-tile v-for="(variable, index) in selectedDataset.variables" :key="index" avatar>
+              <v-list-tile
+                v-for="(variable, index) in selectedDataset.variables"
+                :key="index"
+                avatar
+              >
                 <v-list-tile-content>
                   <v-list-tile-title class="variable">
                     <v-chip small color="secondary">
                       {{ variable.class }}
-                    </v-chip> {{ variable.name }}
+                    </v-chip>
+                    {{ variable.name }}
                   </v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
@@ -106,16 +104,23 @@
               <div class="py-3 citation">
                 <em class="font-weight-bold">
                   Source:
-                </em> <nuxt-link class="font-weight-thin" :to="selectedDataset.sourceUrl">
+                </em>
+                <nuxt-link
+                  class="font-weight-thin"
+                  :to="selectedDataset.sourceUrl"
+                >
                   {{ selectedDataset.sourceUrl }}
                 </nuxt-link>
               </div>
             </v-card-text>
             <v-card-text>
-              <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-1">
-                <span class="font-weight-bold">
-                  {{ label }}:
-                </span> <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+              <div
+                v-for="(label, attr) in metadataAttributes"
+                :key="attr"
+                class="py-1"
+              >
+                <span class="font-weight-bold"> {{ label }}: </span>
+                <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
               </div>
             </v-card-text>
           </v-card>
@@ -132,6 +137,7 @@ import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
+import 'leaflet-draw'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -142,7 +148,7 @@ const Datasets = namespace('datasets')
     VueMarkdown
   }
 })
-export default class DatasetDetail extends Vue {
+class DatasetDetail extends Vue {
   length = 3
   onboarding = 0
   temporalRange = []
@@ -214,17 +220,34 @@ export default class DatasetDetail extends Vue {
 
   mounted() {
     this.$nextTick(() => {
-      this.$refs.layerMap.mapObject.eachLayer(l => {
+      const map = this.$refs.layerMap.mapObject
+      const L = this.$L
+      map.eachLayer(l => {
         const isSkopeLayer = (l.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
           this.selectedLayer = l
         }
       })
-      this.$refs.layerMap.mapObject.on('layeradd', event => {
-        console.log(event)
-        this.selectedLayer = event.layer
-        this.updateWmsLegend(event.target, this.selectedLayer.wmsParams.layers)
+      map.on('layeradd', event => {
+        const layer = event.layer
+        const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
+        if (isSkopeLayer) {
+          this.selectedLayer = layer
+          this.updateWmsLegend(
+            event.target,
+            this.selectedLayer.wmsParams.layers
+          )
+        }
       })
+      const drawnItems = new L.FeatureGroup()
+      map.addLayer(drawnItems)
+      const drawControl = new L.Control.Draw({
+        position: 'topright',
+        edit: {
+          featureGroup: drawnItems
+        }
+      })
+      map.addControl(drawControl)
     })
   }
 
@@ -321,6 +344,7 @@ export default class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id)
   }
 }
+export default DatasetDetail
 </script>
 <style>
 #map-flex {

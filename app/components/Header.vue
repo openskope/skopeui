@@ -1,9 +1,5 @@
 <template>
-  <v-toolbar
-    :clipped-left="clipped"
-    app
-    fixed
-  >
+  <v-toolbar :clipped-left="clipped" app fixed>
     <v-toolbar-title>
       <nuxt-link class="display-1 skope-title" to="/">
         SKOPE: Synthesizing Knowledge of Past Environments

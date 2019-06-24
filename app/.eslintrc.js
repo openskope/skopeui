@@ -8,16 +8,21 @@ module.exports = {
     parser: 'babel-eslint'
   },
   extends: [
-    '@nuxtjs',
-    'plugin:prettier/recommended'
+    "plugin:vue/recommended",
+    'plugin:prettier/recommended',
+    'prettier',
+    'prettier/vue',
   ],
   plugins: [
-    'prettier'
+    'vue',
+    'prettier',
   ],
-  // add your custom rules here
+  // add custom rules here
   rules: {
     "no-console": "off",
+    "semi": [2, "never"],
+    "vue/max-attributes-per-line": "off",
+    "prettier/prettier": ["error", { "semi": false }],
     "no-template-curly-in-string": "off"
-
   }
 }
