@@ -221,7 +221,6 @@ class DatasetDetail extends Vue {
   mounted() {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
-      const L = this.$L
       map.on('layeradd', event => {
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
@@ -230,27 +229,7 @@ class DatasetDetail extends Vue {
           this.updateWmsLegend(map, this.selectedLayer.wmsParams.layers)
         }
       })
-      const drawnItems = new L.FeatureGroup()
-      drawnItems.addTo(map)
-      map.addLayer(drawnItems)
-      const drawControl = new L.Control.Draw({
-        position: 'topleft',
-        draw: {
-          polyline: false,
-          circlemarker: false,
-          polygon: {
-            allowIntersection: false,
-            showArea: true
-          }
-        },
-        edit: {
-          featureGroup: drawnItems
-        }
-      })
-      map.addControl(drawControl)
-      map.on(L.Draw.Event.CREATED, event => {
-        drawnItems.addLayer(event.layer)
-      })
+      this.addDrawToolbar(map)
     })
   }
 
@@ -270,6 +249,44 @@ class DatasetDetail extends Vue {
 
   setLegendImage(htmlElement) {
     this.legendImage = htmlElement
+  }
+
+  addDrawToolbar(map) {
+    const L = this.$L
+    const drawnItems = new L.FeatureGroup()
+    map.addLayer(drawnItems)
+    const drawControlFull = new L.Control.Draw({
+      position: 'topleft',
+      draw: {
+        polyline: false,
+        circlemarker: false,
+        polygon: {
+          allowIntersection: false,
+          showArea: true
+        }
+      },
+      edit: {
+        featureGroup: drawnItems
+      }
+    })
+    const drawControlEditOnly = new L.Control.Draw({
+      edit: {
+        featureGroup: drawnItems
+      },
+      draw: false
+    })
+    map.addControl(drawControlFull)
+    map.on(L.Draw.Event.CREATED, event => {
+      drawnItems.addLayer(event.layer)
+      drawControlFull.remove(map)
+      drawControlEditOnly.addTo(map)
+    })
+    map.on(L.Draw.Event.DELETED, event => {
+      if (drawnItems.getLayers().length === 0) {
+        drawControlEditOnly.remove(map)
+        drawControlFull.addTo(map)
+      }
+    })
   }
 
   generateWmsLegendUrl(layerName) {
