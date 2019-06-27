@@ -231,14 +231,26 @@ class DatasetDetail extends Vue {
         }
       })
       const drawnItems = new L.FeatureGroup()
+      drawnItems.addTo(map)
       map.addLayer(drawnItems)
       const drawControl = new L.Control.Draw({
-        position: 'topright',
+        position: 'topleft',
+        draw: {
+          polyline: false,
+          circlemarker: false,
+          polygon: {
+            allowIntersection: false,
+            showArea: true
+          }
+        },
         edit: {
           featureGroup: drawnItems
         }
       })
       map.addControl(drawControl)
+      map.on(L.Draw.Event.CREATED, event => {
+        drawnItems.addLayer(event.layer)
+      })
     })
   }
 
