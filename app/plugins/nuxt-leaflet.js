@@ -2,6 +2,7 @@ import Vue from 'vue'
 import * as Vue2Leaflet from 'vue2-leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw/dist/leaflet.draw.css'
+import 'leaflet-draw'
 /* eslint no-undef: "off" */
 
 // Build icon assets.

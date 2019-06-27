@@ -22,14 +22,14 @@
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
                 :key="variable.wmsLayer"
-                :crs="defaultCrs"
                 :base-url="skopeWmsUrl"
                 :layers="fillTemplateYear(variable.wmsLayer)"
                 :name="variable.name"
+                :crs="defaultCrs"
                 :transparent="true"
-                :visible="variable.visible"
+                :visible="false"
                 :opacity="0.5"
-                layer-type="base"
+                :layer-type="layerType"
                 version="1.3.0"
                 format="image/png"
               />
@@ -137,7 +137,6 @@ import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
-import 'leaflet-draw'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -169,6 +168,10 @@ class DatasetDetail extends Vue {
 
   get maxYear() {
     return parseInt(this.selectedDatasetTimespan[1])
+  }
+
+  get layerType() {
+    return this.selectedDataset.variables.length > 1 ? 'base' : 'overlay'
   }
 
   get skopeWmsUrl() {
@@ -320,8 +323,6 @@ class DatasetDetail extends Vue {
       this.legendControl = legend
     }
     if (this.legendImage !== null) {
-      console.log('Updating legend image src: ')
-      console.log(this.legendImage)
       this.legendImage.src = wmsLegendUrl
     }
   }
