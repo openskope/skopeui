@@ -38,30 +38,71 @@
         </div>
         <v-form>
           <v-container py-0>
+            <v-subheader class="text-lg-center text-md-center pa-0">
+              Constrain the animation temporal range (in years)
+            </v-subheader>
             <v-layout align-center justify-space-between row>
-              <v-subheader class="pa-0">
-                Date range (year)
-              </v-subheader>
-              <div>
-                <v-icon>play_circle_filled</v-icon>
-                <v-icon>pause</v-icon>
-                <v-icon>stop</v-icon>
-              </div>
+              <v-flex shrink style="width: 6em">
+                <v-text-field
+                  v-model="temporalRange[0]"
+                  class="centered-input mt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                ></v-text-field>
+              </v-flex>
+              <v-flex class="px-3">
+                <v-range-slider
+                  v-model="temporalRange"
+                  :max="maxYear"
+                  :min="minYear"
+                  :thumb-size="24"
+                  class="mt-0"
+                  @change="updateAnimationYear"
+                >
+                </v-range-slider>
+              </v-flex>
+              <v-flex shrink style="width: 6em">
+                <v-text-field
+                  v-model="temporalRange[1]"
+                  class="mt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                ></v-text-field>
+              </v-flex>
             </v-layout>
+            <v-divider :dark="true"></v-divider>
+            <v-subheader class="text-lg-center text-md-center pa-0">
+              Animate selected variable
+            </v-subheader>
+            <v-flex xs12 sm6 class="py-2">
+              <v-btn-toggle v-model="toggleAnimation">
+                <v-btn flat>
+                  <v-icon>play_circle_filled</v-icon>
+                </v-btn>
+                <v-btn flat>
+                  <v-icon>pause</v-icon>
+                </v-btn>
+                <v-btn flat>
+                  <v-icon>stop</v-icon>
+                </v-btn>
+              </v-btn-toggle>
+            </v-flex>
             <v-slider
               :value="year"
-              :max="maxYear"
-              :min="minYear"
-              :thumb-size="30"
-              thumb-label
-              class="mt-0"
+              :max="temporalRange[1]"
+              :min="temporalRange[0]"
+              :thumb-size="24"
+              thumb-label="always"
+              class="mt-2"
               @change="updateYear"
             >
               <template v-slot:prepend>
-                {{ minYear }}
+                {{ temporalRange[0] }}
               </template>
               <template v-slot:append>
-                {{ maxYear }}
+                {{ temporalRange[1] }}
               </template>
             </v-slider>
           </v-container>
@@ -154,8 +195,9 @@ class DatasetDetail extends Vue {
   selectedLayer = null
   legendControl = null
   legendImage = null
-  legendPosition = 'bottomleft'
+  toggleAnimation = null
   year = null
+  legendPosition = 'bottomleft'
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -229,7 +271,7 @@ class DatasetDetail extends Vue {
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
           this.selectedLayer = layer
-          this.updateWmsLegend(map, this.selectedLayer.wmsParams.layers)
+          this.updateWmsLegend(map, layer.wmsParams.layers)
         }
       })
       this.addDrawToolbar(map)
@@ -340,6 +382,12 @@ class DatasetDetail extends Vue {
     this.updateWmsLayer()
   }
 
+  updateAnimationYear(range) {
+    if (this.year !== null && this.year < range[0]) {
+      this.updateYear(range[0])
+    }
+  }
+
   updateWmsLayer() {
     // hairy bit of code to:
     // 1. pull out the currently selected layer's layer template string
@@ -351,10 +399,7 @@ class DatasetDetail extends Vue {
         if (wmsLayer === this.selectedLayer) {
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
-          wmsLayer.setParams(
-            { layers: this.fillTemplateYear(layerName) },
-            false
-          )
+          wmsLayer.setParams({ layers: layerName }, false)
         }
       }
     }
@@ -368,7 +413,7 @@ export default DatasetDetail
 </script>
 <style>
 #map-flex {
-  height: 800px;
+  height: 600px;
 }
 
 @media all and (max-width: 960px) {
