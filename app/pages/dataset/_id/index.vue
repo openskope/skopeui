@@ -136,6 +136,7 @@
             <v-card-text class="body">
               <vue-markdown :source="selectedDataset.description" />
             </v-card-text>
+            <TimeSeries />
             <v-subheader class="title">
               Variables
             </v-subheader>
@@ -201,6 +202,7 @@ import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import { clamp } from 'lodash'
+import TimeSeries from '@/components/TimeSeries.vue'
 import Vue from 'vue'
 
 const fillTemplate = require('es6-dynamic-template')
@@ -209,6 +211,7 @@ const Datasets = namespace('datasets')
 @Component({
   layout: 'dataset',
   components: {
+    TimeSeries,
     VueMarkdown
   }
 })
