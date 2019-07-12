@@ -39,8 +39,26 @@
         <v-form>
           <v-container py-0>
             <v-subheader class="text-lg-center text-md-center pa-0">
-              Constrain the animation temporal range (in years)
+              Constrain the animation temporal range (in years) and animate the
+              selected variable
             </v-subheader>
+            <v-layout align-center justify-space-between row>
+              <v-flex xs12 sm6 class="py-0">
+                <v-toolbar dense>
+                  <v-btn flat>
+                    <v-icon>skip_previous</v-icon>
+                  </v-btn>
+                  <v-btn-toggle v-model="toggleAnimation" class="transparent">
+                    <v-btn flat @click="togglePlay">
+                      <v-icon>{{ playIcon }}</v-icon>
+                    </v-btn>
+                  </v-btn-toggle>
+                  <v-btn flat>
+                    <v-icon>skip_next</v-icon>
+                  </v-btn>
+                </v-toolbar>
+              </v-flex>
+            </v-layout>
             <v-layout align-center justify-space-between row>
               <v-flex shrink style="width: 6em">
                 <v-text-field
@@ -51,17 +69,17 @@
                   type="number"
                 ></v-text-field>
               </v-flex>
-              <v-flex class="px-3">
-                <v-range-slider
-                  v-model="temporalRange"
-                  :max="maxYear"
-                  :min="minYear"
-                  :thumb-size="24"
-                  class="mt-0"
-                  @change="updateAnimationYear"
-                >
-                </v-range-slider>
-              </v-flex>
+              <v-slider
+                :value="year"
+                :max="temporalRange[1]"
+                :min="temporalRange[0]"
+                :thumb-size="20"
+                :validate-on-blur="true"
+                thumb-label="always"
+                class="mt-5"
+                @change="updateYear"
+              >
+              </v-slider>
               <v-flex shrink style="width: 6em">
                 <v-text-field
                   v-model="temporalRange[1]"
@@ -72,39 +90,6 @@
                 ></v-text-field>
               </v-flex>
             </v-layout>
-            <v-divider :dark="true"></v-divider>
-            <v-subheader class="text-lg-center text-md-center pa-0">
-              Animate selected variable
-            </v-subheader>
-            <v-flex xs12 sm6 class="py-2">
-              <v-btn-toggle v-model="toggleAnimation">
-                <v-btn flat>
-                  <v-icon>play_circle_filled</v-icon>
-                </v-btn>
-                <v-btn flat>
-                  <v-icon>pause</v-icon>
-                </v-btn>
-                <v-btn flat>
-                  <v-icon>stop</v-icon>
-                </v-btn>
-              </v-btn-toggle>
-            </v-flex>
-            <v-slider
-              :value="year"
-              :max="temporalRange[1]"
-              :min="temporalRange[0]"
-              :thumb-size="24"
-              thumb-label="always"
-              class="mt-2"
-              @change="updateYear"
-            >
-              <template v-slot:prepend>
-                {{ temporalRange[0] }}
-              </template>
-              <template v-slot:append>
-                {{ temporalRange[1] }}
-              </template>
-            </v-slider>
           </v-container>
         </v-form>
       </v-flex>
@@ -125,7 +110,7 @@
             <v-subheader class="title">
               Variables
             </v-subheader>
-            <v-list dense light>
+            <v-list three-line dense light>
               <v-list-tile
                 v-for="(variable, index) in selectedDataset.variables"
                 :key="index"
@@ -133,16 +118,25 @@
               >
                 <v-list-tile-content>
                   <v-list-tile-title class="variable">
-                    <v-chip small color="secondary">
+                    <v-chip
+                      small
+                      color="indigo"
+                      text-color="white"
+                      disabled="false"
+                    >
+                      <v-icon>view_column</v-icon>
                       {{ variable.class }}
                     </v-chip>
                     {{ variable.name }}
                   </v-list-tile-title>
+                  <v-list-tile-sub-title class="my-0 py-0 mx-3">
+                    {{ variable.description }}
+                  </v-list-tile-sub-title>
                 </v-list-tile-content>
               </v-list-tile>
             </v-list>
             <v-card-text>
-              <div class="py-3 citation">
+              <div class="citation">
                 <em class="font-weight-bold">
                   Source:
                 </em>
@@ -158,7 +152,7 @@
               <div
                 v-for="(label, attr) in metadataAttributes"
                 :key="attr"
-                class="py-1"
+                class="py-0"
               >
                 <span class="font-weight-bold"> {{ label }}: </span>
                 <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
@@ -198,6 +192,7 @@ class DatasetDetail extends Vue {
   toggleAnimation = null
   year = null
   legendPosition = 'bottomleft'
+  isAnimationPlaying = false
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -222,6 +217,15 @@ class DatasetDetail extends Vue {
 
   get defaultBaseMap() {
     return BaseMapEndpoints.default
+  }
+
+  get playIcon() {
+    if (this.isAnimationPlaying) {
+      return 'pause_circle_outline'
+    } else {
+      return 'play_circle_filled'
+    }
+    console.log(this.toggleAnimation)
   }
 
   get spatialCoverage() {
@@ -256,6 +260,10 @@ class DatasetDetail extends Vue {
 
   get absoluteUrl() {
     return '/dataset/' + this.selectedDataset.id
+  }
+
+  togglePlay(event) {
+    this.isAnimationPlaying = !this.isAnimationPlaying
   }
 
   created() {
