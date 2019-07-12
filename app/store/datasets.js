@@ -247,7 +247,8 @@ const ALL_DATA = [
         min: 0.0,
         max: 10.0,
         visible: false,
-        styles: 'default,raster'
+        styles: 'default,raster',
+        description: 'F deg.; Growing Season: May–Sept.'
       },
       {
         id: 'paleocar_precipitation',
@@ -258,7 +259,8 @@ const ALL_DATA = [
         min: 0.0,
         max: 10.0,
         visible: false,
-        styles: 'default,raster'
+        styles: 'default,raster',
+        description: '(prev. Oct through listed year Sept)'
       },
       {
         id: 'paleocar_crop_niche',
@@ -269,7 +271,9 @@ const ALL_DATA = [
         min: 0.0,
         max: 1.0,
         visible: false,
-        styles: 'default'
+        styles: 'default',
+        description:
+          'In niche if Growing Season F GDD (as above) >= 1800 & Water Year Precip. (as above) >= 300 mm; otherwise out of niche.'
       }
     ]
   }
