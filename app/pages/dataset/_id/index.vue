@@ -42,7 +42,7 @@
               Constrain the animation temporal range (in years) and animate the
               selected variable
             </v-subheader>
-            <v-layout align-center justify-space-between row>
+            <v-layout align-center justify-center row>
               <v-flex xs12 sm6 class="py-0">
                 <v-toolbar dense>
                   <v-btn flat>
