@@ -36,9 +36,9 @@
             <vue-markdown :source="description" />
           </v-card-text>
           <!-- FIXME: extract this to a component and reuse across the detail page -->
-          <v-list three-line dense light>
+          <v-list dense light>
             <v-list-tile
-              v-for="(variable, index) in selectedDataset.variables"
+              v-for="(variable, index) in variables"
               :key="index"
               avatar
             >
@@ -48,16 +48,13 @@
                     small
                     color="indigo"
                     text-color="white"
-                    disabled="false"
+                    :disabled="true"
                   >
                     <v-icon>view_column</v-icon>
                     {{ variable.class }}
                   </v-chip>
                   {{ variable.name }}
                 </v-list-tile-title>
-                <v-list-tile-sub-title class="my-0 py-0 mx-3">
-                  {{ variable.description }}
-                </v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>

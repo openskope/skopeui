@@ -122,7 +122,7 @@
                       small
                       color="indigo"
                       text-color="white"
-                      disabled="false"
+                      :disabled="true"
                     >
                       <v-icon>view_column</v-icon>
                       {{ variable.class }}
