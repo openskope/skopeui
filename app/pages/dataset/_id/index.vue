@@ -44,16 +44,24 @@
             </v-subheader>
             <v-layout align-center justify-center row>
               <v-flex xs12 sm6 class="py-0">
+                <v-alert
+                  :value="!isLayerSelected"
+                  type="error"
+                  transition="scale-transition"
+                >
+                  Please select a variable first from the layer control on the
+                  map.
+                </v-alert>
                 <v-toolbar dense>
-                  <v-btn flat>
+                  <v-btn flat @click="previousYear">
                     <v-icon>skip_previous</v-icon>
                   </v-btn>
-                  <v-btn-toggle v-model="toggleAnimation" class="transparent">
+                  <v-btn-toggle class="transparent">
                     <v-btn flat @click="togglePlay">
                       <v-icon>{{ playIcon }}</v-icon>
                     </v-btn>
                   </v-btn-toggle>
-                  <v-btn flat>
+                  <v-btn flat @click="nextYear">
                     <v-icon>skip_next</v-icon>
                   </v-btn>
                 </v-toolbar>
@@ -62,18 +70,22 @@
             <v-layout align-center justify-space-between row>
               <v-flex shrink style="width: 6em">
                 <v-text-field
-                  v-model="temporalRange[0]"
+                  v-model="minTemporalRange"
                   class="centered-input mt-0"
+                  :min="timespanMinYear"
+                  :max="timespanMaxYear"
+                  :validate-on-blur="true"
                   hide-details
                   single-line
                   type="number"
+                  @change="validateMinYear"
                 ></v-text-field>
               </v-flex>
               <v-slider
                 :value="year"
-                :max="temporalRange[1]"
-                :min="temporalRange[0]"
-                :thumb-size="20"
+                :max="maxTemporalRange"
+                :min="minTemporalRange"
+                :thumb-size="50"
                 :validate-on-blur="true"
                 thumb-label="always"
                 class="mt-5"
@@ -82,11 +94,15 @@
               </v-slider>
               <v-flex shrink style="width: 6em">
                 <v-text-field
-                  v-model="temporalRange[1]"
+                  v-model="maxTemporalRange"
+                  :min="timespanMinYear"
+                  :max="timespanMaxYear"
+                  :validate-on-blur="true"
                   class="mt-0"
                   hide-details
                   single-line
                   type="number"
+                  @change="validateMaxYear"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -171,6 +187,7 @@ import { stringify } from 'query-string'
 import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
+import { clamp } from 'lodash'
 import Vue from 'vue'
 
 const fillTemplate = require('es6-dynamic-template')
@@ -185,7 +202,8 @@ const Datasets = namespace('datasets')
 class DatasetDetail extends Vue {
   length = 3
   onboarding = 0
-  temporalRange = []
+  minTemporalRange = 0
+  maxTemporalRange = 2000
   selectedLayer = null
   legendControl = null
   legendImage = null
@@ -199,16 +217,20 @@ class DatasetDetail extends Vue {
   @Datasets.Getter('selectedDatasetTimespan')
   selectedDatasetTimespan
 
-  get minYear() {
+  get timespanMinYear() {
     return parseInt(this.selectedDatasetTimespan[0])
   }
 
-  get maxYear() {
+  get timespanMaxYear() {
     return parseInt(this.selectedDatasetTimespan[1])
   }
 
   get layerType() {
     return this.selectedDataset.variables.length > 1 ? 'base' : 'overlay'
+  }
+
+  get isLayerSelected() {
+    return this.selectedLayer !== null
   }
 
   get skopeWmsUrl() {
@@ -225,7 +247,6 @@ class DatasetDetail extends Vue {
     } else {
       return 'play_circle_filled'
     }
-    console.log(this.toggleAnimation)
   }
 
   get spatialCoverage() {
@@ -268,7 +289,8 @@ class DatasetDetail extends Vue {
 
   created() {
     this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
-    this.temporalRange = this.selectedDatasetTimespan
+    this.minTemporalRange = this.timespanMinYear
+    this.maxTemporalRange = this.timespanMaxYear
   }
 
   mounted() {
@@ -290,6 +312,24 @@ class DatasetDetail extends Vue {
     return {
       title: this.selectedDataset.title
     }
+  }
+
+  nextYear() {
+    if (this.selectedLayer === null) {
+      return
+    }
+    this.updateYear(
+      clamp(this.year + 1, this.minTemporalRange, this.maxTemporalRange)
+    )
+  }
+
+  previousYear() {
+    if (this.selectedLayer === null) {
+      return
+    }
+    this.updateYear(
+      clamp(this.year - 1, this.minTemporalRange, this.maxTemporalRange)
+    )
   }
 
   next() {
@@ -378,7 +418,7 @@ class DatasetDetail extends Vue {
   }
 
   fillTemplateYear(templateString) {
-    const year = (this.year || this.maxYear).toString()
+    const year = (this.year || this.maxTemporalRange).toString()
     const layer = fillTemplate(templateString, {
       year: year.padStart(4, '0')
     })
@@ -390,10 +430,26 @@ class DatasetDetail extends Vue {
     this.updateWmsLayer()
   }
 
-  updateAnimationYear(range) {
-    if (this.year !== null && this.year < range[0]) {
-      this.updateYear(range[0])
+  updateAnimationYear() {
+    if (this.year !== null && this.year < this.minTemporalRange) {
+      this.updateYear(this.minTemporalRange)
     }
+  }
+
+  validateMinYear() {
+    this.minTemporalRange = clamp(
+      this.minTemporalRange,
+      this.timespanMinYear,
+      this.timespanMaxYear
+    )
+  }
+
+  validateMaxYear() {
+    this.maxTemporalRange = clamp(
+      this.maxTemporalRange,
+      this.timespanMinYear,
+      this.timespanMaxYear
+    )
   }
 
   updateWmsLayer() {
