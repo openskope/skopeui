@@ -1,10 +1,6 @@
 <template>
   <no-ssr placeholder="Loading...">
-    <Plotly
-      :data="traces"
-      :layout="metadata"
-      :display-mode-bar="false"
-    ></Plotly>
+    <Plotly :data="traces" :layout="metadata" :options="options"></Plotly>
   </no-ssr>
 </template>
 
@@ -13,7 +9,9 @@ import Vue from 'vue'
 import _ from 'lodash'
 import Component from 'nuxt-class-component'
 import * as queryString from 'query-string'
-const Plotly = () => import('vue-plotly').then(p => p.Plotly)
+import { Prop, Watch } from 'vue-property-decorator'
+import { TIMESERIES_ENDPOINT } from '../store/constants'
+const Plotly = () => import('@statnett/vue-plotly')
 
 export default
 @Component({
@@ -22,13 +20,22 @@ export default
   }
 })
 class TimeSeries extends Vue {
+  @Prop()
+  geometry
+
+  @Prop()
+  datasetUri
+
+  @Prop()
+  variableName
+
   timeseries = {
     x: [],
     y: [],
     type: 'scatter'
   }
 
-  async updateDataset() {
+  async updateDataset(geometry) {
     const qs = {
       start: '0001',
       end: '2017',
@@ -36,17 +43,14 @@ class TimeSeries extends Vue {
       timeZero: '0'
     }
     const body = {
-      boundaryGeometry: {
-        coordinates: [-116, 35],
-        type: 'point'
-      }
+      boundaryGeometry: geometry
     }
-    const url = `https://app.openskope.org/timeseries-service/api/v1/timeseries/lbda-v2/palmer_modified_drought_index?${queryString.stringify(
-      qs
-    )}`
+    const url = `${TIMESERIES_ENDPOINT}${
+      this.datasetUri
+    }?${queryString.stringify(qs)}`
     const res = await this.$axios.$post(url, body)
     const timeseries = {
-      x: _.range(res.startIndex, res.endIndex),
+      x: _.range(res.startIndex, res.endIndex + 1),
       y: res.values,
       type: 'scatter'
     }
@@ -54,7 +58,12 @@ class TimeSeries extends Vue {
   }
 
   mounted() {
-    this.updateDataset()
+    this.updateDataset(this.geometry)
+  }
+
+  @Watch('geometry')
+  onGeometryChange(geometry) {
+    this.updateDataset(geometry)
   }
 
   get traces() {
@@ -63,8 +72,24 @@ class TimeSeries extends Vue {
 
   get metadata() {
     return {
-      title: 'Time Series'
+      xaxis: {
+        title: 'Year'
+      },
+      yaxis: {
+        title: this.variableName
+      },
+      margin: {
+        l: 60,
+        r: 10,
+        b: 60,
+        t: 10,
+        pad: 4
+      }
     }
+  }
+
+  get options() {
+    return {}
   }
 }
 </script>
