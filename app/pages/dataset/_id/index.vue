@@ -26,13 +26,12 @@
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
-                :key="variable.wmsLayer"
+                :key="variable.id"
                 :base-url="skopeWmsUrl"
                 :layers="fillTemplateYear(variable.wmsLayer)"
                 :name="variable.name"
                 :crs="defaultCrs"
                 :transparent="true"
-                :visible="false"
                 :opacity="0.5"
                 :layer-type="layerType"
                 :attribution="variable.name"
@@ -136,35 +135,18 @@
             <v-card-text class="body">
               <vue-markdown :source="selectedDataset.description" />
             </v-card-text>
-            <TimeSeries />
-            <v-subheader class="title">
-              Variables
-            </v-subheader>
-            <v-list three-line dense light>
-              <v-list-tile
-                v-for="(variable, index) in selectedDataset.variables"
-                :key="index"
-                avatar
-              >
-                <v-list-tile-content>
-                  <v-list-tile-title class="variable">
-                    <v-chip
-                      small
-                      color="indigo"
-                      text-color="white"
-                      :disabled="true"
-                    >
-                      <v-icon>view_column</v-icon>
-                      {{ variable.class }}
-                    </v-chip>
-                    {{ variable.name }}
-                  </v-list-tile-title>
-                  <v-list-tile-sub-title class="my-0 py-0 mx-3">
-                    {{ variable.description }}
-                  </v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
+            <v-card-actions>
+              <TimeSeries
+                v-if="selectedArea.coordinates.length > 0"
+                :dataset-uri="selectedLayer.timeseriesServiceUri"
+                :geometry="selectedArea"
+                :variable-name="selectedLayer.name"
+              />
+              <v-alert v-else :value="true" type="warning">
+                No study area selected. Select a study area to show a time
+                series
+              </v-alert>
+            </v-card-actions>
             <v-card-text>
               <div class="citation">
                 <em class="font-weight-bold">
@@ -228,6 +210,7 @@ class DatasetDetail extends Vue {
   year = null
   legendPosition = 'bottomleft'
   isAnimationPlaying = false
+  selectedArea = { type: 'None', coordinates: [] }
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -313,11 +296,16 @@ class DatasetDetail extends Vue {
   mounted() {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
-      map.on('layeradd', event => {
+      this.selectedLayer = this.selectedDataset.variables[0]
+      map.on('baselayerchange', event => {
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
-          this.selectedLayer = layer
+          const variable = _.find(
+            this.selectedDataset.variables,
+            v => v.name === event.name
+          )
+          this.selectedLayer = variable
           this.updateWmsLegend(map, layer.wmsParams.layers)
           // FIXME: there should be a better way to access the selected variable name
           for (const wmsLayerRef of this.$refs.wmsLayers) {
@@ -394,13 +382,19 @@ class DatasetDetail extends Vue {
       },
       draw: false
     })
+    const self = this
     map.addControl(drawControlFull)
+    map.on(L.Draw.Event.EDITMOVE, event => {
+      self.selectedArea = event.layer.toGeoJSON().geometry
+    })
     map.on(L.Draw.Event.CREATED, event => {
       drawnItems.addLayer(event.layer)
+      self.selectedArea = event.layer.toGeoJSON().geometry
       drawControlFull.remove(map)
       drawControlEditOnly.addTo(map)
     })
     map.on(L.Draw.Event.DELETED, event => {
+      self.selectedArea = { type: 'None', coordinates: [] }
       if (drawnItems.getLayers().length === 0) {
         drawControlEditOnly.remove(map)
         drawControlFull.addTo(map)
