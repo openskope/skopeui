@@ -26,7 +26,7 @@
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
-                :key="variable.id"
+                :key="variable.wmsLayer"
                 :base-url="skopeWmsUrl"
                 :layers="fillTemplateYear(variable.wmsLayer)"
                 :name="variable.name"
@@ -480,7 +480,7 @@ class DatasetDetail extends Vue {
     if (this.selectedLayer !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         const wmsLayer = wmsLayerRef.mapObject
-        if (wmsLayer === this.selectedLayer) {
+        if (wmsLayerRef.name === this.selectedLayer.name) {
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
           wmsLayer.setParams({ layers: layerName }, false)
