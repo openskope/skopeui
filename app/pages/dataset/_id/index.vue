@@ -35,6 +35,7 @@
                 :opacity="0.5"
                 :layer-type="layerType"
                 :attribution="variable.name"
+                :visible="variable.visible"
                 version="1.3.0"
                 format="image/png"
               />
