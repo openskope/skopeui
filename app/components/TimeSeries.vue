@@ -35,7 +35,7 @@ class TimeSeries extends Vue {
     type: 'scatter'
   }
 
-  async updateDataset(geometry) {
+  async updateDataset(datasetUri, geometry) {
     const qs = {
       start: '0001',
       end: '2017',
@@ -58,12 +58,17 @@ class TimeSeries extends Vue {
   }
 
   mounted() {
-    this.updateDataset(this.geometry)
+    this.updateDataset(this.datasetUri, this.geometry)
+  }
+
+  @Watch('datasetUri')
+  onDatasetUriChange(datasetUri) {
+    this.updateDataset(datasetUri, this.geometry)
   }
 
   @Watch('geometry')
   onGeometryChange(geometry) {
-    this.updateDataset(geometry)
+    this.updateDataset(this.datasetUri, geometry)
   }
 
   get traces() {
