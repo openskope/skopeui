@@ -18,6 +18,11 @@
                 :attribution="defaultBaseMap.attribution"
                 :transparent="false"
               />
+              <l-rectangle
+                :bounds="selectedDataset.region.extents"
+                :l-style="selectedDataset.region.style"
+                :fill-opacity="0.05"
+              />
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
@@ -30,6 +35,7 @@
                 :visible="false"
                 :opacity="0.5"
                 :layer-type="layerType"
+                :attribution="variable.name"
                 version="1.3.0"
                 format="image/png"
               />
@@ -42,7 +48,7 @@
               Constrain the animation temporal range (in years) and animate the
               selected variable
             </v-subheader>
-            <v-layout align-center justify-center row>
+            <v-layout class="align-center justify-center" row>
               <v-flex xs12 sm6 class="py-0">
                 <v-alert
                   :value="!isLayerSelected"
@@ -52,7 +58,14 @@
                   Please select a variable first from the layer control on the
                   map.
                 </v-alert>
-                <v-toolbar dense>
+                <v-alert
+                  :value="isLayerSelected"
+                  type="info"
+                  transition="scale-transition"
+                >
+                  {{ selectedLayerName }}
+                </v-alert>
+                <v-toolbar collapse>
                   <v-btn flat @click="previousYear">
                     <v-icon>skip_previous</v-icon>
                   </v-btn>
@@ -205,6 +218,7 @@ class DatasetDetail extends Vue {
   minTemporalRange = 0
   maxTemporalRange = 2000
   selectedLayer = null
+  selectedLayerName = ''
   legendControl = null
   legendImage = null
   toggleAnimation = null
@@ -302,6 +316,15 @@ class DatasetDetail extends Vue {
         if (isSkopeLayer) {
           this.selectedLayer = layer
           this.updateWmsLegend(map, layer.wmsParams.layers)
+          // FIXME: there should be a better way to access the selected variable name
+          for (const wmsLayerRef of this.$refs.wmsLayers) {
+            const wmsLayer = wmsLayerRef.mapObject
+            if (wmsLayer === layer) {
+              this.selectedLayerName =
+                wmsLayerRef.$vnode.componentOptions.propsData.name
+              break
+            }
+          }
         }
       })
       this.addDrawToolbar(map)
