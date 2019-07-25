@@ -138,10 +138,10 @@
             </v-card-text>
             <v-card-actions>
               <TimeSeries
-                v-if="selectedArea.coordinates.length > 0"
+                v-if="isLayerSelected && selectedArea.coordinates.length > 0"
                 :dataset-uri="selectedLayer.timeseriesServiceUri"
                 :geometry="selectedArea"
-                :variable-name="selectedLayer.name"
+                :variable-name="selectedLayerName"
               />
               <v-alert v-else :value="true" type="warning">
                 No study area selected. Select a study area to show a time
@@ -232,7 +232,6 @@ class DatasetDetail extends Vue {
   minTemporalRange = 0
   maxTemporalRange = 2000
   selectedLayer = null
-  selectedLayerName = ''
   legendControl = null
   legendImage = null
   toggleAnimation = null
@@ -245,6 +244,10 @@ class DatasetDetail extends Vue {
   selectedDataset
   @Datasets.Getter('selectedDatasetTimespan')
   selectedDatasetTimespan
+
+  get selectedLayerName() {
+    return this.isLayerSelected ? this.selectedLayer.name : ''
+  }
 
   get timespanMinYear() {
     return parseInt(this.selectedDatasetTimespan[0])
@@ -325,7 +328,7 @@ class DatasetDetail extends Vue {
   mounted() {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
-      this.selectedLayer = this.selectedDataset.variables[0]
+      // this.selectedLayer = this.selectedDataset.variables[0]
       map.on('baselayerchange', event => {
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
@@ -336,15 +339,6 @@ class DatasetDetail extends Vue {
           )
           this.selectedLayer = variable
           this.updateWmsLegend(map, layer.wmsParams.layers)
-          // FIXME: there should be a better way to access the selected variable name
-          for (const wmsLayerRef of this.$refs.wmsLayers) {
-            const wmsLayer = wmsLayerRef.mapObject
-            if (wmsLayer === layer) {
-              this.selectedLayerName =
-                wmsLayerRef.$vnode.componentOptions.propsData.name
-              break
-            }
-          }
         }
       })
       this.addDrawToolbar(map)

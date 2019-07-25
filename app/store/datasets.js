@@ -71,7 +71,6 @@ export const actions = {
     context.commit('applyFilterCriteria', filterCriteria)
   },
   loadDataset({ state, commit }, id) {
-    console.log(id)
     if (state.selectedDataset.id !== id) {
       if (state.all === undefined || state.all.length === 0) {
         commit('load')
@@ -147,7 +146,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:pmdi_${year}-01-01',
         min: -6.0,
         max: 6.0,
-        visible: true,
+        visible: false,
         styles: 'default',
         timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
         description:
@@ -196,7 +195,7 @@ const ALL_DATA = [
         class: 'Elevation',
         name: 'Elevation (m)',
         wmsLayer: 'SKOPE:srtm',
-        visible: true,
+        visible: false,
         min: 0.0,
         max: 4500.0,
         styles: 'default'
@@ -253,7 +252,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:paleocar_gdd_${year}-01-01',
         min: 0.0,
         max: 10.0,
-        visible: true,
+        visible: false,
         styles: 'default,raster',
         description: 'F deg.; Growing Season: May–Sept.'
       },
