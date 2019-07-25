@@ -71,6 +71,7 @@ export const actions = {
     context.commit('applyFilterCriteria', filterCriteria)
   },
   loadDataset({ state, commit }, id) {
+    console.log(id)
     if (state.selectedDataset.id !== id) {
       if (state.all === undefined || state.all.length === 0) {
         commit('load')
@@ -89,6 +90,12 @@ export const mutations = {
   },
   selectDataset(state, id) {
     state.selectedDataset = state.all.find(dataset => dataset.id === id)
+  },
+  selectVariable(state, id) {
+    state.selectedDataset.selectedVariableInd = _.findIndex(
+      state.selectedDataset.variables,
+      v => v.id === id
+    )
   },
   applyFilterCriteria(state, filterCriteria) {
     console.log('Filter criteria')
@@ -246,7 +253,7 @@ const ALL_DATA = [
         wmsLayer: 'SKOPE:paleocar_gdd_${year}-01-01',
         min: 0.0,
         max: 10.0,
-        visible: false,
+        visible: true,
         styles: 'default,raster',
         description: 'F deg.; Growing Season: May–Sept.'
       },
