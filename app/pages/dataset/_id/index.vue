@@ -148,6 +148,34 @@
                 series
               </v-alert>
             </v-card-actions>
+            <v-subheader class="title">
+              Variables
+            </v-subheader>
+            <v-list three-line dense light>
+              <v-list-tile
+                v-for="(variable, index) in selectedDataset.variables"
+                :key="index"
+                avatar
+              >
+                <v-list-tile-content>
+                  <v-list-tile-title class="variable">
+                    <v-chip
+                      small
+                      color="indigo"
+                      text-color="white"
+                      :disabled="true"
+                    >
+                      <v-icon>view_column</v-icon>
+                      {{ variable.class }}
+                    </v-chip>
+                    {{ variable.name }}
+                  </v-list-tile-title>
+                  <v-list-tile-sub-title class="my-0 py-0 mx-3">
+                    {{ variable.description }}
+                  </v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
             <v-card-text>
               <div class="citation">
                 <em class="font-weight-bold">
