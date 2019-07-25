@@ -1,6 +1,10 @@
 <template>
   <no-ssr placeholder="Loading...">
-    <Plotly :data="traces" :layout="metadata" :options="options"></Plotly>
+    <div style="width: 100%">
+      <Plotly ref="plot" :data="traces" :layout="metadata" :options="options">
+      </Plotly>
+      <v-btn @click.native="download">Download Chart</v-btn>
+    </div>
   </no-ssr>
 </template>
 
@@ -11,7 +15,10 @@ import Component from 'nuxt-class-component'
 import * as queryString from 'query-string'
 import { Prop, Watch } from 'vue-property-decorator'
 import { TIMESERIES_ENDPOINT } from '../store/constants'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 const Plotly = () => import('@statnett/vue-plotly')
+const { Parser } = require('json2csv')
 
 export default
 @Component({
@@ -69,6 +76,49 @@ class TimeSeries extends Vue {
   @Watch('geometry')
   onGeometryChange(geometry) {
     this.updateDataset(this.datasetUri, geometry)
+  }
+
+  get geometryGeoJSON() {
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: this.geometry
+        }
+      ]
+    }
+  }
+
+  async download() {
+    const fields = ['Year', this.variableName]
+    const data = _.zipWith(this.timeseries.x, this.timeseries.y, (x, y) => ({
+      Year: x,
+      [this.variableName]: y
+    }))
+    const json2csvParser = new Parser({ fields })
+    const csv = json2csvParser.parse(data)
+
+    const zip = new JSZip()
+    const dirname = _.kebabCase(this.datasetUri)
+    const dir = zip.folder(dirname)
+
+    const b64toBlob = async url => {
+      const res = await fetch(url)
+      return res.blob()
+    }
+
+    dir.file('time-series.csv', csv)
+    dir.file('chart.png', b64toBlob(await this.$refs.plot.toImage()))
+    dir.file(
+      'chart.svg',
+      b64toBlob(await this.$refs.plot.toImage({ format: 'svg' }))
+    )
+    dir.file('boundary.geojson', JSON.stringify(this.geometryGeoJSON))
+    zip
+      .generateAsync({ type: 'blob' })
+      .then(content => saveAs(content, `${_.kebabCase(this.datasetUri)}.zip`))
   }
 
   get traces() {
