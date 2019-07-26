@@ -329,7 +329,8 @@ class DatasetDetail extends Vue {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
       // this.selectedLayer = this.selectedDataset.variables[0]
-      map.on('baselayerchange', event => {
+      const handler = event => {
+        console.log(event)
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
@@ -340,7 +341,10 @@ class DatasetDetail extends Vue {
           this.selectedLayer = variable
           this.updateWmsLegend(map, layer.wmsParams.layers)
         }
-      })
+      }
+
+      map.on('overlayadd', handler)
+      map.on('baselayerchange', handler)
       this.addDrawToolbar(map)
     })
   }
