@@ -3,8 +3,6 @@ services:
   web:
     build: app
     image: comses/skopeui/dev:latest
-    ports:
-      - "127.0.0.1:3000:3000"
     volumes:
       - ./app:/code
       - /code/node_modules
