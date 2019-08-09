@@ -338,9 +338,7 @@ class DatasetDetail extends Vue {
   mounted() {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
-      // this.selectedLayer = this.selectedDataset.variables[0]
       const handler = event => {
-        console.log(event)
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
@@ -516,10 +514,10 @@ class DatasetDetail extends Vue {
     // 3. reset the params on the currently selected layer to request the new layer from GeoServer
     if (this.selectedLayer !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
-        const wmsLayer = wmsLayerRef.mapObject
         if (wmsLayerRef.name === this.selectedLayer.name) {
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
+          const wmsLayer = wmsLayerRef.mapObject
           wmsLayer.setParams({ layers: layerName }, false)
         }
       }
