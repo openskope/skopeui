@@ -317,6 +317,16 @@ class DatasetDetail extends Vue {
 
   togglePlay(event) {
     this.isAnimationPlaying = !this.isAnimationPlaying
+    if (this.isAnimationPlaying) {
+      // start an interval
+      const animationInterval = setInterval(() => {
+        if (!this.isAnimationPlaying) {
+          clearInterval(animationInterval)
+          return
+        }
+        this.nextYear()
+      }, 1000)
+    }
   }
 
   created() {
