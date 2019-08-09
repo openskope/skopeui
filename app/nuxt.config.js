@@ -63,6 +63,23 @@ module.exports = {
   },
 
   /*
+   ** auth configuration https://auth.nuxtjs.org/guide/setup.html
+   */
+  auth: {
+    strategies: {
+      github: {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET
+      },
+      google: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET
+
+      }
+    }
+  },
+
+  /*
    ** process environment variables
    */
   env: {},

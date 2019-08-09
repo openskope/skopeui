@@ -6,6 +6,8 @@ services:
     volumes:
       - ./app:/code
       - /code/node_modules
+    env_file:
+      - secrets/oauth.env
   django:
     build: django
     depends_on:
