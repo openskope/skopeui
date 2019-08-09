@@ -1,8 +1,9 @@
-const Hapi = require('@hapi/hapi')
+const { Server } = require('@hapi/hapi')
+const Routes = require('../api')
 const consola = require('consola')
 const HapiNuxt = require('@nuxtjs/hapi')
 
-const server = new Hapi.Server({
+const server = new Server({
   host: process.env.HOST || '0.0.0.0',
   port: process.env.PORT || 3000
 })
@@ -11,6 +12,7 @@ server
   .register({
     plugin: HapiNuxt
   })
+  .then(() => server.route(Routes))
   .then(() => server.start())
   .then(() =>
     consola.ready({
