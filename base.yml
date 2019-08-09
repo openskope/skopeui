@@ -14,6 +14,13 @@ services:
       - db
     volumes:
       - ./secrets:/run/secrets
+  mongo:
+    image: mongo:4
+    restart: always
+    env_file:
+      - secrets/mongo.env
+    volumes:
+      - ./docker/shared/mongo:/data/db
   db:
     image: comses/postgis:10
     volumes:
