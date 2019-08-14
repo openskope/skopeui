@@ -2,18 +2,15 @@ version: '3'
 services:
   web:
     build: app
+    restart: always
     image: comses/skopeui/dev:latest
+    depends_on:
+      - mongo
     volumes:
       - ./app:/code
       - /code/node_modules
     env_file:
       - secrets/oauth.env
-  django:
-    build: django
-    depends_on:
-      - db
-    volumes:
-      - ./secrets:/run/secrets
   mongo:
     image: mongo:4
     restart: always
@@ -21,6 +18,12 @@ services:
       - secrets/mongo.env
     volumes:
       - ./docker/shared/mongo:/data/db
+  django:
+    build: django
+    depends_on:
+      - db
+    volumes:
+      - ./secrets:/run/secrets
   db:
     image: comses/postgis:10
     volumes:

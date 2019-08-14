@@ -50,4 +50,4 @@ cat "${MONGO_TEMPLATE}" | envsubst > "${MONGO_ENV}"
 cat "${OAUTH_TEMPLATE}" | envsubst > "${OAUTH_ENV}"
 ./compose ${DEPLOY}
 
-docker-compose build --pull --force-rm --no-cache web
+docker-compose build --pull web
