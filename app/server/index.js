@@ -2,6 +2,7 @@ const { Server } = require('@hapi/hapi')
 const Routes = require('../api')
 const consola = require('consola')
 const HapiNuxt = require('@nuxtjs/hapi')
+const Bell = require('@hapi/bell')
 
 const server = new Server({
   host: process.env.HOST || '0.0.0.0',

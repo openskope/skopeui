@@ -16,9 +16,14 @@ function clean()
 }
 
 DEPLOY=${DEPLOY:-"dev"} # allowed values: (dev | staging | prod)
+MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-"root"}
 CONFIG_INI_TEMPLATE=./conf/config.ini.template
 SECRETS_DIR=./secrets
 SECRETS_INI=${SECRETS_DIR}/config.ini
+MONGO_TEMPLATE=./conf/mongo.env.template
+MONGO_ENV=${SECRETS_DIR}/mongo.env
+OAUTH_TEMPLATE=./conf/oauth.env.template
+OAUTH_ENV=${SECRETS_DIR}/oauth.env
 BACKUP_CONFIG_INI=/tmp/skope.${RANDOM}.ini
 
 set -a
@@ -35,11 +40,14 @@ fi
 DB_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | head -c60)
 DJANGO_SECRET_KEY=$(head /dev/urandom | base64 | head -c60)
 
+MONGO_INITDB_ROOT_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | head -c60)
 echo "Running env substitution for DB_PASSWORD ${DB_PASSWORD} and DJANGO_SECRET_KEY ${DJANGO_SECRET_KEY}"
 
 mkdir -p ${SECRETS_DIR}
 echo ${DB_PASSWORD} > ${SECRETS_DIR}/postgres-passwd
 cat "${CONFIG_INI_TEMPLATE}" | envsubst > "${SECRETS_INI}"
+cat "${MONGO_TEMPLATE}" | envsubst > "${MONGO_ENV}"
+cat "${OAUTH_TEMPLATE}" | envsubst > "${OAUTH_ENV}"
 ./compose ${DEPLOY}
 
-docker-compose build --pull --force-rm --no-cache
+docker-compose build --pull --force-rm --no-cache web

@@ -52,7 +52,6 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/auth',
     '@nuxtjs/pwa'
   ],
   /*
@@ -63,7 +62,7 @@ module.exports = {
   },
 
   /*
-   ** auth configuration https://auth.nuxtjs.org/guide/setup.html
+   ** use bell auth configuration instead: https://github.com/hapijs/bell
    */
   auth: {
     strategies: {
