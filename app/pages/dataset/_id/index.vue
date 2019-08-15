@@ -275,7 +275,7 @@ class DatasetDetail extends Vue {
 
   get playIcon() {
     if (this.isAnimationPlaying) {
-      return 'pause_circle_outline'
+      return 'pause_circle_filled'
     } else {
       return 'play_circle_filled'
     }

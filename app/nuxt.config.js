@@ -23,6 +23,10 @@ module.exports = {
       },
       {
         rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css?family=Bitter:400,700'
+      },
+      {
+        rel: 'stylesheet',
         href: 'https://use.fontawesome.com/releases/v5.9.0/css/all.css'
       }
     ]
@@ -73,7 +77,6 @@ module.exports = {
       google: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET
-
       }
     }
   },
