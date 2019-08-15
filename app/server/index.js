@@ -10,9 +10,24 @@ const server = new Server({
 })
 
 server
-  .register({
-    plugin: HapiNuxt
-  })
+  .register([
+    {
+      plugin: Bell
+    },
+    {
+      plugin: HapiNuxt
+    }
+  ])
+  .then(() =>
+    server.auth.strategy('github', 'bell', {
+      provider: 'github',
+      password: 'cookie_encryption_password_secure',
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      location: 'https://skope.comses.net',
+      scope: []
+    })
+  )
   .then(() => server.route(Routes))
   .then(() => server.start())
   .then(() =>
