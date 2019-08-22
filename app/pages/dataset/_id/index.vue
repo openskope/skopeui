@@ -142,6 +142,8 @@
                 :dataset-uri="selectedLayer.timeseriesServiceUri"
                 :geometry="selectedArea"
                 :variable-name="selectedLayerName"
+                :min-year="minTemporalRange"
+                :max-year="maxTemporalRange"
               />
               <v-alert v-else :value="true" type="warning">
                 No study area selected. Select a study area to show a time

@@ -1,8 +1,14 @@
 <template>
   <no-ssr placeholder="Loading...">
     <div style="width: 100%">
-      <Plotly ref="plot" :data="traces" :layout="metadata" :options="options">
-      </Plotly>
+      <Plotly
+        v-if="requestMessage.length === 0"
+        ref="plot"
+        :data="traces"
+        :layout="metadata"
+        :options="options"
+      ></Plotly>
+      <v-alert v-else type="error">{{ requestMessage }}</v-alert>
       <v-btn @click.native="download">Download Chart</v-btn>
     </div>
   </no-ssr>
@@ -20,6 +26,41 @@ import { saveAs } from 'file-saver'
 const Plotly = () => import('@statnett/vue-plotly')
 const { Parser } = require('json2csv')
 
+// Would need to make a custom debounce decorator so
+// that debounced methods can exist in a vue-class-component
+//
+// Could use or take from https://github.com/bvaughn/debounce-decorator
+const updateDataset = _.debounce(async function(
+  vue,
+  datasetUri,
+  geometry,
+  minYear,
+  maxYear
+) {
+  // this.isLoading = true
+  const start = minYear.toString().padStart(4, '0')
+  const end = maxYear.toString().padStart(4, '0')
+  const qs = {
+    start: start,
+    end: end,
+    timeResolution: 'year',
+    timeZero: '0'
+  }
+  const body = {
+    boundaryGeometry: geometry
+  }
+  const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
+
+  const res = await vue.$axios.$post(url, body)
+  const timeseries = {
+    x: _.range(res.startIndex, res.endIndex + 1),
+    y: res.values,
+    type: 'scatter'
+  }
+  vue.timeseries = timeseries
+},
+300)
+
 export default
 @Component({
   components: {
@@ -27,6 +68,12 @@ export default
   }
 })
 class TimeSeries extends Vue {
+  @Prop()
+  minYear
+
+  @Prop()
+  maxYear
+
   @Prop()
   geometry
 
@@ -42,40 +89,37 @@ class TimeSeries extends Vue {
     type: 'scatter'
   }
 
-  async updateDataset(datasetUri, geometry) {
-    const qs = {
-      start: '0001',
-      end: '2017',
-      timeResolution: 'year',
-      timeZero: '0'
-    }
-    const body = {
-      boundaryGeometry: geometry
-    }
-    const url = `${TIMESERIES_ENDPOINT}${
-      this.datasetUri
-    }?${queryString.stringify(qs)}`
-    const res = await this.$axios.$post(url, body)
-    const timeseries = {
-      x: _.range(res.startIndex, res.endIndex + 1),
-      y: res.values,
-      type: 'scatter'
-    }
-    this.timeseries = timeseries
-  }
+  requestMessage = ''
+  isLoading = true
 
   mounted() {
-    this.updateDataset(this.datasetUri, this.geometry)
+    updateDataset(
+      this,
+      this.datasetUri,
+      this.geometry,
+      this.minYear,
+      this.maxYear
+    )
   }
 
   @Watch('datasetUri')
   onDatasetUriChange(datasetUri) {
-    this.updateDataset(datasetUri, this.geometry)
+    updateDataset(this, datasetUri, this.geometry, this.minYear, this.maxYear)
   }
 
   @Watch('geometry')
   onGeometryChange(geometry) {
-    this.updateDataset(this.datasetUri, geometry)
+    updateDataset(this, this.datasetUri, geometry, this.minYear, this.maxYear)
+  }
+
+  @Watch('minYear')
+  onMinYearChange(minYear) {
+    updateDataset(this, this.datasetUri, this.geometry, minYear, this.maxYear)
+  }
+
+  @Watch('maxYear')
+  onMaxYearChange(maxYear) {
+    updateDataset(this, this.datasetUri, this.geometry, this.minYear, maxYear)
   }
 
   get geometryGeoJSON() {
