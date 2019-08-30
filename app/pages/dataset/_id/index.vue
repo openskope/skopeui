@@ -32,7 +32,7 @@
                 :name="variable.name"
                 :crs="defaultCrs"
                 :transparent="true"
-                :opacity="0.5"
+                :opacity="0.3"
                 :layer-type="layerType"
                 :attribution="variable.name"
                 :visible="variable.visible"
@@ -67,7 +67,7 @@
                 </v-alert>
                 <v-toolbar collapse>
                   <v-btn flat @click="previousYear">
-                    <v-icon>skip_previous</v-icon>
+                    <v-icon>arrow_left</v-icon>
                   </v-btn>
                   <v-btn-toggle class="transparent">
                     <v-btn flat @click="togglePlay">
@@ -75,7 +75,7 @@
                     </v-btn>
                   </v-btn-toggle>
                   <v-btn flat @click="nextYear">
-                    <v-icon>skip_next</v-icon>
+                    <v-icon>arrow_right</v-icon>
                   </v-btn>
                 </v-toolbar>
               </v-flex>
