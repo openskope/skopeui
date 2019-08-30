@@ -69,6 +69,12 @@ module.exports = {
    ** use bell auth configuration instead: https://github.com/hapijs/bell
    */
   auth: {
+    keys: {
+      GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || '',
+      GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || '',
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || ''
+    },
     strategies: {
       github: {
         client_id: process.env.GITHUB_CLIENT_ID,
@@ -85,6 +91,8 @@ module.exports = {
    ** process environment variables
    */
   env: {},
+
+  dev: process.env.NODE_ENV !== 'production',
 
   /*
    ** Build configuration

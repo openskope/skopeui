@@ -1,8 +1,9 @@
 const { Server } = require('@hapi/hapi')
-const Routes = require('../api')
+const ApiRoutes = require('../api')
 const consola = require('consola')
 const HapiNuxt = require('@nuxtjs/hapi')
 const Bell = require('@hapi/bell')
+let config = require('../nuxt.config.js')
 
 const server = new Server({
   host: process.env.HOST || '0.0.0.0',
@@ -18,17 +19,22 @@ server
       plugin: HapiNuxt
     }
   ])
-  .then(() =>
+  .then(() => {
     server.auth.strategy('github', 'bell', {
       provider: 'github',
-      password: 'cookie_encryption_password_secure',
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: config.auth.keys.GITHUB_CLIENT_ID,
+      clientSecret: config.auth.keys.GITHUB_CLIENT_SECRET,
+      isSecure: !config.dev,
       location: 'https://skope.comses.net',
-      scope: []
     })
-  )
-  .then(() => server.route(Routes))
+    server.auth.strategy('google', 'bell', {
+      provider: 'google',
+      clientId: config.auth.keys.GOOGLE_CLIENT_ID,
+      clientSecret: config.auth.keys.GOOGLE_CLIENT_SECRET,
+      isSecure: !config.dev
+    })
+  })
+  .then(() => server.route(ApiRoutes))
   .then(() => server.start())
   .then(() =>
     consola.ready({
