@@ -16,7 +16,6 @@ function clean()
 }
 
 DEPLOY=${DEPLOY:-"dev"} # allowed values: (dev | staging | prod)
-MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-"root"}
 CONFIG_INI_TEMPLATE=./conf/config.ini.template
 SECRETS_DIR=./secrets
 SECRETS_INI=${SECRETS_DIR}/config.ini
@@ -38,10 +37,11 @@ if [[ -f "${SECRETS_INI}" ]]; then
     done
 fi
 DB_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | head -c60)
-DJANGO_SECRET_KEY=$(head /dev/urandom | base64 | head -c60)
-
+SECRET_KEY=$(head /dev/urandom | base64 | head -c60)
+MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-"root"}
 MONGO_INITDB_ROOT_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | head -c60)
-echo "Running env substitution for DB_PASSWORD ${DB_PASSWORD} and DJANGO_SECRET_KEY ${DJANGO_SECRET_KEY}"
+
+echo "Running mongo env substitution for ${MONGO_INITDB_ROOT_USERNAME} ${MONGO_INITDB_ROOT_PASSWORD}"
 
 mkdir -p ${SECRETS_DIR}
 echo ${DB_PASSWORD} > ${SECRETS_DIR}/postgres-passwd

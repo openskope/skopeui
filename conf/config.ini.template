@@ -25,7 +25,7 @@ SENTRY_DSN=https://none:none@sentry.example.com/1
 SENTRY_PUBLIC_DSN=https://none@sentry.example.com/1
 
 [secrets]
-SECRET_KEY=${DJANGO_SECRET_KEY}
+SECRET_KEY=${SECRET_KEY}
 
 ORCID_CLIENT_ID=${ORCID_CLIENT_ID}
 ORCID_CLIENT_SECRET=${ORCID_CLIENT_SECRET}
