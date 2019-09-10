@@ -421,9 +421,11 @@ class DatasetDetail extends Vue {
     })
     const self = this
     map.addControl(drawControlFull)
-    map.on(L.Draw.Event.EDITMOVE, event => {
-      self.selectedArea = event.layer.toGeoJSON().geometry
-    })
+    const updateSelectedArea = layer => {
+      self.selectedArea = layer.toGeoJSON().geometry
+    }
+    map.on(L.Draw.Event.EDITMOVE, e => updateSelectedArea(e.layer))
+    map.on(L.Draw.Event.EDITVERTEX, e => updateSelectedArea(e.poly))
     map.on(L.Draw.Event.CREATED, event => {
       drawnItems.addLayer(event.layer)
       self.selectedArea = event.layer.toGeoJSON().geometry
