@@ -427,8 +427,9 @@ class DatasetDetail extends Vue {
     map.on(L.Draw.Event.EDITMOVE, e => updateSelectedArea(e.layer))
     map.on(L.Draw.Event.EDITVERTEX, e => updateSelectedArea(e.poly))
     map.on(L.Draw.Event.CREATED, event => {
-      drawnItems.addLayer(event.layer)
-      self.selectedArea = event.layer.toGeoJSON().geometry
+      const layer = event.layer
+      drawnItems.addLayer(layer)
+      updateSelectedArea(layer)
       drawControlFull.remove(map)
       drawControlEditOnly.addTo(map)
     })
