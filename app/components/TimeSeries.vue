@@ -44,7 +44,7 @@ const updateDataset = _.debounce(async function(
     start: start,
     end: end,
     timeResolution: 'year',
-    timeZero: '0'
+    timeZero: vue.timeZero
   }
   const body = {
     boundaryGeometry: geometry
@@ -82,6 +82,9 @@ class TimeSeries extends Vue {
 
   @Prop()
   variableName
+
+  @Prop()
+  timeZero
 
   timeseries = {
     x: [],
@@ -188,7 +191,9 @@ class TimeSeries extends Vue {
   }
 
   get options() {
-    return {}
+    return {
+      // responsive: true
+    }
   }
 }
 </script>

@@ -11,6 +11,13 @@ export const state = () => ({
 })
 
 export const getters = {
+  selectedDatasetTimeZero(state) {
+    const dataset = state.selectedDataset
+    if (dataset.id) {
+      return dataset.timespan.period.timeZero || 0
+    }
+    return 0
+  },
   selectedDatasetTimespan(state) {
     const dataset = state.selectedDataset
     if (dataset.id) {

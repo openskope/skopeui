@@ -140,6 +140,7 @@
               <TimeSeries
                 v-if="isLayerSelected && selectedArea.coordinates.length > 0"
                 :dataset-uri="selectedLayer.timeseriesServiceUri"
+                :time-zero="selectedDatasetTimeZero"
                 :geometry="selectedArea"
                 :variable-name="selectedLayerName"
                 :min-year="minTemporalRange"
@@ -246,6 +247,8 @@ class DatasetDetail extends Vue {
   selectedDataset
   @Datasets.Getter('selectedDatasetTimespan')
   selectedDatasetTimespan
+  @Datasets.Getter('selectedDatasetTimeZero')
+  selectedDatasetTimeZero
 
   get selectedLayerName() {
     return this.isLayerSelected ? this.selectedLayer.name : ''
