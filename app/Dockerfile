@@ -1,4 +1,4 @@
-FROM node:11
+FROM node:12
 
 LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
 
