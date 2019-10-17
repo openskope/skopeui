@@ -5,14 +5,3 @@ services:
       - "127.0.0.1:3000:3000"
     command: >-
       sh -c "yarn install && yarn dev"
-  django:
-    build:
-      args:
-        RUN_SCRIPT: "./docker/run/dev.sh"
-    image: comses/skopebackend/dev:latest
-    environment:
-      DJANGO_SETTINGS_MODULE: "skope.settings.dev"
-    ports:
-      - "127.0.0.1:8000:8000"
-    volumes:
-      - ./django:/code
