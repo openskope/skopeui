@@ -192,6 +192,7 @@ class TimeSeries extends Vue {
 
   get options() {
     return {
+      modeBarButtonsToRemove: ['toImage']
       // responsive: true
     }
   }
