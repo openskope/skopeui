@@ -1,3 +1,5 @@
+import dataset from '../layouts/dataset'
+
 export const state = () => ({
   loading: false,
   all: [],
@@ -9,6 +11,38 @@ export const state = () => ({
     query: ''
   }
 })
+
+function matchesYearFilter(minYear, maxYear, dataset) {
+  const dMinYear = parseInt(dataset.timespan.period.gte)
+  const dMaxYear = parseInt(dataset.timespan.period.lte)
+
+  if (dMaxYear < minYear) {
+    return false
+  }
+  return dMinYear <= maxYear
+}
+
+function matchesVariableFilter(selectedVariableClasses, dataset) {
+  if (selectedVariableClasses.length === 0) {
+    return true
+  }
+  for (const selectedVariableClass of selectedVariableClasses) {
+    for (const variable of dataset.variables) {
+      if (variable.class === selectedVariableClass) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function matchesQueryFilter(query, dataset) {
+  const q = query.toLowerCase()
+  return query.length > 0
+    ? dataset.title.toLowerCase().includes(q) ||
+        dataset.description.toLowerCase().includes(q)
+    : true
+}
 
 export const getters = {
   selectedDatasetTimeZero(state) {
@@ -30,40 +64,17 @@ export const getters = {
     return state.all.filter(dataset => {
       const selectedVariableClasses =
         state.filterCriteria.selectedVariableClasses
-      const yearStart = state.filterCriteria.yearStart
-      const yearEnd = state.filterCriteria.yearEnd
+      const minYear = state.filterCriteria.yearStart
+      const maxYear = state.filterCriteria.yearEnd
       const query = state.filterCriteria.query
-      if (selectedVariableClasses.length === 0) {
-        return true
-      }
-      // !x will be true for '', null, undefined, 0, NaN, false
-      if (!yearStart || !yearEnd) {
-        return true
-      }
 
-      if (!query) {
-        return true
-      }
-
-      // filtering datasets by time range
-      // for (const timespan of dataset.timespan) {
-      //   if (
-      //     yearStart >= timespan.period.gte &&
-      //     yearEnd <= timespan.period.lte
-      //   ) {
-      //     return true
-      //   }
-      // }
-
-      for (const selectedVariableClass of selectedVariableClasses) {
-        for (const variable of dataset.variables) {
-          if (variable.class === selectedVariableClass) {
-            return true
-          }
-        }
-      }
-    }) // end return filteredDatasets
-  } // end filteredDatasets
+      return (
+        matchesYearFilter(minYear, maxYear, dataset) &&
+        matchesQueryFilter(query, dataset) &&
+        matchesVariableFilter(selectedVariableClasses, dataset)
+      )
+    })
+  }
 }
 
 export const actions = {
@@ -104,8 +115,6 @@ export const mutations = {
     )
   },
   applyFilterCriteria(state, filterCriteria) {
-    console.log('Filter criteria')
-    console.log(filterCriteria)
     state.filterCriteria = filterCriteria
   }
 }
