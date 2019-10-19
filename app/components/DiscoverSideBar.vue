@@ -6,27 +6,14 @@
     <form id="searchForm" class="sidebar-form" @submit.prevent>
       <div id="searchContainer" class="input-group">
         <span class="input-group-btn">
-          <input
+          <v-text-field
             id="search"
             v-model="search"
-            type="text"
-            name="search"
-            class="search form-control"
             data-toggle="hideseek"
-            placeholder="Search datasets"
-            data-list=".sidebar-menu"
-            @keydown.enter="search"
-            @change="filterDatasets"
+            label="Search datasets"
+            append-icon="fa fa-search"
+            @keydown.enter="filterDatasets"
           />
-          <button
-            id="search-btn"
-            type="submit"
-            name="search"
-            class="btn btn-flat"
-            @click="search"
-          >
-            <i class="fa fa-search" />
-          </button>
         </span>
       </div>
     </form>
@@ -42,6 +29,7 @@
           hide-details
           single-line
           type="number"
+          @keydown.enter="filterDatasets"
         />
       </v-flex>
       <v-flex class="px-3">
@@ -60,6 +48,7 @@
           hide-details
           single-line
           type="number"
+          @keydown.enter="filterDatasets"
         />
       </v-flex>
     </v-layout>
