@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app>
-    <v-toolbar elevation="0">
+    <v-toolbar flat>
       <v-toolbar-title>
         <nuxt-link class="pl-3 skope-title" to="/">
           SKOPE
