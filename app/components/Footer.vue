@@ -8,10 +8,13 @@
       class="indigo lighten-1 mx-auto white--text text-xs-center"
     >
       <v-card-text>
-        <v-btn v-for="icon in icons" :key="icon" class="mx-3 white--text" icon>
-          <v-icon size="24px">
-            {{ icon }}
-          </v-icon>
+        <v-btn icon :href="github.url">
+          <v-icon size="24px" class="mx-3 white--text">{{
+            github.icon
+          }}</v-icon>
+        </v-btn>
+        <v-btn text class="white--text" :href="skope.url">
+          Skope
         </v-btn>
       </v-card-text>
       <v-divider />
@@ -29,7 +32,13 @@ export default {
   data() {
     return {
       year: new Date().getFullYear(),
-      icons: ['fab fa-github', 'fab fa-twitter']
+      github: {
+        icon: 'fab fa-github',
+        url: 'https://github.com/openskope/skopeui'
+      },
+      skope: {
+        url: 'https://www.openskope.org'
+      }
     }
   }
 }
