@@ -1,7 +1,12 @@
 <template>
   <!-- footer -->
-  <v-footer light height="auto" app absolute>
-    <v-card text tile class="flex indigo lighten-1 white--text text-xs-center">
+  <v-footer light height="auto" app absolute class="indigo lighten-1">
+    <v-card
+      elevation="0"
+      text
+      tile
+      class="indigo lighten-1 mx-auto white--text text-xs-center"
+    >
       <v-card-text>
         <v-btn v-for="icon in icons" :key="icon" class="mx-3 white--text" icon>
           <v-icon size="24px">
