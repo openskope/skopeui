@@ -2,7 +2,7 @@
   <v-layout row pa-2 mb-2 align-content-start justify-space-around fill-height>
     <v-flex xs4>
       <div class="map px-2">
-        <no-ssr>
+        <client-only>
           <l-map
             :min-zoom="2"
             :max-zoom="8"
@@ -16,7 +16,7 @@
             />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
-        </no-ssr>
+        </client-only>
       </div>
     </v-flex>
     <v-flex xs8>
@@ -37,13 +37,9 @@
           </v-card-text>
           <!-- FIXME: extract this to a component and reuse across the detail page -->
           <v-list dense light>
-            <v-list-tile
-              v-for="(variable, index) in variables"
-              :key="index"
-              avatar
-            >
-              <v-list-tile-content>
-                <v-list-tile-title class="variable">
+            <v-list-item v-for="(variable, index) in variables" :key="index">
+              <v-list-item-content>
+                <v-list-item-title class="variable">
                   <v-chip
                     small
                     color="indigo"
@@ -54,9 +50,9 @@
                     {{ variable.class }}
                   </v-chip>
                   {{ variable.name }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
           <v-card-text>
             <div class="py-3 citation">

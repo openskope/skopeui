@@ -47,15 +47,11 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['~/assets/style/app.styl'],
 
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [
-    '@/plugins/vuetify',
-    { src: '~/plugins/nuxt-leaflet.js', ssr: false }
-  ],
+  plugins: [{ src: '~/plugins/nuxt-leaflet.js', ssr: false }],
 
   /*
    ** Nuxt.js modules
@@ -108,6 +104,18 @@ module.exports = {
 
   dev: process.env.NODE_ENV !== 'production',
 
+  buildModules: ['@nuxtjs/vuetify'],
+
+  vuetify: {
+    optionsPath: './assets/style/vuetify.js',
+    defaultAssets: {
+      font: {
+        family: 'Roboto'
+      },
+      icons: 'fa'
+    }
+  },
+
   /*
    ** Build configuration
    */
@@ -120,11 +128,6 @@ module.exports = {
     },
     transpile: ['vuetify/lib'],
     plugins: [new VuetifyLoaderPlugin()],
-    loaders: {
-      stylus: {
-        import: ['~assets/style/variables.styl']
-      }
-    },
 
     /*
      ** You can extend webpack config here

@@ -1,5 +1,5 @@
 <template>
-  <no-ssr placeholder="Loading...">
+  <client-only placeholder="Loading...">
     <div style="width: 100%">
       <Plotly
         v-if="requestMessage.length === 0"
@@ -11,7 +11,7 @@
       <v-alert v-else type="error">{{ requestMessage }}</v-alert>
       <v-btn @click.native="download">Download Chart</v-btn>
     </div>
-  </no-ssr>
+  </client-only>
 </template>
 
 <script>

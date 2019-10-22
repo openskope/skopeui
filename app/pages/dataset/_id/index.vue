@@ -3,7 +3,7 @@
     <v-layout row pa-2 mb-2 align-content-start justify-space-around wrap>
       <v-flex id="map-flex" xs12 md6>
         <div class="map px-2">
-          <no-ssr placeholder="Loading map, please wait...">
+          <client-only placeholder="Loading map, please wait...">
             <l-map
               ref="layerMap"
               :zoom="selectedDataset.region.zoom"
@@ -40,7 +40,7 @@
                 format="image/png"
               />
             </l-map>
-          </no-ssr>
+          </client-only>
         </div>
         <v-form>
           <v-container py-0>
@@ -65,16 +65,16 @@
                 >
                   {{ selectedLayerName }}
                 </v-alert>
-                <v-toolbar collapse>
-                  <v-btn flat @click="previousYear">
+                <v-toolbar class="d-flex justify-center">
+                  <v-btn text @click="previousYear">
                     <v-icon>arrow_left</v-icon>
                   </v-btn>
                   <v-btn-toggle class="transparent">
-                    <v-btn flat @click="togglePlay">
+                    <v-btn text @click="togglePlay">
                       <v-icon>{{ playIcon }}</v-icon>
                     </v-btn>
                   </v-btn-toggle>
-                  <v-btn flat @click="nextYear">
+                  <v-btn text @click="nextYear">
                     <v-icon>arrow_right</v-icon>
                   </v-btn>
                 </v-toolbar>
@@ -155,13 +155,12 @@
               Variables
             </v-subheader>
             <v-list three-line dense light>
-              <v-list-tile
+              <v-list-item
                 v-for="(variable, index) in selectedDataset.variables"
                 :key="index"
-                avatar
               >
-                <v-list-tile-content>
-                  <v-list-tile-title class="variable">
+                <v-list-item-content>
+                  <v-list-item-title class="variable">
                     <v-chip
                       small
                       color="indigo"
@@ -172,12 +171,12 @@
                       {{ variable.class }}
                     </v-chip>
                     {{ variable.name }}
-                  </v-list-tile-title>
-                  <v-list-tile-sub-title class="my-0 py-0 mx-3">
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="my-0 py-0 mx-3">
                     {{ variable.description }}
-                  </v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
             <v-card-text>
               <div class="citation">

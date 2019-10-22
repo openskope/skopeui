@@ -1,7 +1,7 @@
 <template>
   <v-app light>
     <Header />
-    <side-bar />
+    <SideBar />
     <div>
       <v-content>
         <v-container fluid>

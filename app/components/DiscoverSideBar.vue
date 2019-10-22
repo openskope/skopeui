@@ -25,6 +25,7 @@
       <v-flex shrink style="width: 60px">
         <v-text-field
           v-model="bounds[0]"
+          class="pl-3"
           style="width: 50px"
           hide-details
           single-line
@@ -42,9 +43,10 @@
           @change="filterDatasets"
         />
       </v-flex>
-      <v-flex>
+      <v-flex shrink style="width: 60px">
         <v-text-field
           v-model="bounds[1]"
+          style="width: 50px"
           hide-details
           single-line
           type="number"

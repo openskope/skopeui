@@ -3,7 +3,7 @@
     <v-flex text-xs-center>
       <div class="nav">
         <v-layout row wrap>
-          <v-btn flat icon class="arrow_back">
+          <v-btn text icon class="arrow_back">
             <v-icon color="grey darken-2">
               arrow_back
             </v-icon>
@@ -26,14 +26,14 @@
         </v-layout>
       </div>
       <div style="height: 600px">
-        <no-ssr>
+        <client-only>
           <l-map :center="[35, -105]" :min-zoom="4" :zoom="4">
             <l-tile-layer
               url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
               :draggable="false"
             />
           </l-map>
-        </no-ssr>
+        </client-only>
       </div>
     </v-flex>
   </v-layout>

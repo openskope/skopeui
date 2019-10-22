@@ -1,28 +1,33 @@
 <template>
-  <v-toolbar :clipped-left="clipped" app fixed>
-    <v-toolbar-title>
-      <nuxt-link class="pl-3 skope-title" to="/">
-        SKOPE
-      </nuxt-link>
-      Synthesizing Knowledge of Past Environments
-    </v-toolbar-title>
-    <v-spacer />
-    <v-toolbar-items>
-      <v-btn text><v-icon left dark>help</v-icon> Help</v-btn>
-      <v-btn text href="https://www.comses.net/about/contact/" target="_blank">
-        <v-icon left dark>email</v-icon>
-        Contact
-      </v-btn>
-      <v-btn text tile><v-icon left dark>account_box</v-icon> Sign In</v-btn>
-    </v-toolbar-items>
-  </v-toolbar>
+  <v-app-bar app>
+    <v-toolbar elevation="0">
+      <v-toolbar-title>
+        <nuxt-link class="pl-3 skope-title" to="/">
+          SKOPE
+        </nuxt-link>
+        Synthesizing Knowledge of Past Environments
+      </v-toolbar-title>
+      <v-spacer />
+      <v-toolbar-items>
+        <v-btn text><v-icon left dark>help</v-icon> Help</v-btn>
+        <v-btn
+          text
+          href="https://www.comses.net/about/contact/"
+          target="_blank"
+        >
+          <v-icon left dark>email</v-icon>
+          Contact
+        </v-btn>
+        <v-btn text tile><v-icon left dark>account_box</v-icon> Sign In</v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
+  </v-app-bar>
 </template>
 <script>
 export default {
   name: 'Header',
   data() {
     return {
-      clipped: false,
       drawer: false,
       fixed: false
     }
