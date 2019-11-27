@@ -66,16 +66,22 @@
                   {{ selectedLayerName }}
                 </v-alert>
                 <v-toolbar class="d-flex justify-center">
+                  <v-btn text @click="gotoFirstYear">
+                    <v-icon>skip_previous</v-icon>
+                  </v-btn>
                   <v-btn text @click="previousYear">
                     <v-icon>arrow_left</v-icon>
                   </v-btn>
-                  <v-btn-toggle class="transparent">
+                  <v-btn-toggle>
                     <v-btn text @click="togglePlay">
                       <v-icon>{{ playIcon }}</v-icon>
                     </v-btn>
                   </v-btn-toggle>
                   <v-btn text @click="nextYear">
                     <v-icon>arrow_right</v-icon>
+                  </v-btn>
+                  <v-btn text @click="gotoLastYear">
+                    <v-icon>skip_next</v-icon>
                   </v-btn>
                 </v-toolbar>
               </v-flex>
@@ -383,6 +389,20 @@ class DatasetDetail extends Vue {
     this.updateYear(
       clamp(this.year - 1, this.minTemporalRange, this.maxTemporalRange)
     )
+  }
+
+  gotoFirstYear() {
+    if (this.selectedLayer === null) {
+      return
+    }
+    this.updateYear(this.minTemporalRange)
+  }
+
+  gotoLastYear() {
+    if (this.selectedLayer === null) {
+      return
+    }
+    this.updateYear(this.maxTemporalRange)
   }
 
   next() {
