@@ -424,6 +424,7 @@ class DatasetDetail extends Vue {
     const drawControlFull = new L.Control.Draw({
       position: 'topleft',
       draw: {
+        // disable polylines and circlemarkers, allow polygon, rectangle, circle, and marker
         polyline: false,
         circlemarker: false,
         polygon: {
@@ -441,6 +442,17 @@ class DatasetDetail extends Vue {
       },
       draw: false
     })
+    // set custom tooltips on the draw and edit toolbars
+    const drawControlButtons = L.drawLocal.draw.toolbar.buttons
+    drawControlButtons.marker = 'Select a point'
+    drawControlButtons.polygon = 'Select a polygon area'
+    drawControlButtons.circle = 'Select a circular area'
+    drawControlButtons.rectangle = 'Select a rectangular area'
+    const editControlButtons = L.drawLocal.edit.toolbar.buttons
+    editControlButtons.edit = 'Edit spatial selection'
+    editControlButtons.editDisabled = 'No spatial selection to edit'
+    editControlButtons.remove = 'Clear spatial selection'
+    editControlButtons.removeDisabled = 'No spatial selection to remove'
     const self = this
     map.addControl(drawControlFull)
     const updateSelectedArea = layer => {
