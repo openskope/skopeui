@@ -360,7 +360,11 @@ class DatasetDetail extends Vue {
           this.updateWmsLegend(map, layer.wmsParams.layers)
         }
       }
-
+      if (this.selectedDataset.variables.length === 1) {
+        let defaultVariable = this.selectedDataset.variables[0]
+        this.$store.dispatch('datasets/selectVariable', defaultVariable.id)
+        this.selectedLayer = defaultVariable
+      }
       map.on('overlayadd', handler)
       map.on('baselayerchange', handler)
       this.addDrawToolbar(map)

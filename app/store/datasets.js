@@ -95,6 +95,14 @@ export const actions = {
       }
       commit('selectDataset', id)
     }
+  },
+  selectVariable({ state, commit }, id) {
+    if (state.all === undefined || state.all.length === 0) {
+      commit('load')
+    }
+    if (state.selectedDataset) {
+      commit('selectVariable', id)
+    }
   }
 }
 
@@ -109,10 +117,11 @@ export const mutations = {
     state.selectedDataset = state.all.find(dataset => dataset.id === id)
   },
   selectVariable(state, id) {
-    state.selectedDataset.selectedVariableInd = _.findIndex(
-      state.selectedDataset.variables,
-      v => v.id === id
+    let selectedVariable = state.selectedDataset.variables.find(
+      variable => variable.id === id
     )
+    selectedVariable.visible = true
+    state.selectedDataset.selectedVariable = selectedVariable
   },
   applyFilterCriteria(state, filterCriteria) {
     state.filterCriteria = filterCriteria
