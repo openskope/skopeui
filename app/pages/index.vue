@@ -7,10 +7,17 @@
             <v-icon left>
               sd_card
             </v-icon>
-            <span class="title">
+            <span class="headline">
               Datasets
             </span>
           </v-card-title>
+          <v-card-text>
+            <div class="title text--primary">
+              Welcome to the SKOPE Application! To obtain data, click on a
+              dataset name, pan &amp; zoom the map, define your area of
+              interest, and select a variable layer.
+            </div>
+          </v-card-text>
           <v-list>
             <template v-for="(dataset, index) in datasets" router exact>
               <Dataset :key="dataset.absolute_url" v-bind="dataset" />
