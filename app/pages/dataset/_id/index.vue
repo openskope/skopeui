@@ -51,14 +51,6 @@
             <v-layout class="align-center justify-center" row>
               <v-flex xs12 sm6 class="py-0">
                 <v-alert
-                  :value="!isLayerSelected"
-                  type="error"
-                  transition="scale-transition"
-                >
-                  Please select a variable first from the layer control on the
-                  map.
-                </v-alert>
-                <v-alert
                   :value="isLayerSelected"
                   type="info"
                   transition="scale-transition"
@@ -153,8 +145,8 @@
                 :max-year="maxTemporalRange"
               />
               <v-alert v-else :value="true" type="warning">
-                No study area selected. Select a study area to show a time
-                series
+                Please select a <b>study area and variable of interest</b> to
+                display a time series for the given date range.
               </v-alert>
             </v-card-actions>
             <v-subheader class="title">
