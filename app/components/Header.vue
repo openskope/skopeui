@@ -1,37 +1,30 @@
 <template>
-  <v-app-bar app>
-    <v-toolbar flat>
-      <v-toolbar-title>
-        <nuxt-link class="pl-3 skope-title" to="/">
-          SKOPE
-        </nuxt-link>
-        Synthesizing Knowledge of Past Environments
-      </v-toolbar-title>
-      <v-spacer />
-      <v-toolbar-items>
-        <v-btn text><v-icon left dark>help</v-icon> Help</v-btn>
-        <v-btn
-          text
-          href="https://www.comses.net/about/contact/"
-          target="_blank"
+  <v-app-bar absolute app prominent>
+    <v-toolbar-title>
+      <nuxt-link to="/">
+        <v-img
+          alt="SKOPE logo"
+          position="left center"
+          max-height="115"
+          src="/logo-640x360.png"
+          contain
         >
-          <v-icon left dark>email</v-icon>
-          Contact
-        </v-btn>
-        <v-btn text tile><v-icon left dark>account_box</v-icon> Sign In</v-btn>
-      </v-toolbar-items>
-    </v-toolbar>
+        </v-img>
+      </nuxt-link>
+    </v-toolbar-title>
+    <v-spacer />
+    <v-toolbar-items>
+      <v-btn text><v-icon left dark>help</v-icon> Help</v-btn>
+      <v-btn text href="https://www.comses.net/about/contact/" target="_blank">
+        <v-icon left dark>email</v-icon>
+        Contact
+      </v-btn>
+    </v-toolbar-items>
   </v-app-bar>
 </template>
 <script>
 export default {
-  name: 'Header',
-  data() {
-    return {
-      drawer: false,
-      fixed: false
-    }
-  }
+  name: 'Header'
 }
 </script>
 <style scoped>
