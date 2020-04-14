@@ -1,4 +1,0 @@
-#!/bin/sh
-
-export DJANGO_SETTINGS_MODULE="skope.settings.production"
-/usr/local/bin/inv -r /code borg.backup > /var/log/backup.log 2>&1

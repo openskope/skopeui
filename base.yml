@@ -18,12 +18,6 @@ services:
       - secrets/mongo.env
     volumes:
       - ./docker/shared/mongo:/data/db
-  django:
-    build: django
-    depends_on:
-      - db
-    volumes:
-      - ./secrets:/run/secrets
   db:
     image: comses/postgis:10
     volumes:
