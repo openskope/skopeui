@@ -1,73 +1,86 @@
 <template>
-  <v-navigation-drawer absolute app style="position: fixed">
-    <!-- had to fixed style since fixed prop didn't work -->
-    <section class="sidebar">
+  <v-navigation-drawer fixed app>
+    <section class="pt-2">
       <div class="container">
-        <span class="title">Dataset Filters</span>
-        <v-spacer class="spacing" />
+        <v-title class="title">Filter Datasets</v-title>
         <!-- search form -->
-        <form id="searchForm" class="sidebar-form" @submit.prevent>
-          <div id="searchContainer" class="input-group">
+        <form @submit.prevent>
+          <div class="input-group pb-2">
             <span class="input-group-btn">
               <v-text-field
                 id="search"
                 v-model="search"
                 data-toggle="hideseek"
                 label="Search datasets"
-                append-icon="fa fa-search"
+                append-icon="fas fa-search"
                 @keydown.enter="filterDatasets"
               />
             </span>
           </div>
         </form>
         <!-- end search form -->
-        <v-divider class="dividerPadding" />
         <!-- time range slider -->
-        <v-subheader>Range Slider</v-subheader>
-        <v-layout row>
-          <v-flex shrink style="width: 60px">
+        <v-title>Year Range</v-title>
+        <v-range-slider
+          v-model="bounds"
+          class="align-center"
+          :value="bounds"
+          :max="yearEnd"
+          :min="0"
+          :step="1"
+          @change="filterDatasets"
+        >
+          <template v-slot:prepend>
             <v-text-field
               v-model="bounds[0]"
-              class="pl-3"
+              class="mt-0 pt-0"
               style="width: 50px"
+              dense
               hide-details
               single-line
               type="number"
               @keydown.enter="filterDatasets"
-            />
-          </v-flex>
-          <v-flex class="px-3">
-            <v-range-slider
-              v-model="bounds"
-              :value="bounds"
-              :max="2019"
-              :min="1"
-              :step="1"
-              @change="filterDatasets"
-            />
-          </v-flex>
-          <v-flex shrink style="width: 60px">
+            >
+            </v-text-field>
+          </template>
+          <template v-slot:append>
             <v-text-field
               v-model="bounds[1]"
+              class="mt-0 pt-0"
               style="width: 50px"
               hide-details
               single-line
               type="number"
               @keydown.enter="filterDatasets"
-            />
-          </v-flex>
-        </v-layout>
-        <!-- end time range slider -->
-        <v-divider class="dividerPadding" />
+            >
+            </v-text-field>
+          </template>
+        </v-range-slider>
+        <!-- end year range slider -->
+        <v-divider class="mb-3" />
         <!-- variable checkbox selector -->
-        <v-subheader>Variables</v-subheader>
-        <v-list v-for="(variable, index) in variableClasses" :key="index">
+        <v-title>Variables</v-title>
+        <v-spacer class="pb-2" />
+        <v-list
+          v-for="(variable, index) in variableClasses"
+          :key="index"
+          class="py-0"
+        >
           <v-checkbox
             v-model="selectedVariableClasses"
             :value="variable.name"
             :label="variable.name"
+            dense
+            class="py-0 my-0"
             @change="filterDatasets"
-          />
+          >
+            <template v-slot:label>
+              <v-chip small color="indigo" text-color="white" :disabled="true">
+                <v-icon>view_column</v-icon>
+                {{ variable.name }}
+              </v-chip>
+            </template>
+          </v-checkbox>
         </v-list>
         <!-- end variable checkbox selector -->
       </div>
@@ -78,12 +91,13 @@
 export default {
   name: 'DiscoverSideBar',
   data() {
+    const currentYear = new Date().getFullYear()
     return {
       search: '',
-      bounds: [1, 2019],
+      bounds: [1, currentYear],
       selectedVariableClasses: [],
       yearStart: 1,
-      yearEnd: 2019
+      yearEnd: currentYear
     }
   },
   computed: {
@@ -126,37 +140,7 @@ export default {
 }
 </script>
 <style scoped>
-.sidebar {
-  padding-top: 30px;
-}
-#searchForm {
-  padding-left: 0em;
-  padding-right: 0em;
-}
-
-#searchContainer {
-  height: 100%;
-  padding-bottom: 15px;
-}
-
-#search {
-  width: 80%;
-  float: right;
-}
-
-#search-btn {
-  width: 20%;
-}
-
-.dividerPadding {
-  padding-bottom: 3em;
-}
-
 .title {
-  font-size: 18px;
-}
-
-.spacing {
-  padding-bottom: 2em;
+  font-size: 2em;
 }
 </style>
