@@ -78,44 +78,43 @@
                 </v-toolbar>
               </v-col>
             </v-row>
-            <v-row align-center justify-space-between>
-              <v-col shrink style="width: 6em">
-                <v-text-field
-                  v-model="minTemporalRange"
-                  class="centered-input mt-0"
-                  :min="timespanMinYear"
-                  :max="timespanMaxYear"
-                  :validate-on-blur="true"
-                  hide-details
-                  single-line
-                  type="number"
-                  @change="validateMinYear"
-                ></v-text-field>
-              </v-col>
+            <v-row>
               <v-slider
                 :value="year"
                 :max="maxTemporalRange"
                 :min="minTemporalRange"
-                :thumb-size="50"
-                :validate-on-blur="true"
+                :thumb-size="42"
                 thumb-label="always"
-                class="mt-5"
+                class="px-3 pt-10"
                 @change="updateYear"
               >
+                <template v-slot:prepend>
+                  <v-text-field
+                    v-model="minTemporalRange"
+                    class="pt-0 mt-0"
+                    :min="timespanMinYear"
+                    :max="timespanMaxYear"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                    @input="validateMinYear"
+                  ></v-text-field>
+                </template>
+                <template v-slot:append>
+                  <v-text-field
+                    v-model="maxTemporalRange"
+                    :min="timespanMinYear"
+                    :max="timespanMaxYear"
+                    class="pt-0 mt-0"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                    @input="validateMaxYear"
+                  ></v-text-field>
+                </template>
               </v-slider>
-              <v-col shrink style="width: 6em">
-                <v-text-field
-                  v-model="maxTemporalRange"
-                  :min="timespanMinYear"
-                  :max="timespanMaxYear"
-                  :validate-on-blur="true"
-                  class="mt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  @change="validateMaxYear"
-                ></v-text-field>
-              </v-col>
             </v-row>
           </v-container>
         </v-form>
@@ -230,7 +229,7 @@ class DatasetDetail extends Vue {
   length = 3
   onboarding = 0
   minTemporalRange = 0
-  maxTemporalRange = 2000
+  maxTemporalRange = new Date().getFullYear()
   selectedLayer = null
   legendControl = null
   legendImage = null
@@ -532,6 +531,9 @@ class DatasetDetail extends Vue {
       this.timespanMinYear,
       this.timespanMaxYear
     )
+    this.updateYear(
+      clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
+    )
   }
 
   validateMaxYear() {
@@ -539,6 +541,9 @@ class DatasetDetail extends Vue {
       this.maxTemporalRange,
       this.timespanMinYear,
       this.timespanMaxYear
+    )
+    this.updateYear(
+      clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
     )
   }
 
