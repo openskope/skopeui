@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# invoke via `DEPLOY=prod ./build.sh`
+# invoke via `./build.sh (dev|staging|prod)`
 
 set -o errexit
 set -o pipefail
@@ -15,7 +15,7 @@ function clean()
     echo "Delete all docker data in ./docker/shared/ as you will probably be unable to access it"
 }
 
-DEPLOY=${DEPLOY:-"dev"} # allowed values: (dev | staging | prod)
+DEPLOY=${1:-"dev"} # allowed values: (dev | staging | prod)
 CONFIG_INI_TEMPLATE=./conf/config.ini.template
 SECRETS_DIR=./secrets
 SECRETS_INI=${SECRETS_DIR}/config.ini
