@@ -1,8 +1,8 @@
 <template>
-  <v-navigation-drawer fixed app>
-    <section class="pt-2">
+  <v-navigation-drawer fixed permanent app>
+    <section class="pt-3">
       <div class="container">
-        <v-title class="title">Filter Datasets</v-title>
+        <h2 class="headline font-weight-black">Filter Datasets</h2>
         <!-- search form -->
         <form @submit.prevent>
           <div class="input-group pb-2">
@@ -20,7 +20,7 @@
         </form>
         <!-- end search form -->
         <!-- time range slider -->
-        <v-title>Year Range</v-title>
+        <h3 class="title py-3">Year Range</h3>
         <v-range-slider
           v-model="bounds"
           class="align-center"
@@ -59,8 +59,7 @@
         <!-- end year range slider -->
         <v-divider class="mb-3" />
         <!-- variable checkbox selector -->
-        <v-title>Variables</v-title>
-        <v-spacer class="pb-2" />
+        <h3 class="title py-3">Variables</h3>
         <v-list
           v-for="(variable, index) in variableClasses"
           :key="index"
@@ -75,7 +74,13 @@
             @change="filterDatasets"
           >
             <template v-slot:label>
-              <v-chip small color="indigo" text-color="white" :disabled="true">
+              <v-chip
+                small
+                label
+                class="ma-1"
+                color="indigo"
+                text-color="white"
+              >
                 <v-icon>view_column</v-icon>
                 {{ variable.name }}
               </v-chip>
@@ -139,8 +144,4 @@ export default {
   }
 }
 </script>
-<style scoped>
-.title {
-  font-size: 2em;
-}
-</style>
+<style scoped></style>

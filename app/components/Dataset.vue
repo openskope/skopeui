@@ -42,9 +42,10 @@
                 <v-list-item-title class="variable">
                   <v-chip
                     small
+                    label
+                    class="ma-2"
                     color="indigo"
                     text-color="white"
-                    :disabled="true"
                   >
                     <v-icon>view_column</v-icon>
                     {{ variable.class }}
