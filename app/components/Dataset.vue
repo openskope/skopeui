@@ -1,6 +1,6 @@
 <template>
-  <v-layout row pa-2 mb-2 align-content-start justify-space-around fill-height>
-    <v-flex xs4>
+  <v-row pa-2 mb-2 align-content-start justify-space-around fill-height>
+    <v-col xs4>
       <div class="map px-2">
         <client-only>
           <l-map
@@ -18,8 +18,8 @@
           </l-map>
         </client-only>
       </div>
-    </v-flex>
-    <v-flex xs8>
+    </v-col>
+    <v-col xs8>
       <div class="px-2">
         <v-card>
           <v-card-title class="pb-0">
@@ -56,19 +56,20 @@
             </v-list-item>
           </v-list>
           <v-card-text>
-            <div class="py-3 citation">
-              <em class="font-weight-bold">
+            <div class="py-3 citation font-weight-bold">
+              <em>
                 Source:
               </em>
-              <nuxt-link class="font-weight-thin" :to="sourceUrl">
+              <a target="_blank" :href="sourceUrl">
                 {{ sourceUrl }}
-              </nuxt-link>
+                <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+              </a>
             </div>
           </v-card-text>
         </v-card>
       </div>
-    </v-flex>
-  </v-layout>
+    </v-col>
+  </v-row>
 </template>
 
 <script>

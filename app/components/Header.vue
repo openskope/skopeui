@@ -1,10 +1,9 @@
 <template>
   <v-app-bar src="/header.png" shrink-on-scroll prominent app>
-    <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <nuxt-link class="skope-title" to="/">
         <v-img
-          class="d-xs-none d-sm-none d-md-flex d-lg-flex d-xl-flex mb-n4"
+          class="mb-n10"
           alt="SKOPE"
           position="left center"
           height="120"
