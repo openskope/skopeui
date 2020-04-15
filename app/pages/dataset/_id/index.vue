@@ -1,7 +1,7 @@
 <template>
   <v-container fill-width fluid>
-    <v-layout row pa-2 mb-2 align-content-start justify-space-around wrap>
-      <v-flex id="map-flex" xs12 md6>
+    <v-row pa-2 mb-2 align-content-start justify-space-around wrap>
+      <v-col id="map-flex" xs12 md6>
         <div class="map px-2">
           <client-only placeholder="Loading map, please wait...">
             <l-map
@@ -48,8 +48,8 @@
               Constrain the animation temporal range (in years) and animate the
               selected variable
             </v-subheader>
-            <v-layout class="align-center justify-center" row>
-              <v-flex xs12 sm6 class="py-0">
+            <v-row class="align-center justify-center">
+              <v-col xs12 sm6 class="py-0">
                 <v-alert
                   :value="isLayerSelected"
                   type="info"
@@ -76,10 +76,10 @@
                     <v-icon>skip_next</v-icon>
                   </v-btn>
                 </v-toolbar>
-              </v-flex>
-            </v-layout>
-            <v-layout align-center justify-space-between row>
-              <v-flex shrink style="width: 6em">
+              </v-col>
+            </v-row>
+            <v-row align-center justify-space-between>
+              <v-col shrink style="width: 6em">
                 <v-text-field
                   v-model="minTemporalRange"
                   class="centered-input mt-0"
@@ -91,7 +91,7 @@
                   type="number"
                   @change="validateMinYear"
                 ></v-text-field>
-              </v-flex>
+              </v-col>
               <v-slider
                 :value="year"
                 :max="maxTemporalRange"
@@ -103,7 +103,7 @@
                 @change="updateYear"
               >
               </v-slider>
-              <v-flex shrink style="width: 6em">
+              <v-col shrink style="width: 6em">
                 <v-text-field
                   v-model="maxTemporalRange"
                   :min="timespanMinYear"
@@ -115,12 +115,12 @@
                   type="number"
                   @change="validateMaxYear"
                 ></v-text-field>
-              </v-flex>
-            </v-layout>
+              </v-col>
+            </v-row>
           </v-container>
         </v-form>
-      </v-flex>
-      <v-flex xs12 md6>
+      </v-col>
+      <v-col xs12 md6>
         <div class="px-2">
           <v-card>
             <v-card-title class="pb-0">
@@ -201,8 +201,8 @@
             </v-card-text>
           </v-card>
         </div>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
