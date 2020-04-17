@@ -1,6 +1,6 @@
 <template>
   <v-container fill-width fluid>
-    <v-row pa-2 mb-2 align-content-start justify-space-around wrap>
+    <v-row dense align-content-start justify-space-around wrap>
       <v-col id="map-flex" xs12 md6>
         <div class="map px-2">
           <client-only placeholder="Loading map, please wait...">
@@ -21,7 +21,7 @@
               <l-rectangle
                 :bounds="selectedDataset.region.extents"
                 :l-style="selectedDataset.region.style"
-                :fill-opacity="0.05"
+                :fill-opacity="defaultRegionOpacity"
               />
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
@@ -32,7 +32,7 @@
                 :name="variable.name"
                 :crs="defaultCrs"
                 :transparent="true"
-                :opacity="0.3"
+                :opacity="layerOpacity"
                 :layer-type="layerType"
                 :attribution="variable.name"
                 :visible="variable.visible"
@@ -42,82 +42,95 @@
             </l-map>
           </client-only>
         </div>
-        <v-form>
-          <v-container py-0>
-            <v-subheader class="text-lg-center text-md-center pa-0">
-              Constrain the animation temporal range (in years) and animate the
-              selected variable
-            </v-subheader>
-            <v-row class="align-center justify-center">
-              <v-col xs12 sm6 class="py-0">
-                <v-alert
-                  :value="isLayerSelected"
-                  type="info"
-                  transition="scale-transition"
+        <v-card class="mx-2" dense>
+          <v-toolbar color="indigo" dark>
+            <v-toolbar-title>
+              <span v-if="isLayerSelected" class="title">
+                <v-icon>view_column</v-icon>
+                {{ selectedLayerName }}
+              </span>
+              <span v-else class="subtitle-2">
+                <v-icon>fas fa-info-circle</v-icon>
+                Please select a variable using the layers control at the top
+                right of the map.</span
+              >
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn text @click="gotoFirstYear">
+              <v-icon>skip_previous</v-icon>
+            </v-btn>
+            <v-btn text @click="previousYear">
+              <v-icon>arrow_left</v-icon>
+            </v-btn>
+            <v-btn-toggle background-color="indigo">
+              <v-btn text @click="togglePlay">
+                <v-icon>{{ playIcon }}</v-icon>
+              </v-btn>
+            </v-btn-toggle>
+            <v-btn text @click="nextYear">
+              <v-icon>arrow_right</v-icon>
+            </v-btn>
+            <v-btn text @click="gotoLastYear">
+              <v-icon>skip_next</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-container>
+            <v-row dense>
+              <v-col>
+                <v-slider
+                  v-model="opacity"
+                  dense
+                  label="Opacity"
+                  min="0"
+                  max="100"
+                  step="1"
                 >
-                  {{ selectedLayerName }}
-                </v-alert>
-                <v-toolbar class="d-flex justify-center">
-                  <v-btn text @click="gotoFirstYear">
-                    <v-icon>skip_previous</v-icon>
-                  </v-btn>
-                  <v-btn text @click="previousYear">
-                    <v-icon>arrow_left</v-icon>
-                  </v-btn>
-                  <v-btn-toggle>
-                    <v-btn text @click="togglePlay">
-                      <v-icon>{{ playIcon }}</v-icon>
-                    </v-btn>
-                  </v-btn-toggle>
-                  <v-btn text @click="nextYear">
-                    <v-icon>arrow_right</v-icon>
-                  </v-btn>
-                  <v-btn text @click="gotoLastYear">
-                    <v-icon>skip_next</v-icon>
-                  </v-btn>
-                </v-toolbar>
+                </v-slider>
               </v-col>
             </v-row>
-            <v-row>
-              <v-slider
-                :value="year"
-                :max="maxTemporalRange"
-                :min="minTemporalRange"
-                :thumb-size="42"
-                thumb-label="always"
-                class="px-3 pt-10"
-                @change="updateYear"
-              >
-                <template v-slot:prepend>
-                  <v-text-field
-                    v-model="minTemporalRange"
-                    class="pt-0 mt-0"
-                    :min="timespanMinYear"
-                    :max="timespanMaxYear"
-                    hide-details
-                    single-line
-                    type="number"
-                    style="width: 60px"
-                    @input="validateMinYear"
-                  ></v-text-field>
-                </template>
-                <template v-slot:append>
-                  <v-text-field
-                    v-model="maxTemporalRange"
-                    :min="timespanMinYear"
-                    :max="timespanMaxYear"
-                    class="pt-0 mt-0"
-                    hide-details
-                    single-line
-                    type="number"
-                    style="width: 60px"
-                    @input="validateMaxYear"
-                  ></v-text-field>
-                </template>
-              </v-slider>
+            <v-row dense>
+              <v-col>
+                <v-slider
+                  dense
+                  :value="year"
+                  :max="maxTemporalRange"
+                  :min="minTemporalRange"
+                  :thumb-size="42"
+                  thumb-label="always"
+                  class="px-3 pt-2"
+                  @change="updateYear"
+                >
+                  <template v-slot:prepend>
+                    <v-text-field
+                      v-model="minTemporalRange"
+                      class="pt-0 mt-0"
+                      :min="timespanMinYear"
+                      :max="timespanMaxYear"
+                      hide-details
+                      single-line
+                      type="number"
+                      style="width: 60px"
+                      @input="validateMinYear"
+                    ></v-text-field>
+                  </template>
+                  <template v-slot:append>
+                    <v-text-field
+                      v-model="maxTemporalRange"
+                      :min="timespanMinYear"
+                      :max="timespanMaxYear"
+                      class="pt-0 mt-0"
+                      hide-details
+                      single-line
+                      type="number"
+                      style="width: 60px"
+                      @input="validateMaxYear"
+                    ></v-text-field>
+                  </template>
+                </v-slider>
+              </v-col>
             </v-row>
           </v-container>
-        </v-form>
+        </v-card>
       </v-col>
       <v-col xs12 md6>
         <div class="px-2">
@@ -148,22 +161,17 @@
                 display a time series for the given date range.
               </v-alert>
             </v-card-actions>
-            <v-subheader class="title">
+            <v-subheader class="title py-0">
               Variables
             </v-subheader>
-            <v-list three-line dense light>
+            <v-list three-line dense light class="py-0">
               <v-list-item
                 v-for="(variable, index) in selectedDataset.variables"
                 :key="index"
               >
                 <v-list-item-content>
-                  <v-list-item-title class="variable">
-                    <v-chip
-                      small
-                      color="indigo"
-                      text-color="white"
-                      :disabled="true"
-                    >
+                  <v-list-item-title>
+                    <v-chip label small color="indigo" text-color="white">
                       <v-icon>view_column</v-icon>
                       {{ variable.class }}
                     </v-chip>
@@ -175,20 +183,18 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
-            <v-card-text>
-              <div class="citation">
-                <em class="font-weight-bold">
+            <v-card-text class="pt-0">
+              <div class="citation font-weight-bold">
+                <em>
                   Source:
                 </em>
-                <nuxt-link
-                  class="font-weight-thin"
-                  :to="selectedDataset.sourceUrl"
-                >
+                <a target="_blank" :href="selectedDataset.sourceUrl">
                   {{ selectedDataset.sourceUrl }}
-                </nuxt-link>
+                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+                </a>
               </div>
             </v-card-text>
-            <v-card-text>
+            <v-card-text class="pt-0">
               <div
                 v-for="(label, attr) in metadataAttributes"
                 :key="attr"
@@ -235,8 +241,12 @@ class DatasetDetail extends Vue {
   legendImage = null
   toggleAnimation = null
   year = null
+  defaultRegionOpacity = 0.05
+  opacity = 30
   legendPosition = 'bottomleft'
   isAnimationPlaying = false
+  showDetails = false
+  animationSpeed = 2000
   selectedArea = { type: 'None', coordinates: [] }
 
   @Datasets.State('selectedDataset')
@@ -248,6 +258,10 @@ class DatasetDetail extends Vue {
 
   get selectedLayerName() {
     return this.isLayerSelected ? this.selectedLayer.name : ''
+  }
+
+  get layerOpacity() {
+    return this.opacity / 100.0
   }
 
   get timespanMinYear() {
@@ -326,7 +340,7 @@ class DatasetDetail extends Vue {
           return
         }
         this.nextYear()
-      }, 1000)
+      }, this.animationSpeed)
     }
   }
 
@@ -591,9 +605,5 @@ export default DatasetDetail
   height: 100%;
   position: relative;
   z-index: 1;
-}
-
-.variable {
-  height: 3em;
 }
 </style>
