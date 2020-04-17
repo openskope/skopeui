@@ -1,13 +1,6 @@
-FROM node:12
+FROM node:lts-buster
 
 LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libjpeg-turbo-progs \
-    nasm \
-    realpath \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 3000
 
