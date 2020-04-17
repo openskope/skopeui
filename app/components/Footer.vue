@@ -1,12 +1,7 @@
 <template>
   <!-- footer -->
-  <v-footer light height="auto" app absolute class="indigo lighten-1">
-    <v-card
-      elevation="0"
-      text
-      tile
-      class="indigo lighten-1 mx-auto white--text text-xs-center"
-    >
+  <v-footer app absolute padless dark color="indigo" class="darken-1">
+    <v-card elevation="0" dark color="indigo" class="darken-1 mx-auto">
       <v-card-text class="white--text">
         <div>
           This material is based upon work supported by the National Science
@@ -16,13 +11,13 @@
           University.
         </div>
       </v-card-text>
-      <v-divider />
+      <v-divider></v-divider>
       <v-card-text class="white--text text-center">
         <v-btn class="white--text" icon :href="github.url">
           <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
         </v-btn>
-        <v-btn class="white--text" text :href="skope.url">
-          SKOPE
+        <v-btn class="white--text" text href="https://www.openskope.org">
+          openskope.org
         </v-btn>
         &copy; 2016 - {{ year }}
       </v-card-text>
@@ -40,9 +35,6 @@ export default {
       github: {
         icon: 'fab fa-github',
         url: 'https://github.com/openskope/skopeui'
-      },
-      skope: {
-        url: 'https://www.openskope.org'
       }
     }
   }

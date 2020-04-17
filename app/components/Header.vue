@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar src="/header.png" shrink-on-scroll prominent app>
+  <v-app-bar src="/header.png" shrink-on-scroll app>
     <v-toolbar-title>
       <nuxt-link class="skope-title" to="/">
         <v-img
