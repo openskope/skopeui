@@ -426,6 +426,30 @@ class DatasetDetail extends Vue {
     this.legendImage = htmlElement
   }
 
+  updateSelectedArea(layer) {
+    const data = layer.toGeoJSON()
+    // store geoJSON in local storage
+    self.saveArea(data)
+    self.selectedArea = data.geometry
+  }
+
+  clearSelectedArea() {
+    this.selectedArea = { type: 'None', coordinates: [] }
+    this.$warehouse.remove('skope.area')
+  }
+
+  saveArea(geoJson) {
+    this.$warehouse.set('skope.area', JSON.stringify(geoJson))
+  }
+
+  getSelectedArea() {
+    const skopeArea = this.$warehouse.get('skope.area')
+    if (skopeArea) {
+      return JSON.parse(skopeArea)
+    }
+    return false
+  }
+
   addDrawToolbar(map) {
     const L = this.$L
     const drawnItems = new L.FeatureGroup()
@@ -463,9 +487,19 @@ class DatasetDetail extends Vue {
     editControlButtons.remove = 'Clear spatial selection'
     editControlButtons.removeDisabled = 'No spatial selection to remove'
     const self = this
+    // check for a persisted area
+    const savedArea = this.getSelectedArea()
+    if (savedArea) {
+      const geoJsonLayer = L.geoJson(savedArea)
+      geoJsonLayer.eachLayer(l => drawnItems.addLayer(l))
+      map.fitBounds(drawnItems.getBounds())
+    }
     map.addControl(drawControlFull)
     const updateSelectedArea = layer => {
-      self.selectedArea = layer.toGeoJSON().geometry
+      const data = layer.toGeoJSON()
+      // store geoJSON in local storage
+      self.saveArea(data)
+      self.selectedArea = data.geometry
     }
     map.on(L.Draw.Event.EDITMOVE, e => updateSelectedArea(e.layer))
     map.on(L.Draw.Event.EDITVERTEX, e => updateSelectedArea(e.poly))
@@ -477,7 +511,7 @@ class DatasetDetail extends Vue {
       drawControlEditOnly.addTo(map)
     })
     map.on(L.Draw.Event.DELETED, event => {
-      self.selectedArea = { type: 'None', coordinates: [] }
+      self.clearSelectedArea()
       if (drawnItems.getLayers().length === 0) {
         drawControlEditOnly.remove(map)
         drawControlFull.addTo(map)
