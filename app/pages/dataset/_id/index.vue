@@ -55,22 +55,30 @@
                 right of the map.</span
               >
             </v-toolbar-title>
+            <v-btn icon @click="exportSelectedArea">
+              <a id="exportSelectedArea">
+                <v-icon>fas fa-download</v-icon>
+              </a>
+            </v-btn>
+            <v-btn icon @click="importGeoJson">
+              <v-icon>fas fa-upload</v-icon>
+            </v-btn>
             <v-spacer></v-spacer>
-            <v-btn text @click="gotoFirstYear">
+            <v-btn icon @click="gotoFirstYear">
               <v-icon>skip_previous</v-icon>
             </v-btn>
-            <v-btn text @click="previousYear">
+            <v-btn icon @click="previousYear">
               <v-icon>arrow_left</v-icon>
             </v-btn>
-            <v-btn-toggle background-color="indigo">
+            <v-btn-toggle icon background-color="indigo">
               <v-btn text @click="togglePlay">
                 <v-icon>{{ playIcon }}</v-icon>
               </v-btn>
             </v-btn-toggle>
-            <v-btn text @click="nextYear">
+            <v-btn icon @click="nextYear">
               <v-icon>arrow_right</v-icon>
             </v-btn>
-            <v-btn text @click="gotoLastYear">
+            <v-btn icon @click="gotoLastYear">
               <v-icon>skip_next</v-icon>
             </v-btn>
           </v-toolbar>
@@ -426,11 +434,27 @@ class DatasetDetail extends Vue {
     this.legendImage = htmlElement
   }
 
+  importGeoJson() {
+    alert('Importing not functional yet')
+  }
+
+  exportSelectedArea(event) {
+    const selectedArea = this.getSelectedArea()
+    if (selectedArea) {
+      const convertedArea =
+        'text/json;charset=utf-8,' +
+        encodeURIComponent(JSON.stringify(selectedArea))
+      const button = document.getElementById('exportSelectedArea')
+      button.setAttribute('href', 'data:' + convertedArea)
+      button.setAttribute('download', 'skope-area.geojson')
+    }
+  }
+
   updateSelectedArea(layer) {
     const data = layer.toGeoJSON()
     // store geoJSON in local storage
-    self.saveArea(data)
-    self.selectedArea = data.geometry
+    this.saveSelectedArea(data)
+    this.selectedArea = data.geometry
   }
 
   clearSelectedArea() {
@@ -438,7 +462,7 @@ class DatasetDetail extends Vue {
     this.$warehouse.remove('skope.area')
   }
 
-  saveArea(geoJson) {
+  saveSelectedArea(geoJson) {
     this.$warehouse.set('skope.area', JSON.stringify(geoJson))
   }
 
@@ -619,6 +643,11 @@ class DatasetDetail extends Vue {
 export default DatasetDetail
 </script>
 <style>
+#exportSelectedArea {
+  text-decoration: none;
+  color: inherit;
+}
+
 #map-flex {
   height: 600px;
 }

@@ -59,17 +59,16 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    ['vue-warehouse/nuxt', {
-      vuex: true,
-      plugins: [
-        'store/plugins/expire',
-        'store/plugins/defaults'
-      ],
-      storages: [
-        'store/storages/localStorage',
-        'store/storages/cookieStorage'
-      ]
-    }
+    [
+      'vue-warehouse/nuxt',
+      {
+        vuex: true,
+        plugins: ['store/plugins/expire', 'store/plugins/defaults'],
+        storages: [
+          'store/storages/localStorage',
+          'store/storages/cookieStorage'
+        ]
+      }
     ]
   ],
   /*
