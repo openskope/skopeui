@@ -208,15 +208,24 @@
                 </a>
               </div>
             </v-card-text>
-            <v-card-text class="pt-0">
-              <div
-                v-for="(label, attr) in metadataAttributes"
-                :key="attr"
-                class="py-0"
-              >
-                <span class="font-weight-bold"> {{ label }}: </span>
-                <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
-              </div>
+            <v-card-text class="pt-0 mx-0">
+              <v-expansion-panels flat>
+                <v-expansion-panel class="elevation-0">
+                  <v-expansion-panel-header class="title px-0 mx-0">
+                    Detailed Metadata
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <div
+                      v-for="(label, attr) in metadataAttributes"
+                      :key="attr"
+                      class="py-0"
+                    >
+                      <span class="font-weight-bold"> {{ label }}: </span>
+                      <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-card-text>
           </v-card>
         </div>
