@@ -467,6 +467,9 @@ class DatasetDetail extends Vue {
   updateSelectedArea(layer) {
     const data = layer.toGeoJSON()
     // store geoJSON in local storage
+    if (layer instanceof L.Circle) {
+      data.properties.radius = layer.getRadius()
+    }
     this.saveSelectedArea(data)
     this.selectedArea = data.geometry
   }
@@ -480,6 +483,20 @@ class DatasetDetail extends Vue {
     this.$warehouse.set('skope.area', JSON.stringify(geoJson))
   }
 
+  restoreSelectedArea(savedArea, map) {
+    if (!map) {
+      map = this.$refs.layerMap.mapObject
+    }
+    const geoJsonLayer = L.geoJson(savedArea)
+    geoJsonLayer.eachLayer(l => {
+      console.log(l)
+      this.drawnItems.addLayer(l)
+      this.selectedArea = savedArea.geometry
+    })
+    this.enableEditOnly(map)
+    map.fitBounds(this.drawnItems.getBounds(), { padding: [5, 5] })
+  }
+
   getSelectedArea() {
     const skopeArea = this.$warehouse.get('skope.area')
     if (skopeArea) {
@@ -488,11 +505,21 @@ class DatasetDetail extends Vue {
     return false
   }
 
+  disableEditOnly(map) {
+    this.drawControlEditOnly.remove(map)
+    this.drawControlFull.addTo(map)
+  }
+
+  enableEditOnly(map) {
+    this.drawControlFull.remove(map)
+    this.drawControlEditOnly.addTo(map)
+  }
+
   addDrawToolbar(map) {
     const L = this.$L
-    const drawnItems = new L.FeatureGroup()
-    map.addLayer(drawnItems)
-    const drawControlFull = new L.Control.Draw({
+    this.drawnItems = new L.FeatureGroup()
+    map.addLayer(this.drawnItems)
+    this.drawControlFull = new L.Control.Draw({
       position: 'topleft',
       draw: {
         // disable polylines and circlemarkers, allow polygon, rectangle, circle, and marker
@@ -504,12 +531,12 @@ class DatasetDetail extends Vue {
         }
       },
       edit: {
-        featureGroup: drawnItems
+        featureGroup: this.drawnItems
       }
     })
-    const drawControlEditOnly = new L.Control.Draw({
+    this.drawControlEditOnly = new L.Control.Draw({
       edit: {
-        featureGroup: drawnItems
+        featureGroup: this.drawnItems
       },
       draw: false
     })
@@ -525,34 +552,24 @@ class DatasetDetail extends Vue {
     editControlButtons.remove = 'Clear spatial selection'
     editControlButtons.removeDisabled = 'No spatial selection to remove'
     const self = this
+    map.addControl(this.drawControlFull)
     // check for a persisted area
     const savedArea = this.getSelectedArea()
-    map.addControl(drawControlFull)
     if (savedArea) {
-      const geoJsonLayer = L.geoJson(savedArea)
-      geoJsonLayer.eachLayer(l => {
-        console.log(l)
-        drawnItems.addLayer(l)
-        this.selectedArea = savedArea.geometry
-      })
-      drawControlFull.remove(map)
-      drawControlEditOnly.addTo(map)
-      map.fitBounds(drawnItems.getBounds(), { padding: [5, 5] })
+      this.restoreSelectedArea(savedArea, map)
     }
-    map.on(L.Draw.Event.EDITMOVE, e => this.updateSelectedArea(e.layer))
-    map.on(L.Draw.Event.EDITVERTEX, e => this.updateSelectedArea(e.poly))
+    map.on(L.Draw.Event.EDITMOVE, e => self.updateSelectedArea(e.layer))
+    map.on(L.Draw.Event.EDITVERTEX, e => self.updateSelectedArea(e.poly))
     map.on(L.Draw.Event.CREATED, event => {
       const layer = event.layer
-      this.updateSelectedArea(layer)
-      drawnItems.addLayer(layer)
-      drawControlFull.remove(map)
-      drawControlEditOnly.addTo(map)
+      self.updateSelectedArea(layer)
+      self.drawnItems.addLayer(layer)
+      self.enableEditOnly(map)
     })
     map.on(L.Draw.Event.DELETED, event => {
       self.clearSelectedArea()
-      if (drawnItems.getLayers().length === 0) {
-        drawControlEditOnly.remove(map)
-        drawControlFull.addTo(map)
+      if (self.drawnItems.getLayers().length === 0) {
+        self.disableEditOnly(map)
       }
     })
   }
