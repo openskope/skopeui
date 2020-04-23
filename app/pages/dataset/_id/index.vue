@@ -487,9 +487,16 @@ class DatasetDetail extends Vue {
     if (!map) {
       map = this.$refs.layerMap.mapObject
     }
-    const geoJsonLayer = L.geoJson(savedArea)
+    const geoJsonLayer = L.geoJson(savedArea, {
+      pointToLayer: (feature, latlng) => {
+        if (feature.properties.radius) {
+          return new L.Circle(latlng, feature.properties.radius)
+        } else {
+          return new L.Marker(latlng)
+        }
+      }
+    })
     geoJsonLayer.eachLayer(l => {
-      console.log(l)
       this.drawnItems.addLayer(l)
       this.selectedArea = savedArea.geometry
     })
