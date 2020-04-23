@@ -20,7 +20,7 @@
               />
               <l-rectangle
                 :bounds="selectedDataset.region.extents"
-                :l-style="selectedDataset.region.style"
+                :style="selectedDataset.region.style"
                 :fill-opacity="defaultRegionOpacity"
               />
               <l-wms-tile-layer
@@ -60,7 +60,13 @@
                 <v-icon>fas fa-download</v-icon>
               </a>
             </v-btn>
-            <v-btn icon @click="importGeoJson">
+            <input
+              id="loadGeoJsonFile"
+              type="file"
+              style="display:none"
+              @change="loadGeoJson"
+            />
+            <v-btn icon @click="selectGeoJsonFile">
               <v-icon>fas fa-upload</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
@@ -434,8 +440,16 @@ class DatasetDetail extends Vue {
     this.legendImage = htmlElement
   }
 
-  importGeoJson() {
-    alert('Importing not functional yet')
+  loadGeoJson(event) {
+    const file = event.target.files[0]
+    file.text().then(text => {
+      console.log('received text')
+      console.log(text)
+    })
+  }
+
+  selectGeoJsonFile() {
+    document.getElementById('loadGeoJsonFile').click()
   }
 
   exportSelectedArea(event) {
@@ -513,24 +527,24 @@ class DatasetDetail extends Vue {
     const self = this
     // check for a persisted area
     const savedArea = this.getSelectedArea()
+    map.addControl(drawControlFull)
     if (savedArea) {
       const geoJsonLayer = L.geoJson(savedArea)
-      geoJsonLayer.eachLayer(l => drawnItems.addLayer(l))
-      map.fitBounds(drawnItems.getBounds())
+      geoJsonLayer.eachLayer(l => {
+        console.log(l)
+        drawnItems.addLayer(l)
+        this.selectedArea = savedArea.geometry
+      })
+      drawControlFull.remove(map)
+      drawControlEditOnly.addTo(map)
+      map.fitBounds(drawnItems.getBounds(), { padding: [5, 5] })
     }
-    map.addControl(drawControlFull)
-    const updateSelectedArea = layer => {
-      const data = layer.toGeoJSON()
-      // store geoJSON in local storage
-      self.saveArea(data)
-      self.selectedArea = data.geometry
-    }
-    map.on(L.Draw.Event.EDITMOVE, e => updateSelectedArea(e.layer))
-    map.on(L.Draw.Event.EDITVERTEX, e => updateSelectedArea(e.poly))
+    map.on(L.Draw.Event.EDITMOVE, e => this.updateSelectedArea(e.layer))
+    map.on(L.Draw.Event.EDITVERTEX, e => this.updateSelectedArea(e.poly))
     map.on(L.Draw.Event.CREATED, event => {
       const layer = event.layer
+      this.updateSelectedArea(layer)
       drawnItems.addLayer(layer)
-      updateSelectedArea(layer)
       drawControlFull.remove(map)
       drawControlEditOnly.addTo(map)
     })
