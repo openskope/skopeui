@@ -503,9 +503,11 @@ class DatasetDetail extends Vue {
         }
       }
     })
+    // remove all existing layers from the FeatureGroup
+    this.drawnItems.clearLayers()
     geoJsonLayer.eachLayer(l => {
       this.drawnItems.addLayer(l)
-      this.selectedArea = savedArea.geometry
+      this.updateSelectedArea(l)
     })
     this.enableEditOnly(map)
     map.fitBounds(this.drawnItems.getBounds(), { padding: [5, 5] })
