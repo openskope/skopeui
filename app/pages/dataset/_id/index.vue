@@ -445,6 +445,13 @@ class DatasetDetail extends Vue {
     file.text().then(text => {
       console.log('received text')
       console.log(text)
+      try {
+        let area = JSON.parse(text)
+        this.restoreSelectedArea(area)
+      } catch (error) {
+        console.error(error)
+        alert("Sorry! We couldn't re-import this file: " + text)
+      }
     })
   }
 
