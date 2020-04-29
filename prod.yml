@@ -2,4 +2,4 @@ version: '3'
 services:
   web:
     command: >-
-      sh -c "yarn install && yarn build && yarn start"
+      sh -c "yarn build && yarn start"
