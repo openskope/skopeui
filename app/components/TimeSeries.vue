@@ -62,7 +62,7 @@ const updateDataset = _.debounce(async function(
     console.error(e)
     vue.$store.dispatch(
       'error',
-      'Unable to load timeseries service, please try selecting a smaller area or contact us if the error persists.'
+      'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
     )
   }
 },

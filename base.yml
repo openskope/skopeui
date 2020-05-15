@@ -18,11 +18,3 @@ services:
       - secrets/mongo.env
     volumes:
       - ./docker/shared/mongo:/data/db
-  db:
-    image: comses/postgis:10
-    volumes:
-      - ./docker/shared/pgdata:/var/lib/postgresql/data
-      - ./secrets:/run/secrets
-    environment:
-      POSTGRES_PASSWORD_FILE: "/run/secrets/postgres-passwd"
-      POSTGRES_DB: "skope"

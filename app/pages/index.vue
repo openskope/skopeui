@@ -10,7 +10,6 @@
             <span class="headline">
               Datasets
             </span>
-            <v-btn @click="testAxios">Test</v-btn>
           </v-card-title>
           <v-card-text class="title text--primary">
             Welcome to the SKOPE Application! To obtain data, click on a dataset
@@ -53,12 +52,6 @@ import Vue from 'vue'
 class LandingPage extends Vue {
   created() {
     this.$store.dispatch('datasets/load')
-  }
-
-  async testAxios() {
-    console.log('TIMEOUT:' + this.$axios.defaults.timeout)
-    const response = await this.$axios.get('http://localhost:30000')
-    console.log(response)
   }
 }
 export default LandingPage
