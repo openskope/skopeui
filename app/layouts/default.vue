@@ -5,6 +5,7 @@
     <div>
       <v-content>
         <v-container fluid>
+          <Messages />
           <nuxt />
         </v-container>
       </v-content>
@@ -14,9 +15,10 @@
 </template>
 
 <script>
-import Header from '../components/Header'
-import SideBar from '../components/SideBar'
-import Footer from '../components/Footer'
+import Header from '@/components/Header'
+import SideBar from '@/components/SideBar'
+import Messages from '@/components/Messages'
+import Footer from '@/components/Footer'
 
 export default {
   name: 'SKOPE',
@@ -24,6 +26,7 @@ export default {
   components: {
     Header,
     SideBar,
+    Messages,
     Footer
   }
 }

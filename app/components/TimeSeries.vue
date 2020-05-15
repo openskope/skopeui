@@ -20,7 +20,7 @@ import _ from 'lodash'
 import Component from 'nuxt-class-component'
 import * as queryString from 'query-string'
 import { Prop, Watch } from 'vue-property-decorator'
-import { TIMESERIES_ENDPOINT } from '../store/constants'
+import { TIMESERIES_ENDPOINT } from '@/store/constants'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 const Plotly = () => import('@statnett/vue-plotly')
@@ -37,7 +37,6 @@ const updateDataset = _.debounce(async function(
   minYear,
   maxYear
 ) {
-  // this.isLoading = true
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
   const qs = {
@@ -51,17 +50,24 @@ const updateDataset = _.debounce(async function(
   }
   const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
 
-  const res = await vue.$axios.$post(url, body)
-  const timeseries = {
-    x: _.range(res.startIndex, res.endIndex + 1),
-    y: res.values,
-    type: 'scatter'
+  try {
+    const res = await vue.$axios.$post(url, body)
+    const timeseries = {
+      x: _.range(res.startIndex, res.endIndex + 1),
+      y: res.values,
+      type: 'scatter'
+    }
+    vue.timeseries = timeseries
+  } catch (e) {
+    console.error(e)
+    vue.$store.dispatch(
+      'error',
+      'Unable to load timeseries service, please try selecting a smaller area or contact us if the error persists.'
+    )
   }
-  vue.timeseries = timeseries
 },
 300)
 
-export default
 @Component({
   components: {
     Plotly
@@ -93,7 +99,6 @@ class TimeSeries extends Vue {
   }
 
   requestMessage = ''
-  isLoading = true
 
   mounted() {
     updateDataset(
@@ -197,4 +202,5 @@ class TimeSeries extends Vue {
     }
   }
 }
+export default TimeSeries
 </script>

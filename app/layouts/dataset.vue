@@ -2,6 +2,7 @@
   <v-app light>
     <Header />
     <v-content>
+      <Messages />
       <nuxt />
     </v-content>
     <Footer />
@@ -9,15 +10,17 @@
 </template>
 
 <script>
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
+import Messages from '@/components/Messages'
 
 export default {
   name: 'SKOPE',
   title: 'SKOPE',
   components: {
+    Footer,
     Header,
-    Footer
+    Messages
   }
 }
 </script>

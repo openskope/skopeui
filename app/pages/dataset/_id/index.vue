@@ -237,7 +237,7 @@
 <script>
 import VueMarkdown from 'vue-markdown'
 import { stringify } from 'query-string'
-import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '~/store/constants.js'
+import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '@/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import { clamp } from 'lodash'

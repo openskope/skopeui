@@ -1,5 +1,3 @@
-import dataset from '../layouts/dataset'
-
 export const state = () => ({
   loading: false,
   all: [],

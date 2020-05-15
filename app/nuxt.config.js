@@ -50,7 +50,10 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [{ src: '~/plugins/nuxt-leaflet.js', ssr: false }],
+  plugins: [
+    { src: '~/plugins/nuxt-leaflet.js', ssr: false },
+    { src: '~/plugins/axios.js', ssr: false }
+  ],
 
   /*
    ** Nuxt.js modules
