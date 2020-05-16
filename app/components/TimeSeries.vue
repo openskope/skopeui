@@ -39,6 +39,10 @@ const updateDataset = _.debounce(async function(
 ) {
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
+  if (start > end) {
+    vue.$store.dispatch('info', 'Please select a start year before the end year')
+    return
+  }
   const qs = {
     start: start,
     end: end,
