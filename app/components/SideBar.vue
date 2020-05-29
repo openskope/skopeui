@@ -130,10 +130,8 @@ export default {
   // mounted() {},
   methods: {
     filterDatasets() {
-      // FIXME: something magical happens to the store
-      // based on the criteria / parameterizations set on this component,
-      // update the store so that pages/index.vue can properly filter its datasets
-      console.log(this.selectedVariableClasses)
+      // update the store with the selected variable classes, year range, and optional
+      // keyword query which will be applied as a filter across the available datasets
       this.$store.dispatch('datasets/filter', {
         selectedVariableClasses: this.selectedVariableClasses,
         yearStart: this.bounds[0],

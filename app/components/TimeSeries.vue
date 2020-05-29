@@ -40,7 +40,10 @@ const updateDataset = _.debounce(async function(
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
   if (start > end) {
-    vue.$store.dispatch('info', 'Please select a start year before the end year')
+    vue.$store.dispatch(
+      'info',
+      'Please select a start year before the end year'
+    )
     return
   }
   const qs = {
@@ -56,8 +59,12 @@ const updateDataset = _.debounce(async function(
 
   try {
     const res = await vue.$axios.$post(url, body)
+    const timeZeroOffset = vue.timeZero
     const timeseries = {
-      x: _.range(res.startIndex, res.endIndex + 1),
+      x: _.range(
+        res.startIndex + timeZeroOffset,
+        res.endIndex + timeZeroOffset + 1
+      ),
       y: res.values,
       type: 'scatter'
     }
