@@ -241,6 +241,7 @@ import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '@/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import { clamp } from 'lodash'
+import circleToPolygon from 'circle-to-polygon'
 import TimeSeries from '@/components/TimeSeries.vue'
 import Vue from 'vue'
 
@@ -270,6 +271,7 @@ class DatasetDetail extends Vue {
   isAnimationPlaying = false
   showDetails = false
   animationSpeed = 2000
+  defaultCircleToPolygonEdges = 32
   selectedArea = { type: 'None', coordinates: [] }
 
   @Datasets.State('selectedDataset')
@@ -452,7 +454,7 @@ class DatasetDetail extends Vue {
   loadGeoJson(event) {
     const file = event.target.files[0]
     file.text().then(text => {
-      console.log('received text')
+      console.log('received possible geojson to load')
       console.log(text)
       try {
         let area = JSON.parse(text)
@@ -487,6 +489,16 @@ class DatasetDetail extends Vue {
       data.properties.radius = layer.getRadius()
     }
     this.saveSelectedArea(data)
+    if (layer instanceof L.Circle) {
+      const geometry = circleToPolygon(
+        data.geometry.coordinates,
+        layer.getRadius(),
+        this.defaultCircleToPolygonEdges
+      )
+      console.log('converting circle to polygon: ')
+      console.log(geometry)
+      data.geometry = geometry
+    }
     this.selectedArea = data.geometry
   }
 
