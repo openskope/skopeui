@@ -1,48 +1,52 @@
+import { find } from 'lodash'
 export const DEPLOY_HOST_URL = 'https://app.openskope.org/' // FIXME: this should be parameterized at build / deployment
 export const WMS_SERVER_URI = 'geoserver/SKOPE/wms?'
 export const TIMESERIES_SERVICE_URI = 'timeseries-service/api/v1/timeseries/'
 export const SKOPE_WMS_ENDPOINT = `${DEPLOY_HOST_URL}${WMS_SERVER_URI}`
 export const TIMESERIES_ENDPOINT = `${DEPLOY_HOST_URL}${TIMESERIES_SERVICE_URI}`
-const BASE_MAP_TILE_SERVERS = [
+export const LEAFLET_PROVIDERS = [
   {
-    name: 'arcgis',
-    title: 'ArcGIS World Topography Map',
-    type: 'xyz',
+    name: 'Esri.WorldTopoMap',
     url:
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    attribution:
-      "&copy; <a target='_blank' href='https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer'>Esri and other contributors</a>"
+    attribution: 'Tiles &copy; Esri et al',
+    visible: true
   },
   {
-    name: 'osm',
-    title: 'OpenStreetMap',
-    type: 'xyz',
-    url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-    attribution:
-      "&copy; <a target='_blank' href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
-  }
-]
-const BASE_MAP_WMS_SERVERS = [
-  {
-    name: 'ahocevar',
-    title: 'ne_10m_admin_0_countries',
-    type: 'wms',
+    name: 'Esri.WorldTerrain',
     url:
-      'https://ahocevar.com/geoserver/ne/wms?layers=ne:ne_10m_admin_0_countries&tiled=true'
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 13,
+    visible: false,
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS'
   },
   {
-    name: 'Mundialis TOPO-OSM-WMS',
-    url: 'http://ows.mundialis.de/services/service?',
-    layer: 'TOPO-OSM-WMS'
+    name: 'CartoDB.Positron',
+    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    maxZoom: 19,
+    visible: false,
+    attribution:
+      'OpenStreetMap &copy; <a href="//carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd'
+  },
+  {
+    name: 'Stamen.TonerLite',
+    url:
+      'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+    minZoom: 0,
+    maxZoom: 20,
+    visible: false,
+    attribution:
+      'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>'
   }
 ]
 
-export class BaseMapEndpoints {
+export class BaseMapProvider {
   static get default() {
-    return BASE_MAP_TILE_SERVERS[0]
+    return LEAFLET_PROVIDERS[0]
   }
-
-  static get defaultWms() {
-    return BASE_MAP_WMS_SERVERS[0]
+  static get(name) {
+    return find(LEAFLET_PROVIDERS, { name })
   }
 }

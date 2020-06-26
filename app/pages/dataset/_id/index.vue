@@ -1,7 +1,7 @@
 <template>
   <v-container fill-width fluid>
     <v-row dense align-content-start justify-space-around wrap>
-      <v-col id="map-flex" xs12 md6>
+      <v-col id="map-flex" xs12 md7>
         <div class="map px-2">
           <client-only placeholder="Loading map, please wait...">
             <l-map
@@ -12,11 +12,17 @@
               style="z-index: 2"
             >
               <l-control-scale />
-              <l-control-layers />
+              <l-control-layers position="topright" />
               <l-tile-layer
-                :url="defaultBaseMap.url"
-                :attribution="defaultBaseMap.attribution"
-                :transparent="false"
+                v-for="provider of leafletProviders"
+                :key="provider.name"
+                :url="provider.url"
+                :name="provider.name"
+                :attribution="provider.attribution"
+                :visible="provider.default"
+                :min-zoom="provider.minZoom"
+                :max-zoom="provider.maxZoom"
+                layer-type="base"
               />
               <l-rectangle
                 :bounds="selectedDataset.region.extents"
@@ -33,7 +39,7 @@
                 :crs="defaultCrs"
                 :transparent="true"
                 :opacity="layerOpacity"
-                :layer-type="layerType"
+                layer-type="overlay"
                 :attribution="variable.name"
                 :visible="variable.visible"
                 version="1.3.0"
@@ -42,7 +48,7 @@
             </l-map>
           </client-only>
         </div>
-        <v-card class="mx-2" dense>
+        <v-sheet inset height="100%" class="mx-2">
           <v-toolbar color="indigo" dark>
             <v-toolbar-title>
               <span v-if="isLayerSelected" class="title">
@@ -88,13 +94,13 @@
               <v-icon>skip_next</v-icon>
             </v-btn>
           </v-toolbar>
-          <v-container>
+          <v-container height="100%">
             <v-row dense>
               <v-col>
                 <v-slider
                   v-model="opacity"
                   dense
-                  label="Opacity"
+                  label="Variable Layer Opacity"
                   min="0"
                   max="100"
                   step="1"
@@ -109,7 +115,9 @@
                   :value="year"
                   :max="maxTemporalRange"
                   :min="minTemporalRange"
-                  :thumb-size="42"
+                  :thumb-size="36"
+                  hint="Temporal Range (Start Year | Current Year | End Year)"
+                  persistent-hint
                   thumb-label="always"
                   class="px-3 pt-2"
                   @change="updateYear"
@@ -120,6 +128,8 @@
                       class="pt-0 mt-0"
                       :min="timespanMinYear"
                       :max="timespanMaxYear"
+                      hint="Start Year"
+                      label="Start Year"
                       hide-details
                       single-line
                       type="number"
@@ -133,6 +143,7 @@
                       :min="timespanMinYear"
                       :max="timespanMaxYear"
                       class="pt-0 mt-0"
+                      hint="End Year"
                       hide-details
                       single-line
                       type="number"
@@ -144,9 +155,9 @@
               </v-col>
             </v-row>
           </v-container>
-        </v-card>
+        </v-sheet>
       </v-col>
-      <v-col xs12 md6>
+      <v-col xs12 md5>
         <div class="px-2">
           <v-card>
             <v-card-title class="pb-0">
@@ -170,9 +181,14 @@
                 :min-year="minTemporalRange"
                 :max-year="maxTemporalRange"
               />
-              <v-alert v-else :value="true" type="warning">
+              <v-alert v-else :value="true" type="info">
                 Please select a <b>study area and variable of interest</b> to
                 display a time series for the given date range.
+                <b>Select a study</b>
+                area with the toolbar on the left side of the map and
+                <b>select a variable</b> using the layer control
+                <v-icon>fas fa-layer-group</v-icon> at the top right corner of
+                the map.
               </v-alert>
             </v-card-actions>
             <v-subheader class="title py-0">
@@ -208,7 +224,7 @@
                 </a>
               </div>
             </v-card-text>
-            <v-card-text class="pt-0 mx-0">
+            <v-card-text height="100%" class="pt-0 mx-0">
               <v-expansion-panels flat>
                 <v-expansion-panel class="elevation-0">
                   <v-expansion-panel-header class="title px-0 mx-0">
@@ -237,7 +253,11 @@
 <script>
 import VueMarkdown from 'vue-markdown'
 import { stringify } from 'query-string'
-import { SKOPE_WMS_ENDPOINT, BaseMapEndpoints } from '@/store/constants.js'
+import {
+  LEAFLET_PROVIDERS,
+  SKOPE_WMS_ENDPOINT,
+  BaseMapProvider
+} from '@/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
 import { clamp } from 'lodash'
@@ -309,8 +329,8 @@ class DatasetDetail extends Vue {
     return SKOPE_WMS_ENDPOINT
   }
 
-  get defaultBaseMap() {
-    return BaseMapEndpoints.default
+  get leafletProviders() {
+    return LEAFLET_PROVIDERS
   }
 
   get playIcon() {
@@ -717,18 +737,18 @@ export default DatasetDetail
 }
 
 #map-flex {
-  height: 600px;
+  height: 550px;
 }
 
 @media all and (max-width: 960px) {
   #map-flex {
-    height: 500px;
+    height: 400px;
   }
 }
 
 @media all and (max-width: 600px) {
   #map-flex {
-    height: 350px;
+    height: 250px;
   }
 }
 

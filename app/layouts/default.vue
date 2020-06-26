@@ -2,14 +2,12 @@
   <v-app light>
     <Header />
     <SideBar />
-    <div>
-      <v-content>
-        <v-container fluid>
-          <Messages />
-          <nuxt />
-        </v-container>
-      </v-content>
-    </div>
+    <v-main>
+      <v-container fluid>
+        <Messages />
+        <nuxt />
+      </v-container>
+    </v-main>
     <Footer />
   </v-app>
 </template>

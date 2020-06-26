@@ -1,15 +1,13 @@
 <template>
   <!-- footer -->
-  <v-footer app absolute padless dark color="indigo" class="darken-1">
+  <v-footer absolute app padless dark color="indigo" class="darken-1">
     <v-card elevation="0" dark color="indigo" class="darken-1 mx-auto">
       <v-card-text class="white--text">
-        <div>
-          This material is based upon work supported by the National Science
-          Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
-          University, SMA 1439603 and 1637155 to the University of Illinois at
-          Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State
-          University.
-        </div>
+        This material is based upon work supported by the National Science
+        Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
+        University, SMA 1439603 and 1637155 to the University of Illinois at
+        Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State
+        University.
       </v-card-text>
       <v-divider></v-divider>
       <v-card-text class="white--text text-center">

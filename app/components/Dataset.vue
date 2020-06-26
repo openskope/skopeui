@@ -11,8 +11,8 @@
           >
             <l-control-scale />
             <l-tile-layer
-              :url="defaultBaseMap.url"
-              :attribution="defaultBaseMap.attribution"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+              attribution="Tiles &copy; Esri"
             />
             <l-rectangle :bounds="region.extents" :l-style="region.style" />
           </l-map>
@@ -76,7 +76,7 @@
 import Vue from 'vue'
 import VueMarkdown from 'vue-markdown'
 import Component from 'nuxt-class-component'
-import { BaseMapEndpoints } from '~/store/constants.js'
+import { BaseMapProvider } from '~/store/constants.js'
 
 @Component({
   props: {
@@ -107,7 +107,7 @@ import { BaseMapEndpoints } from '~/store/constants.js'
 })
 class Dataset extends Vue {
   get defaultBaseMap() {
-    return BaseMapEndpoints.default
+    return BaseMapProvider.default
   }
   get spatialCoverage() {
     return `${this.region.name} at ${this.region.resolution}`

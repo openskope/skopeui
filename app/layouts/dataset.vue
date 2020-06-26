@@ -1,10 +1,10 @@
 <template>
   <v-app light>
     <Header />
-    <v-content>
+    <v-main>
       <Messages />
       <nuxt />
-    </v-content>
+    </v-main>
     <Footer />
   </v-app>
 </template>
