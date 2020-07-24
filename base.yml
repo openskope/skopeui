@@ -1,20 +1,11 @@
-version: '3'
+version: '3.8'
 services:
   web:
     build: app
     restart: always
     image: comses/skopeui/dev:latest
-    depends_on:
-      - mongo
     volumes:
       - ./app:/code
       - /code/node_modules
     env_file:
       - secrets/oauth.env
-  mongo:
-    image: mongo:4
-    restart: always
-    env_file:
-      - secrets/mongo.env
-    volumes:
-      - ./docker/shared/mongo:/data/db
