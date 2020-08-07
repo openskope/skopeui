@@ -17,10 +17,16 @@ export const actions = {
   },
   dismiss({ state, commit }, index) {
     commit('removeMessage', index)
+  },
+  clearMessages({ state, commit }) {
+    commit('clearMessages')
   }
 }
 
 export const mutations = {
+  clearMessages(state) {
+    state.messages = []
+  },
   addMessage(state, alert) {
     state.messages.push(alert)
   },

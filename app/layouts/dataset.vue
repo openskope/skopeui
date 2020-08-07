@@ -2,8 +2,10 @@
   <v-app light>
     <Header />
     <v-main>
-      <Messages />
-      <nuxt />
+      <v-container fluid>
+        <Messages />
+        <nuxt />
+      </v-container>
     </v-main>
     <Footer />
   </v-app>

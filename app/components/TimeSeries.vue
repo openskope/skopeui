@@ -58,17 +58,19 @@ const updateDataset = _.debounce(async function(
   const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
 
   try {
-    const res = await vue.$axios.$post(url, body)
+    const response = await vue.$axios.$post(url, body)
     const timeZeroOffset = vue.timeZero
     const timeseries = {
       x: _.range(
-        res.startIndex + timeZeroOffset,
-        res.endIndex + timeZeroOffset + 1
+        response.startIndex + timeZeroOffset,
+        response.endIndex + timeZeroOffset + 1
       ),
-      y: res.values,
+      y: response.values,
       type: 'scatter'
     }
     vue.timeseries = timeseries
+    console.log('Clearing messages')
+    vue.$store.dispatch('clearMessages')
   } catch (e) {
     console.error(e)
     vue.$store.dispatch(
@@ -168,8 +170,8 @@ class TimeSeries extends Vue {
     const dir = zip.folder(dirname)
 
     const b64toBlob = async url => {
-      const res = await fetch(url)
-      return res.blob()
+      const response = await fetch(url)
+      return response.blob()
     }
 
     dir.file('time-series.csv', csv)

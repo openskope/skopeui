@@ -10,7 +10,7 @@
         University.
       </v-card-text>
       <v-divider></v-divider>
-      <v-card-text class="white--text text-center">
+      <v-card-text class="text-center">
         <v-btn class="white--text" icon :href="github.url">
           <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
         </v-btn>

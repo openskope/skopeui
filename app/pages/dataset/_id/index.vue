@@ -225,7 +225,7 @@
               </div>
             </v-card-text>
             <v-card-text height="100%" class="pt-0 mx-0">
-              <v-expansion-panels flat>
+              <v-expansion-panels flat focusable>
                 <v-expansion-panel class="elevation-0">
                   <v-expansion-panel-header class="title px-0 mx-0">
                     Detailed Metadata
