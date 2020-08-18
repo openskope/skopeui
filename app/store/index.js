@@ -1,11 +1,11 @@
 export const state = () => ({
-  messages: []
+  messages: [],
 })
 
 export const getters = {
   messages(state) {
     return state.messages
-  }
+  },
 }
 
 export const actions = {
@@ -20,7 +20,7 @@ export const actions = {
   },
   clearMessages({ state, commit }) {
     commit('clearMessages')
-  }
+  },
 }
 
 export const mutations = {
@@ -32,5 +32,5 @@ export const mutations = {
   },
   removeMessage(state, index) {
     state.messages.splice(index, 1)
-  }
+  },
 }

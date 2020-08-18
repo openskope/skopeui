@@ -41,13 +41,13 @@ import Vue from 'vue'
 @Component({
   layout: 'default',
   components: {
-    Dataset
+    Dataset,
   },
   computed: {
     ...mapGetters({
-      datasets: 'datasets/filteredDatasets'
-    })
-  }
+      datasets: 'datasets/filteredDatasets',
+    }),
+  },
 })
 class LandingPage extends Vue {
   created() {

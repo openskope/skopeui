@@ -11,7 +11,7 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: pkg.description }
+      { hid: 'description', name: 'description', content: pkg.description },
     ],
     link: [
       { rel: 'icon', type: 'image/png', href: '/favicon-32x32.png' },
@@ -19,23 +19,23 @@ module.exports = {
       {
         rel: 'apple-touch-icon',
         sizes: '180x180',
-        href: '/apple-touch-icon.png'
+        href: '/apple-touch-icon.png',
       },
       { rel: 'manifest', href: '/site.webmanifest' },
       {
         rel: 'stylesheet',
         href:
-          'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'
+          'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons',
       },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css?family=Bitter:400,700'
+        href: 'https://fonts.googleapis.com/css?family=Bitter:400,700',
       },
       {
         rel: 'stylesheet',
-        href: 'https://use.fontawesome.com/releases/v5.11.2/css/all.css'
-      }
-    ]
+        href: 'https://use.fontawesome.com/releases/v5.11.2/css/all.css',
+      },
+    ],
   },
 
   /*
@@ -52,7 +52,7 @@ module.exports = {
    */
   plugins: [
     { src: '~/plugins/nuxt-leaflet.js', ssr: false },
-    { src: '~/plugins/axios.js', ssr: false }
+    { src: '~/plugins/axios.js', ssr: false },
   ],
 
   /*
@@ -69,10 +69,10 @@ module.exports = {
         plugins: ['store/plugins/expire', 'store/plugins/defaults'],
         storages: [
           'store/storages/localStorage',
-          'store/storages/cookieStorage'
-        ]
-      }
-    ]
+          'store/storages/cookieStorage',
+        ],
+      },
+    ],
   ],
   /*
    ** Axios module configuration
@@ -89,19 +89,19 @@ module.exports = {
       GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || '',
       GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || '',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || ''
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
     },
     COOKIE_ENCRYPTION_PASSWORD: process.env.SECRET_KEY,
     strategies: {
       github: {
         client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
       },
       google: {
         client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET
-      }
-    }
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      },
+    },
   },
 
   /*
@@ -111,8 +111,8 @@ module.exports = {
 
   vue: {
     config: {
-      devtools: true
-    }
+      devtools: true,
+    },
   },
 
   dev: process.env.NODE_ENV !== 'production',
@@ -123,10 +123,10 @@ module.exports = {
     optionsPath: './assets/style/vuetify.js',
     defaultAssets: {
       font: {
-        family: 'Roboto'
+        family: 'Roboto',
       },
-      icons: 'fa'
-    }
+      icons: 'fa',
+    },
   },
 
   /*
@@ -136,8 +136,8 @@ module.exports = {
     babel: {
       plugins: [
         ['@babel/plugin-proposal-decorators', { legacy: true }],
-        ['@babel/plugin-proposal-class-properties', { loose: true }]
-      ]
+        ['@babel/plugin-proposal-class-properties', { loose: true }],
+      ],
     },
     transpile: ['vuetify/lib'],
 
@@ -151,12 +151,12 @@ module.exports = {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules)/
+          exclude: /(node_modules)/,
         })
       }
       if (ctx.isClient) {
         config.devtool = 'source-map'
       }
-    }
-  }
+    },
+  },
 }

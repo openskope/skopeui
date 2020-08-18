@@ -1,6 +1,6 @@
 <template>
   <client-only placeholder="Loading...">
-    <div style="width: 100%">
+    <div style="width: 100%;">
       <Plotly
         v-if="requestMessage.length === 0"
         ref="plot"
@@ -30,7 +30,7 @@ const { Parser } = require('json2csv')
 // that debounced methods can exist in a vue-class-component
 //
 // Could use or take from https://github.com/bvaughn/debounce-decorator
-const updateDataset = _.debounce(async function(
+const updateDataset = _.debounce(async function (
   vue,
   datasetUri,
   geometry,
@@ -50,10 +50,10 @@ const updateDataset = _.debounce(async function(
     start: start,
     end: end,
     timeResolution: 'year',
-    timeZero: vue.timeZero
+    timeZero: vue.timeZero,
   }
   const body = {
-    boundaryGeometry: geometry
+    boundaryGeometry: geometry,
   }
   const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
 
@@ -66,7 +66,7 @@ const updateDataset = _.debounce(async function(
         response.endIndex + timeZeroOffset + 1
       ),
       y: response.values,
-      type: 'scatter'
+      type: 'scatter',
     }
     vue.timeseries = timeseries
     console.log('Clearing messages')
@@ -83,8 +83,8 @@ const updateDataset = _.debounce(async function(
 
 @Component({
   components: {
-    Plotly
-  }
+    Plotly,
+  },
 })
 class TimeSeries extends Vue {
   @Prop()
@@ -108,7 +108,7 @@ class TimeSeries extends Vue {
   timeseries = {
     x: [],
     y: [],
-    type: 'scatter'
+    type: 'scatter',
   }
 
   requestMessage = ''
@@ -150,9 +150,9 @@ class TimeSeries extends Vue {
         {
           type: 'Feature',
           properties: {},
-          geometry: this.geometry
-        }
-      ]
+          geometry: this.geometry,
+        },
+      ],
     }
   }
 
@@ -160,7 +160,7 @@ class TimeSeries extends Vue {
     const fields = ['Year', this.variableName]
     const data = _.zipWith(this.timeseries.x, this.timeseries.y, (x, y) => ({
       Year: x,
-      [this.variableName]: y
+      [this.variableName]: y,
     }))
     const json2csvParser = new Parser({ fields })
     const csv = json2csvParser.parse(data)
@@ -169,7 +169,7 @@ class TimeSeries extends Vue {
     const dirname = _.kebabCase(this.datasetUri)
     const dir = zip.folder(dirname)
 
-    const b64toBlob = async url => {
+    const b64toBlob = async (url) => {
       const response = await fetch(url)
       return response.blob()
     }
@@ -183,7 +183,7 @@ class TimeSeries extends Vue {
     dir.file('boundary.geojson', JSON.stringify(this.geometryGeoJSON))
     zip
       .generateAsync({ type: 'blob' })
-      .then(content => saveAs(content, `${_.kebabCase(this.datasetUri)}.zip`))
+      .then((content) => saveAs(content, `${_.kebabCase(this.datasetUri)}.zip`))
   }
 
   get traces() {
@@ -193,24 +193,24 @@ class TimeSeries extends Vue {
   get metadata() {
     return {
       xaxis: {
-        title: 'Year'
+        title: 'Year',
       },
       yaxis: {
-        title: this.variableName
+        title: this.variableName,
       },
       margin: {
         l: 60,
         r: 10,
         b: 60,
         t: 10,
-        pad: 4
-      }
+        pad: 4,
+      },
     }
   }
 
   get options() {
     return {
-      modeBarButtonsToRemove: ['toImage']
+      modeBarButtonsToRemove: ['toImage'],
       // responsive: true
     }
   }

@@ -9,7 +9,7 @@
               :zoom="selectedDataset.region.zoom"
               :center="selectedDataset.region.center"
               :draw-control="true"
-              style="z-index: 2"
+              style="z-index: 2;"
             >
               <l-control-scale />
               <l-control-layers position="topright" />
@@ -69,7 +69,7 @@
             <input
               id="loadGeoJsonFile"
               type="file"
-              style="display:none"
+              style="display: none;"
               @change="loadGeoJson"
             />
             <v-btn icon @click="selectGeoJsonFile">
@@ -133,7 +133,7 @@
                       hide-details
                       single-line
                       type="number"
-                      style="width: 60px"
+                      style="width: 60px;"
                       @input="validateMinYear"
                     ></v-text-field>
                   </template>
@@ -147,7 +147,7 @@
                       hide-details
                       single-line
                       type="number"
-                      style="width: 60px"
+                      style="width: 60px;"
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
@@ -256,7 +256,7 @@ import { stringify } from 'query-string'
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
-  BaseMapProvider
+  BaseMapProvider,
 } from '@/store/constants.js'
 import Component from 'nuxt-class-component'
 import { namespace } from 'vuex-class'
@@ -272,8 +272,8 @@ const Datasets = namespace('datasets')
   layout: 'dataset',
   components: {
     TimeSeries,
-    VueMarkdown
-  }
+    VueMarkdown,
+  },
 })
 class DatasetDetail extends Vue {
   length = 3
@@ -360,7 +360,7 @@ class DatasetDetail extends Vue {
       uncertainty: 'Uncertainty',
       methodSummary: 'Method Summary',
       references: 'References',
-      contactInformation: 'Contact Information'
+      contactInformation: 'Contact Information',
     }
   }
 
@@ -398,13 +398,13 @@ class DatasetDetail extends Vue {
   mounted() {
     this.$nextTick(() => {
       const map = this.$refs.layerMap.mapObject
-      const handler = event => {
+      const handler = (event) => {
         const layer = event.layer
         const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
         if (isSkopeLayer) {
           const variable = _.find(
             this.selectedDataset.variables,
-            v => v.name === event.name
+            (v) => v.name === event.name
           )
           this.selectedLayer = variable
           this.updateWmsLegend(map, layer.wmsParams.layers)
@@ -423,7 +423,7 @@ class DatasetDetail extends Vue {
 
   head() {
     return {
-      title: this.selectedDataset.title
+      title: this.selectedDataset.title,
     }
   }
 
@@ -473,7 +473,7 @@ class DatasetDetail extends Vue {
 
   loadGeoJson(event) {
     const file = event.target.files[0]
-    file.text().then(text => {
+    file.text().then((text) => {
       console.log('received possible geojson to load')
       console.log(text)
       try {
@@ -542,11 +542,11 @@ class DatasetDetail extends Vue {
         } else {
           return new L.Marker(latlng)
         }
-      }
+      },
     })
     // remove all existing layers from the FeatureGroup
     this.drawnItems.clearLayers()
-    geoJsonLayer.eachLayer(l => {
+    geoJsonLayer.eachLayer((l) => {
       this.drawnItems.addLayer(l)
       this.updateSelectedArea(l)
     })
@@ -584,18 +584,18 @@ class DatasetDetail extends Vue {
         circlemarker: false,
         polygon: {
           allowIntersection: false,
-          showArea: true
-        }
+          showArea: true,
+        },
       },
       edit: {
-        featureGroup: this.drawnItems
-      }
+        featureGroup: this.drawnItems,
+      },
     })
     this.drawControlEditOnly = new L.Control.Draw({
       edit: {
-        featureGroup: this.drawnItems
+        featureGroup: this.drawnItems,
       },
-      draw: false
+      draw: false,
     })
     // set custom tooltips on the draw and edit toolbars
     const drawControlButtons = L.drawLocal.draw.toolbar.buttons
@@ -615,15 +615,15 @@ class DatasetDetail extends Vue {
     if (savedArea) {
       this.restoreSelectedArea(savedArea, map)
     }
-    map.on(L.Draw.Event.EDITMOVE, e => self.updateSelectedArea(e.layer))
-    map.on(L.Draw.Event.EDITVERTEX, e => self.updateSelectedArea(e.poly))
-    map.on(L.Draw.Event.CREATED, event => {
+    map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedArea(e.layer))
+    map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedArea(e.poly))
+    map.on(L.Draw.Event.CREATED, (event) => {
       const layer = event.layer
       self.updateSelectedArea(layer)
       self.drawnItems.addLayer(layer)
       self.enableEditOnly(map)
     })
-    map.on(L.Draw.Event.DELETED, event => {
+    map.on(L.Draw.Event.DELETED, (event) => {
       self.clearSelectedArea()
       if (self.drawnItems.getLayers().length === 0) {
         self.disableEditOnly(map)
@@ -637,7 +637,7 @@ class DatasetDetail extends Vue {
       VERSION: '1.0.0',
       FORMAT: 'image/png',
       LAYER: layerName,
-      LEGEND_OPTIONS: 'layout:vertical;dx:10'
+      LEGEND_OPTIONS: 'layout:vertical;dx:10',
     }
     const queryString = stringify(query)
     const legendUrl = this.skopeWmsUrl + queryString
@@ -649,7 +649,7 @@ class DatasetDetail extends Vue {
     const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
     if (this.legendControl === null) {
       const legend = L.control({ position: this.legendPosition })
-      legend.onAdd = map => {
+      legend.onAdd = (map) => {
         const controlCss = 'leaflet-control-wms-legend'
         const legendCss = 'wms-legend'
         const div = L.DomUtil.create('div', controlCss)
@@ -669,7 +669,7 @@ class DatasetDetail extends Vue {
   fillTemplateYear(templateString) {
     const year = (this.year || this.maxTemporalRange).toString()
     const layer = fillTemplate(templateString, {
-      year: year.padStart(4, '0')
+      year: year.padStart(4, '0'),
     })
     return layer
   }

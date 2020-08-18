@@ -34,7 +34,7 @@
             <v-text-field
               v-model="bounds[0]"
               class="mt-0 pt-0"
-              style="width: 50px"
+              style="width: 50px;"
               dense
               hide-details
               single-line
@@ -47,7 +47,7 @@
             <v-text-field
               v-model="bounds[1]"
               class="mt-0 pt-0"
-              style="width: 50px"
+              style="width: 50px;"
               hide-details
               single-line
               type="number"
@@ -102,7 +102,7 @@ export default {
       bounds: [1, currentYear],
       selectedVariableClasses: [],
       yearStart: 1,
-      yearEnd: currentYear
+      yearEnd: currentYear,
     }
   },
   computed: {
@@ -118,11 +118,11 @@ export default {
       for (const variableClass of variableClassSet) {
         variableClasses.push({
           name: variableClass,
-          checked: false
+          checked: false,
         })
       }
       return variableClasses
-    }
+    },
   },
   created() {
     this.$store.dispatch('datasets/load')
@@ -136,10 +136,10 @@ export default {
         selectedVariableClasses: this.selectedVariableClasses,
         yearStart: this.bounds[0],
         yearEnd: this.bounds[1],
-        query: this.search
+        query: this.search,
       })
-    }
-  }
+    },
+  },
 }
 </script>
 <style scoped></style>

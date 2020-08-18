@@ -6,8 +6,8 @@ export const state = () => ({
     selectedVariableClasses: [],
     yearStart: 1,
     yearEnd: 2019,
-    query: ''
-  }
+    query: '',
+  },
 })
 
 function matchesYearFilter(minYear, maxYear, dataset) {
@@ -59,7 +59,7 @@ export const getters = {
     return [1, new Date().getFullYear()]
   },
   filteredDatasets(state) {
-    return state.all.filter(dataset => {
+    return state.all.filter((dataset) => {
       const selectedVariableClasses =
         state.filterCriteria.selectedVariableClasses
       const minYear = state.filterCriteria.yearStart
@@ -72,7 +72,7 @@ export const getters = {
         matchesVariableFilter(selectedVariableClasses, dataset)
       )
     })
-  }
+  },
 }
 
 export const actions = {
@@ -101,7 +101,7 @@ export const actions = {
     if (state.selectedDataset) {
       commit('selectVariable', id)
     }
-  }
+  },
 }
 
 export const mutations = {
@@ -112,18 +112,18 @@ export const mutations = {
     state.loading = false
   },
   selectDataset(state, id) {
-    state.selectedDataset = state.all.find(dataset => dataset.id === id)
+    state.selectedDataset = state.all.find((dataset) => dataset.id === id)
   },
   selectVariable(state, id) {
     let selectedVariable = state.selectedDataset.variables.find(
-      variable => variable.id === id
+      (variable) => variable.id === id
     )
     selectedVariable.visible = true
     state.selectedDataset.selectedVariable = selectedVariable
   },
   applyFilterCriteria(state, filterCriteria) {
     state.filterCriteria = filterCriteria
-  }
+  },
 }
 
 const ALL_DATA = [
@@ -141,7 +141,10 @@ const ALL_DATA = [
       resolution: '.5 degree (~55.5km)',
       name: 'Continental USA',
       style: { color: 'blue', weight: 2 },
-      extents: [[49, -124.5], [24, -67]]
+      extents: [
+        [49, -124.5],
+        [24, -67],
+      ],
     },
     timespan: {
       resolution: 'year',
@@ -150,8 +153,8 @@ const ALL_DATA = [
         timeZero: 0,
         gte: '0001',
         lte: '2017',
-        suffix: 'CE'
-      }
+        suffix: 'CE',
+      },
     },
     uncertainty: 'No uncertainty estimates available.',
     methodSummary:
@@ -173,10 +176,10 @@ const ALL_DATA = [
         styles: 'default',
         timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
         description:
-          'Palmer’s Modified Drought Index: Jun–Aug.; <=-4.00 extreme drought; -3.00 to-3.99 severe drought; -2.00 to -2.99 moderate dought, -1.99 to 1.99 midrange; 2.00 to 2.99 moderately moist; 3.00 to 3.99 very moist; >=4.00 extremely moist.'
-      }
+          'Palmer’s Modified Drought Index: Jun–Aug.; <=-4.00 extreme drought; -3.00 to-3.99 severe drought; -2.00 to -2.99 moderate dought, -1.99 to 1.99 midrange; 2.00 to 2.99 moderately moist; 3.00 to 3.99 very moist; >=4.00 extremely moist.',
+      },
     ],
-    sourceUrl: 'https://www.ncdc.noaa.gov/paleo-search/study/22454'
+    sourceUrl: 'https://www.ncdc.noaa.gov/paleo-search/study/22454',
   },
   {
     id: 'srtm',
@@ -201,7 +204,10 @@ const ALL_DATA = [
       resolution: '250m',
       name: 'Continental USA',
       style: { color: 'gray', weight: 2 },
-      extents: [[50, -125], [25, -65]]
+      extents: [
+        [50, -125],
+        [25, -65],
+      ],
     },
     timespan: {
       resolution: '',
@@ -209,8 +215,8 @@ const ALL_DATA = [
       period: {
         gte: '2009',
         lte: '2009',
-        suffix: 'CE'
-      }
+        suffix: 'CE',
+      },
     },
     variables: [
       {
@@ -221,9 +227,9 @@ const ALL_DATA = [
         visible: false,
         min: 0.0,
         max: 4500.0,
-        styles: 'default'
-      }
-    ]
+        styles: 'default',
+      },
+    ],
   },
   {
     id: 'paleocar',
@@ -252,7 +258,10 @@ const ALL_DATA = [
       resolution: '800m',
       name: 'Southwestern USA',
       style: { color: 'red', weight: 1 },
-      extents: [[43, -115], [31, -102]]
+      extents: [
+        [43, -115],
+        [31, -102],
+      ],
     },
 
     timespan: {
@@ -262,8 +271,8 @@ const ALL_DATA = [
         timeZero: 1,
         gte: '0001',
         lte: '2000',
-        suffix: 'CE'
-      }
+        suffix: 'CE',
+      },
     },
 
     variables: [
@@ -277,7 +286,7 @@ const ALL_DATA = [
         max: 10.0,
         visible: false,
         styles: 'default,raster',
-        description: 'F deg.; Growing Season: May–Sept.'
+        description: 'F deg.; Growing Season: May–Sept.',
       },
       {
         id: 'paleocar_precipitation',
@@ -289,7 +298,7 @@ const ALL_DATA = [
         max: 10.0,
         visible: false,
         styles: 'default,raster',
-        description: '(prev. Oct through listed year Sept)'
+        description: '(prev. Oct through listed year Sept)',
       },
       {
         id: 'paleocar_crop_niche',
@@ -302,8 +311,8 @@ const ALL_DATA = [
         visible: false,
         styles: 'default',
         description:
-          'In niche if Growing Season F GDD (as above) >= 1800 & Water Year Precip. (as above) >= 300 mm; otherwise out of niche.'
-      }
-    ]
-  }
+          'In niche if Growing Season F GDD (as above) >= 1800 & Water Year Precip. (as above) >= 300 mm; otherwise out of niche.',
+      },
+    ],
+  },
 ]

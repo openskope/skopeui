@@ -32,9 +32,9 @@ export default {
       year: new Date().getFullYear(),
       github: {
         icon: 'fab fa-github',
-        url: 'https://github.com/openskope/skopeui'
-      }
+        url: 'https://github.com/openskope/skopeui',
+      },
     }
-  }
+  },
 }
 </script>

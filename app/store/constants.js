@@ -10,7 +10,7 @@ export const LEAFLET_PROVIDERS = [
     url:
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri et al',
-    visible: true
+    visible: true,
   },
   {
     name: 'Esri.WorldTerrain',
@@ -19,7 +19,7 @@ export const LEAFLET_PROVIDERS = [
     maxZoom: 13,
     visible: false,
     attribution:
-      'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS'
+      'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS',
   },
   {
     name: 'CartoDB.Positron',
@@ -28,7 +28,7 @@ export const LEAFLET_PROVIDERS = [
     visible: false,
     attribution:
       'OpenStreetMap &copy; <a href="//carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd'
+    subdomains: 'abcd',
   },
   {
     name: 'Stamen.TonerLite',
@@ -38,8 +38,8 @@ export const LEAFLET_PROVIDERS = [
     maxZoom: 20,
     visible: false,
     attribution:
-      'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>'
-  }
+      'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>',
+  },
 ]
 
 export class BaseMapProvider {

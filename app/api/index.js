@@ -4,9 +4,9 @@ const saveSpatialBoundsRoute = {
   handler(request, h) {
     // FIXME: persist geometries to firebase or mongodb associated with username
     return {
-      works: true
+      works: true,
     }
-  }
+  },
 }
 
 module.exports = [saveSpatialBoundsRoute]

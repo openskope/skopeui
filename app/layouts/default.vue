@@ -25,7 +25,7 @@ export default {
     Header,
     SideBar,
     Messages,
-    Footer
-  }
+    Footer,
+  },
 }
 </script>

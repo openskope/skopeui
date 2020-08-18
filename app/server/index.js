@@ -7,17 +7,17 @@ let config = require('../nuxt.config.js')
 
 const server = new Server({
   host: process.env.HOST || '0.0.0.0',
-  port: process.env.PORT || 3000
+  port: process.env.PORT || 3000,
 })
 
 server
   .register([
     {
-      plugin: Bell
+      plugin: Bell,
     },
     {
-      plugin: HapiNuxt
-    }
+      plugin: HapiNuxt,
+    },
   ])
   //  .then(() => {
   //    server.auth.strategy('github', 'bell', {
@@ -41,10 +41,10 @@ server
   .then(() =>
     consola.ready({
       message: `Server running at: ${server.info.uri}`,
-      badge: true
+      badge: true,
     })
   )
-  .catch(err => {
+  .catch((err) => {
     consola.error(err)
     throw err
   })

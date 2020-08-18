@@ -88,7 +88,7 @@ import { BaseMapProvider } from '~/store/constants.js'
     description: String,
     variables: Array,
     id: String,
-    sourceUrl: String
+    sourceUrl: String,
   },
   components: { VueMarkdown },
   // app specific functions
@@ -98,12 +98,12 @@ import { BaseMapProvider } from '~/store/constants.js'
         return this.$L.CRS.EPSG4326
       }
       return ''
-    }
+    },
   },
   methods: {
     initMap() {},
-    initLayers() {}
-  }
+    initLayers() {},
+  },
 })
 class Dataset extends Vue {
   get defaultBaseMap() {

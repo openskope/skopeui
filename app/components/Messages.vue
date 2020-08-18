@@ -28,13 +28,13 @@ export default {
   name: 'Messages',
   computed: {
     ...mapGetters({
-      messages: 'messages'
-    })
+      messages: 'messages',
+    }),
   },
   methods: {
     dismiss(index) {
       this.$store.dispatch('dismiss', index)
-    }
-  }
+    },
+  },
 }
 </script>
