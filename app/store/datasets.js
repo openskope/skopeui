@@ -64,7 +64,7 @@ export const getters = {
         state.filterCriteria.selectedVariableClasses
       const minYear = state.filterCriteria.yearStart
       const maxYear = state.filterCriteria.yearEnd
-      const query = state.filterCriteria.query
+      const query = state.filterCriteria.query || ''
 
       return (
         matchesYearFilter(minYear, maxYear, dataset) &&

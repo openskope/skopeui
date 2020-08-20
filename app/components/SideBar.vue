@@ -3,91 +3,86 @@
     <section class="pt-3">
       <div class="container">
         <h2 class="headline font-weight-black">Filter Datasets</h2>
-        <!-- search form -->
-        <form @submit.prevent>
-          <div class="input-group pb-2">
-            <span class="input-group-btn">
-              <v-text-field
-                id="search"
-                v-model="search"
-                data-toggle="hideseek"
-                label="Search datasets"
-                append-icon="fas fa-search"
-                @keydown.enter="filterDatasets"
-              />
-            </span>
-          </div>
-        </form>
-        <!-- end search form -->
-        <!-- time range slider -->
-        <h3 class="title py-3">Year Range</h3>
-        <v-range-slider
-          v-model="bounds"
-          class="align-center"
-          :value="bounds"
-          :max="yearEnd"
-          :min="0"
-          :step="1"
-          @change="filterDatasets"
-        >
-          <template v-slot:prepend>
-            <v-text-field
-              v-model="bounds[0]"
-              class="mt-0 pt-0"
-              style="width: 50px;"
-              dense
-              hide-details
-              single-line
-              type="number"
-              @keydown.enter="filterDatasets"
-            >
-            </v-text-field>
-          </template>
-          <template v-slot:append>
-            <v-text-field
-              v-model="bounds[1]"
-              class="mt-0 pt-0"
-              style="width: 50px;"
-              hide-details
-              single-line
-              type="number"
-              @keydown.enter="filterDatasets"
-            >
-            </v-text-field>
-          </template>
-        </v-range-slider>
-        <!-- end year range slider -->
-        <v-divider class="mb-3" />
-        <!-- variable checkbox selector -->
-        <h3 class="title py-3">Variables</h3>
-        <v-list
-          v-for="(variable, index) in variableClasses"
-          :key="index"
-          class="py-0"
-        >
-          <v-checkbox
-            v-model="selectedVariableClasses"
-            :value="variable.name"
-            :label="variable.name"
-            dense
-            class="py-0 my-0"
-            @change="filterDatasets"
-          >
-            <template v-slot:label>
-              <v-chip
-                small
-                label
-                class="ma-1"
-                color="indigo"
-                text-color="white"
+        <v-form @submit.prevent>
+          <v-container>
+            <v-row>
+              <v-col>
+                <!-- keyword search -->
+                <v-text-field
+                  id="search"
+                  v-model="search"
+                  clearable
+                  data-toggle="hideseek"
+                  label="Keyword Search"
+                  append-icon="fas fa-search"
+                  @change="filterDatasets"
+                />
+              </v-col>
+            </v-row>
+            <!-- start and end date range -->
+            <h3 class="title">Year Range</h3>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="startYear"
+                  outlined
+                  dense
+                  label="Start Year"
+                  :rules="startYearRules"
+                  type="number"
+                  @change="filterDatasets"
+                >
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="endYear"
+                  outlined
+                  dense
+                  :rules="endYearRules"
+                  label="End Year"
+                  type="number"
+                  @change="filterDatasets"
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <!-- variable checkbox selector -->
+            <h3 class="title">Variables</h3>
+            <v-row>
+              <v-list
+                v-for="(variable, index) in variableClasses"
+                :key="index"
+                class="py-0"
               >
-                <v-icon>view_column</v-icon>
-                {{ variable.name }}
-              </v-chip>
-            </template>
-          </v-checkbox>
-        </v-list>
-        <!-- end variable checkbox selector -->
+                <v-checkbox
+                  v-model="selectedVariableClasses"
+                  :value="variable.name"
+                  :label="variable.name"
+                  dense
+                  hide-details
+                  class="py-0 my-0"
+                  @change="filterDatasets"
+                >
+                  <template v-slot:label>
+                    <v-chip
+                      small
+                      label
+                      outlined
+                      class="ma-1 width-50"
+                      color="indigo"
+                    >
+                      <v-icon>view_column</v-icon>
+                      {{ variable.name }}
+                    </v-chip>
+                  </template>
+                </v-checkbox>
+              </v-list>
+            </v-row>
+
+            <!-- end variable checkbox selector -->
+          </v-container>
+        </v-form>
       </div>
     </section>
   </v-navigation-drawer>
@@ -99,13 +94,34 @@ export default {
     const currentYear = new Date().getFullYear()
     return {
       search: '',
-      bounds: [1, currentYear],
+      startYear: 1,
+      endYear: currentYear,
       selectedVariableClasses: [],
-      yearStart: 1,
-      yearEnd: currentYear,
+      minYear: 1,
+      maxYear: currentYear,
     }
   },
   computed: {
+    startYearRules() {
+      return [
+        (v) =>
+          v >= this.minYear ||
+          `Please enter a valid start year after ${this.minYear}`,
+        (v) =>
+          v <= this.endYear ||
+          `Please enter a valid start year before ${this.endYear}`,
+      ]
+    },
+    endYearRules() {
+      return [
+        (v) =>
+          v >= this.startYear ||
+          `Please enter a valid end year after ${this.startYear}`,
+        (v) =>
+          v <= this.maxYear ||
+          `Please enter a valid end year before ${this.maxYear}`,
+      ]
+    },
     variableClasses() {
       const datasets = this.$store.state.datasets.all
       const variableClassSet = new Set()
@@ -134,8 +150,8 @@ export default {
       // keyword query which will be applied as a filter across the available datasets
       this.$store.dispatch('datasets/filter', {
         selectedVariableClasses: this.selectedVariableClasses,
-        yearStart: this.bounds[0],
-        yearEnd: this.bounds[1],
+        yearStart: this.startYear,
+        yearEnd: this.endYear,
         query: this.search,
       })
     },

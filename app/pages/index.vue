@@ -26,6 +26,9 @@
               />
             </template>
           </v-list>
+          <v-alert v-if="datasets.length === 0" type="info">
+            No datasets found, please refine your filter criteria.
+          </v-alert>
         </v-responsive>
       </v-card>
     </v-col>
