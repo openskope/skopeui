@@ -57,9 +57,7 @@
           </v-list>
           <v-card-text>
             <div class="py-3 citation font-weight-bold">
-              <em>
-                Source:
-              </em>
+              <em> Source: </em>
               <a target="_blank" :href="sourceUrl">
                 {{ sourceUrl }}
                 <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
@@ -75,7 +73,7 @@
 <script>
 import Vue from 'vue'
 import VueMarkdown from 'vue-markdown'
-import Component from 'nuxt-class-component'
+import { Component } from 'nuxt-property-decorator'
 import { BaseMapProvider } from '~/store/constants.js'
 
 @Component({

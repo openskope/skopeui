@@ -1,6 +1,6 @@
 <template>
   <client-only placeholder="Loading...">
-    <div style="width: 100%;">
+    <div style="width: 100%">
       <Plotly
         v-if="requestMessage.length === 0"
         ref="plot"
@@ -17,7 +17,7 @@
 <script>
 import Vue from 'vue'
 import _ from 'lodash'
-import Component from 'nuxt-class-component'
+import { Component } from 'nuxt-property-decorator'
 import * as queryString from 'query-string'
 import { Prop, Watch } from 'vue-property-decorator'
 import { TIMESERIES_ENDPOINT } from '@/store/constants'

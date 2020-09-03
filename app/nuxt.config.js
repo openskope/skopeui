@@ -117,7 +117,10 @@ module.exports = {
 
   dev: process.env.NODE_ENV !== 'production',
 
-  buildModules: ['@nuxtjs/vuetify'],
+  buildModules: [
+    '@nuxtjs/vuetify',
+    ['@nuxtjs/google-analytics', { id: 'UA-109730826-1' }],
+  ],
 
   vuetify: {
     optionsPath: './assets/style/vuetify.js',
@@ -134,27 +137,27 @@ module.exports = {
    */
   build: {
     babel: {
-      plugins: [
-        ['@babel/plugin-proposal-decorators', { legacy: true }],
-        ['@babel/plugin-proposal-class-properties', { loose: true }],
-      ],
+      presets({ isServer }) {
+        return [
+          ['@nuxt/babel-preset-app', { loose: true, corejs: { version: 3 } }],
+        ]
+      },
     },
     transpile: ['vuetify/lib'],
 
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {
+    extend(config, { isDev, isClient }) {
+      config.node = { fs: 'empty' }
       // Run ESLint on save
-      if (ctx.isDev && ctx.isClient) {
-        config.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules)/,
-        })
-      }
-      if (ctx.isClient) {
+      config.module.rules.push({
+        enforce: 'pre',
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        exclude: /(node_modules)/,
+      })
+      if (isClient) {
         config.devtool = 'source-map'
       }
     },

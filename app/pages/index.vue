@@ -4,17 +4,14 @@
       <v-card>
         <v-responsive :aspect-ratio="16 / 9">
           <v-card-title>
-            <v-icon left>
-              fas fa-database
-            </v-icon>
-            <span class="headline">
-              Datasets
-            </span>
+            <v-icon left> fas fa-database </v-icon>
+            <span class="headline"> Datasets </span>
           </v-card-title>
           <v-card-text class="title text--primary">
-            Welcome to the SKOPE Application! To obtain data, click on a dataset
-            name, pan &amp; zoom the map, define your area of interest, and
-            select a variable layer.
+            Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
+            application! To examine data, click on a dataset name, pan &amp;
+            zoom the map, define your area of interest, then select a variable
+            layer.
           </v-card-text>
           <v-list>
             <template v-for="(dataset, index) in datasets" router exact>
@@ -38,7 +35,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Dataset from '@/components/Dataset.vue'
-import Component from 'nuxt-class-component'
+import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
 
 @Component({

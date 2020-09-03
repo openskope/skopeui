@@ -9,7 +9,7 @@
               :zoom="selectedDataset.region.zoom"
               :center="selectedDataset.region.center"
               :draw-control="true"
-              style="z-index: 2;"
+              style="z-index: 2"
             >
               <l-control-scale />
               <l-control-layers position="topright" />
@@ -69,7 +69,7 @@
             <input
               id="loadGeoJsonFile"
               type="file"
-              style="display: none;"
+              style="display: none"
               @change="loadGeoJson"
             />
             <v-btn icon @click="selectGeoJsonFile">
@@ -133,7 +133,7 @@
                       hide-details
                       single-line
                       type="number"
-                      style="width: 60px;"
+                      style="width: 60px"
                       @input="validateMinYear"
                     ></v-text-field>
                   </template>
@@ -147,7 +147,7 @@
                       hide-details
                       single-line
                       type="number"
-                      style="width: 60px;"
+                      style="width: 60px"
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
@@ -191,9 +191,7 @@
                 the map.
               </v-alert>
             </v-card-actions>
-            <v-subheader class="title py-0">
-              Variables
-            </v-subheader>
+            <v-subheader class="title py-0"> Variables </v-subheader>
             <v-list three-line dense light class="py-0">
               <v-list-item
                 v-for="(variable, index) in selectedDataset.variables"
@@ -215,9 +213,7 @@
             </v-list>
             <v-card-text class="pt-0">
               <div class="citation font-weight-bold">
-                <em>
-                  Source:
-                </em>
+                <em> Source: </em>
                 <a target="_blank" :href="selectedDataset.sourceUrl">
                   {{ selectedDataset.sourceUrl }}
                   <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
@@ -258,7 +254,7 @@ import {
   SKOPE_WMS_ENDPOINT,
   BaseMapProvider,
 } from '@/store/constants.js'
-import Component from 'nuxt-class-component'
+import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
 import { clamp } from 'lodash'
 import circleToPolygon from 'circle-to-polygon'
