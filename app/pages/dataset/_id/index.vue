@@ -247,19 +247,20 @@
 </template>
 
 <script>
-import VueMarkdown from 'vue-markdown'
+import circleToPolygon from 'circle-to-polygon'
+import { clamp } from 'lodash'
+import { Component } from 'nuxt-property-decorator'
 import { stringify } from 'query-string'
+import Vue from 'vue'
+import VueMarkdown from 'vue-markdown'
+import { namespace } from 'vuex-class'
+
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
   BaseMapProvider,
 } from '@/store/constants.js'
-import { Component } from 'nuxt-property-decorator'
-import { namespace } from 'vuex-class'
-import { clamp } from 'lodash'
-import circleToPolygon from 'circle-to-polygon'
 import TimeSeries from '@/components/TimeSeries.vue'
-import Vue from 'vue'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -752,5 +753,9 @@ export default DatasetDetail
   height: 100%;
   position: relative;
   z-index: 1;
+}
+
+ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {
+  display: none;
 }
 </style>

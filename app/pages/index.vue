@@ -33,10 +33,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Dataset from '@/components/Dataset.vue'
 import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
+import { mapGetters } from 'vuex'
+import Dataset from '@/components/Dataset.vue'
 
 @Component({
   layout: 'default',
