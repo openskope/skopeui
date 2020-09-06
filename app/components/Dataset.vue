@@ -33,7 +33,7 @@
             {{ spatialCoverage }} | {{ temporalCoverage }}
           </v-subheader>
           <v-card-text class="body">
-            <vue-markdown :source="description" />
+            <div v-html="$md.render(description)"></div>
           </v-card-text>
           <!-- FIXME: extract this to a component and reuse across the detail page -->
           <v-list dense light>
@@ -72,7 +72,6 @@
 
 <script>
 import Vue from 'vue'
-import VueMarkdown from 'vue-markdown'
 import { Component } from 'nuxt-property-decorator'
 import { BaseMapProvider } from '~/store/constants.js'
 
@@ -88,7 +87,6 @@ import { BaseMapProvider } from '~/store/constants.js'
     id: String,
     sourceUrl: String,
   },
-  components: { VueMarkdown },
   // app specific functions
   computed: {
     defaultCrs() {

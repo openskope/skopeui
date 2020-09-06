@@ -169,7 +169,9 @@
               {{ spatialCoverage }} | {{ temporalCoverage }}
             </v-subheader>
             <v-card-text class="body">
-              <vue-markdown :source="selectedDataset.description" />
+              <template lang="md">
+                {{ selectedDataset.description }}
+              </template>
             </v-card-text>
             <v-card-actions>
               <TimeSeries
@@ -233,7 +235,7 @@
                       class="py-0"
                     >
                       <span class="font-weight-bold"> {{ label }}: </span>
-                      <vue-markdown>{{ selectedDataset[attr] }}</vue-markdown>
+                      <div v-html="$md.render(selectedDataset[attr])"></div>
                     </div>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -252,7 +254,6 @@ import { clamp } from 'lodash'
 import { Component } from 'nuxt-property-decorator'
 import { stringify } from 'query-string'
 import Vue from 'vue'
-import VueMarkdown from 'vue-markdown'
 import { namespace } from 'vuex-class'
 
 import {
@@ -269,7 +270,6 @@ const Datasets = namespace('datasets')
   layout: 'dataset',
   components: {
     TimeSeries,
-    VueMarkdown,
   },
 })
 class DatasetDetail extends Vue {

@@ -62,6 +62,8 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    // https://www.npmjs.com/package/@nuxtjs/markdownit
+    '@nuxtjs/markdownit',
     [
       'vue-warehouse/nuxt',
       {
@@ -74,6 +76,15 @@ module.exports = {
       },
     ],
   ],
+  // [optional] markdownit options
+  // See https://github.com/markdown-it/markdown-it
+  markdownit: {
+    injected: true,
+    preset: 'default',
+    linkify: true,
+    breaks: true,
+    use: ['markdown-it-div', 'markdown-it-attrs'],
+  },
   /*
    ** Axios module configuration
    */
