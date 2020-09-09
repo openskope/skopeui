@@ -1,6 +1,9 @@
 version: '3.8'
 services:
   web:
+    volumes:
+      - ./app:/code
+      - /code/node_modules
     ports:
       - "127.0.0.1:3000:3000"
     command: >-

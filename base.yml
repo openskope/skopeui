@@ -4,8 +4,5 @@ services:
     build: app
     restart: always
     image: comses/skopeui/dev:latest
-    volumes:
-      - ./app:/code
-      - /code/node_modules
     env_file:
       - secrets/oauth.env
