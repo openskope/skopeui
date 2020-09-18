@@ -126,6 +126,7 @@ export const mutations = {
   },
 }
 
+// FIXME: create a clear schema with types for Datasets
 const ALL_DATA = [
   {
     id: 'lbda',
@@ -263,7 +264,6 @@ const ALL_DATA = [
         [31, -102],
       ],
     },
-
     timespan: {
       resolution: 'year',
       resolutionLabel: 'annually',
@@ -274,7 +274,6 @@ const ALL_DATA = [
         suffix: 'CE',
       },
     },
-
     variables: [
       {
         id: 'paleocar_temperature',

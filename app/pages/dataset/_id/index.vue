@@ -12,7 +12,7 @@
               style="z-index: 2"
             >
               <l-control-scale />
-              <l-control-layers sort-layers="false" position="topright" />
+              <l-control-layers :sort-layers="false" position="topright" />
               <l-tile-layer
                 v-for="provider of leafletProviders"
                 :key="provider.name"
@@ -29,7 +29,7 @@
                 :style="selectedDataset.region.style"
                 :fill-opacity="defaultRegionOpacity"
               />
-              <l-control-layers sort-layers="false" position="bottomright" />
+              <l-control-layers :sort-layers="false" position="bottomright" />
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
@@ -58,8 +58,9 @@
               </span>
               <span v-else class="subtitle-2">
                 <v-icon>fas fa-info-circle</v-icon>
-                Please select a variable using the layers control at the top
-                right of the map.</span
+                Please select a variable using the layer control
+                <v-icon>fas fa-layer-group</v-icon> at the bottom right of the
+                map.</span
               >
             </v-toolbar-title>
             <v-btn icon @click="exportSelectedArea">
@@ -101,7 +102,7 @@
                 <v-slider
                   v-model="opacity"
                   dense
-                  label="Variable Layer Opacity"
+                  :label="opacityLabel"
                   min="0"
                   max="100"
                   step="1"
@@ -303,6 +304,10 @@ class DatasetDetail extends Vue {
     return this.isLayerSelected ? this.selectedLayer.name : ''
   }
 
+  get opacityLabel() {
+    return `${this.selectedLayerName} Opacity`
+  }
+
   get layerOpacity() {
     return this.opacity / 100.0
   }
@@ -406,6 +411,7 @@ class DatasetDetail extends Vue {
           )
           this.selectedLayer = variable
           this.updateWmsLegend(map, layer.wmsParams.layers)
+          layer.bringToFront()
         }
       }
       if (this.selectedDataset.variables.length === 1) {
