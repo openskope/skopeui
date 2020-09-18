@@ -12,7 +12,7 @@
               style="z-index: 2"
             >
               <l-control-scale />
-              <l-control-layers position="topright" />
+              <l-control-layers sort-layers="false" position="topright" />
               <l-tile-layer
                 v-for="provider of leafletProviders"
                 :key="provider.name"
@@ -29,6 +29,7 @@
                 :style="selectedDataset.region.style"
                 :fill-opacity="defaultRegionOpacity"
               />
+              <l-control-layers sort-layers="false" position="bottomright" />
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
@@ -39,7 +40,7 @@
                 :crs="defaultCrs"
                 :transparent="true"
                 :opacity="layerOpacity"
-                layer-type="overlay"
+                layer-type="base"
                 :attribution="variable.name"
                 :visible="variable.visible"
                 version="1.3.0"
@@ -188,9 +189,9 @@
                 display a time series for the given date range.
                 <b>Select a study</b>
                 area with the toolbar on the left side of the map and
-                <b>select a variable</b> using the layer control
-                <v-icon>fas fa-layer-group</v-icon> at the top right corner of
-                the map.
+                <b>select a variable</b> using the layer controls
+                <v-icon>fas fa-layer-group</v-icon> at the top and bottom right
+                corners of the map.
               </v-alert>
             </v-card-actions>
             <v-subheader class="title py-0"> Variables </v-subheader>
