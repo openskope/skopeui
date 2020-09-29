@@ -4,8 +4,8 @@
       <Plotly
         v-if="requestMessage.length === 0"
         ref="plot"
-        :data="traces"
-        :layout="metadata"
+        :data="timeseriesData"
+        :layout="layoutMetadata"
         :options="options"
       ></Plotly>
       <v-alert v-else type="error">{{ requestMessage }}</v-alert>
@@ -23,7 +23,8 @@ import { Prop, Watch } from 'vue-property-decorator'
 import { TIMESERIES_ENDPOINT } from '@/store/constants'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
-const Plotly = () => import('@statnett/vue-plotly')
+import { Plotly } from 'vue-plotly'
+// const Plotly = () => import('@statnett/vue-plotly')
 const { Parser } = require('json2csv')
 
 // Would need to make a custom debounce decorator so
@@ -186,11 +187,11 @@ class TimeSeries extends Vue {
       .then((content) => saveAs(content, `${_.kebabCase(this.datasetUri)}.zip`))
   }
 
-  get traces() {
+  get timeseriesData() {
     return [this.timeseries]
   }
 
-  get metadata() {
+  get layoutMetadata() {
     return {
       xaxis: {
         title: 'Year',

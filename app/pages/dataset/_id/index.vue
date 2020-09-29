@@ -51,18 +51,6 @@
         </div>
         <v-sheet inset height="100%" class="mx-2">
           <v-toolbar color="indigo" dark>
-            <v-toolbar-title>
-              <span v-if="isLayerSelected" class="title">
-                <v-icon>view_column</v-icon>
-                {{ selectedLayerName }}
-              </span>
-              <span v-else class="subtitle-2">
-                <v-icon>fas fa-info-circle</v-icon>
-                Please select a variable using the layer control
-                <v-icon>fas fa-layer-group</v-icon> at the bottom right of the
-                map.</span
-              >
-            </v-toolbar-title>
             <v-btn icon @click="exportSelectedArea">
               <a id="exportSelectedArea">
                 <v-icon>fas fa-download</v-icon>
@@ -162,6 +150,29 @@
       <v-col xs12 md5>
         <div class="px-2">
           <v-card>
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header disable-icon-rotate>
+                  <h3 class="blue--text">View Time Series</h3>
+                  <template v-slot:actions>
+                    <v-icon color="primary">info</v-icon>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-alert border="left" color="blue lighten-3" prominent>
+                    Please select a
+                    <b>study area</b> and <b>variable of interest</b> to display
+                    a time series for the given date range. You can
+                    <b>select a study area</b>
+                    with the toolbar on the left side of the map and
+                    <b>select a variable</b> using the layer controls
+                    <v-icon>fas fa-layer-group</v-icon> at the top and bottom
+                    right corners of the map.
+                  </v-alert>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
             <v-card-title class="pb-0">
               <h2 class="headline">
                 {{ selectedDataset.title }}
@@ -175,9 +186,10 @@
                 {{ selectedDataset.description }}
               </template>
             </v-card-text>
-            <v-card-actions>
-              <TimeSeries
-                v-if="isLayerSelected && selectedArea.coordinates.length > 0"
+            <v-card-actions
+              v-if="isLayerSelected && selectedArea.coordinates.length > 0"
+            >
+              <time-series
                 :dataset-uri="selectedLayer.timeseriesServiceUri"
                 :time-zero="selectedDatasetTimeZero"
                 :geometry="selectedArea"
@@ -185,17 +197,8 @@
                 :min-year="minTemporalRange"
                 :max-year="maxTemporalRange"
               />
-              <v-alert v-else :value="true" type="info">
-                Please select a <b>study area and variable of interest</b> to
-                display a time series for the given date range.
-                <b>Select a study</b>
-                area with the toolbar on the left side of the map and
-                <b>select a variable</b> using the layer controls
-                <v-icon>fas fa-layer-group</v-icon> at the top and bottom right
-                corners of the map.
-              </v-alert>
             </v-card-actions>
-            <v-subheader class="title py-0"> Variables </v-subheader>
+            <v-subheader class="title">Variables</v-subheader>
             <v-list three-line dense light class="py-0">
               <v-list-item
                 v-for="(variable, index) in selectedDataset.variables"
@@ -263,7 +266,6 @@ import {
   SKOPE_WMS_ENDPOINT,
   BaseMapProvider,
 } from '@/store/constants.js'
-import TimeSeries from '@/components/TimeSeries.vue'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -271,7 +273,9 @@ const Datasets = namespace('datasets')
 @Component({
   layout: 'dataset',
   components: {
-    TimeSeries,
+    // load time series plotly component lazily to avoid document is not defined errors
+    // https://stackoverflow.com/a/50458090
+    'time-series': () => import('@/components/TimeSeries.vue'),
   },
 })
 class DatasetDetail extends Vue {
