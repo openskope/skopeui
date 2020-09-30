@@ -11,7 +11,8 @@
               :draw-control="true"
               style="z-index: 2"
             >
-              <l-control-scale />
+              <l-control-scale position="bottomright" />
+              <l-control-attribution position="topright" />
               <l-control-layers :sort-layers="false" position="topright" />
               <l-tile-layer
                 v-for="provider of leafletProviders"
@@ -29,7 +30,7 @@
                 :style="selectedDataset.region.style"
                 :fill-opacity="defaultRegionOpacity"
               />
-              <l-control-layers :sort-layers="false" position="bottomright" />
+              <l-control-layers :sort-layers="false" position="topright" />
               <l-wms-tile-layer
                 v-for="variable of selectedDataset.variables"
                 ref="wmsLayers"
@@ -88,19 +89,6 @@
             <v-row dense>
               <v-col>
                 <v-slider
-                  v-model="opacity"
-                  dense
-                  :label="opacityLabel"
-                  min="0"
-                  max="100"
-                  step="1"
-                >
-                </v-slider>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col>
-                <v-slider
                   dense
                   :value="year"
                   :max="maxTemporalRange"
@@ -141,6 +129,19 @@
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
+                </v-slider>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col>
+                <v-slider
+                  v-model="opacity"
+                  dense
+                  :label="opacityLabel"
+                  min="0"
+                  max="100"
+                  step="1"
+                >
                 </v-slider>
               </v-col>
             </v-row>
@@ -740,17 +741,19 @@ export default DatasetDetail
 </script>
 <style>
 .leaflet-top.leaflet-right
-  .leaflet-control-layers
+  .leaflet-control-layers:nth-child(2)
   .leaflet-control-layers-toggle {
   background-image: url(/earth.svg);
 }
+
 #exportSelectedArea {
   text-decoration: none;
   color: inherit;
 }
 
 #map-flex {
-  height: 550px;
+  height: 500px;
+  margin-bottom: 2rem;
 }
 
 @media all and (max-width: 960px) {
