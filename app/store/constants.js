@@ -6,22 +6,6 @@ export const SKOPE_WMS_ENDPOINT = `${DEPLOY_HOST_URL}${WMS_SERVER_URI}`
 export const TIMESERIES_ENDPOINT = `${DEPLOY_HOST_URL}${TIMESERIES_SERVICE_URI}`
 export const LEAFLET_PROVIDERS = [
   {
-    name: 'Esri.WorldTopoMap',
-    url:
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri et al',
-    visible: true,
-  },
-  {
-    name: 'Esri.WorldTerrain',
-    url:
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 13,
-    visible: false,
-    attribution:
-      'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS',
-  },
-  {
     name: 'CartoDB.Positron',
     url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
     maxZoom: 19,
@@ -39,6 +23,22 @@ export const LEAFLET_PROVIDERS = [
     visible: false,
     attribution:
       'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>',
+  },
+  {
+    name: 'Esri.WorldTerrain',
+    url:
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 13,
+    visible: false,
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS',
+  },
+  {
+    name: 'Esri.WorldTopoMap',
+    url:
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri et al',
+    visible: true,
   },
 ]
 
