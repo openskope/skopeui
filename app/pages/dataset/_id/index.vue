@@ -153,7 +153,7 @@
             <v-expansion-panels>
               <v-expansion-panel>
                 <v-expansion-panel-header disable-icon-rotate>
-                  <h3 class="blue--text">View Time Series</h3>
+                  <h3 class="blue--text">Time Series (click for more info)</h3>
                   <template v-slot:actions>
                     <v-icon color="primary">info</v-icon>
                   </template>
@@ -739,6 +739,11 @@ class DatasetDetail extends Vue {
 export default DatasetDetail
 </script>
 <style>
+.leaflet-top.leaflet-right
+  .leaflet-control-layers
+  .leaflet-control-layers-toggle {
+  background-image: url(/earth.svg);
+}
 #exportSelectedArea {
   text-decoration: none;
   color: inherit;
