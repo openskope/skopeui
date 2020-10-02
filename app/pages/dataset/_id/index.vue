@@ -8,10 +8,7 @@
               ref="layerMap"
               :zoom="selectedDataset.region.zoom"
               :center="selectedDataset.region.center"
-              :draw-control="true"
-              style="z-index: 2"
             >
-              <l-control-scale position="bottomright" />
               <l-control-attribution position="topright" />
               <l-control-layers :sort-layers="false" position="topright" />
               <l-tile-layer
@@ -47,13 +44,14 @@
                 version="1.3.0"
                 format="image/png"
               />
+              <l-control-scale position="bottomright" />
             </l-map>
           </client-only>
         </div>
         <v-sheet inset height="100%" class="mx-2">
           <v-toolbar color="indigo" dark>
-            <v-btn icon @click="exportSelectedArea">
-              <a id="exportSelectedArea">
+            <v-btn icon @click="exportSelectedGeometry">
+              <a id="exportSelectedGeometry">
                 <v-icon>fas fa-download</v-icon>
               </a>
             </v-btn>
@@ -66,6 +64,9 @@
             <v-btn icon @click="selectGeoJsonFile">
               <v-icon>fas fa-upload</v-icon>
             </v-btn>
+            <template v-if="selectedArea > 0">
+              Selected area: {{ selectedArea }} km<sup>2</sup>
+            </template>
             <v-spacer></v-spacer>
             <v-btn icon @click="gotoFirstYear">
               <v-icon>skip_previous</v-icon>
@@ -188,12 +189,12 @@
               </template>
             </v-card-text>
             <v-card-actions
-              v-if="isLayerSelected && selectedArea.coordinates.length > 0"
+              v-if="isLayerSelected && selectedGeometry.coordinates.length > 0"
             >
               <time-series
                 :dataset-uri="selectedLayer.timeseriesServiceUri"
                 :time-zero="selectedDatasetTimeZero"
-                :geometry="selectedArea"
+                :geometry="selectedGeometry"
                 :variable-name="selectedLayerName"
                 :min-year="minTemporalRange"
                 :max-year="maxTemporalRange"
@@ -207,7 +208,7 @@
               >
                 <v-list-item-content>
                   <v-list-item-title>
-                    <v-chip label small color="indigo" text-color="white">
+                    <v-chip small color="info" text-color="white">
                       <v-icon>view_column</v-icon>
                       {{ variable.class }}
                     </v-chip>
@@ -280,8 +281,6 @@ const Datasets = namespace('datasets')
   },
 })
 class DatasetDetail extends Vue {
-  length = 3
-  onboarding = 0
   minTemporalRange = 0
   maxTemporalRange = new Date().getFullYear()
   selectedLayer = null
@@ -296,7 +295,10 @@ class DatasetDetail extends Vue {
   showDetails = false
   animationSpeed = 2000
   defaultCircleToPolygonEdges = 32
-  selectedArea = { type: 'None', coordinates: [] }
+  selectedGeometry = { type: 'None', coordinates: [] }
+  selectedAreaInSquareMeters = 0.0
+  warehouseGeometryKey = 'skope-geometry'
+  warehouseTemporalKey = 'skope-temporal-range'
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -304,6 +306,47 @@ class DatasetDetail extends Vue {
   selectedDatasetTimespan
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
+
+  created() {
+    this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
+    this.minTemporalRange = this.timespanMinYear
+    this.maxTemporalRange = this.timespanMaxYear
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      const map = this.$refs.layerMap.mapObject
+      const handler = (event) => {
+        const layer = event.layer
+        const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
+        if (isSkopeLayer) {
+          const variable = _.find(
+            this.selectedDataset.variables,
+            (v) => v.name === event.name
+          )
+          this.selectedLayer = variable
+          this.updateWmsLegend(map, layer.wmsParams.layers)
+          layer.bringToFront()
+        }
+      }
+      if (this.selectedDataset.variables.length === 1) {
+        let defaultVariable = this.selectedDataset.variables[0]
+        this.$store.dispatch('datasets/selectVariable', defaultVariable.id)
+        this.selectedLayer = defaultVariable
+      }
+      map.on('overlayadd', handler)
+      map.on('baselayerchange', handler)
+      this.addDrawToolbar(map)
+    })
+  }
+
+  get selectedArea() {
+    if (this.selectedAreaInSquareMeters > 0) {
+      return Number.parseFloat(
+        this.selectedAreaInSquareMeters / 1000000.0
+      ).toFixed(2)
+    }
+  }
 
   get selectedLayerName() {
     return this.isLayerSelected ? this.selectedLayer.name : ''
@@ -397,39 +440,6 @@ class DatasetDetail extends Vue {
     }
   }
 
-  created() {
-    this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
-    this.minTemporalRange = this.timespanMinYear
-    this.maxTemporalRange = this.timespanMaxYear
-  }
-
-  mounted() {
-    this.$nextTick(() => {
-      const map = this.$refs.layerMap.mapObject
-      const handler = (event) => {
-        const layer = event.layer
-        const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
-        if (isSkopeLayer) {
-          const variable = _.find(
-            this.selectedDataset.variables,
-            (v) => v.name === event.name
-          )
-          this.selectedLayer = variable
-          this.updateWmsLegend(map, layer.wmsParams.layers)
-          layer.bringToFront()
-        }
-      }
-      if (this.selectedDataset.variables.length === 1) {
-        let defaultVariable = this.selectedDataset.variables[0]
-        this.$store.dispatch('datasets/selectVariable', defaultVariable.id)
-        this.selectedLayer = defaultVariable
-      }
-      map.on('overlayadd', handler)
-      map.on('baselayerchange', handler)
-      this.addDrawToolbar(map)
-    })
-  }
-
   head() {
     return {
       title: this.selectedDataset.title,
@@ -468,14 +478,6 @@ class DatasetDetail extends Vue {
     this.updateYear(this.maxTemporalRange)
   }
 
-  next() {
-    this.onboarding = (this.onboarding + 1) % this.length
-  }
-
-  prev() {
-    this.onboarding = (this.onboarding - 1 + this.length) % this.length
-  }
-
   setLegendImage(htmlElement) {
     this.legendImage = htmlElement
   }
@@ -487,7 +489,7 @@ class DatasetDetail extends Vue {
       console.log(text)
       try {
         let area = JSON.parse(text)
-        this.restoreSelectedArea(area)
+        this.restoreSelectedGeometry(area)
       } catch (error) {
         console.error(error)
         alert("Sorry! We couldn't re-import this file: " + text)
@@ -499,25 +501,25 @@ class DatasetDetail extends Vue {
     document.getElementById('loadGeoJsonFile').click()
   }
 
-  exportSelectedArea(event) {
-    const selectedArea = this.getSelectedArea()
-    if (selectedArea) {
+  exportSelectedGeometry(event) {
+    const geometry = this.getSelectedGeometry()
+    if (geometry) {
       const convertedArea =
         'text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(selectedArea))
-      const button = document.getElementById('exportSelectedArea')
+        encodeURIComponent(JSON.stringify(geometry))
+      const button = document.getElementById('exportSelectedGeometry')
       button.setAttribute('href', 'data:' + convertedArea)
-      button.setAttribute('download', 'skope-area.geojson')
+      button.setAttribute('download', `${this.warehouseGeometryKey}.geojson`)
     }
   }
 
-  updateSelectedArea(layer) {
+  updateSelectedGeometry(layer) {
     const data = layer.toGeoJSON()
     // store geoJSON in local storage
     if (layer instanceof L.Circle) {
       data.properties.radius = layer.getRadius()
     }
-    this.saveSelectedArea(data)
+    this.saveSelectedGeometry(data)
     if (layer instanceof L.Circle) {
       const geometry = circleToPolygon(
         data.geometry.coordinates,
@@ -528,23 +530,29 @@ class DatasetDetail extends Vue {
       console.log(geometry)
       data.geometry = geometry
     }
-    this.selectedArea = data.geometry
+    console.log(layer.getLatLngs())
+    this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
+      layer.getLatLngs()[0]
+    )
+    console.log(this.selectedAreaInSquareMeters)
+    this.selectedGeometry = data.geometry
   }
 
-  clearSelectedArea() {
-    this.selectedArea = { type: 'None', coordinates: [] }
-    this.$warehouse.remove('skope.area')
+  clearSelectedGeometry() {
+    this.selectedGeometry = { type: 'None', coordinates: [] }
+    this.selectedAreaInSquareMeters = 0.0
+    this.$warehouse.remove(this.warehouseGeometryKey)
   }
 
-  saveSelectedArea(geoJson) {
-    this.$warehouse.set('skope.area', JSON.stringify(geoJson))
+  saveSelectedGeometry(geoJson) {
+    this.$warehouse.set(this.warehouseGeometryKey, JSON.stringify(geoJson))
   }
 
-  restoreSelectedArea(savedArea, map) {
+  restoreSelectedGeometry(savedGeometry, map) {
     if (!map) {
       map = this.$refs.layerMap.mapObject
     }
-    const geoJsonLayer = L.geoJson(savedArea, {
+    const geoJsonLayer = L.geoJson(savedGeometry, {
       pointToLayer: (feature, latlng) => {
         if (feature.properties.radius) {
           return new L.Circle(latlng, feature.properties.radius)
@@ -557,16 +565,16 @@ class DatasetDetail extends Vue {
     this.drawnItems.clearLayers()
     geoJsonLayer.eachLayer((l) => {
       this.drawnItems.addLayer(l)
-      this.updateSelectedArea(l)
+      this.updateSelectedGeometry(l)
     })
     this.enableEditOnly(map)
     map.fitBounds(this.drawnItems.getBounds(), { padding: [5, 5] })
   }
 
-  getSelectedArea() {
-    const skopeArea = this.$warehouse.get('skope.area')
-    if (skopeArea) {
-      return JSON.parse(skopeArea)
+  getSelectedGeometry() {
+    const skopeGeometry = this.$warehouse.get(this.warehouseGeometryKey)
+    if (skopeGeometry) {
+      return JSON.parse(skopeGeometry)
     }
     return false
   }
@@ -620,20 +628,20 @@ class DatasetDetail extends Vue {
     const self = this
     map.addControl(this.drawControlFull)
     // check for a persisted area
-    const savedArea = this.getSelectedArea()
-    if (savedArea) {
-      this.restoreSelectedArea(savedArea, map)
+    const savedGeometry = this.getSelectedGeometry()
+    if (savedGeometry) {
+      this.restoreSelectedGeometry(savedGeometry, map)
     }
-    map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedArea(e.layer))
-    map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedArea(e.poly))
+    map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedGeometry(e.layer))
+    map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
     map.on(L.Draw.Event.CREATED, (event) => {
       const layer = event.layer
-      self.updateSelectedArea(layer)
+      self.updateSelectedGeometry(layer)
       self.drawnItems.addLayer(layer)
       self.enableEditOnly(map)
     })
     map.on(L.Draw.Event.DELETED, (event) => {
-      self.clearSelectedArea()
+      self.clearSelectedGeometry()
       if (self.drawnItems.getLayers().length === 0) {
         self.disableEditOnly(map)
       }
@@ -746,7 +754,7 @@ export default DatasetDetail
   background-image: url(/earth.svg);
 }
 
-#exportSelectedArea {
+#exportSelectedGeometry {
   text-decoration: none;
   color: inherit;
 }
