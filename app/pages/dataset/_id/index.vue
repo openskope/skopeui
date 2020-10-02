@@ -48,22 +48,37 @@
             </l-map>
           </client-only>
         </div>
-        <v-sheet inset height="100%" class="mx-2">
-          <v-toolbar color="indigo" dark>
-            <v-btn icon @click="exportSelectedGeometry">
-              <a id="exportSelectedGeometry">
-                <v-icon>fas fa-download</v-icon>
-              </a>
-            </v-btn>
+        <v-sheet inset class="mx-2">
+          <v-toolbar color="indigo" dark dense>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  icon
+                  v-on="on"
+                  @click="exportSelectedGeometry"
+                >
+                  <a id="exportSelectedGeometry">
+                    <v-icon>fas fa-download</v-icon>
+                  </a>
+                </v-btn>
+              </template>
+              <span>Download selected geometry as a GeoJSON file</span>
+            </v-tooltip>
             <input
               id="loadGeoJsonFile"
               type="file"
               style="display: none"
               @change="loadGeoJson"
             />
-            <v-btn icon @click="selectGeoJsonFile">
-              <v-icon>fas fa-upload</v-icon>
-            </v-btn>
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
+                  <v-icon>fas fa-upload</v-icon>
+                </v-btn>
+              </template>
+              <span>Upload a GeoJSON file</span>
+            </v-tooltip>
             <template v-if="selectedArea > 0">
               Selected area: {{ selectedArea }} km<sup>2</sup>
             </template>
@@ -89,13 +104,15 @@
           <v-container height="100%">
             <v-row dense>
               <v-col>
+                <b>Temporal Range (Start Year | Current Year | End Year)</b>
+              </v-col>
+              <v-col>
                 <v-slider
                   dense
                   :value="year"
                   :max="maxTemporalRange"
                   :min="minTemporalRange"
                   :thumb-size="36"
-                  hint="Temporal Range (Start Year | Current Year | End Year)"
                   persistent-hint
                   thumb-label="always"
                   class="px-3 pt-2"
@@ -260,8 +277,8 @@ import circleToPolygon from 'circle-to-polygon'
 import { clamp } from 'lodash'
 import { Component } from 'nuxt-property-decorator'
 import { stringify } from 'query-string'
-import Vue from 'vue'
 import { namespace } from 'vuex-class'
+import Vue from 'vue'
 
 import {
   LEAFLET_PROVIDERS,
@@ -297,8 +314,9 @@ class DatasetDetail extends Vue {
   defaultCircleToPolygonEdges = 32
   selectedGeometry = { type: 'None', coordinates: [] }
   selectedAreaInSquareMeters = 0.0
-  warehouseGeometryKey = 'skope-geometry'
-  warehouseTemporalKey = 'skope-temporal-range'
+  wGeometryKey = 'skope:geometry'
+  wMinTemporalRangeKey = 'skope:temporal-range-min'
+  wMaxTemporalRangeKey = 'skope:temporal-range-max'
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -502,14 +520,14 @@ class DatasetDetail extends Vue {
   }
 
   exportSelectedGeometry(event) {
-    const geometry = this.getSelectedGeometry()
+    const geometry = this.getSavedGeometry()
     if (geometry) {
       const convertedArea =
         'text/json;charset=utf-8,' +
         encodeURIComponent(JSON.stringify(geometry))
       const button = document.getElementById('exportSelectedGeometry')
       button.setAttribute('href', 'data:' + convertedArea)
-      button.setAttribute('download', `${this.warehouseGeometryKey}.geojson`)
+      button.setAttribute('download', `${this.wGeometryKey}.geojson`)
     }
   }
 
@@ -529,11 +547,12 @@ class DatasetDetail extends Vue {
       console.log('converting circle to polygon: ')
       console.log(geometry)
       data.geometry = geometry
+      this.selectedAreaInSquareMeters = layer.getRadius() * Math.PI * Math.PI
+    } else {
+      this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
+        layer.getLatLngs()[0]
+      )
     }
-    console.log(layer.getLatLngs())
-    this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
-      layer.getLatLngs()[0]
-    )
     console.log(this.selectedAreaInSquareMeters)
     this.selectedGeometry = data.geometry
   }
@@ -541,14 +560,50 @@ class DatasetDetail extends Vue {
   clearSelectedGeometry() {
     this.selectedGeometry = { type: 'None', coordinates: [] }
     this.selectedAreaInSquareMeters = 0.0
-    this.$warehouse.remove(this.warehouseGeometryKey)
+    this.$warehouse.remove(this.wGeometryKey)
   }
 
   saveSelectedGeometry(geoJson) {
-    this.$warehouse.set(this.warehouseGeometryKey, JSON.stringify(geoJson))
+    this.$warehouse.set(this.wGeometryKey, JSON.stringify(geoJson))
+  }
+
+  saveTemporalRange() {
+    this.$warehouse.set(
+      this.wMinTemporalRangeKey,
+      JSON.stringify(this.minTemporalRange)
+    )
+    this.$warehouse.set(
+      this.wMaxTemporalRangeKey,
+      JSON.stringify(this.maxTemporalRange)
+    )
+  }
+
+  getSavedTemporalRange() {
+    const minTemporalRange = this.$warehouse.get(this.wMinTemporalRangeKey)
+    const maxTemporalRange = this.$warehouse.get(this.wMaxTemporalRangeKey)
+    if (minTemporalRange || maxTemporalRange) {
+      return [minTemporalRange, maxTemporalRange]
+    }
+    return []
+  }
+
+  checkAndRestoreSavedTemporalRange() {
+    const savedTemporalRange = this.getSavedTemporalRange()
+    if (savedTemporalRange) {
+      this.minTemporalRange ||= savedTemporalRange[0]
+      this.maxTemporalRange ||= savedTemporalRange[1]
+    }
+  }
+
+  checkAndRestoreSavedGeometry(map) {
+    const savedGeometry = this.getSavedGeometry()
+    if (savedGeometry) {
+      this.restoreSelectedGeometry(savedGeometry, map)
+    }
   }
 
   restoreSelectedGeometry(savedGeometry, map) {
+    const L = this.$L
     if (!map) {
       map = this.$refs.layerMap.mapObject
     }
@@ -571,7 +626,7 @@ class DatasetDetail extends Vue {
     map.fitBounds(this.drawnItems.getBounds(), { padding: [5, 5] })
   }
 
-  getSelectedGeometry() {
+  getSavedGeometry() {
     const skopeGeometry = this.$warehouse.get(this.warehouseGeometryKey)
     if (skopeGeometry) {
       return JSON.parse(skopeGeometry)
@@ -627,11 +682,10 @@ class DatasetDetail extends Vue {
     editControlButtons.removeDisabled = 'No spatial selection to remove'
     const self = this
     map.addControl(this.drawControlFull)
-    // check for a persisted area
-    const savedGeometry = this.getSelectedGeometry()
-    if (savedGeometry) {
-      this.restoreSelectedGeometry(savedGeometry, map)
-    }
+    // check for persisted geometry
+    this.checkAndRestoreSavedGeometry(map)
+    // check for persisted temporal range
+    this.checkAndRestoreSavedTemporalRange()
     map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedGeometry(e.layer))
     map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
     map.on(L.Draw.Event.CREATED, (event) => {
@@ -711,6 +765,7 @@ class DatasetDetail extends Vue {
     this.updateYear(
       clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
     )
+    this.saveTemporalRange()
   }
 
   validateMaxYear() {
@@ -722,6 +777,7 @@ class DatasetDetail extends Vue {
     this.updateYear(
       clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
     )
+    this.saveTemporalRange()
   }
 
   updateWmsLayer() {
