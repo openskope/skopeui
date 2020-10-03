@@ -103,19 +103,26 @@
           </v-toolbar>
           <v-container height="100%">
             <v-row dense>
-              <v-col>
-                <b>Temporal Range (Start Year | Current Year | End Year)</b>
+              <v-col cols="6">
+                <v-slider
+                  v-model="opacity"
+                  dense
+                  :label="opacityLabel"
+                  min="0"
+                  max="100"
+                  step="1"
+                />
               </v-col>
-              <v-col>
+              <v-col cols="6">
                 <v-slider
                   dense
                   :value="year"
                   :max="maxTemporalRange"
                   :min="minTemporalRange"
-                  :thumb-size="36"
+                  :thumb-size="32"
+                  hint="Temporal Range"
                   persistent-hint
                   thumb-label="always"
-                  class="px-3 pt-2"
                   @change="updateYear"
                 >
                   <template v-slot:prepend>
@@ -125,7 +132,6 @@
                       :min="timespanMinYear"
                       :max="timespanMaxYear"
                       hint="Start Year"
-                      label="Start Year"
                       hide-details
                       single-line
                       type="number"
@@ -147,19 +153,6 @@
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
-                </v-slider>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col>
-                <v-slider
-                  v-model="opacity"
-                  dense
-                  :label="opacityLabel"
-                  min="0"
-                  max="100"
-                  step="1"
-                >
                 </v-slider>
               </v-col>
             </v-row>
@@ -304,7 +297,7 @@ class DatasetDetail extends Vue {
   legendControl = null
   legendImage = null
   toggleAnimation = null
-  year = null
+  year = 1
   defaultRegionOpacity = 0.05
   opacity = 30
   legendPosition = 'bottomleft'
@@ -568,19 +561,19 @@ class DatasetDetail extends Vue {
   }
 
   saveTemporalRange() {
-    this.$warehouse.set(
-      this.wMinTemporalRangeKey,
-      JSON.stringify(this.minTemporalRange)
-    )
-    this.$warehouse.set(
-      this.wMaxTemporalRangeKey,
-      JSON.stringify(this.maxTemporalRange)
-    )
+    this.$warehouse.set(this.wMinTemporalRangeKey, this.minTemporalRange)
+    this.$warehouse.set(this.wMaxTemporalRangeKey, this.maxTemporalRange)
   }
 
   getSavedTemporalRange() {
-    const minTemporalRange = this.$warehouse.get(this.wMinTemporalRangeKey)
-    const maxTemporalRange = this.$warehouse.get(this.wMaxTemporalRangeKey)
+    const minTemporalRange = this.$warehouse.get(
+      this.wMinTemporalRangeKey,
+      this.minTemporalRange
+    )
+    const maxTemporalRange = this.$warehouse.get(
+      this.wMaxTemporalRangeKey,
+      this.maxTemporalRange
+    )
     if (minTemporalRange || maxTemporalRange) {
       return [minTemporalRange, maxTemporalRange]
     }
@@ -589,9 +582,14 @@ class DatasetDetail extends Vue {
 
   checkAndRestoreSavedTemporalRange() {
     const savedTemporalRange = this.getSavedTemporalRange()
+    console.log('Saved temporal range: ')
+    console.log(savedTemporalRange)
     if (savedTemporalRange) {
-      this.minTemporalRange ||= savedTemporalRange[0]
-      this.maxTemporalRange ||= savedTemporalRange[1]
+      this.minTemporalRange = savedTemporalRange[0]
+      this.maxTemporalRange = savedTemporalRange[1]
+      this.updateYear(
+        clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
+      )
     }
   }
 
@@ -816,7 +814,7 @@ export default DatasetDetail
 }
 
 #map-flex {
-  height: 500px;
+  height: 520px;
   margin-bottom: 2rem;
 }
 
@@ -828,7 +826,7 @@ export default DatasetDetail
 
 @media all and (max-width: 600px) {
   #map-flex {
-    height: 250px;
+    height: 350px;
   }
 }
 
