@@ -496,13 +496,13 @@ class DatasetDetail extends Vue {
   loadGeoJson(event) {
     const file = event.target.files[0]
     file.text().then((text) => {
-      console.log('received possible geojson to load')
-      console.log(text)
+      console.log('received possible geojson to load: ', text)
       try {
         let area = JSON.parse(text)
         this.restoreSelectedGeometry(area)
       } catch (error) {
         console.error(error)
+        // FIXME: this should be a toast or other notification
         alert("Sorry! We couldn't re-import this file: " + text)
       }
     })
@@ -537,16 +537,15 @@ class DatasetDetail extends Vue {
         layer.getRadius(),
         this.defaultCircleToPolygonEdges
       )
-      console.log('converting circle to polygon: ')
-      console.log(geometry)
       data.geometry = geometry
       this.selectedAreaInSquareMeters = layer.getRadius() * Math.PI * Math.PI
+    } else if (layer instanceof L.Marker) {
+      this.selectedAreaInSquareMeters = 0
     } else {
       this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
         layer.getLatLngs()[0]
       )
     }
-    console.log(this.selectedAreaInSquareMeters)
     this.selectedGeometry = data.geometry
   }
 
@@ -582,8 +581,6 @@ class DatasetDetail extends Vue {
 
   checkAndRestoreSavedTemporalRange() {
     const savedTemporalRange = this.getSavedTemporalRange()
-    console.log('Saved temporal range: ')
-    console.log(savedTemporalRange)
     if (savedTemporalRange) {
       this.minTemporalRange = savedTemporalRange[0]
       this.maxTemporalRange = savedTemporalRange[1]
@@ -625,7 +622,7 @@ class DatasetDetail extends Vue {
   }
 
   getSavedGeometry() {
-    const skopeGeometry = this.$warehouse.get(this.warehouseGeometryKey)
+    const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
     if (skopeGeometry) {
       return JSON.parse(skopeGeometry)
     }
