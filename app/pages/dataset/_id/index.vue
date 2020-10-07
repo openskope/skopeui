@@ -6,7 +6,8 @@
           <client-only placeholder="Loading map, please wait...">
             <l-map
               ref="layerMap"
-              :zoom="selectedDataset.region.zoom"
+              :min-zoom="3"
+              :zoom="4"
               :center="selectedDataset.region.center"
             >
               <l-control-attribution position="topright" />
@@ -618,7 +619,13 @@ class DatasetDetail extends Vue {
       this.updateSelectedGeometry(l)
     })
     this.enableEditOnly(map)
-    map.fitBounds(this.drawnItems.getBounds(), { padding: [5, 5] })
+    let padding = [5, 5]
+    console.log(geoJsonLayer)
+    if (geoJsonLayer instanceof L.Marker) {
+      console.log('Setting padding for marker')
+      padding = [30, 30]
+    }
+    map.fitBounds(this.drawnItems.getBounds(), { padding })
   }
 
   getSavedGeometry() {

@@ -1,15 +1,26 @@
 <template>
   <client-only placeholder="Loading...">
     <div style="width: 100%">
-      <Plotly
-        v-if="requestMessage.length === 0"
-        ref="plot"
-        :data="timeseriesData"
-        :layout="layoutMetadata"
-        :options="options"
-      ></Plotly>
-      <v-alert v-else type="error">{{ requestMessage }}</v-alert>
-      <v-btn @click.native="download">Download Chart</v-btn>
+      <div v-if="isLoadingData" class="justify-center">
+        <v-progress-circular
+          v-if="isLoadingData"
+          indeterminate
+          color="primary"
+        />
+        Loading . . .
+      </div>
+      <div v-else-if="hasData">
+        <Plotly
+          ref="plot"
+          :data="timeseriesData"
+          :layout="layoutMetadata"
+          :options="options"
+        ></Plotly>
+        <v-btn @click.native="download">Download Chart</v-btn>
+      </div>
+      <v-alert v-else type="error"
+        >Sorry, we couldn't build a graph from the given parameters.</v-alert
+      >
     </div>
   </client-only>
 </template>
@@ -20,12 +31,11 @@ import _ from 'lodash'
 import { Component } from 'nuxt-property-decorator'
 import * as queryString from 'query-string'
 import { Prop, Watch } from 'vue-property-decorator'
-import { TIMESERIES_ENDPOINT } from '@/store/constants'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { Plotly } from 'vue-plotly'
-// const Plotly = () => import('@statnett/vue-plotly')
 const { Parser } = require('json2csv')
+import { TIMESERIES_ENDPOINT } from '@/store/constants'
 
 // Would need to make a custom debounce decorator so
 // that debounced methods can exist in a vue-class-component
@@ -38,6 +48,7 @@ const updateDataset = _.debounce(async function (
   minYear,
   maxYear
 ) {
+  vue.isLoadingData = true
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
   if (start > end) {
@@ -57,7 +68,6 @@ const updateDataset = _.debounce(async function (
     boundaryGeometry: geometry,
   }
   const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
-
   try {
     const response = await vue.$axios.$post(url, body)
     const timeZeroOffset = vue.timeZero
@@ -70,15 +80,28 @@ const updateDataset = _.debounce(async function (
       type: 'scatter',
     }
     vue.timeseries = timeseries
-    console.log('Clearing messages')
+    vue.hasData = true
     vue.$store.dispatch('clearMessages')
   } catch (e) {
-    console.error(e)
-    vue.$store.dispatch(
-      'error',
+    vue.$store.dispatch('clearMessages')
+    vue.hasData = false
+    let errorMessage =
       'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
-    )
+    if (e.response) {
+      console.error('received error response from server: ', e)
+      const responseData = e.response.data
+      if (responseData.status === 400) {
+        // bad request
+        errorMessage = responseData.message
+      }
+    } else if (e.request) {
+      // browser made a request but didn't see a response, likely a timeout / client network error
+      console.log('did not receive a server response: ', { e })
+      errorMessage += ` Cause: ${e.message}`
+    }
+    vue.$store.dispatch('error', errorMessage)
   }
+  vue.isLoadingData = false
 },
 300)
 
@@ -112,7 +135,8 @@ class TimeSeries extends Vue {
     type: 'scatter',
   }
 
-  requestMessage = ''
+  hasData = false
+  isLoadingData = false
 
   mounted() {
     updateDataset(
