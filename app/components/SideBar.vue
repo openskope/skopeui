@@ -88,6 +88,9 @@
   </v-navigation-drawer>
 </template>
 <script>
+import { getModule } from 'vuex-module-decorators'
+import { DataSets } from '@/store/datasets'
+
 export default {
   name: 'DiscoverSideBar',
   data() {
@@ -123,7 +126,8 @@ export default {
       ]
     },
     variableClasses() {
-      const datasets = this.$store.state.datasets.all
+      const d = getModule(DataSets, this.$store)
+      const datasets = d.all
       const variableClassSet = new Set()
       for (const dataset of datasets) {
         for (const variable of dataset.variables) {
@@ -141,14 +145,16 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('datasets/load')
+    const d = getModule(DataSets, this.$store)
+    d.retrieveData()
   },
   // mounted() {},
   methods: {
     filterDatasets() {
+      const d = getModule(DataSets, this.$store)
       // update the store with the selected variable classes, year range, and optional
       // keyword query which will be applied as a filter across the available datasets
-      this.$store.dispatch('datasets/filter', {
+      d.filter({
         selectedVariableClasses: this.selectedVariableClasses,
         yearStart: this.startYear,
         yearEnd: this.endYear,

@@ -23,18 +23,22 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-export default {
-  name: 'Messages',
-  computed: {
-    ...mapGetters({
-      messages: 'messages',
-    }),
-  },
-  methods: {
-    dismiss(index) {
-      this.$store.dispatch('dismiss', index)
-    },
-  },
+import { getModule } from 'vuex-module-decorators'
+import * as msg from '~/store/messages'
+import { Component } from 'nuxt-property-decorator'
+import Vue from 'vue'
+
+@Component()
+class Messages extends Vue {
+  get messages() {
+    const m = getModule(msg.Messages, this.$store)
+    return m.messages
+  }
+
+  dismiss(index) {
+    this.$store.messages.dispatch('dismiss', index)
+  }
 }
+
+export default Messages
 </script>

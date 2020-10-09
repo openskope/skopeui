@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { getModule } from 'vuex-module-decorators'
+import { DataSets } from '@/store/datasets'
 import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
@@ -43,15 +45,16 @@ import Dataset from '@/components/Dataset.vue'
   components: {
     Dataset,
   },
-  computed: {
-    ...mapGetters({
-      datasets: 'datasets/filteredDatasets',
-    }),
-  },
 })
 class LandingPage extends Vue {
+  get datasets() {
+    const d = getModule(DataSets, this.$store)
+    return d.filteredDatasets
+  }
+
   created() {
-    this.$store.dispatch('datasets/load')
+    const d = getModule(DataSets, this.$store)
+    d.retrieveData()
   }
 }
 export default LandingPage

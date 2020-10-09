@@ -1,14 +1,10 @@
-export const state = () => ({
-  loading: false,
-  all: [],
-  selectedDataset: {},
-  filterCriteria: {
-    selectedVariableClasses: [],
-    yearStart: 1,
-    yearEnd: 2019,
-    query: '',
-  },
-})
+import {
+  Module,
+  VuexModule,
+  Action,
+  Mutation,
+  MutationAction,
+} from 'vuex-module-decorators'
 
 function matchesYearFilter(minYear, maxYear, dataset) {
   const dMinYear = parseInt(dataset.timespan.period.gte)
@@ -40,90 +36,6 @@ function matchesQueryFilter(query, dataset) {
     ? dataset.title.toLowerCase().includes(q) ||
         dataset.description.toLowerCase().includes(q)
     : true
-}
-
-export const getters = {
-  selectedDatasetTimeZero(state) {
-    const dataset = state.selectedDataset
-    if (dataset.id) {
-      return dataset.timespan.period.timeZero || 0
-    }
-    return 0
-  },
-  selectedDatasetTimespan(state) {
-    const dataset = state.selectedDataset
-    if (dataset.id) {
-      return [dataset.timespan.period.gte, dataset.timespan.period.lte]
-    }
-    console.log('No selected dataset, returning default year range')
-    return [1, new Date().getFullYear()]
-  },
-  filteredDatasets(state) {
-    return state.all.filter((dataset) => {
-      const selectedVariableClasses =
-        state.filterCriteria.selectedVariableClasses
-      const minYear = state.filterCriteria.yearStart
-      const maxYear = state.filterCriteria.yearEnd
-      const query = state.filterCriteria.query || ''
-
-      return (
-        matchesYearFilter(minYear, maxYear, dataset) &&
-        matchesQueryFilter(query, dataset) &&
-        matchesVariableFilter(selectedVariableClasses, dataset)
-      )
-    })
-  },
-}
-
-export const actions = {
-  load({ state, commit }) {
-    if (state.loading) {
-      console.debug('already loading - ignoring request')
-    } else {
-      commit('load')
-    }
-  },
-  filter(context, filterCriteria) {
-    context.commit('applyFilterCriteria', filterCriteria)
-  },
-  loadDataset({ state, commit }, id) {
-    if (state.selectedDataset.id !== id) {
-      if (state.all === undefined || state.all.length === 0) {
-        commit('load')
-      }
-      commit('selectDataset', id)
-    }
-  },
-  selectVariable({ state, commit }, id) {
-    if (state.all === undefined || state.all.length === 0) {
-      commit('load')
-    }
-    if (state.selectedDataset) {
-      commit('selectVariable', id)
-    }
-  },
-}
-
-export const mutations = {
-  load(state) {
-    state.loading = true
-    // FIXME: eventually this should get loaded from the backend from an async call
-    state.all = ALL_DATA
-    state.loading = false
-  },
-  selectDataset(state, id) {
-    state.selectedDataset = state.all.find((dataset) => dataset.id === id)
-  },
-  selectVariable(state, id) {
-    let selectedVariable = state.selectedDataset.variables.find(
-      (variable) => variable.id === id
-    )
-    selectedVariable.visible = true
-    state.selectedDataset.selectedVariable = selectedVariable
-  },
-  applyFilterCriteria(state, filterCriteria) {
-    state.filterCriteria = filterCriteria
-  },
 }
 
 // FIXME: create a clear schema with types for Datasets
@@ -315,3 +227,108 @@ const ALL_DATA = [
     ],
   },
 ]
+
+@Module({ stateFactory: true, name: 'datasets', namespaced: true })
+class DataSets extends VuexModule {
+  loading = false
+  all = []
+  selectedDataset = {}
+  filterCriteria = {
+    selectedVariableClasses: [],
+    yearStart: 1,
+    yearEnd: 2019,
+    query: '',
+  }
+  get selectedDatasetTimeZero() {
+    const dataset = this.selectedDataset
+    if (dataset.id) {
+      return dataset.timespan.period.timeZero || 0
+    }
+    return 0
+  }
+  get selectedDatasetTimespan() {
+    const dataset = this.selectedDataset
+    if (dataset.id) {
+      return [dataset.timespan.period.gte, dataset.timespan.period.lte]
+    }
+    console.log('No selected dataset, returning default year range')
+    return [1, new Date().getFullYear()]
+  }
+  get filteredDatasets() {
+    return this.all.filter((dataset) => {
+      const selectedVariableClasses = this.filterCriteria
+        .selectedVariableClasses
+      const minYear = this.filterCriteria.yearStart
+      const maxYear = this.filterCriteria.yearEnd
+      const query = this.filterCriteria.query || ''
+
+      return (
+        matchesYearFilter(minYear, maxYear, dataset) &&
+        matchesQueryFilter(query, dataset) &&
+        matchesVariableFilter(selectedVariableClasses, dataset)
+      )
+    })
+  }
+
+  @Action({ commit: 'load' })
+  retrieveData() {
+    if (this.loading) {
+      console.debug('already loading - ignoring request')
+    }
+    return ALL_DATA
+  }
+
+  @Action({ commit: 'applyFilterCriteria' })
+  filter(filterCriteria) {
+    return filterCriteria
+  }
+
+  @Action
+  loadDataset(id) {
+    if (this.selectedDataset.id !== id) {
+      if (this.all === undefined || this.all.length === 0) {
+        this.context.commit('load', ALL_DATA)
+      }
+      this.context.commit('selectDataset', id)
+    }
+  }
+
+  @Action
+  loadAndSelectVariable(id) {
+    if (this.all === undefined || this.all.length === 0) {
+      this.context.commit('load', ALL_DATA)
+    }
+    if (state.selectedDataset) {
+      this.context.commit('selectVariable', id)
+    }
+  }
+
+  @Mutation
+  load(data) {
+    this.loading = true
+    // FIXME: eventually this should get loaded from the backend from an async call
+    this.all = data
+    this.loading = false
+  }
+
+  @Mutation
+  selectDataset(id) {
+    this.selectedDataset = this.all.find((dataset) => dataset.id === id)
+  }
+
+  @Mutation
+  selectVariable(id) {
+    let selectedVariable = this.selectedDataset.variables.find(
+      (variable) => variable.id === id
+    )
+    selectedVariable.visible = true
+    this.selectedDataset.selectedVariable = selectedVariable
+  }
+
+  @Mutation
+  applyFilterCriteria(filterCriteria) {
+    this.filterCriteria = filterCriteria
+  }
+}
+
+export { DataSets }

@@ -1,36 +1,10 @@
-export const state = () => ({
-  messages: [],
-})
+import Vuex from 'vuex'
+import { DataSets } from '~/store/datasets'
+import { Messages } from '@/store/messages'
 
-export const getters = {
-  messages(state) {
-    return state.messages
-  },
-}
+export const state = () => ({})
 
-export const actions = {
-  info({ state, commit }, message) {
-    commit('addMessage', { type: 'info', message })
-  },
-  error({ state, commit }, message) {
-    commit('addMessage', { type: 'error', message })
-  },
-  dismiss({ state, commit }, index) {
-    commit('removeMessage', index)
-  },
-  clearMessages({ state, commit }) {
-    commit('clearMessages')
-  },
-}
-
-export const mutations = {
-  clearMessages(state) {
-    state.messages = []
-  },
-  addMessage(state, alert) {
-    state.messages.push(alert)
-  },
-  removeMessage(state, index) {
-    state.messages.splice(index, 1)
-  },
+export const modules = {
+  datasets: DataSets,
+  messages: Messages,
 }

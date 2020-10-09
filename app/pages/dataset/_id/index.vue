@@ -268,6 +268,7 @@
 
 <script>
 import circleToPolygon from 'circle-to-polygon'
+import { getModule } from 'vuex-module-decorators'
 import { clamp } from 'lodash'
 import { Component } from 'nuxt-property-decorator'
 import { stringify } from 'query-string'
@@ -279,6 +280,7 @@ import {
   SKOPE_WMS_ENDPOINT,
   BaseMapProvider,
 } from '@/store/constants.js'
+import { DataSets } from '@/store/datasets'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -319,8 +321,9 @@ class DatasetDetail extends Vue {
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
 
-  created() {
-    this.$store.dispatch('datasets/loadDataset', this.$route.params.id)
+  async created() {
+    const d = getModule(DataSets, this.$store)
+    await d.loadDataset(this.$route.params.id)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear
   }
@@ -343,7 +346,8 @@ class DatasetDetail extends Vue {
       }
       if (this.selectedDataset.variables.length === 1) {
         let defaultVariable = this.selectedDataset.variables[0]
-        this.$store.dispatch('datasets/selectVariable', defaultVariable.id)
+        const d = getModule(DataSets, this.$store)
+        d.selectVariable(defaultVariable.id)
         this.selectedLayer = defaultVariable
       }
       map.on('overlayadd', handler)
