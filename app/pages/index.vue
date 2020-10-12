@@ -37,7 +37,6 @@ import { getModule } from 'vuex-module-decorators'
 import { DataSets } from '@/store/datasets'
 import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
-import { mapGetters } from 'vuex'
 import Dataset from '@/components/Dataset.vue'
 
 @Component({
@@ -48,13 +47,11 @@ import Dataset from '@/components/Dataset.vue'
 })
 class LandingPage extends Vue {
   get datasets() {
-    const d = getModule(DataSets, this.$store)
-    return d.filteredDatasets
+    return this.$api().datasets.filteredDatasets
   }
 
   created() {
-    const d = getModule(DataSets, this.$store)
-    d.retrieveData()
+    this.$api().datasets.retrieveData()
   }
 }
 export default LandingPage

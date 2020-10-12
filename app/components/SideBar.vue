@@ -126,8 +126,7 @@ export default {
       ]
     },
     variableClasses() {
-      const d = getModule(DataSets, this.$store)
-      const datasets = d.all
+      const datasets = this.$api().datasets.all
       const variableClassSet = new Set()
       for (const dataset of datasets) {
         for (const variable of dataset.variables) {
@@ -145,16 +144,14 @@ export default {
     },
   },
   created() {
-    const d = getModule(DataSets, this.$store)
-    d.retrieveData()
+    this.$api().datasets.retrieveData()
   },
   // mounted() {},
   methods: {
     filterDatasets() {
-      const d = getModule(DataSets, this.$store)
       // update the store with the selected variable classes, year range, and optional
       // keyword query which will be applied as a filter across the available datasets
-      d.filter({
+      this.$api().datasets.filter({
         selectedVariableClasses: this.selectedVariableClasses,
         yearStart: this.startYear,
         yearEnd: this.endYear,

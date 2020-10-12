@@ -12,22 +12,22 @@ class Messages extends VuexModule {
 
   @Action
   info(message) {
-    this.context.commit('addMessage', { type: 'info', message })
+    this.addMessage({ type: 'info', message })
   }
 
   @Action
   error(message) {
-    this.context.commit('addMessage', { type: 'error', message })
+    this.addMessage({ type: 'error', message })
   }
 
   @Action
   dismiss(index) {
-    this.context.commit('removeMessage', index)
+    this.removeMessage(index)
   }
 
-  @MutationAction({ mutate: ['messages'] })
+  @Mutation
   clearMessages() {
-    return []
+    this.messages.splice(0, this.messages.length)
   }
 
   @Mutation

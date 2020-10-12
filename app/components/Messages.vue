@@ -23,20 +23,17 @@
 </template>
 
 <script>
-import { getModule } from 'vuex-module-decorators'
-import * as msg from '~/store/messages'
 import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
 
 @Component()
 class Messages extends Vue {
   get messages() {
-    const m = getModule(msg.Messages, this.$store)
-    return m.messages
+    return this.$api().messages.messages
   }
 
   dismiss(index) {
-    this.$store.messages.dispatch('dismiss', index)
+    this.$api().messages.dismiss(index)
   }
 }
 

@@ -52,10 +52,7 @@ const updateDataset = _.debounce(async function (
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
   if (start > end) {
-    vue.$store.dispatch(
-      'info',
-      'Please select a start year before the end year'
-    )
+    vue.$api().messages.info('Please select a start year before the end year')
     return
   }
   const qs = {
@@ -81,9 +78,9 @@ const updateDataset = _.debounce(async function (
     }
     vue.timeseries = timeseries
     vue.hasData = true
-    vue.$store.dispatch('clearMessages')
+    vue.$api().messages.clearMessages()
   } catch (e) {
-    vue.$store.dispatch('clearMessages')
+    vue.$api().messages.clearMessages()
     vue.hasData = false
     let errorMessage =
       'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
@@ -99,7 +96,7 @@ const updateDataset = _.debounce(async function (
       console.log('did not receive a server response: ', { e })
       errorMessage += ` Cause: ${e.message}`
     }
-    vue.$store.dispatch('error', errorMessage)
+    vue.$api().messages.error(errorMessage)
   }
   vue.isLoadingData = false
 },

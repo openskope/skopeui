@@ -287,19 +287,19 @@ class DataSets extends VuexModule {
   loadDataset(id) {
     if (this.selectedDataset.id !== id) {
       if (this.all === undefined || this.all.length === 0) {
-        this.context.commit('load', ALL_DATA)
+        this.load(ALL_DATA)
       }
-      this.context.commit('selectDataset', id)
+      this.selectDataset(id)
     }
   }
 
   @Action
   loadAndSelectVariable(id) {
     if (this.all === undefined || this.all.length === 0) {
-      this.context.commit('load', ALL_DATA)
+      this.load(ALL_DATA)
     }
     if (state.selectedDataset) {
-      this.context.commit('selectVariable', id)
+      this.selectVariable(id)
     }
   }
 

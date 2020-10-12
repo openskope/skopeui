@@ -346,8 +346,7 @@ class DatasetDetail extends Vue {
       }
       if (this.selectedDataset.variables.length === 1) {
         let defaultVariable = this.selectedDataset.variables[0]
-        const d = getModule(DataSets, this.$store)
-        d.selectVariable(defaultVariable.id)
+        this.$api().datasets.selectVariable(defaultVariable.id)
         this.selectedLayer = defaultVariable
       }
       map.on('overlayadd', handler)
