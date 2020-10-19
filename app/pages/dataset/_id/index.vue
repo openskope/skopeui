@@ -823,8 +823,8 @@ export default DatasetDetail
 </script>
 <style>
 .leaflet-top.leaflet-right
-.leaflet-control-layers:nth-child(2)
-.leaflet-control-layers-toggle {
+  .leaflet-control-layers:nth-child(2)
+  .leaflet-control-layers-toggle {
   background-image: url(/earth.svg);
 }
 
