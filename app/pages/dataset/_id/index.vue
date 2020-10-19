@@ -2,6 +2,7 @@
   <v-container fill-width fluid>
     <v-row dense align-content-start justify-space-around wrap>
       <v-col id="map-flex" xs12 md7>
+        <!-- map -->
         <div class="map px-2">
           <client-only placeholder="Loading map, please wait...">
             <l-map
@@ -49,7 +50,10 @@
             </l-map>
           </client-only>
         </div>
+        <!-- end map -->
+        <!-- map controls -->
         <v-sheet inset class="mx-2">
+          <!-- toolbar -->
           <v-toolbar color="indigo" dark dense>
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
@@ -102,18 +106,25 @@
               <v-icon>skip_next</v-icon>
             </v-btn>
           </v-toolbar>
+          <!-- end toolbar -->
+          <!-- filter sliders -->
           <v-container height="100%">
             <v-row dense>
+              <!-- palmer modified drought index opacity -->
               <v-col cols="6">
                 <v-slider
                   v-model="opacity"
                   dense
-                  :label="opacityLabel"
+                  hint="Palmer Modified Drought Index Opacity"
+                  persistent-hint
                   min="0"
                   max="100"
                   step="1"
+                  thumb-label="always"
+                  :thumb-size="24"
                 />
               </v-col>
+              <!-- temporal range -->
               <v-col cols="6">
                 <v-slider
                   dense
@@ -158,7 +169,9 @@
               </v-col>
             </v-row>
           </v-container>
+          <!-- end filter sliders -->
         </v-sheet>
+        <!-- end map controls -->
       </v-col>
       <v-col xs12 md5>
         <div class="px-2">
@@ -810,8 +823,8 @@ export default DatasetDetail
 </script>
 <style>
 .leaflet-top.leaflet-right
-  .leaflet-control-layers:nth-child(2)
-  .leaflet-control-layers-toggle {
+.leaflet-control-layers:nth-child(2)
+.leaflet-control-layers-toggle {
   background-image: url(/earth.svg);
 }
 
