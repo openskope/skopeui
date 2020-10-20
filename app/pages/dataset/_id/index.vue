@@ -120,52 +120,90 @@
                   min="0"
                   max="100"
                   step="1"
-                  thumb-label="always"
+                  thumb-label
                   :thumb-size="24"
+                  :track-color="colors.grey.color"
+                  :color="colors.orange.color"
+                  :thumb-color="colors.orange.color"
                 />
               </v-col>
               <!-- temporal range -->
               <v-col cols="6">
-                <v-slider
-                  dense
-                  :value="year"
-                  :max="maxTemporalRange"
+                <v-range-slider
+                  v-model="temporalRange"
                   :min="minTemporalRange"
-                  :thumb-size="32"
+                  :max="maxTemporalRange"
                   hint="Temporal Range"
                   persistent-hint
-                  thumb-label="always"
-                  @change="updateYear"
+                  single-line
                 >
                   <template v-slot:prepend>
                     <v-text-field
-                      v-model="minTemporalRange"
-                      class="pt-0 mt-0"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      hint="Start Year"
+                      :value="temporalRange[0]"
+                      class="mt-0 pt-0"
                       hide-details
                       single-line
                       type="number"
                       style="width: 60px"
+                      @change="$set(temporalRange, 0, () => validateMinYear)"
                       @input="validateMinYear"
                     ></v-text-field>
                   </template>
                   <template v-slot:append>
                     <v-text-field
-                      v-model="maxTemporalRange"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      class="pt-0 mt-0"
-                      hint="End Year"
+                      :value="temporalRange[1]"
+                      class="mt-0 pt-0"
                       hide-details
                       single-line
                       type="number"
                       style="width: 60px"
+                      @change="$set(temporalRange, 1, () => validateMaxYear)"
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
-                </v-slider>
+                </v-range-slider>
+                <!--                <v-slider-->
+                <!--                  dense-->
+                <!--                  :value="year"-->
+                <!--                  :max="maxTemporalRange"-->
+                <!--                  :min="minTemporalRange"-->
+                <!--                  :color="colors.grey.color"-->
+                <!--                  :thumb-color="colors.blue.color"-->
+                <!--                  :thumb-size="32"-->
+                <!--                  hint="Temporal Range"-->
+                <!--                  persistent-hint-->
+                <!--                  thumb-label="always"-->
+                <!--                  @change="updateYear"-->
+                <!--                >-->
+                <!--                  <template v-slot:prepend>-->
+                <!--                    <v-text-field-->
+                <!--                      v-model="minTemporalRange"-->
+                <!--                      class="pt-0 mt-0"-->
+                <!--                      :min="timespanMinYear"-->
+                <!--                      :max="timespanMaxYear"-->
+                <!--                      hint="Start Year"-->
+                <!--                      hide-details-->
+                <!--                      single-line-->
+                <!--                      type="number"-->
+                <!--                      style="width: 60px"-->
+                <!--                      @input="validateMinYear"-->
+                <!--                    ></v-text-field>-->
+                <!--                  </template>-->
+                <!--                  <template v-slot:append>-->
+                <!--                    <v-text-field-->
+                <!--                      v-model="maxTemporalRange"-->
+                <!--                      :min="timespanMinYear"-->
+                <!--                      :max="timespanMaxYear"-->
+                <!--                      class="pt-0 mt-0"-->
+                <!--                      hint="End Year"-->
+                <!--                      hide-details-->
+                <!--                      single-line-->
+                <!--                      type="number"-->
+                <!--                      style="width: 60px"-->
+                <!--                      @input="validateMaxYear"-->
+                <!--                    ></v-text-field>-->
+                <!--                  </template>-->
+                <!--                </v-slider>-->
               </v-col>
             </v-row>
           </v-container>
@@ -306,8 +344,9 @@ const Datasets = namespace('datasets')
   },
 })
 class DatasetDetail extends Vue {
-  minTemporalRange = 0
+  minTemporalRange = 1
   maxTemporalRange = new Date().getFullYear()
+  temporalRange = [this.minTemporalRange, this.maxTemporalRange]
   selectedLayer = null
   legendControl = null
   legendImage = null
@@ -465,6 +504,12 @@ class DatasetDetail extends Vue {
         this.nextYear()
       }, this.animationSpeed)
     }
+  }
+
+  colors = {
+    grey: { label: 'grey', color: 'grey lighten-2' },
+    blue: { label: 'blue', color: 'blue' },
+    orange: { label: 'orange', color: 'orange' },
   }
 
   head() {
@@ -787,6 +832,7 @@ class DatasetDetail extends Vue {
   }
 
   validateMaxYear() {
+    c
     this.maxTemporalRange = clamp(
       this.maxTemporalRange,
       this.timespanMinYear,
