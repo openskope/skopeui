@@ -1,10 +1,4 @@
-import {
-  Module,
-  VuexModule,
-  Action,
-  Mutation,
-  MutationAction,
-} from 'vuex-module-decorators'
+import { Module, VuexModule, Action, Mutation } from 'vuex-module-decorators'
 
 function matchesYearFilter(minYear, maxYear, dataset) {
   const dMinYear = parseInt(dataset.timespan.period.gte)

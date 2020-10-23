@@ -29,78 +29,11 @@
 import Vue from 'vue'
 import _ from 'lodash'
 import { Component } from 'nuxt-property-decorator'
-import * as queryString from 'query-string'
 import { Prop, Watch } from 'vue-property-decorator'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { Plotly } from 'vue-plotly'
 const { Parser } = require('json2csv')
-import { TIMESERIES_ENDPOINT } from '@/store/constants'
-
-// Would need to make a custom debounce decorator so
-// that debounced methods can exist in a vue-class-component
-//
-// Could use or take from https://github.com/bvaughn/debounce-decorator
-const updateDataset = _.debounce(async function (
-  vue,
-  datasetUri,
-  geometry,
-  minYear,
-  maxYear
-) {
-  vue.isLoadingData = true
-  const start = minYear.toString().padStart(4, '0')
-  const end = maxYear.toString().padStart(4, '0')
-  if (start > end) {
-    vue.$api().messages.info('Please select a start year before the end year')
-    return
-  }
-  const qs = {
-    start: start,
-    end: end,
-    timeResolution: 'year',
-    timeZero: vue.timeZero,
-  }
-  const body = {
-    boundaryGeometry: geometry,
-  }
-  const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
-  try {
-    const response = await vue.$axios.$post(url, body)
-    const timeZeroOffset = vue.timeZero
-    const timeseries = {
-      x: _.range(
-        response.startIndex + timeZeroOffset,
-        response.endIndex + timeZeroOffset + 1
-      ),
-      y: response.values,
-      type: 'scatter',
-    }
-    vue.timeseries = timeseries
-    vue.hasData = true
-    vue.$api().messages.clearMessages()
-  } catch (e) {
-    vue.$api().messages.clearMessages()
-    vue.hasData = false
-    let errorMessage =
-      'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
-    if (e.response) {
-      console.error('received error response from server: ', e)
-      const responseData = e.response.data
-      if (responseData.status === 400) {
-        // bad request
-        errorMessage = responseData.message
-      }
-    } else if (e.request) {
-      // browser made a request but didn't see a response, likely a timeout / client network error
-      console.log('did not receive a server response: ', { e })
-      errorMessage += ` Cause: ${e.message}`
-    }
-    vue.$api().messages.error(errorMessage)
-  }
-  vue.isLoadingData = false
-},
-300)
 
 @Component({
   components: {
@@ -126,43 +59,58 @@ class TimeSeries extends Vue {
   @Prop()
   timeZero
 
-  timeseries = {
-    x: [],
-    y: [],
-    type: 'scatter',
+  mounted() {
+    this.updateTimeSeries({})
   }
 
-  hasData = false
-  isLoadingData = false
-
-  mounted() {
-    updateDataset(
-      this,
-      this.datasetUri,
-      this.geometry,
-      this.minYear,
-      this.maxYear
-    )
+  async updateTimeSeries(options) {
+    const opts = {
+      datasetUri: this.datasetUri,
+      geometry: this.geometry,
+      minYear: this.minYear,
+      maxYear: this.maxYear,
+      zeroYearOffset: this.timeZero,
+      ...options,
+    }
+    console.log(opts)
+    await this.$api().dataset.retrieveTimeSeries(opts)
   }
 
   @Watch('datasetUri')
   onDatasetUriChange(datasetUri) {
-    updateDataset(this, datasetUri, this.geometry, this.minYear, this.maxYear)
+    this.updateTimeSeries({ datasetUri })
   }
 
   @Watch('geometry')
   onGeometryChange(geometry) {
-    updateDataset(this, this.datasetUri, geometry, this.minYear, this.maxYear)
+    this.updateTimeSeries({ geometry })
   }
 
   @Watch('minYear')
   onMinYearChange(minYear) {
-    updateDataset(this, this.datasetUri, this.geometry, minYear, this.maxYear)
+    this.updateTimeSeries({ minYear })
   }
 
   @Watch('maxYear')
   onMaxYearChange(maxYear) {
-    updateDataset(this, this.datasetUri, this.geometry, this.minYear, maxYear)
+    this.updateTimeSeries({ maxYear })
+  }
+
+  get hasData() {
+    return this.$store.state.dataset.hasData
+  }
+
+  get isLoadingData() {
+    return this.$store.state.dataset.isLoadingData
+  }
+
+  get timeseries() {
+    const { x, y } = this.$store.state.dataset.timeseries
+    return {
+      x,
+      y,
+      type: 'scatter',
+    }
   }
 
   get geometryGeoJSON() {

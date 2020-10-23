@@ -88,9 +88,6 @@
   </v-navigation-drawer>
 </template>
 <script>
-import { getModule } from 'vuex-module-decorators'
-import { DataSets } from '@/store/datasets'
-
 export default {
   name: 'DiscoverSideBar',
   data() {

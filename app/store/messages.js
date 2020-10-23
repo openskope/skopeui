@@ -6,23 +6,23 @@ import {
   MutationAction,
 } from 'vuex-module-decorators'
 
-@Module({ stateFactory: true, name: 'messages' })
+@Module({ stateFactory: true, namespaced: true, name: 'messages' })
 class Messages extends VuexModule {
   messages = []
 
-  @Action
+  @Mutation
   info(message) {
-    this.addMessage({ type: 'info', message })
+    this.messages.push({ type: 'info', message })
   }
 
-  @Action
+  @Mutation
   error(message) {
-    this.addMessage({ type: 'error', message })
+    this.messages.push({ type: 'error', message })
   }
 
-  @Action
+  @Mutation
   dismiss(index) {
-    this.removeMessage(index)
+    this.messages.splice(index, 1)
   }
 
   @Mutation

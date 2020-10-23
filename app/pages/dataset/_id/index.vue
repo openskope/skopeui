@@ -268,7 +268,6 @@
 
 <script>
 import circleToPolygon from 'circle-to-polygon'
-import { getModule } from 'vuex-module-decorators'
 import { clamp } from 'lodash'
 import { Component } from 'nuxt-property-decorator'
 import { stringify } from 'query-string'
@@ -322,7 +321,7 @@ class DatasetDetail extends Vue {
   selectedDatasetTimeZero
 
   async created() {
-    const d = getModule(DataSets, this.$store)
+    const d = this.$api().datasets
     await d.loadDataset(this.$route.params.id)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear

@@ -33,8 +33,6 @@
 </template>
 
 <script>
-import { getModule } from 'vuex-module-decorators'
-import { DataSets } from '@/store/datasets'
 import { Component } from 'nuxt-property-decorator'
 import Vue from 'vue'
 import Dataset from '@/components/Dataset.vue'
