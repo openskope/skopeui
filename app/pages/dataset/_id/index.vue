@@ -690,6 +690,7 @@ class DatasetDetail extends Vue {
     this.checkAndRestoreSavedGeometry(map)
     // check for persisted temporal range
     this.checkAndRestoreSavedTemporalRange()
+    map.on(L.Draw.Event.EDITRESIZE, (e) => self.updateSelectedGeometry(e.layer))
     map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedGeometry(e.layer))
     map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
     map.on(L.Draw.Event.CREATED, (event) => {
