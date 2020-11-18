@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
+import Footer from '@/components/global/Footer'
+import Header from '@/components/global/Header'
 import Messages from '@/components/Messages'
 
 export default {
