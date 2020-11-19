@@ -1,9 +1,9 @@
 <template>
   <v-app light>
     <Header />
-    <Navigation />
     <SideBar />
     <v-main>
+      <Navigation />
       <v-container fluid>
         <Messages />
         <nuxt />
