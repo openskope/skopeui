@@ -38,7 +38,7 @@ import Vue from 'vue'
 import Dataset from '@/components/Dataset.vue'
 
 @Component({
-  layout: 'default',
+  layout: 'BaseDefault',
   components: {
     Dataset,
   },
