@@ -1,5 +1,6 @@
 <template>
-  <v-app-bar src="/header.png" shrink-on-scroll app>
+  <v-app-bar src="/header.png" shrink-on-scroll dense app>
+    <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <nuxt-link class="skope-title" to="/">
         <v-img
@@ -16,7 +17,7 @@
     </v-toolbar-title>
     <v-spacer />
     <v-toolbar-items>
-      <v-btn text><v-icon left dark>help</v-icon> Help</v-btn>
+      <v-btn text><v-icon left dark>help</v-icon>Help</v-btn>
       <v-btn text href="https://www.comses.net/about/contact/" target="_blank">
         <v-icon left dark>email</v-icon>
         Contact
