@@ -62,21 +62,10 @@ class Navigation extends Vue {
     return this.$api().app.currentStep
   }
 
-  get disableDrawer() {
-    return this.$api().app.disableDrawer
-  }
-  get toggleDrawer() {
-    return this.$api().app.toggleDrawer
-  }
-
   selectStep(step) {
     this.e5 = step
     console.log('hi')
     this.$api().app.setStep(step)
-  }
-
-  toggleDrawer(openDrawer) {
-    this.$api().app.setDrawer()
   }
 }
 export default Navigation

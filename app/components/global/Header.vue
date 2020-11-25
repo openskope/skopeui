@@ -26,9 +26,24 @@
   </v-app-bar>
 </template>
 <script>
-export default {
-  name: 'Header',
+import Vue from 'vue'
+import { Component } from 'nuxt-property-decorator'
+import { App } from '@/store/app'
+
+@Component()
+class Header extends Vue {
+  get disableDrawer() {
+    return this.$api().app.disableDrawer
+  }
+  get toggleDrawer() {
+    return this.$api().app.toggleDrawer
+  }
+
+  toggleDrawer(openDrawer) {
+    this.$api().app.setDrawer()
+  }
 }
+export default Header
 </script>
 <style scoped>
 .skope-title {
