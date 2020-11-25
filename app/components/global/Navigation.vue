@@ -1,23 +1,85 @@
 <template>
-  <v-stepper>
+  <v-stepper v-model="e5">
     <v-stepper-header nonlinear>
-      <v-stepper-step editable step="1">Select Data Set</v-stepper-step>
+      <v-stepper-step
+        step="1"
+        :complete="e5 > 1"
+        editable
+        @click="selectStep(1)"
+        >Select Data Set</v-stepper-step
+      >
       <v-divider></v-divider>
-      <v-stepper-step step="2">Define Study Area</v-stepper-step>
+      <v-stepper-step
+        step="2"
+        :complete="e5 > 2"
+        editable
+        @click="selectStep(2)"
+        >Define Study Area</v-stepper-step
+      >
       <v-divider></v-divider>
-      <v-stepper-step step="3" editable>Animate Map</v-stepper-step>
+      <v-stepper-step
+        step="3"
+        :complete="e5 > 3"
+        editable
+        @click="selectStep(3)"
+        >Animate Map</v-stepper-step
+      >
       <v-divider></v-divider>
-      <v-stepper-step step="4" editable>Visualize Data</v-stepper-step>
+      <v-stepper-step
+        step="4"
+        :complete="e5 > 4"
+        editable
+        @click="selectStep(4)"
+        >Visualize Data</v-stepper-step
+      >
       <v-divider></v-divider>
-      <v-stepper-step step="3" editable>View Metadata</v-stepper-step>
+      <v-stepper-step
+        step="5"
+        :complete="e5 > 5"
+        editable
+        @click="selectStep(5)"
+        >View Metadata</v-stepper-step
+      >
     </v-stepper-header>
   </v-stepper>
 </template>
 
 <script>
-export default {
-  name: 'Navigation',
+import Vue from 'vue'
+import { Component } from 'nuxt-property-decorator'
+import { App, STEPS } from '@/store/app'
+
+@Component()
+class Navigation extends Vue {
+  data() {
+    return {
+      e5: 1,
+      totalSteps: 5,
+    }
+  }
+
+  get currentStep() {
+    return this.$api().app.currentStep
+  }
+
+  get disableDrawer() {
+    return this.$api().app.disableDrawer
+  }
+  get toggleDrawer() {
+    return this.$api().app.toggleDrawer
+  }
+
+  selectStep(step) {
+    this.e5 = step
+    console.log('hi')
+    this.$api().app.setStep(step)
+  }
+
+  toggleDrawer(openDrawer) {
+    this.$api().app.setDrawer()
+  }
 }
+export default Navigation
 </script>
 
 <style scoped></style>
