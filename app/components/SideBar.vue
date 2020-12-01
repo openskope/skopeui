@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer fixed permanent app>
+  <v-navigation-drawer absolute bottom temporary>
     <section class="pt-3">
       <div class="container">
         <h2 class="headline font-weight-black">Filter Datasets</h2>
@@ -88,74 +88,72 @@
   </v-navigation-drawer>
 </template>
 <script>
-export default {
-  name: 'DiscoverSideBar',
-  data() {
-    const currentYear = new Date().getFullYear()
-    return {
-      search: '',
-      startYear: 1,
-      endYear: currentYear,
-      selectedVariableClasses: [],
-      minYear: 1,
-      maxYear: currentYear,
+import { Component } from 'nuxt-property-decorator'
+import { Prop, Watch } from 'vue-property-decorator'
+import Vue from 'vue'
+
+@Component()
+class DiscoverSideBar extends Vue {
+  currentYear = new Date().getFullYear()
+
+  search = ''
+  startYear = 1
+  endYear = this.currentYear
+  selectedVariableClasses = []
+  minYearthis = 1
+  maxYear = this.currentYear
+
+  // methods
+  filterDatasets() {
+    // update the store with the selected variable classes, year range, and optional
+    // keyword query which will be applied as a filter across the available datasets
+    this.$api().datasets.filter({
+      selectedVariableClasses: this.selectedVariableClasses,
+      yearStart: this.startYear,
+      yearEnd: this.endYear,
+      query: this.search,
+    })
+  }
+  // computed
+  startYearRules() {
+    return [
+      (v) =>
+        v >= this.minYear ||
+        `Please enter a valid start year after ${this.minYear}`,
+      (v) =>
+        v <= this.endYear ||
+        `Please enter a valid start year before ${this.endYear}`,
+    ]
+  }
+  endYearRules() {
+    return [
+      (v) =>
+        v >= this.startYear ||
+        `Please enter a valid end year after ${this.startYear}`,
+      (v) =>
+        v <= this.maxYear ||
+        `Please enter a valid end year before ${this.maxYear}`,
+    ]
+  }
+  variableClasses() {
+    const datasets = this.$api().datasets.all
+    const variableClassSet = new Set()
+    for (const dataset of datasets) {
+      for (const variable of dataset.variables) {
+        variableClassSet.add(variable.class)
+      }
     }
-  },
-  computed: {
-    startYearRules() {
-      return [
-        (v) =>
-          v >= this.minYear ||
-          `Please enter a valid start year after ${this.minYear}`,
-        (v) =>
-          v <= this.endYear ||
-          `Please enter a valid start year before ${this.endYear}`,
-      ]
-    },
-    endYearRules() {
-      return [
-        (v) =>
-          v >= this.startYear ||
-          `Please enter a valid end year after ${this.startYear}`,
-        (v) =>
-          v <= this.maxYear ||
-          `Please enter a valid end year before ${this.maxYear}`,
-      ]
-    },
-    variableClasses() {
-      const datasets = this.$api().datasets.all
-      const variableClassSet = new Set()
-      for (const dataset of datasets) {
-        for (const variable of dataset.variables) {
-          variableClassSet.add(variable.class)
-        }
-      }
-      const variableClasses = []
-      for (const variableClass of variableClassSet) {
-        variableClasses.push({
-          name: variableClass,
-          checked: false,
-        })
-      }
-      return variableClasses
-    },
-  },
-  created() {
-    this.$api().datasets.retrieveData()
-  },
-  // mounted() {},
-  methods: {
-    filterDatasets() {
-      // update the store with the selected variable classes, year range, and optional
-      // keyword query which will be applied as a filter across the available datasets
-      this.$api().datasets.filter({
-        selectedVariableClasses: this.selectedVariableClasses,
-        yearStart: this.startYear,
-        yearEnd: this.endYear,
-        query: this.search,
+    const variableClasses = []
+    for (const variableClass of variableClassSet) {
+      variableClasses.push({
+        name: variableClass,
+        checked: false,
       })
-    },
-  },
+    }
+    return variableClasses
+  }
 }
+
+export default DiscoverSideBar
 </script>
 <style scoped></style>

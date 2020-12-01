@@ -1,6 +1,6 @@
 <template>
   <v-app-bar src="/header.png" shrink-on-scroll dense app>
-    <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <nuxt-link class="skope-title" to="/">
         <v-img
@@ -28,19 +28,34 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { App } from '@/store/app'
+import { Prop, Watch } from 'vue-property-decorator'
 
 @Component()
 class Header extends Vue {
   get disableDrawer() {
     return this.$api().app.disableDrawer
   }
-  get toggleDrawer() {
-    return this.$api().app.toggleDrawer
+
+  get currentStep() {
+    return this.$api().app.currentStep
   }
 
-  toggleDrawer(openDrawer) {
-    this.$api().app.setDrawer()
+  get drawerVisible() {
+    return this.$api().app.drawerVisible
+  }
+
+  toggleDrawer() {
+    var visible = 0
+    if (!this.disableDrawer) {
+      visible = this.drawerVisible
+      if (this.drawerVisible) {
+        visible -= 1
+      } else {
+        visible += 1
+      }
+    }
+    console.debug('visible =  %i', visible)
+    this.$api().app.toggleDrawer(visible)
   }
 }
 export default Header

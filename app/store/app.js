@@ -1,10 +1,4 @@
-import {
-  Module,
-  VuexModule,
-  Mutation,
-  Action,
-  MutationAction,
-} from 'vuex-module-decorators'
+import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
 // drawer visibility and v-stepper state
 export const STEPS = Object.freeze({
@@ -19,7 +13,7 @@ export const STEPS = Object.freeze({
 class App extends VuexModule {
   disableDrawer = 0
   currentStep = STEPS.SELECT_DATASET
-  toggleDrawer = 0
+  drawerVisible = 0
 
   /**
    * Determine if drawer can be toggled.
@@ -38,22 +32,29 @@ class App extends VuexModule {
    * Toggle drawer with options to filter datasets.
    * @param {*} openDrawer
    */
-  @MutationAction
-  setDrawer(openDrawer) {
-    if (this.canShowDrawer() && openDrawer) {
-      this.toggleDrawer += 1
-    } else {
-      this.toggleDrawer -= 1
-    }
+  @Mutation
+  setDrawer(drawerVisible) {
+    this.drawerVisible = drawerVisible
   }
 
   /**
    * Set step from stepper navigation.
    * @param {*} step
    */
-  @MutationAction
+  @Mutation
   setStep(step) {
     this.currentStep = step
+  }
+
+  @Action({ commit: 'setDrawer' })
+  toggleDrawer(drawerVisible) {
+    return drawerVisible
+  }
+
+  @Action({ commit: 'setStep' })
+  selectStep(step) {
+    this.context.commit('setStep', step)
+    return step
   }
 }
 
