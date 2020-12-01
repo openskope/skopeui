@@ -46,11 +46,19 @@ class App extends VuexModule {
     this.currentStep = step
   }
 
+  /**
+   * Pass value to toggle drawer.
+   * @param {*} drawerVisible Value that determines show/hide (1/0)drawer
+   */
   @Action({ commit: 'setDrawer' })
   toggleDrawer(drawerVisible) {
     return drawerVisible
   }
 
+  /**
+   * Change current step in app via click.
+   * @param {*} step The step the user clicked on
+   */
   @Action({ commit: 'setStep' })
   selectStep(step) {
     this.context.commit('setStep', step)
