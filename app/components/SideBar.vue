@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer absolute bottom temporary>
+  <v-navigation-drawer v-model="drawerVisible" absolute bottom temporary>
     <section class="pt-3">
       <div class="container">
         <h2 class="headline font-weight-black">Filter Datasets</h2>
@@ -102,6 +102,11 @@ class DiscoverSideBar extends Vue {
   selectedVariableClasses = []
   minYearthis = 1
   maxYear = this.currentYear
+
+  get drawerVisible() {
+    // !! converts value to a boolean
+    return !!this.$api().app.drawerVisible
+  }
 
   // methods
   filterDatasets() {
