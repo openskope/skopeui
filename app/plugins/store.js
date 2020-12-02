@@ -1,8 +1,8 @@
-import { App } from '@/store/app'
-import { DataSets } from '@/store/datasets'
-import { Messages } from '@/store/messages'
+import { App } from '@/store/modules/app'
+import { DataSets } from '@/store/modules/datasets'
+import { Messages } from '@/store/modules/messages'
 import { getModule } from 'vuex-module-decorators'
-import { DataSet } from '@/store/dataset'
+import { DataSet } from '@/store/modules/dataset'
 
 export class API {
   constructor(store) {

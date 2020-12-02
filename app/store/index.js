@@ -1,7 +1,7 @@
-import { App } from '@/store/app'
-import { DataSet } from '@/store/dataset'
-import { DataSets } from '@/store/datasets'
-import { Messages } from '@/store/messages'
+import { App } from '@/store/modules/app'
+import { DataSet } from '@/store/modules/dataset'
+import { DataSets } from '@/store/modules/datasets'
+import { Messages } from '@/store/modules/messages'
 
 export const state = () => ({})
 

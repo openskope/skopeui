@@ -73,7 +73,7 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { BaseMapProvider } from '~/store/constants.js'
+import { BaseMapProvider } from '@/store/modules/constants.js'
 
 @Component({
   props: {

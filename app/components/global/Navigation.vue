@@ -47,7 +47,7 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { App, STEPS } from '@/store/app'
+import { App, STEPS } from '@/store/modules/app'
 
 @Component()
 class Navigation extends Vue {

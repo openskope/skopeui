@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { TIMESERIES_ENDPOINT } from '@/store/constants'
+import { TIMESERIES_ENDPOINT } from '@/store/modules/constants'
 import * as queryString from 'query-string'
 import {
   Module,
