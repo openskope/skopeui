@@ -1,6 +1,9 @@
 <template>
   <v-app-bar src="/header.png" shrink-on-scroll dense app>
-    <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon
+      @disabled="isDisabled"
+      @click="toggleDrawer"
+    ></v-app-bar-nav-icon>
     <v-toolbar-title>
       <nuxt-link class="skope-title" to="/">
         <v-img
@@ -32,30 +35,34 @@ import { Prop, Watch } from 'vue-property-decorator'
 
 @Component()
 class Header extends Vue {
-  get disableDrawer() {
-    return this.$api().app.disableDrawer
+  // --------- GETTERS ---------
+
+  get isDisabled() {
+    return this.$api().app.isDisabled
   }
 
   get currentStep() {
     return this.$api().app.currentStep
   }
 
-  get drawerVisible() {
-    return this.$api().app.drawerVisible
+  get isVisible() {
+    return this.$api().app.isVisible
   }
 
+  // --------- METHODS ---------
+
   toggleDrawer() {
-    var visible = 0
-    if (!this.disableDrawer) {
-      visible = this.drawerVisible
-      if (this.drawerVisible) {
-        visible -= 1
+    var drawerVisible = 0
+    if (!this.isDisabled) {
+      drawerVisible = this.isVisible
+      if (this.isVisible) {
+        drawerVisible -= 1
       } else {
-        visible += 1
+        drawerVisible += 1
       }
     }
-    console.debug('visible =  %i', visible)
-    this.$api().app.toggleDrawer(visible)
+    console.debug('visible =  %i', drawerVisible)
+    this.$api().app.toggleDrawer(drawerVisible)
   }
 }
 export default Header

@@ -11,31 +11,30 @@ export const STEPS = Object.freeze({
 
 @Module({ stateFactory: true, namespaced: true, name: 'app' })
 class App extends VuexModule {
-  disableDrawer = 0
+  isDisabled = 0
   currentStep = STEPS.SELECT_DATASET
-  drawerVisible = 0
+  isVisible = 0
 
   /**
    * Determine if drawer can be toggled.
    */
   @Mutation
-  canShowDrawer() {
-    if ((this.currentStep = 1)) {
-      this.disableDrawer += 1
+  disableDrawer(step) {
+    if (step == 1) {
+      return (this.isDisabled = 0)
     } else {
-      this.disableDrawer -= 1
+      return (this.isDisabled = 1)
     }
-    return this.disableDrawer
   }
 
   /**
-   * Toggle drawer with options to filter datasets.
+   * Toggle drawer with options click filter datasets.
    * @param {*} openDrawer
    */
   @Mutation
-  setDrawer(drawerVisible) {
-    console.log('drawerVisible: %i', drawerVisible)
-    this.drawerVisible = drawerVisible
+  setDrawer(isVisible) {
+    console.log('isVisible: %i', isVisible)
+    this.isVisible = isVisible
   }
 
   /**
@@ -47,13 +46,19 @@ class App extends VuexModule {
     this.currentStep = step
   }
 
+  @Action({ commit: 'disableDrawer' })
+  canShowDrawer(step) {
+    this.context.commit('disableDrawer', step)
+    return isDisabled
+  }
+
   /**
    * Pass value to toggle drawer.
-   * @param {*} drawerVisible Value that determines show/hide (1/0)drawer
+   * @param {*} isVisible Value that determines show/hide (1/0)drawer
    */
   @Action({ commit: 'setDrawer' })
-  toggleDrawer(drawerVisible) {
-    return drawerVisible
+  toggleDrawer(isVisible) {
+    return isVisible
   }
 
   /**

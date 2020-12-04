@@ -28,9 +28,13 @@ import Vue from 'vue'
 
 @Component()
 class Messages extends Vue {
+  // --------- GETTERS ---------
+
   get messages() {
     return this.$api().messages.messages
   }
+
+  // --------- METHODS ---------
 
   dismiss(index) {
     this.$api().messages.dismiss(index)

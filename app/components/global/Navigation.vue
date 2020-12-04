@@ -51,21 +51,25 @@ import { App, STEPS } from '@/store/modules/app'
 
 @Component()
 class Navigation extends Vue {
-  data() {
-    return {
-      e5: 1,
-      totalSteps: 5,
-    }
-  }
+  e5 = 1
+  totalSteps = 5
+
+  // --------- GETTERS ---------
 
   get currentStep() {
     return this.$api().app.currentStep
   }
 
+  get isDisabled() {
+    return this.$api().app.isDisabled
+  }
+
+  // --------- METHODS ---------
+
   selectStep(step) {
     this.e5 = step
-    console.log('hi')
-    this.$api().app.setStep(step)
+    this.$api().app.disableDrawer(this.e5)
+    this.$api().app.selectStep(this.e5)
   }
 }
 export default Navigation

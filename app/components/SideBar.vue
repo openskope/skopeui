@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawerVisible" absolute bottom temporary>
+  <v-navigation-drawer v-model="isVisible" absolute bottom temporary>
     <section class="pt-3">
       <div class="container">
         <v-btn class="ma-2" color="orange darken-2" dark @click="hideDrawer">
@@ -106,13 +106,11 @@ class DiscoverSideBar extends Vue {
   minYearthis = 1
   maxYear = this.currentYear
 
-  get drawerVisible() {
-    // "!!" - converts value to boolean
-    return !!this.$api().app.drawerVisible
-  }
+  // --------- GETTERS ---------
 
-  get canShowDrawer() {
-    return this.$api().app.canShowDrawer
+  get isVisible() {
+    // "!!" - converts value to boolean
+    return !!this.$api().app.isVisible
   }
 
   // --------- METHODS ---------
@@ -133,7 +131,8 @@ class DiscoverSideBar extends Vue {
       query: this.search,
     })
   }
-  // computed
+  // --------- COMPUTED ---------
+
   startYearRules() {
     return [
       (v) =>
