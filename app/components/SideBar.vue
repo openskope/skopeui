@@ -2,6 +2,9 @@
   <v-navigation-drawer v-model="drawerVisible" absolute bottom temporary>
     <section class="pt-3">
       <div class="container">
+        <v-btn class="ma-2" color="orange darken-2" dark @click="hideDrawer">
+          <v-icon dark left>fas fa-arrow-left</v-icon>Hide Menu
+        </v-btn>
         <h2 class="headline font-weight-black">Filter Datasets</h2>
         <v-form @submit.prevent>
           <v-container>
@@ -104,11 +107,22 @@ class DiscoverSideBar extends Vue {
   maxYear = this.currentYear
 
   get drawerVisible() {
-    // !! converts value to a boolean
+    // "!!" - converts value to boolean
     return !!this.$api().app.drawerVisible
   }
 
-  // methods
+  get canShowDrawer() {
+    return this.$api().app.canShowDrawer
+  }
+
+  // --------- METHODS ---------
+
+  hideDrawer() {
+    // hide drawer when visible = 0
+    var visible = 0
+    this.$api().app.toggleDrawer(visible)
+  }
+
   filterDatasets() {
     // update the store with the selected variable classes, year range, and optional
     // keyword query which will be applied as a filter across the available datasets

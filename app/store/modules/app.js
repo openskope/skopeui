@@ -34,6 +34,7 @@ class App extends VuexModule {
    */
   @Mutation
   setDrawer(drawerVisible) {
+    console.log('drawerVisible: %i', drawerVisible)
     this.drawerVisible = drawerVisible
   }
 
