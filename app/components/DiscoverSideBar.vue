@@ -103,7 +103,7 @@ class DiscoverSideBar extends Vue {
   startYear = 1
   endYear = this.currentYear
   selectedVariableClasses = []
-  minYearthis = 1
+  minYear = 1
   maxYear = this.currentYear
 
   // --------- GETTERS ---------
@@ -111,6 +111,50 @@ class DiscoverSideBar extends Vue {
   get isVisible() {
     // "!!" - converts value to boolean
     return !!this.$api().app.isVisible
+  }
+
+  get startYearRules() {
+    return [
+      (v) =>
+        v >= this.minYear ||
+        `Please enter a valid start year after ${this.minYear}`,
+      (v) =>
+        v <= this.endYear ||
+        `Please enter a valid start year before ${this.endYear}`,
+    ]
+  }
+
+  get endYearRules() {
+    return [
+      (v) =>
+        v >= this.startYear ||
+        `Please enter a valid end year after ${this.startYear}`,
+      (v) =>
+        v <= this.maxYear ||
+        `Please enter a valid end year before ${this.maxYear}`,
+    ]
+  }
+
+  get variableClasses() {
+    const datasets = this.$api().datasets.all
+    const variableClassSet = new Set()
+    for (const dataset of datasets) {
+      for (const variable of dataset.variables) {
+        variableClassSet.add(variable.class)
+      }
+    }
+    const variableClasses = []
+    for (const variableClass of variableClassSet) {
+      variableClasses.push({
+        name: variableClass,
+        checked: false,
+      })
+    }
+    return variableClasses
+  }
+
+  created() {
+    this.$api().datasets.retrieveData()
   }
 
   // --------- METHODS ---------
@@ -130,45 +174,6 @@ class DiscoverSideBar extends Vue {
       yearEnd: this.endYear,
       query: this.search,
     })
-  }
-  // --------- COMPUTED ---------
-
-  startYearRules() {
-    return [
-      (v) =>
-        v >= this.minYear ||
-        `Please enter a valid start year after ${this.minYear}`,
-      (v) =>
-        v <= this.endYear ||
-        `Please enter a valid start year before ${this.endYear}`,
-    ]
-  }
-  endYearRules() {
-    return [
-      (v) =>
-        v >= this.startYear ||
-        `Please enter a valid end year after ${this.startYear}`,
-      (v) =>
-        v <= this.maxYear ||
-        `Please enter a valid end year before ${this.maxYear}`,
-    ]
-  }
-  variableClasses() {
-    const datasets = this.$api().datasets.all
-    const variableClassSet = new Set()
-    for (const dataset of datasets) {
-      for (const variable of dataset.variables) {
-        variableClassSet.add(variable.class)
-      }
-    }
-    const variableClasses = []
-    for (const variableClass of variableClassSet) {
-      variableClasses.push({
-        name: variableClass,
-        checked: false,
-      })
-    }
-    return variableClasses
   }
 }
 

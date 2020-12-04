@@ -1,7 +1,7 @@
 <template>
   <v-app light>
     <Header />
-    <SideBar />
+    <DiscoverSideBar />
     <v-main>
       <Navigation />
       <v-container fluid>
@@ -16,7 +16,7 @@
 <script>
 import Header from '@/components/global/Header'
 import Navigation from '@/components/global/Navigation'
-import SideBar from '@/components/SideBar'
+import DiscoverSideBar from '@/components/DiscoverSideBar'
 import Messages from '@/components/Messages'
 import Footer from '@/components/global/Footer'
 
@@ -26,7 +26,7 @@ export default {
   components: {
     Header,
     Navigation,
-    SideBar,
+    DiscoverSideBar,
     Messages,
     Footer,
   },
