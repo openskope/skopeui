@@ -131,13 +131,11 @@
               <v-col cols="6">
                 <v-range-slider
                   v-model="temporalRange"
-                  dense
                   :min="minTemporalRange"
                   :max="maxTemporalRange"
                   hint="Temporal Range"
                   persistent-hint
                   single-line
-                  @change="updateYear"
                 >
                   <template v-slot:prepend>
                     <v-text-field
@@ -147,7 +145,7 @@
                       single-line
                       type="number"
                       style="width: 60px"
-                      @change="$set(temporalRange, 0, $event)"
+                      @change="$set(temporalRange, 0, () => validateMinYear)"
                       @input="validateMinYear"
                     ></v-text-field>
                   </template>
@@ -159,7 +157,7 @@
                       single-line
                       type="number"
                       style="width: 60px"
-                      @change="$set(temporalRange, 1, $event)"
+                      @change="$set(temporalRange, 1, () => validateMaxYear)"
                       @input="validateMaxYear"
                     ></v-text-field>
                   </template>
@@ -813,8 +811,6 @@ class DatasetDetail extends Vue {
   updateYear(year) {
     this.year = year
     this.updateWmsLayer()
-    console.log('year: ', this.year)
-    console.log(this.temporalRange)
   }
 
   updateAnimationYear() {
@@ -836,6 +832,7 @@ class DatasetDetail extends Vue {
   }
 
   validateMaxYear() {
+    c
     this.maxTemporalRange = clamp(
       this.maxTemporalRange,
       this.timespanMinYear,
