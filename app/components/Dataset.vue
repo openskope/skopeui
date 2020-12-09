@@ -73,35 +73,40 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { BaseMapProvider } from '@/store/modules/constants.js'
+import { Prop } from 'vue-property-decorator'
+import { BaseMapProvider } from '@/store/modules/constants'
 
-@Component({
-  props: {
-    title: String,
-    status: String,
-    revised: String,
-    region: Object,
-    timespan: Object,
-    description: String,
-    variables: Array,
-    id: String,
-    sourceUrl: String,
-  },
-  // app specific functions
-  computed: {
-    defaultCrs() {
-      if (this.$L) {
-        return this.$L.CRS.EPSG4326
-      }
-      return ''
-    },
-  },
-  methods: {
-    initMap() {},
-    initLayers() {},
-  },
-})
+@Component()
 class Dataset extends Vue {
+  @Prop()
+  title //: String
+
+  @Prop()
+  status //: String
+
+  @Prop()
+  revised //: String
+
+  @Prop()
+  region //: Object
+
+  @Prop()
+  timespan //: Object
+
+  @Prop()
+  description //: String
+
+  @Prop()
+  variables //: Array
+
+  @Prop()
+  id //: String
+
+  @Prop()
+  sourceUrl //: String
+
+  // --------- GETTERS ---------
+
   get defaultBaseMap() {
     return BaseMapProvider.default
   }
@@ -117,6 +122,18 @@ class Dataset extends Vue {
   get absoluteUrl() {
     return '/dataset/' + this.id
   }
+  get defaultCrs() {
+    if (this.$L) {
+      return this.$L.CRS.EPSG4326
+    }
+    return ''
+  }
+
+  // --------- METHODS ---------
+
+  initMap() {}
+
+  initLayers() {}
 }
 export default Dataset
 </script>
