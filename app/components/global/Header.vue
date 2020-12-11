@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar src="/header.png" shrink-on-scroll dense app>
+  <v-app-bar src="/header.png" shrink-on-scroll flat dense app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"

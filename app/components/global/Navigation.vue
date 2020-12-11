@@ -1,5 +1,5 @@
 <template>
-  <v-stepper v-model="e5">
+  <v-stepper v-model="e5" class="primary">
     <v-stepper-header nonlinear>
       <v-stepper-step
         step="1"
@@ -22,7 +22,7 @@
         :complete="e5 > 3"
         editable
         @click="selectStep(3)"
-        >Animate Map</v-stepper-step
+        >Visualize Data</v-stepper-step
       >
       <v-divider></v-divider>
       <v-stepper-step
@@ -30,7 +30,7 @@
         :complete="e5 > 4"
         editable
         @click="selectStep(4)"
-        >Visualize Data</v-stepper-step
+        >Analyze Data</v-stepper-step
       >
       <v-divider></v-divider>
       <v-stepper-step
@@ -47,12 +47,16 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { App, STEPS } from '@/store/modules/app'
-
 @Component()
 class Navigation extends Vue {
   e5 = 1
-  totalSteps = 5
+  steps = new Map([
+    [1, '#'],
+    [2, 'study'],
+    [3, 'visualize'],
+    [4, 'analyze'],
+    [5, 'metadata'],
+  ])
 
   // --------- GETTERS ---------
 
@@ -64,12 +68,23 @@ class Navigation extends Vue {
     return this.$api().app.isDisabled
   }
 
+  get selectedDatasetId() {
+    return this.$api().datasets.selectedDataset.id
+  }
+
   // --------- METHODS ---------
 
   selectStep(step) {
     this.e5 = step
     this.$api().app.disableDrawer(this.e5)
     this.$api().app.selectStep(this.e5)
+
+    let action = String(this.steps.get(this.e5))
+
+    this.$router.push({
+      name: 'dataset-id-action',
+      params: { id: this.selectedDatasetId, action: action },
+    })
   }
 }
 export default Navigation
