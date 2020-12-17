@@ -4,8 +4,8 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 export const STEPS = Object.freeze({
   SELECT_DATASET: 1,
   DEFINE_STUDY_AREA: 2,
-  ANIMATE_MAP: 3,
-  VISUALIZE_DATA: 4,
+  VISUALIZE_DATA: 3,
+  ANALYZE_DATA: 4,
   VIEW_METADATA: 5,
 })
 
@@ -13,7 +13,7 @@ export const STEPS = Object.freeze({
 class App extends VuexModule {
   isDisabled = 0
   currentStep = STEPS.SELECT_DATASET
-  isVisible = 0
+  isVisible = 1
 
   /**
    * Determine if drawer can be toggled.

@@ -1,10 +1,7 @@
 <template>
-  <v-navigation-drawer v-model="isVisible" absolute bottom temporary>
+  <v-navigation-drawer v-model="isVisible" permanent app>
     <section class="pt-3">
       <div class="container">
-        <v-btn class="ma-2" color="orange darken-2" dark @click="hideDrawer">
-          <v-icon dark left>fas fa-arrow-left</v-icon>Hide Menu
-        </v-btn>
         <h2 class="headline font-weight-black">Filter Datasets</h2>
         <v-form @submit.prevent>
           <v-container>
