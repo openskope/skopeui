@@ -24,6 +24,10 @@
         @click="goToViz($route.params.id)"
         >Visualize Data</v-stepper-step
       >
+      <v-divider></v-divider>
+      <v-stepper-step step="4" editable @click="selectStep(4)"
+        >Export</v-stepper-step
+      >
     </v-stepper-header>
   </v-stepper>
 </template>
