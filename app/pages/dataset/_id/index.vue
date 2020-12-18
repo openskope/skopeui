@@ -290,9 +290,7 @@ import Vue from 'vue'
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
-  BaseMapProvider,
 } from '@/store/modules/constants.js'
-import { DataSets } from '@/store/modules/datasets'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')

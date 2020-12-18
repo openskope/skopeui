@@ -158,7 +158,7 @@ class Map extends Vue {
   }
 
   clearSelectedGeometry() {
-    this.selectedGeometry = { type: 'None', coordinates: [] }
+    this.$api().dataset.clearGeometry()
     this.selectedAreaInSquareMeters = 0.0
     this.$warehouse.remove(this.wGeometryKey)
   }
@@ -251,7 +251,6 @@ class Map extends Vue {
     // 1. pull out the currently selected layer's layer template string
     // 2. update it with the current year
     // 3. reset the params on the currently selected layer to request the new layer from GeoServer
-    console.log({ layer: this.selectedLayer })
     if (this.selectedLayer !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         if (wmsLayerRef.name === this.selectedLayer.name) {
@@ -361,8 +360,6 @@ class Map extends Vue {
     map.on('baselayerchange', handler)
     this.addDrawToolbar(map)
   }
-
-  mounted() {}
 }
 export default Map
 </script>

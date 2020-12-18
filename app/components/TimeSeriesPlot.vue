@@ -28,7 +28,15 @@ class TimeSeriesPlot extends Vue {
   @Prop()
   yearSelected
 
+  get variableName() {
+    const api = this.$api()
+    return _.isEmpty(api.dataset.layer) ? '' : api.dataset.layer.name
+  }
+
   get layoutMetadata() {
+    const xaxisTitle = `Year (currently ${
+      _.isEmpty(this.yearSelected) ? `${this.yearSelected}CE` : 'None'
+    })`
     return {
       margin: {
         l: 60,
@@ -39,7 +47,7 @@ class TimeSeriesPlot extends Vue {
       },
       showlegend: false,
       xaxis: {
-        title: 'Year',
+        title: xaxisTitle,
       },
       yaxis: {
         title: this.variableName,
@@ -85,7 +93,12 @@ class TimeSeriesPlot extends Vue {
     this.$refs.plot.update(timeSeriesData, this.layoutMetadata)
   }
 
-  mounted() {}
+  @Watch('layoutMetadata')
+  getLayoutMetadata(layoutMetadata) {
+    if (this.$refs.plot) {
+      this.$refs.plot.update(this.timeSeriesData, layoutMetadata)
+    }
+  }
 }
 export default TimeSeriesPlot
 </script>
