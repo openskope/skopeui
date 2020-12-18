@@ -1,94 +1,156 @@
 <template>
-  <client-only placeholder="Loading...">
-    <div v-if="isLoadingData" class="justify-center">
-      <v-progress-circular v-if="isLoadingData" indeterminate color="primary" />
-    </div>
-    <div v-else>
-      <Plotly
-        ref="plot"
-        :data="timeSeriesData"
-        :layout="layoutMetadata"
-        :options="options"
-        @click="setYear"
-      >
-      </Plotly>
-    </div>
-  </client-only>
+  <v-container fill-width fluid>
+    <v-row dense align-content-start justify-space-around wrap>
+      <v-col v-if="isLoadingData">
+        <v-progress-circular
+          v-if="isLoadingData"
+          indeterminate
+          color="primary"
+        />
+      </v-col>
+      <template v-else>
+        <v-col id="map-flex">
+          <Map :year="yearSelected" />
+        </v-col>
+        <v-col>
+          <TimeSeriesPlot
+            :time-series="timeSeries"
+            :year-selected="yearSelected"
+            @yearSelected="setYear"
+          />
+        </v-col>
+      </template>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import { Component } from 'nuxt-property-decorator'
+import { Component, Watch } from 'nuxt-property-decorator'
+import Map from '@/components/Map.vue'
+import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Vue from 'vue'
+import { namespace } from 'vuex-class'
+const Dataset = namespace('dataset')
+const Datasets = namespace('datasets')
 
 @Component({
   layout: 'dashboard',
   components: {
-    Plotly: () => import('vue-plotly').then((vp) => vp.Plotly),
+    Map,
+    TimeSeriesPlot,
   },
 })
 class Visualize extends Vue {
   isLoadingData = true
   hasData = false
-  hasInitializedPlotly = false
 
-  yearSeries = {
-    x: [],
-    y: [],
-    type: 'scatter',
+  yearSelected = 1500
+
+  @Dataset.State('geometry')
+  selectedGeometry
+
+  @Dataset.State('layer')
+  selectedLayer
+
+  @Datasets.State('selectedDataset')
+  selectedDataset
+
+  timeSeriesUnwatcher = null
+
+  get timeSeries() {
+    const timeseries = this.$api().dataset.timeseries
+    if (timeseries.x.length > 0) {
+      return { ...this.$api().dataset.timeseries, type: 'scatter' }
+    } else {
+      return { x: [], y: [], type: 'scatter' }
+    }
   }
 
-  timeSeries = {
-    x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    y: [0.5, 0.4, 0.6, 0.55, 0.54, 0.64, 0.31, 0.24, 0.33, 0.67],
-    type: 'scatter',
+  get minYear() {
+    return parseInt(this.selectedDataset.timespan.period.gte)
   }
 
-  mounted() {
+  get maxYear() {
+    return parseInt(this.selectedDataset.timespan.period.lte)
+  }
+
+  setYear(year) {
+    this.yearSelected = year
+  }
+
+  async created() {
+    const d = this.$api().datasets
+    await d.loadDataset(this.$route.params.id)
+    this.timeSeriesUnwatcher = this.$watch(
+      function () {
+        const datasetUri = this.selectedLayer
+          ? this.selectedLayer.timeseriesServiceUri
+          : null
+        return {
+          datasetUri,
+          geometry: this.selectedGeometry,
+          minYear: this.minYear,
+          maxYear: this.maxYear,
+          zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
+        }
+      },
+      async function (data) {
+        if (data.datasetUri) {
+          await this.$api().dataset.retrieveTimeSeries(data)
+        }
+      }
+    )
+  }
+
+  async mounted() {
+    await this.updateTimeSeries()
+    this.yearSelected = this.minYear
     this.isLoadingData = false
     this.hasData = true
   }
 
-  setYear(data) {
-    let x = data.points[0].x
-    x = [x, x]
-    const y = [_.min(this.timeSeries.y), _.max(this.timeSeries.y)]
-    this.yearSeries.x.splice(0, this.yearSeries.x.length, ...x)
-    this.yearSeries.y.splice(0, this.yearSeries.y.length, ...y)
-    this.$refs.plot.update(this.timeSeriesData, this.layoutMetadata)
+  destroyed() {
+    this.timeSeriesUnwatcher()
   }
 
-  get timeSeriesData() {
-    return this.yearSeries.x.length === 0
-      ? [this.timeSeries]
-      : [this.timeSeries, this.yearSeries]
+  async updateTimeSeries() {
+    const api = this.$api()
+    await api.dataset.retrieveTimeSeries({
+      datasetUri: this.selectedDataset.timeseriesServiceUri,
+      geometry: this.selectedGeometry,
+      minYear: this.minYear,
+      maxYear: this.minYear,
+      zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
+    })
   }
 
-  get layoutMetadata() {
-    return {
-      margin: {
-        l: 60,
-        r: 10,
-        b: 60,
-        t: 10,
-        pad: 4,
-      },
-      showlegend: false,
-      xaxis: {
-        title: 'Year',
-      },
-      yaxis: {
-        title: this.variableName,
-      },
-    }
-  }
-
-  get options() {
-    return {
-      modeBarButtonsToRemove: ['toImage'],
-      // responsive: true
+  @Watch()
+  async changeTimeSeries(data) {
+    if (data.datasetUri) {
+      const api = this.$api()
+      await api.dataset.retrieveTimeSeries(data)
     }
   }
 }
 
 export default Visualize
 </script>
+
+<style>
+#map-flex {
+  height: 520px;
+  margin-bottom: 2rem;
+}
+
+@media all and (max-width: 960px) {
+  #map-flex {
+    height: 400px;
+  }
+}
+
+@media all and (max-width: 600px) {
+  #map-flex {
+    height: 350px;
+  }
+}
+</style>

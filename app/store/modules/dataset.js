@@ -9,6 +9,7 @@ import {
   MutationAction,
 } from 'vuex-module-decorators'
 import { API } from '@/plugins/store'
+import Vue from 'vue'
 
 // Would need to make a custom debounce decorator so
 // that debounced methods can exist in a vue-class-component
@@ -84,10 +85,27 @@ class DataSet extends VuexModule {
   }
   isLoadingData = false
   hasData = false
+  geometry = { type: 'None', coordinates: [] }
+  layer = null
 
   @Mutation
   setIsLoading(value) {
     this.isLoadingData = value
+  }
+
+  @Mutation
+  setGeometry(geometry) {
+    Vue.set(this, 'geometry', geometry)
+  }
+
+  @Mutation
+  clearGeometry() {
+    Vue.set(this, 'geometry', { type: 'None', coordinates: [] })
+  }
+
+  @Mutation
+  setLayer(layer) {
+    Vue.set(this, 'layer', layer)
   }
 
   @Mutation
