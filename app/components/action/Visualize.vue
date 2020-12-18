@@ -1,21 +1,6 @@
 <template>
   <v-container fill-width fluid>
-    <h2>Define Study Area</h2>
-    <v-card>
-      <v-card-title class="pb-0">
-        <h2 class="headline">
-          {{ selectedDataset.title }}
-        </h2>
-      </v-card-title>
-      <v-subheader class="subheading">
-        {{ spatialCoverage }} | {{ temporalCoverage }}
-      </v-subheader>
-      <v-card-text class="body">
-        <template lang="md">
-          {{ selectedDataset.description }}
-        </template>
-      </v-card-text>
-    </v-card>
+    <h2>Visualize Data</h2>
     <v-row dense align-content-start justify-space-around wrap>
       <v-col id="map-flex" xs12 md7>
         <!-- map -->
@@ -104,23 +89,23 @@
               Selected area: {{ selectedArea }} km<sup>2</sup>
             </template>
             <v-spacer></v-spacer>
-            <!--            <v-btn icon @click="gotoFirstYear">-->
-            <!--              <v-icon>skip_previous</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn icon @click="previousYear">-->
-            <!--              <v-icon>arrow_left</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn-toggle icon background-color="indigo">-->
-            <!--              <v-btn text @click="togglePlay">-->
-            <!--                <v-icon>{{ playIcon }}</v-icon>-->
-            <!--              </v-btn>-->
-            <!--            </v-btn-toggle>-->
-            <!--            <v-btn icon @click="nextYear">-->
-            <!--              <v-icon>arrow_right</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn icon @click="gotoLastYear">-->
-            <!--              <v-icon>skip_next</v-icon>-->
-            <!--            </v-btn>-->
+            <v-btn icon @click="gotoFirstYear">
+              <v-icon>skip_previous</v-icon>
+            </v-btn>
+            <v-btn icon @click="previousYear">
+              <v-icon>arrow_left</v-icon>
+            </v-btn>
+            <v-btn-toggle icon background-color="indigo">
+              <v-btn text @click="togglePlay">
+                <v-icon>{{ playIcon }}</v-icon>
+              </v-btn>
+            </v-btn-toggle>
+            <v-btn icon @click="nextYear">
+              <v-icon>arrow_right</v-icon>
+            </v-btn>
+            <v-btn icon @click="gotoLastYear">
+              <v-icon>skip_next</v-icon>
+            </v-btn>
           </v-toolbar>
           <!-- end toolbar -->
           <!-- filter sliders -->
@@ -189,6 +174,108 @@
         </v-sheet>
         <!-- end map controls -->
       </v-col>
+      <v-col xs12 md5>
+        <div class="px-2">
+          <v-card>
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header disable-icon-rotate>
+                  <h3 class="blue--text">Time Series (click for more info)</h3>
+                  <template v-slot:actions>
+                    <v-icon color="primary">info</v-icon>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-alert border="left" color="blue lighten-3" prominent>
+                    Please select a
+                    <b>study area</b> and <b>variable of interest</b> to display
+                    a time series for the given date range. You can
+                    <b>select a study area</b>
+                    with the toolbar on the left side of the map and
+                    <b>select a variable</b> using the layer controls
+                    <v-icon>fas fa-layer-group</v-icon> at the top and bottom
+                    right corners of the map.
+                  </v-alert>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
+            <v-card-title class="pb-0">
+              <h2 class="headline">
+                {{ selectedDataset.title }}
+              </h2>
+            </v-card-title>
+            <v-subheader class="subheading">
+              {{ spatialCoverage }} | {{ temporalCoverage }}
+            </v-subheader>
+            <v-card-text class="body">
+              <template lang="md">
+                {{ selectedDataset.description }}
+              </template>
+            </v-card-text>
+            <v-card-actions
+              v-if="isLayerSelected && selectedGeometry.coordinates.length > 0"
+            >
+              <time-series
+                :dataset-uri="selectedLayer.timeseriesServiceUri"
+                :time-zero="selectedDatasetTimeZero"
+                :geometry="selectedGeometry"
+                :variable-name="selectedLayerName"
+                :min-year="minTemporalRange"
+                :max-year="maxTemporalRange"
+              />
+            </v-card-actions>
+            <v-subheader class="title">Variables</v-subheader>
+            <v-list three-line dense light class="py-0">
+              <v-list-item
+                v-for="(variable, index) in selectedDataset.variables"
+                :key="index"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    <v-chip small color="info" text-color="white">
+                      <v-icon>view_column</v-icon>
+                      {{ variable.class }}
+                    </v-chip>
+                    {{ variable.name }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="my-0 py-0 mx-3">
+                    {{ variable.description }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+            <v-card-text class="pt-0">
+              <div class="citation font-weight-bold">
+                <em> Source: </em>
+                <a target="_blank" :href="selectedDataset.sourceUrl">
+                  {{ selectedDataset.sourceUrl }}
+                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+                </a>
+              </div>
+            </v-card-text>
+            <v-card-text height="100%" class="pt-0 mx-0">
+              <v-expansion-panels flat focusable>
+                <v-expansion-panel class="elevation-0">
+                  <v-expansion-panel-header class="title px-0 mx-0">
+                    Detailed Metadata
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <div
+                      v-for="(label, attr) in metadataAttributes"
+                      :key="attr"
+                      class="py-0"
+                    >
+                      <span class="font-weight-bold"> {{ label }}: </span>
+                      <div v-html="$md.render(selectedDataset[attr])"></div>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-card-text>
+          </v-card>
+        </div>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -204,7 +291,9 @@ import Vue from 'vue'
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
+  BaseMapProvider,
 } from '@/store/modules/constants.js'
+import { DataSets } from '@/store/modules/datasets'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -217,7 +306,7 @@ const Datasets = namespace('datasets')
     'time-series': () => import('@/components/TimeSeries.vue'),
   },
 })
-class DatasetDetail extends Vue {
+class Visualize extends Vue {
   minTemporalRange = 0
   maxTemporalRange = new Date().getFullYear()
   selectedLayer = null
@@ -731,7 +820,7 @@ class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id)
   }
 }
-export default DatasetDetail
+export default Visualize
 </script>
 <style>
 .leaflet-top.leaflet-right
