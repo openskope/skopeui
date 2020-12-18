@@ -1,6 +1,25 @@
 <template>
   <v-container fill-width fluid>
-    <h2>Visualize Data</h2>
+    <v-row>
+      <h2 class="mx-5">Visualize Data</h2>
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            View Metadata
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline"> Metadata </v-card-title>
+          <v-card-text><Metadata /></v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="dialog = false">
+              Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
     <v-row dense align-content-start justify-space-around wrap>
       <v-col id="map-flex" xs12 md7>
         <!-- map -->
@@ -225,35 +244,6 @@
                 :max-year="maxTemporalRange"
               />
             </v-card-actions>
-            <v-subheader class="title">Variables</v-subheader>
-            <v-list three-line dense light class="py-0">
-              <v-list-item
-                v-for="(variable, index) in selectedDataset.variables"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <v-chip small color="info" text-color="white">
-                      <v-icon>view_column</v-icon>
-                      {{ variable.class }}
-                    </v-chip>
-                    {{ variable.name }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle class="my-0 py-0 mx-3">
-                    {{ variable.description }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-            <v-card-text class="pt-0">
-              <div class="citation font-weight-bold">
-                <em> Source: </em>
-                <a target="_blank" :href="selectedDataset.sourceUrl">
-                  {{ selectedDataset.sourceUrl }}
-                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
-                </a>
-              </div>
-            </v-card-text>
             <v-card-text height="100%" class="pt-0 mx-0">
               <v-expansion-panels flat focusable>
                 <v-expansion-panel class="elevation-0">
@@ -294,6 +284,7 @@ import {
   BaseMapProvider,
 } from '@/store/modules/constants.js'
 import { DataSets } from '@/store/modules/datasets'
+import Metadata from '@/components/action/Metadata.vue'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -304,6 +295,7 @@ const Datasets = namespace('datasets')
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
     'time-series': () => import('@/components/TimeSeries.vue'),
+    Metadata,
   },
 })
 class Visualize extends Vue {
@@ -333,6 +325,7 @@ class Visualize extends Vue {
   selectedDatasetTimespan
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
+  dialog = false
 
   async created() {
     const d = this.$api().datasets
@@ -452,6 +445,10 @@ class Visualize extends Vue {
 
   get absoluteUrl() {
     return '/dataset/' + this.selectedDataset.id
+  }
+
+  get metadata() {
+    return '/dataset/' + this.selectedDataset.id + '/metadata'
   }
 
   togglePlay(event) {
