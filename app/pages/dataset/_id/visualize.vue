@@ -71,10 +71,14 @@
         </v-col>
         <v-col>
           <TimeSeriesPlot
+            v-if="hasTimeSeries"
             :time-series="timeSeries"
             :year-selected="yearSelected"
             @yearSelected="setYear"
           />
+          <v-alert v-else color="blue lighten-2">
+            A study area needs to be selected for a timeseries to be displayed
+          </v-alert>
         </v-col>
       </template>
     </v-row>
@@ -116,6 +120,10 @@ class Visualize extends Vue {
   selectedDataset
 
   timeSeriesUnwatcher = null
+
+  get hasTimeSeries() {
+    return this.timeSeries.x.length > 0
+  }
 
   get timeSeries() {
     const timeseries = this.$api().dataset.timeseries
@@ -283,7 +291,7 @@ class Visualize extends Vue {
 
   @Watch()
   async changeTimeSeries(data) {
-    if (data.datasetUri) {
+    if (data.datasetUri && data.selectedGeometry.type !== 'None') {
       const api = this.$api()
       await api.dataset.retrieveTimeSeries(data)
     }
