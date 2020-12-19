@@ -71,9 +71,11 @@ class Map extends Vue {
   @Prop()
   year
 
+  @Prop()
+  opacity
+
   maxTemporalRange = new Date().getFullYear()
 
-  opacity = 30
   defaultRegionOpacity = 0.05
   defaultCircleToPolygonEdges = 32
   legendImage = null
