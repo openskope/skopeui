@@ -17,6 +17,7 @@
         <v-col id="map-flex">
           <Map :year="yearSelected" :opacity="opacity" />
           <v-toolbar color="indigo" dark dense>
+            <v-toolbar-title>Opacity: </v-toolbar-title>
             <v-btn icon @click="decreaseOpacity">
               <v-icon>fas fa-minus</v-icon>
             </v-btn>
@@ -110,7 +111,7 @@ const Dataset = namespace('dataset')
 const Datasets = namespace('datasets')
 
 @Component({
-  layout: 'dashboard',
+  layout: 'BaseDataset',
   components: {
     Map,
     TimeSeriesPlot,

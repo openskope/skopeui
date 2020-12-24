@@ -1,44 +1,28 @@
 <template>
-  <v-stepper v-model="e5" class="primary">
+  <v-stepper class="primary">
     <v-stepper-header nonlinear>
       <v-stepper-step
         step="1"
-        :complete="e5 > 1"
-        editable
-        @click="selectStep(1)"
+        :complete="complete(0)"
+        :editable="$route.name !== 'index'"
+        @click="goToDataSets"
         >Select Data Set</v-stepper-step
       >
       <v-divider></v-divider>
       <v-stepper-step
         step="2"
-        :complete="e5 > 2"
-        editable
-        @click="selectStep(2)"
+        :complete="complete(1)"
+        :editable="hasSelectedDataSet && $route.name !== 'dataset-id-studyarea'"
+        @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
       >
       <v-divider></v-divider>
       <v-stepper-step
         step="3"
-        :complete="e5 > 3"
-        editable
-        @click="selectStep(3)"
+        :complete="complete(2)"
+        :editable="hasSelectedDataSet && $route.name !== 'dataset-id-visualize'"
+        @click="goToViz($route.params.id)"
         >Visualize Data</v-stepper-step
-      >
-      <v-divider></v-divider>
-      <v-stepper-step
-        step="4"
-        :complete="e5 > 4"
-        editable
-        @click="selectStep(4)"
-        >Analyze Data</v-stepper-step
-      >
-      <v-divider></v-divider>
-      <v-stepper-step
-        step="5"
-        :complete="e5 > 5"
-        editable
-        @click="selectStep(5)"
-        >View Metadata</v-stepper-step
       >
     </v-stepper-header>
   </v-stepper>
@@ -47,21 +31,60 @@
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
+import _ from 'lodash'
+
 @Component()
 class Navigation extends Vue {
-  e5 = 1
-  steps = new Map([
-    [1, '#'],
-    [2, 'study'],
-    [3, 'visualize'],
-    [4, 'analyze'],
-    [5, 'metadata'],
-  ])
+  steps = [
+    {
+      step: 1,
+      name: 'index',
+      label: 'Select Data Set',
+    },
+    {
+      step: 2,
+      name: 'dataset-id-studyarea',
+      label: 'Define Study Area',
+    },
+    {
+      step: 3,
+      name: 'dataset-id-visualize',
+      label: 'Visualize Data',
+    },
+  ]
+
+  step_names = ['index', 'dataset-id-studyarea', 'dataset-id-visualize']
+
+  complete(index) {
+    return this.currentStep > index
+  }
+
+  get hasSelectedDataSet() {
+    return !_.isUndefined(this.$route.params.id)
+  }
 
   // --------- GETTERS ---------
 
+  goToDataSets() {
+    this.$router.push({ name: 'index' })
+  }
+
+  goToStudyArea(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-studyarea', params: { id } })
+  }
+
+  goToViz(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-visualize', params: { id } })
+  }
+
   get currentStep() {
-    return this.$api().app.currentStep
+    return this.step_names.findIndex((x) => x === this.$route.name)
   }
 
   get isDisabled() {

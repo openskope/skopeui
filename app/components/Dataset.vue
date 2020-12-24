@@ -120,7 +120,7 @@ class Dataset extends Vue {
     return `${timespan}${period.suffix} ${this.timespan.resolutionLabel}`
   }
   get absoluteUrl() {
-    return '/dataset/' + this.id
+    return `/dataset/${this.id}/studyarea`
   }
   get defaultCrs() {
     if (this.$L) {
