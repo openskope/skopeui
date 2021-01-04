@@ -20,6 +20,9 @@
     </v-toolbar-title>
     <v-spacer />
     <v-toolbar-items>
+      <v-btn icon :href="github.url">
+        <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
+      </v-btn>
       <v-btn text><v-icon left dark>help</v-icon>Help</v-btn>
       <v-btn text href="https://www.comses.net/about/contact/" target="_blank">
         <v-icon left dark>email</v-icon>
@@ -35,6 +38,10 @@ import { Prop, Watch } from 'vue-property-decorator'
 
 @Component()
 class Header extends Vue {
+  github = {
+    icon: 'fab fa-github',
+    url: 'https://github.com/openskope/skopeui',
+  }
   // --------- GETTERS ---------
 
   get isDisabled() {
