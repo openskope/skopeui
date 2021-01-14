@@ -2,7 +2,6 @@
   <v-row>
     <Analyze v-if="isAnalyze($route.params.action)" />
     <Visualize v-if="isVisualize($route.params.action)" />
-    <Metadata v-if="isMetadata($route.params.action)" />
   </v-row>
 </template>
 

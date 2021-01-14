@@ -3,7 +3,7 @@
     <v-row>
       <h2 class="mx-5">Analyze Data</h2>
       <v-dialog v-model="dialog" persistent max-width="600px">
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             View Metadata
           </v-btn>

@@ -35,7 +35,7 @@
             />
             <v-toolbar color="indigo" dark dense>
               <v-tooltip top>
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     v-bind="attrs"
                     icon
@@ -56,7 +56,7 @@
                 @change="loadGeoJson"
               />
               <v-tooltip top>
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     v-bind="attrs"
                     icon

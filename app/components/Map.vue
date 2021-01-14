@@ -68,10 +68,10 @@ const fillTemplate = require('es6-dynamic-template')
   components: {},
 })
 class Map extends Vue {
-  @Prop()
+  @Prop({ default: 2000 })
   year
 
-  @Prop()
+  @Prop({ default: 0.5 })
   opacity
 
   maxTemporalRange = new Date().getFullYear()

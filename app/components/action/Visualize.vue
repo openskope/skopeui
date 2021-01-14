@@ -1,9 +1,9 @@
 <template>
   <v-container fill-width fluid>
     <v-row>
-      <h2 class="mx-5">Visualize Data</h2>
+      <h2 class="mx-5">{{ selectedDataset.title }}</h2>
       <v-dialog v-model="dialog" persistent max-width="600px">
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             View Metadata
           </v-btn>
@@ -20,7 +20,21 @@
         </v-card>
       </v-dialog>
     </v-row>
-    <v-row dense align-content-start justify-space-around wrap>
+    <v-row dense align-content-start justify-space-around wrap class="my-3">
+      <!-- palmer modified drought index opacity -->
+      <v-col md="auto" cols="2" class="mx-5 px-3">
+        <v-slider
+          v-model="opacity"
+          class="v-slider--vertical"
+          vertical
+          min="0"
+          max="100"
+          step="1"
+          thumb-label="always"
+          :thumb-size="25"
+        >
+        </v-slider>
+      </v-col>
       <v-col id="map-flex" xs12 md7>
         <!-- map -->
         <div class="map px-2">
@@ -76,7 +90,7 @@
           <!-- toolbar -->
           <v-toolbar color="indigo" dark dense>
             <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn
                   v-bind="attrs"
                   icon
@@ -97,7 +111,7 @@
               @change="loadGeoJson"
             />
             <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
                   <v-icon>fas fa-upload</v-icon>
                 </v-btn>
@@ -127,80 +141,102 @@
             </v-btn>
           </v-toolbar>
           <!-- end toolbar -->
-          <!-- filter sliders -->
           <v-container height="100%">
             <v-row dense>
-              <!-- palmer modified drought index opacity -->
-              <v-col cols="6">
-                <v-slider
-                  v-model="opacity"
-                  dense
-                  hint="Palmer Modified Drought Index Opacity"
-                  persistent-hint
-                  min="0"
-                  max="100"
-                  step="1"
-                  thumb-label="always"
-                  :thumb-size="24"
-                />
-              </v-col>
               <!-- temporal range -->
-              <v-col cols="6">
-                <v-slider
-                  dense
-                  :value="year"
-                  :max="maxTemporalRange"
-                  :min="minTemporalRange"
-                  :thumb-size="32"
-                  hint="Temporal Range"
-                  persistent-hint
-                  thumb-label="always"
-                  @change="updateYear"
-                >
-                  <template v-slot:prepend>
-                    <v-text-field
-                      v-model="minTemporalRange"
-                      class="pt-0 mt-0"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      hint="Start Year"
-                      hide-details
-                      single-line
-                      type="number"
-                      style="width: 60px"
-                      @input="validateMinYear"
-                    ></v-text-field>
-                  </template>
-                  <template v-slot:append>
-                    <v-text-field
-                      v-model="maxTemporalRange"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      class="pt-0 mt-0"
-                      hint="End Year"
-                      hide-details
-                      single-line
-                      type="number"
-                      style="width: 60px"
-                      @input="validateMaxYear"
-                    ></v-text-field>
-                  </template>
-                </v-slider>
-              </v-col>
+              <v-slider
+                dense
+                :value="year"
+                :max="maxTemporalRange"
+                :min="minTemporalRange"
+                :thumb-size="32"
+                hint="Temporal Range"
+                persistent-hint
+                thumb-label="always"
+                @change="updateYear"
+              >
+                <template #prepend>
+                  <v-text-field
+                    v-model="minTemporalRange"
+                    class="pt-0 mt-0"
+                    :min="timespanMinYear"
+                    :max="timespanMaxYear"
+                    hint="Start Year"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                    @input="validateMinYear"
+                  ></v-text-field>
+                </template>
+                <template #append>
+                  <v-text-field
+                    v-model="maxTemporalRange"
+                    :min="timespanMinYear"
+                    :max="timespanMaxYear"
+                    class="pt-0 mt-0"
+                    hint="End Year"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                    @input="validateMaxYear"
+                  ></v-text-field>
+                </template>
+              </v-slider>
             </v-row>
           </v-container>
-          <!-- end filter sliders -->
         </v-sheet>
         <!-- end map controls -->
       </v-col>
       <v-col xs12 md5>
         <div class="px-2">
           <v-card>
+            <!--            <v-card>-->
+            <v-card-title class="pb-0"> </v-card-title>
+            <v-subheader class="subheading">
+              {{ spatialCoverage }} | {{ temporalCoverage }}
+            </v-subheader>
+            <v-card-text class="body">
+              <template lang="md">
+                {{ selectedDataset.description }}
+              </template>
+            </v-card-text>
+            <v-subheader class="title">Variables</v-subheader>
+            <v-list three-line dense light class="py-0">
+              <v-list-item
+                v-for="(variable, index) in selectedDataset.variables"
+                :key="index"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    <v-chip small color="info" text-color="white">
+                      <v-icon>view_column</v-icon>
+                      {{ variable.class }}
+                    </v-chip>
+                    {{ variable.name }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="my-0 py-0 mx-3">
+                    {{ variable.description }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+            <v-card-text class="pt-0">
+              <div class="citation font-weight-bold">
+                <em> Source: </em>
+                <a target="_blank" :href="selectedDataset.sourceUrl">
+                  {{ selectedDataset.sourceUrl }}
+                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+                </a>
+              </div>
+            </v-card-text>
+            <!--            </v-card>-->
             <v-expansion-panels>
               <v-expansion-panel>
                 <v-expansion-panel-header disable-icon-rotate>
                   <h3 class="blue--text">Time Series (click for more info)</h3>
-                  <template v-slot:actions>
+                  <template #actions>
                     <v-icon color="primary">info</v-icon>
                   </template>
                 </v-expansion-panel-header>
@@ -218,20 +254,6 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
-
-            <v-card-title class="pb-0">
-              <h2 class="headline">
-                {{ selectedDataset.title }}
-              </h2>
-            </v-card-title>
-            <v-subheader class="subheading">
-              {{ spatialCoverage }} | {{ temporalCoverage }}
-            </v-subheader>
-            <v-card-text class="body">
-              <template lang="md">
-                {{ selectedDataset.description }}
-              </template>
-            </v-card-text>
             <v-card-actions
               v-if="isLayerSelected && selectedGeometry.coordinates.length > 0"
             >
@@ -244,25 +266,6 @@
                 :max-year="maxTemporalRange"
               />
             </v-card-actions>
-            <v-card-text height="100%" class="pt-0 mx-0">
-              <v-expansion-panels flat focusable>
-                <v-expansion-panel class="elevation-0">
-                  <v-expansion-panel-header class="title px-0 mx-0">
-                    Detailed Metadata
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <div
-                      v-for="(label, attr) in metadataAttributes"
-                      :key="attr"
-                      class="py-0"
-                    >
-                      <span class="font-weight-bold"> {{ label }}: </span>
-                      <div v-html="$md.render(selectedDataset[attr])"></div>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-card-text>
           </v-card>
         </div>
       </v-col>
@@ -846,6 +849,14 @@ export default Visualize
   #map-flex {
     height: 350px;
   }
+}
+
+.v-slider--vertical {
+  height: 40vh;
+}
+
+.opacity {
+  transform: rotateZ(270deg);
 }
 
 .map {

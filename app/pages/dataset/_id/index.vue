@@ -1,9 +1,11 @@
 <template>
-  <v-container fill-width fluid>
+  <v-container fill-width height="100%" fluid>
     <v-row>
-      <h2 class="mx-5">Define Study Area</h2>
+      <h2 class="mx-3">
+        {{ selectedDataset.title }}
+      </h2>
       <v-dialog v-model="dialog" persistent max-width="600px">
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             View Metadata
           </v-btn>
@@ -20,222 +22,106 @@
         </v-card>
       </v-dialog>
     </v-row>
-    <v-card>
-      <v-card-title class="pb-0">
-        <h2 class="headline">
-          {{ selectedDataset.title }}
-        </h2>
-      </v-card-title>
-      <v-subheader class="subheading">
-        {{ spatialCoverage }} | {{ temporalCoverage }}
-      </v-subheader>
-      <v-card-text class="body">
-        <template lang="md">
-          {{ selectedDataset.description }}
-        </template>
-      </v-card-text>
-      <v-subheader class="title">Variables</v-subheader>
-      <v-list three-line dense light class="py-0">
-        <v-list-item
-          v-for="(variable, index) in selectedDataset.variables"
-          :key="index"
-        >
-          <v-list-item-content>
-            <v-list-item-title>
-              <v-chip small color="info" text-color="white">
-                <v-icon>view_column</v-icon>
-                {{ variable.class }}
-              </v-chip>
-              {{ variable.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle class="my-0 py-0 mx-3">
-              {{ variable.description }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-      <v-card-text class="pt-0">
-        <div class="citation font-weight-bold">
-          <em> Source: </em>
-          <a target="_blank" :href="selectedDataset.sourceUrl">
-            {{ selectedDataset.sourceUrl }}
-            <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
-          </a>
-        </div>
-      </v-card-text>
-    </v-card>
-    <v-row dense align-content-start justify-space-around wrap>
-      <v-col id="map-flex" xs12 md7>
-        <!-- map -->
-        <div class="map px-2">
-          <client-only placeholder="Loading map, please wait...">
-            <l-map
-              ref="layerMap"
-              :min-zoom="3"
-              :zoom="4"
-              :center="selectedDataset.region.center"
+    <v-row
+      height="100%"
+      class="my-5"
+      dense
+      align-content-start
+      justify-space-around
+      wrap
+    >
+      <v-col id="map-flex" height="100%" cols="9" xs12 md7>
+        <v-card flat outlined height="100%" class="map blue-grey lighten-5">
+          <v-card-title>Map</v-card-title>
+          <Map />
+          <v-sheet inset>
+            <v-toolbar dark dense>
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    icon
+                    v-on="on"
+                    @click="exportSelectedGeometry"
+                  >
+                    <a id="exportSelectedGeometry">
+                      <v-icon>fas fa-download</v-icon>
+                    </a>
+                  </v-btn>
+                </template>
+                <span>Download selected geometry as a GeoJSON file</span>
+              </v-tooltip>
+              <input
+                id="loadGeoJsonFile"
+                type="file"
+                style="display: none"
+                @change="loadGeoJson"
+              />
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    icon
+                    v-on="on"
+                    @click="selectGeoJsonFile"
+                  >
+                    <v-icon>fas fa-upload</v-icon>
+                  </v-btn>
+                </template>
+                <span>Upload a GeoJSON file</span>
+              </v-tooltip>
+              <template v-if="selectedArea > 0">
+                Selected area: {{ selectedArea }} km<sup>2</sup>
+              </template>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <!-- end toolbar -->
+          </v-sheet>
+        </v-card>
+      </v-col>
+      <v-col cols="3">
+        <v-card>
+          <v-card-title class="blue-grey lighten-5">Metadata</v-card-title>
+          <v-subheader
+            >{{ spatialCoverage }} | {{ temporalCoverage }}</v-subheader
+          >
+          <v-card-text>
+            {{ selectedDataset.description }}
+          </v-card-text>
+          <!-- FIXME: extract this to a component and reuse across the detail page -->
+          <v-card-text>Variables</v-card-text>
+          <v-list dense light>
+            <v-list-item
+              v-for="(variable, index) in selectedDataset.variables"
+              :key="index"
             >
-              <l-control-attribution position="topright" />
-              <l-control-layers :sort-layers="false" position="topright" />
-              <l-tile-layer
-                v-for="provider of leafletProviders"
-                :key="provider.name"
-                :url="provider.url"
-                :name="provider.name"
-                :attribution="provider.attribution"
-                :visible="provider.default"
-                :min-zoom="provider.minZoom"
-                :max-zoom="provider.maxZoom"
-                layer-type="base"
-              />
-              <l-rectangle
-                :bounds="selectedDataset.region.extents"
-                :style="selectedDataset.region.style"
-                :fill-opacity="defaultRegionOpacity"
-              />
-              <l-control-layers :sort-layers="false" position="topright" />
-              <l-wms-tile-layer
-                v-for="variable of selectedDataset.variables"
-                ref="wmsLayers"
-                :key="variable.wmsLayer"
-                :base-url="skopeWmsUrl"
-                :layers="fillTemplateYear(variable.wmsLayer)"
-                :name="variable.name"
-                :crs="defaultCrs"
-                :transparent="true"
-                :opacity="layerOpacity"
-                layer-type="base"
-                :attribution="variable.name"
-                :visible="variable.visible"
-                version="1.3.0"
-                format="image/png"
-              />
-              <l-control-scale position="bottomright" />
-            </l-map>
-          </client-only>
-        </div>
-        <!-- end map -->
-        <!-- map controls -->
-        <v-sheet inset class="mx-2">
-          <!-- toolbar -->
-          <v-toolbar color="indigo" dark dense>
-            <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-bind="attrs"
-                  icon
-                  v-on="on"
-                  @click="exportSelectedGeometry"
-                >
-                  <a id="exportSelectedGeometry">
-                    <v-icon>fas fa-download</v-icon>
-                  </a>
-                </v-btn>
-              </template>
-              <span>Download selected geometry as a GeoJSON file</span>
-            </v-tooltip>
-            <input
-              id="loadGeoJsonFile"
-              type="file"
-              style="display: none"
-              @change="loadGeoJson"
-            />
-            <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
-                  <v-icon>fas fa-upload</v-icon>
-                </v-btn>
-              </template>
-              <span>Upload a GeoJSON file</span>
-            </v-tooltip>
-            <template v-if="selectedArea > 0">
-              Selected area: {{ selectedArea }} km<sup>2</sup>
-            </template>
-            <v-spacer></v-spacer>
-            <!--            <v-btn icon @click="gotoFirstYear">-->
-            <!--              <v-icon>skip_previous</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn icon @click="previousYear">-->
-            <!--              <v-icon>arrow_left</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn-toggle icon background-color="indigo">-->
-            <!--              <v-btn text @click="togglePlay">-->
-            <!--                <v-icon>{{ playIcon }}</v-icon>-->
-            <!--              </v-btn>-->
-            <!--            </v-btn-toggle>-->
-            <!--            <v-btn icon @click="nextYear">-->
-            <!--              <v-icon>arrow_right</v-icon>-->
-            <!--            </v-btn>-->
-            <!--            <v-btn icon @click="gotoLastYear">-->
-            <!--              <v-icon>skip_next</v-icon>-->
-            <!--            </v-btn>-->
-          </v-toolbar>
-          <!-- end toolbar -->
-          <!-- filter sliders -->
-          <v-container height="100%">
-            <v-row dense>
-              <!-- palmer modified drought index opacity -->
-              <v-col cols="6">
-                <v-slider
-                  v-model="opacity"
-                  dense
-                  hint="Palmer Modified Drought Index Opacity"
-                  persistent-hint
-                  min="0"
-                  max="100"
-                  step="1"
-                  thumb-label="always"
-                  :thumb-size="24"
-                />
-              </v-col>
-              <!-- temporal range -->
-              <v-col cols="6">
-                <v-slider
-                  dense
-                  :value="year"
-                  :max="maxTemporalRange"
-                  :min="minTemporalRange"
-                  :thumb-size="32"
-                  hint="Temporal Range"
-                  persistent-hint
-                  thumb-label="always"
-                  @change="updateYear"
-                >
-                  <template v-slot:prepend>
-                    <v-text-field
-                      v-model="minTemporalRange"
-                      class="pt-0 mt-0"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      hint="Start Year"
-                      hide-details
-                      single-line
-                      type="number"
-                      style="width: 60px"
-                      @input="validateMinYear"
-                    ></v-text-field>
-                  </template>
-                  <template v-slot:append>
-                    <v-text-field
-                      v-model="maxTemporalRange"
-                      :min="timespanMinYear"
-                      :max="timespanMaxYear"
-                      class="pt-0 mt-0"
-                      hint="End Year"
-                      hide-details
-                      single-line
-                      type="number"
-                      style="width: 60px"
-                      @input="validateMaxYear"
-                    ></v-text-field>
-                  </template>
-                </v-slider>
-              </v-col>
-            </v-row>
-          </v-container>
-          <!-- end filter sliders -->
-        </v-sheet>
-        <!-- end map controls -->
+              <v-list-item-content>
+                <v-list-item-title class="variable">
+                  <v-chip
+                    small
+                    label
+                    class="ma-2"
+                    color="indigo"
+                    text-color="white"
+                  >
+                    <v-icon>view_column</v-icon>
+                    {{ variable.class }}
+                  </v-chip>
+                  {{ variable.name }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+          <v-card-text>
+            <div class="py-3 citation font-weight-bold">
+              <em> Source: </em>
+              <a target="_blank" :href="sourceUrl">
+                {{ sourceUrl }}
+                <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+              </a>
+            </div>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -245,6 +131,7 @@
 import circleToPolygon from 'circle-to-polygon'
 import { clamp } from 'lodash'
 import { Component } from 'nuxt-property-decorator'
+import { Prop } from 'vue-property-decorator'
 import { stringify } from 'query-string'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
@@ -253,8 +140,8 @@ import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
 } from '@/store/modules/constants.js'
-import { DataSets } from '@/store/modules/datasets'
 import Metadata from '@/components/action/Metadata.vue'
+import Map from '@/components/Map.vue'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
@@ -264,31 +151,11 @@ const Datasets = namespace('datasets')
   components: {
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
-    'time-series': () => import('@/components/TimeSeries.vue'),
     Metadata,
+    Map,
   },
 })
 class DatasetDetail extends Vue {
-  minTemporalRange = 0
-  maxTemporalRange = new Date().getFullYear()
-  selectedLayer = null
-  legendControl = null
-  legendImage = null
-  toggleAnimation = null
-  year = 1
-  defaultRegionOpacity = 0.05
-  opacity = 30
-  legendPosition = 'bottomleft'
-  isAnimationPlaying = false
-  showDetails = false
-  animationSpeed = 2000
-  defaultCircleToPolygonEdges = 32
-  selectedGeometry = { type: 'None', coordinates: [] }
-  selectedAreaInSquareMeters = 0.0
-  wGeometryKey = 'skope:geometry'
-  wMinTemporalRangeKey = 'skope:temporal-range-min'
-  wMaxTemporalRangeKey = 'skope:temporal-range-max'
-
   @Datasets.State('selectedDataset')
   selectedDataset
   @Datasets.Getter('selectedDatasetTimespan')
@@ -296,40 +163,12 @@ class DatasetDetail extends Vue {
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
 
-  dialog = false
-
+  // created lifecycle hook
   async created() {
     const d = this.$api().datasets
     await d.loadDataset(this.$route.params.id)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear
-  }
-
-  mounted() {
-    this.$nextTick(() => {
-      const map = this.$refs.layerMap.mapObject
-      const handler = (event) => {
-        const layer = event.layer
-        const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
-        if (isSkopeLayer) {
-          const variable = _.find(
-            this.selectedDataset.variables,
-            (v) => v.name === event.name
-          )
-          this.selectedLayer = variable
-          this.updateWmsLegend(map, layer.wmsParams.layers)
-          layer.bringToFront()
-        }
-      }
-      if (this.selectedDataset.variables.length === 1) {
-        let defaultVariable = this.selectedDataset.variables[0]
-        this.$api().datasets.selectVariable(defaultVariable.id)
-        this.selectedLayer = defaultVariable
-      }
-      map.on('overlayadd', handler)
-      map.on('baselayerchange', handler)
-      this.addDrawToolbar(map)
-    })
   }
 
   get selectedArea() {
@@ -827,5 +666,9 @@ export default DatasetDetail
 
 ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {
   display: none;
+}
+
+.variable {
+  height: 3em;
 }
 </style>

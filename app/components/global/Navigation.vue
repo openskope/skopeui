@@ -12,7 +12,7 @@
       <v-stepper-step
         step="2"
         :complete="complete(1)"
-        :editable="hasSelectedDataSet && $route.name !== 'dataset-id-studyarea'"
+        :editable="hasSelectedDataSet && $route.name !== 'dataset-id'"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
       >
@@ -57,7 +57,7 @@ class Navigation extends Vue {
     },
   ]
 
-  step_names = ['index', 'dataset-id-studyarea', 'dataset-id-visualize']
+  step_names = ['index', 'dataset-id', 'dataset-id-visualize']
 
   complete(index) {
     return this.currentStep > index
@@ -77,7 +77,7 @@ class Navigation extends Vue {
     if (_.isUndefined(id)) {
       return
     }
-    this.$router.push({ name: 'dataset-id-studyarea', params: { id } })
+    this.$router.push({ name: 'dataset-id', params: { id } })
   }
 
   goToViz(id) {
@@ -108,10 +108,16 @@ class Navigation extends Vue {
 
     let action = String(this.steps.get(this.e5))
 
-    this.$router.push({
-      name: 'dataset-id-action',
-      params: { id: this.selectedDatasetId, action: action },
-    })
+    if (this.e5 != 1) {
+      this.$router.push({
+        name: 'dataset-id-action',
+        params: { id: this.selectedDatasetId, action: action },
+      })
+    } else {
+      this.$router.push({
+        name: 'index',
+      })
+    }
   }
 }
 export default Navigation

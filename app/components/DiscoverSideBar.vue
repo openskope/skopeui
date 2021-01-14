@@ -64,7 +64,7 @@
                   class="py-0 my-0"
                   @change="filterDatasets"
                 >
-                  <template v-slot:label>
+                  <template #label>
                     <v-chip
                       small
                       label

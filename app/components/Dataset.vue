@@ -97,9 +97,6 @@ class Dataset extends Vue {
   description //: String
 
   @Prop()
-  variables //: Array
-
-  @Prop()
   id //: String
 
   @Prop()
@@ -120,7 +117,7 @@ class Dataset extends Vue {
     return `${timespan}${period.suffix} ${this.timespan.resolutionLabel}`
   }
   get absoluteUrl() {
-    return `/dataset/${this.id}/studyarea`
+    return `/dataset/${this.id}`
   }
   get defaultCrs() {
     if (this.$L) {
