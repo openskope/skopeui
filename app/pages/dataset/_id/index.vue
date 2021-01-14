@@ -163,6 +163,8 @@ class DatasetDetail extends Vue {
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
 
+  dialog = false
+
   // created lifecycle hook
   async created() {
     const d = this.$api().datasets

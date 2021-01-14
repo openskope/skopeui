@@ -1,6 +1,26 @@
 <template>
   <v-container fill-width fluid>
     <v-row dense align-conent-center justify-space-around wrap>
+      <h2 class="mx-3">
+        {{ selectedDataset.title }}
+      </h2>
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <template #activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            View Metadata
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline"> Metadata </v-card-title>
+          <v-card-text><Metadata /></v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="dialog = false">
+              Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-col>
         <!-- toolbar -->
       </v-col>
@@ -24,6 +44,15 @@
             <v-btn icon @click="increaseOpacity">
               <v-icon>fas fa-plus</v-icon>
             </v-btn>
+            <v-select
+              v-model="layer"
+              :items="layers"
+              item-text="class"
+              item-value="id"
+              label="Select"
+              single-line
+            >
+            </v-select>
           </v-toolbar>
         </v-col>
         <v-col>
@@ -126,6 +155,7 @@ class Visualize extends Vue {
   opacityLevels = _.range(0, 10).map((x) => x * 10)
   selectedAreaInSquareMeters = 0
   yearSelected = 1500
+  dialog = false
 
   @Dataset.State('geometry')
   selectedGeometry
@@ -177,6 +207,10 @@ class Visualize extends Vue {
         this.selectedAreaInSquareMeters / 1000000.0
       ).toFixed(2)
     }
+  }
+
+  get layers() {
+    return this.selectedDataset.variables
   }
 
   async created() {
@@ -305,6 +339,16 @@ class Visualize extends Vue {
 
   setYear(year) {
     this.yearSelected = year
+  }
+
+  set layer(l) {
+    l = this.layers.find((layer) => layer.id === l)
+    this.$api().datasets.selectVariable(l.id)
+    this.$api().dataset.setLayer(l)
+  }
+
+  get layer() {
+    return this.$api().dataset.layer
   }
 
   async updateTimeSeries() {
