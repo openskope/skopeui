@@ -115,8 +115,8 @@
           <v-card-text>
             <div class="py-3 citation font-weight-bold">
               <em> Source: </em>
-              <a target="_blank" :href="sourceUrl">
-                {{ sourceUrl }}
+              <a target="_blank" :href="selectedDataset.sourceUrl">
+                {{ selectedDataset.sourceUrl }}
                 <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
               </a>
             </div>
