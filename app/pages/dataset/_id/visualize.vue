@@ -29,8 +29,8 @@
         />
       </v-col>
       <template v-else>
-        <v-col id="map-flex">
-          <v-card flat outlined height="100%">
+        <v-col>
+          <v-card flat outlined id="map-flex">
             <v-card-title class="secondary">Map</v-card-title>
             <Map :year="yearSelected" :opacity="opacity" />
             <v-toolbar flat color="primary" class="px-1" dense>
@@ -62,7 +62,7 @@
           </v-card>
         </v-col>
         <v-col>
-          <v-card flat outlined>
+          <v-card flat outlined id="timeseries">
             <v-card-title class="secondary">Time Series</v-card-title>
             <template v-if="hasTimeSeries">
               <TimeSeriesPlot
@@ -71,61 +71,27 @@
                 @yearSelected="setYear"
               />
               <v-toolbar color="primary" dark flat dense>
-                <v-tooltip top>
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      v-bind="attrs"
-                      icon
-                      v-on="on"
-                      @click="exportSelectedGeometry"
-                    >
-                      <a id="exportSelectedGeometry">
-                        <v-icon>fas fa-download</v-icon>
-                      </a>
-                    </v-btn>
-                  </template>
-                  <span>Download selected geometry as a GeoJSON file</span>
-                </v-tooltip>
-                <input
-                  id="loadGeoJsonFile"
-                  type="file"
-                  style="display: none"
-                  @change="loadGeoJson"
-                />
-                <v-tooltip top>
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      v-bind="attrs"
-                      icon
-                      v-on="on"
-                      @click="selectGeoJsonFile"
-                    >
-                      <v-icon>fas fa-upload</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Upload a GeoJSON file</span>
-                </v-tooltip>
-                <template v-if="selectedArea > 0">
-                  Selected area: {{ selectedArea }} km<sup>2</sup>
-                </template>
                 <v-spacer></v-spacer>
-                <v-btn icon @click="gotoFirstYear">
-                  <v-icon>skip_previous</v-icon>
-                </v-btn>
-                <v-btn icon background-color="accent" @click="previousYear">
-                  <v-icon>arrow_left</v-icon>
-                </v-btn>
-                <v-btn-toggle icon background-color="primary">
-                  <v-btn text @click="togglePlay">
-                    <v-icon>{{ playIcon }}</v-icon>
+                <v-toolbar-items>
+                  <v-btn icon @click="gotoFirstYear">
+                    <v-icon>skip_previous</v-icon>
                   </v-btn>
-                </v-btn-toggle>
-                <v-btn icon background-color="accent" @click="nextYear">
-                  <v-icon>arrow_right</v-icon>
-                </v-btn>
-                <v-btn icon background-color="accent" @click="gotoLastYear">
-                  <v-icon>skip_next</v-icon>
-                </v-btn>
+                  <v-btn icon @click="previousYear">
+                    <v-icon>arrow_left</v-icon>
+                  </v-btn>
+                  <v-btn-toggle icon background-color="indigo">
+                    <v-btn text @click="togglePlay">
+                      <v-icon>{{ playIcon }}</v-icon>
+                    </v-btn>
+                  </v-btn-toggle>
+                  <v-btn icon @click="nextYear">
+                    <v-icon>arrow_right</v-icon>
+                  </v-btn>
+                  <v-btn icon @click="gotoLastYear">
+                    <v-icon>skip_next</v-icon>
+                  </v-btn>
+                </v-toolbar-items>
+                <v-spacer></v-spacer>
               </v-toolbar>
             </template>
             <v-alert v-else color="warning">
@@ -358,16 +324,26 @@ export default Visualize
   color: inherit;
 }
 #map-flex {
-  height: 520px;
+  height: 65vh;
+  margin-bottom: 2rem;
+}
+#timeseries {
+  height: 65vh;
   margin-bottom: 2rem;
 }
 @media all and (max-width: 960px) {
   #map-flex {
     height: 400px;
   }
+  #timeseries {
+    height: 400px;
+  }
 }
 @media all and (max-width: 600px) {
   #map-flex {
+    height: 350px;
+  }
+  #timeseries {
     height: 350px;
   }
 }
