@@ -32,7 +32,7 @@
         step="4"
         editable
         edit-icon="$complete"
-        @click="goToAnalyze(4)"
+        @click="goToAnalyze($route.params.id)"
         >Export</v-stepper-step
       >
     </v-stepper-header>
