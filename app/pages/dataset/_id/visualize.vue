@@ -124,12 +124,17 @@
             A study area needs to be selected for a timeseries to be displayed
           </v-alert>
           <v-card>
-            <v-card-title class="blue-grey lighten-5">
-              {{ layer.name }}
-            </v-card-title>
-            <v-card-text>
-              {{ layer.description }}
-            </v-card-text>
+            <template v-if="layer">
+              <v-card-title class="blue-grey lighten-5">
+                {{ layer.name }}
+              </v-card-title>
+              <v-card-text>
+                {{ layer.description }}
+              </v-card-text>
+            </template>
+            <template v-else>
+              <v-card-title>No variable selected</v-card-title>
+            </template>
           </v-card>
         </v-col>
       </template>
