@@ -102,6 +102,9 @@ class Dataset extends Vue {
   @Prop()
   sourceUrl //: String
 
+  @Prop()
+  variables
+
   // --------- GETTERS ---------
 
   get defaultBaseMap() {
