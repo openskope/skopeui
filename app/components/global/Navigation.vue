@@ -1,10 +1,11 @@
 <template>
-  <v-stepper class="primary">
+  <v-stepper dark class="primary stepper">
     <v-stepper-header nonlinear>
       <v-stepper-step
         step="1"
         :complete="complete(0)"
         :editable="$route.name !== 'index'"
+        edit-icon="$complete"
         @click="goToDataSets"
         >Select Data Set</v-stepper-step
       >
@@ -13,6 +14,7 @@
         step="2"
         :complete="complete(1)"
         :editable="hasSelectedDataSet && $route.name !== 'dataset-id'"
+        edit-icon="$complete"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
       >
@@ -21,11 +23,16 @@
         step="3"
         :complete="complete(2)"
         :editable="hasSelectedDataSet && $route.name !== 'dataset-id-visualize'"
+        edit-icon="$complete"
         @click="goToViz($route.params.id)"
         >Visualize Data</v-stepper-step
       >
       <v-divider></v-divider>
-      <v-stepper-step step="4" editable @click="selectStep(4)"
+      <v-stepper-step
+        step="4"
+        editable
+        edit-icon="$complete"
+        @click="selectStep(4)"
         >Export</v-stepper-step
       >
     </v-stepper-header>
@@ -123,4 +130,8 @@ class Navigation extends Vue {
 export default Navigation
 </script>
 
-<style scoped></style>
+<style scoped>
+.stepper {
+  font-size: 1.2rem;
+}
+</style>

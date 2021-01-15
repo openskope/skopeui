@@ -1,8 +1,8 @@
 <template>
   <client-only placeholder="Loading...">
     <Plotly
-      class="timeseries"
       ref="plot"
+      class="timeseries"
       :data="timeSeriesData"
       :layout="layoutMetadata"
       :options="options"

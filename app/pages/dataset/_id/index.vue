@@ -1,23 +1,21 @@
 <template>
   <v-container fill-width height="100%" fluid>
-    <v-row>
+    <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
       </h2>
       <v-dialog v-model="dialog" persistent max-width="600px">
         <template #activator="{ on, attrs }">
-          <v-btn color="primary" dark v-bind="attrs" v-on="on">
-            View Metadata
-          </v-btn>
+          <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+            >View Metadata</v-btn
+          >
         </template>
         <v-card>
-          <v-card-title class="headline"> Metadata </v-card-title>
+          <v-card-title class="accent">Metadata</v-card-title>
           <v-card-text><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-1" text @click="dialog = false">
-              Close
-            </v-btn>
+            <v-btn text @click="dialog = false">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -31,16 +29,17 @@
       wrap
     >
       <v-col id="map-flex" height="100%" cols="9" xs12 md7>
-        <v-card flat outlined height="100%" class="map blue-grey lighten-5">
-          <v-card-title>Map</v-card-title>
+        <v-card flat outlined height="100%" class="map">
+          <v-card-title class="secondary">Map</v-card-title>
           <Map />
           <v-sheet inset>
-            <v-toolbar dark dense>
+            <v-toolbar class="primary" flat dense>
               <v-tooltip top>
                 <template #activator="{ on, attrs }">
                   <v-btn
                     v-bind="attrs"
                     icon
+                    color="white"
                     v-on="on"
                     @click="exportSelectedGeometry"
                   >
@@ -62,6 +61,7 @@
                   <v-btn
                     v-bind="attrs"
                     icon
+                    color="white"
                     v-on="on"
                     @click="selectGeoJsonFile"
                   >
@@ -80,8 +80,8 @@
         </v-card>
       </v-col>
       <v-col cols="3">
-        <v-card>
-          <v-card-title class="blue-grey lighten-5">Metadata</v-card-title>
+        <v-card flat outlined>
+          <v-card-title class="secondary">Metadata</v-card-title>
           <v-subheader
             >{{ spatialCoverage }} | {{ temporalCoverage }}</v-subheader
           >
@@ -89,21 +89,15 @@
             {{ selectedDataset.description }}
           </v-card-text>
           <!-- FIXME: extract this to a component and reuse across the detail page -->
-          <v-card-text>Variables</v-card-text>
-          <v-list dense light>
+          <v-card-text><h3>Variables</h3></v-card-text>
+          <v-list dense>
             <v-list-item
               v-for="(variable, index) in selectedDataset.variables"
               :key="index"
             >
               <v-list-item-content>
                 <v-list-item-title class="variable">
-                  <v-chip
-                    small
-                    label
-                    class="ma-2"
-                    color="indigo"
-                    text-color="white"
-                  >
+                  <v-chip small label class="ma-2" color="accent">
                     <v-icon>view_column</v-icon>
                     {{ variable.class }}
                   </v-chip>
@@ -664,6 +658,10 @@ export default DatasetDetail
   height: 100%;
   position: relative;
   z-index: 1;
+}
+
+.header {
+  color: white;
 }
 
 ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {

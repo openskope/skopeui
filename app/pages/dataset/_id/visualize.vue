@@ -1,29 +1,24 @@
 <template>
   <v-container fill-width fluid>
-    <v-row dense align-conent-center justify-space-around wrap>
+    <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
       </h2>
       <v-dialog v-model="dialog" persistent max-width="600px">
         <template #activator="{ on, attrs }">
-          <v-btn color="primary" dark v-bind="attrs" v-on="on">
-            View Metadata
-          </v-btn>
+          <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+            >View Metadata</v-btn
+          >
         </template>
         <v-card>
-          <v-card-title class="headline">Metadata</v-card-title>
+          <v-card-title class="accent">Metadata</v-card-title>
           <v-card-text><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-1" text @click="dialog = false">
-              Close
-            </v-btn>
+            <v-btn text @click="dialog = false">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-col>
-        <!-- toolbar -->
-      </v-col>
     </v-row>
     <v-row dense align-content-start justify-space-around wrap>
       <v-col v-if="isLoadingData">
@@ -34,70 +29,139 @@
         />
       </v-col>
       <template v-else>
-        <v-col>
-          <v-card id="map-flex">
+        <v-col id="map-flex">
+          <v-card flat outlined height="100%">
+            <v-card-title class="secondary">Map</v-card-title>
             <Map :year="yearSelected" :opacity="opacity" />
-            <v-toolbar color="indigo" dark dense>
-              <v-toolbar-title>Opacity: </v-toolbar-title>
-              <v-btn icon @click="decreaseOpacity">
+            <v-toolbar flat color="primary" class="px-1" dense>
+              <v-toolbar-title class="white--text">Opacity:</v-toolbar-title>
+              <v-btn icon color="white" @click="decreaseOpacity">
                 <v-icon>fas fa-minus</v-icon>
               </v-btn>
-              <v-btn icon @click="increaseOpacity">
+              <v-btn icon color="white" @click="increaseOpacity">
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
+              <v-spacer></v-spacer>
               <v-select
                 v-model="layer"
+                dense
+                dark
                 :items="layers"
-                item-text="name"
+                item-text="class"
                 item-value="id"
                 label="Select"
+                color="accent"
+                class="mt-5 pt-1"
                 single-line
+                filled
+                flat
               >
-                <template v-slot:selection="{ item }">
-                  <span class="d-flex justify-center" style="width: 100%">
-                    {{ item.name }}
-                  </span>
-                </template>
               </v-select>
             </v-toolbar>
           </v-card>
         </v-col>
         <v-col>
-          <v-card id="timeseries">
+          <v-card flat outlined>
+            <v-card-title class="secondary">Time Series</v-card-title>
             <template v-if="hasTimeSeries">
               <TimeSeriesPlot
                 :time-series="timeSeries"
                 :year-selected="yearSelected"
                 @yearSelected="setYear"
               />
-              <v-toolbar color="indigo" dark dense>
-                <v-spacer></v-spacer>
-                <v-toolbar-items>
-                  <v-btn icon @click="gotoFirstYear">
-                    <v-icon>skip_previous</v-icon>
-                  </v-btn>
-                  <v-btn icon @click="previousYear">
-                    <v-icon>arrow_left</v-icon>
-                  </v-btn>
-                  <v-btn-toggle icon background-color="indigo">
-                    <v-btn text @click="togglePlay">
-                      <v-icon>{{ playIcon }}</v-icon>
+              <v-toolbar color="primary" dark flat dense>
+                <v-tooltip top>
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      v-bind="attrs"
+                      icon
+                      v-on="on"
+                      @click="exportSelectedGeometry"
+                    >
+                      <a id="exportSelectedGeometry">
+                        <v-icon>fas fa-download</v-icon>
+                      </a>
                     </v-btn>
-                  </v-btn-toggle>
-                  <v-btn icon @click="nextYear">
-                    <v-icon>arrow_right</v-icon>
-                  </v-btn>
-                  <v-btn icon @click="gotoLastYear">
-                    <v-icon>skip_next</v-icon>
-                  </v-btn>
-                </v-toolbar-items>
+                  </template>
+                  <span>Download selected geometry as a GeoJSON file</span>
+                </v-tooltip>
+                <input
+                  id="loadGeoJsonFile"
+                  type="file"
+                  style="display: none"
+                  @change="loadGeoJson"
+                />
+                <v-tooltip top>
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      v-bind="attrs"
+                      icon
+                      v-on="on"
+                      @click="selectGeoJsonFile"
+                    >
+                      <v-icon>fas fa-upload</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Upload a GeoJSON file</span>
+                </v-tooltip>
+                <template v-if="selectedArea > 0">
+                  Selected area: {{ selectedArea }} km<sup>2</sup>
+                </template>
                 <v-spacer></v-spacer>
+                <v-btn icon @click="gotoFirstYear">
+                  <v-icon>skip_previous</v-icon>
+                </v-btn>
+                <v-btn icon background-color="accent" @click="previousYear">
+                  <v-icon>arrow_left</v-icon>
+                </v-btn>
+                <v-btn-toggle icon background-color="primary">
+                  <v-btn text @click="togglePlay">
+                    <v-icon>{{ playIcon }}</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
+                <v-btn icon background-color="accent" @click="nextYear">
+                  <v-icon>arrow_right</v-icon>
+                </v-btn>
+                <v-btn icon background-color="accent" @click="gotoLastYear">
+                  <v-icon>skip_next</v-icon>
+                </v-btn>
               </v-toolbar>
             </template>
-            <v-alert v-else color="blue lighten-2">
+            <v-alert v-else color="warning">
               A study area needs to be selected for a timeseries to be displayed
             </v-alert>
+          </v-card>
+          <v-card class="my-3" flat outlined>
+            <v-card-title class="secondary">Variable Information</v-card-title>
+            <v-card-text>
+              {{ selectedDataset.description }}
+            </v-card-text>
+            <!-- FIXME: extract this to a component and reuse across the detail page -->
+            <v-card-text>Variables</v-card-text>
+            <v-card-text v-if="layer">
+              <v-chip
+                small
+                label
+                class="ma-2"
+                color="accent"
+                text-color="white"
+              >
+                <v-icon>view_column</v-icon>
+                {{ layer.class }}
+              </v-chip>
+              {{ layer.name }}
+              {{ layer.description }}
+            </v-card-text>
+            <v-card-text>
+              <div class="py-3 citation font-weight-bold">
+                <em> Source: </em>
+                <a target="_blank" :href="selectedDataset.sourceUrl">
+                  {{ selectedDataset.sourceUrl }}
+                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
+                </a>
+              </div>
+            </v-card-text>
           </v-card>
         </v-col>
       </template>
@@ -115,7 +179,6 @@ import _ from 'lodash'
 import { namespace } from 'vuex-class'
 const Dataset = namespace('dataset')
 const Datasets = namespace('datasets')
-
 @Component({
   layout: 'BaseDataset',
   components: {
@@ -134,22 +197,16 @@ class Visualize extends Vue {
   selectedAreaInSquareMeters = 0
   yearSelected = 1500
   dialog = false
-
   @Dataset.State('geometry')
   selectedGeometry
-
   @Dataset.State('layer')
   selectedLayer
-
   @Datasets.State('selectedDataset')
   selectedDataset
-
   timeSeriesUnwatcher = null
-
   get hasTimeSeries() {
     return this.timeSeries.x.length > 0
   }
-
   get timeSeries() {
     const timeseries = this.$api().dataset.timeseries
     if (timeseries.x.length > 0) {
@@ -158,19 +215,15 @@ class Visualize extends Vue {
       return { x: [], y: [], type: 'scatter' }
     }
   }
-
   get minYear() {
     return parseInt(this.selectedDataset.timespan.period.gte)
   }
-
   get maxYear() {
     return parseInt(this.selectedDataset.timespan.period.lte)
   }
-
   get opacity() {
     return this.opacityLevels[this.opacityIndex]
   }
-
   get playIcon() {
     if (this.isAnimationPlaying) {
       return 'pause_circle_filled'
@@ -178,7 +231,6 @@ class Visualize extends Vue {
       return 'play_circle_filled'
     }
   }
-
   get selectedArea() {
     if (this.selectedAreaInSquareMeters > 0) {
       return Number.parseFloat(
@@ -186,21 +238,9 @@ class Visualize extends Vue {
       ).toFixed(2)
     }
   }
-
-  set layer(l) {
-    l = this.layers.find((layer) => layer.id === l)
-    this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setLayer(l)
-  }
-
-  get layer() {
-    return this.$api().dataset.layer
-  }
-
   get layers() {
     return this.selectedDataset.variables
   }
-
   async created() {
     const d = this.$api().datasets
     await d.loadDataset(this.$route.params.id)
@@ -224,26 +264,21 @@ class Visualize extends Vue {
       }
     )
   }
-
   async mounted() {
     await this.updateTimeSeries()
     this.yearSelected = this.minYear
     this.isLoadingData = false
     this.hasData = true
   }
-
   destroyed() {
     this.timeSeriesUnwatcher()
   }
-
   decreaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10)
   }
-
   increaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
   }
-
   exportSelectedGeometry(event) {
     const geometry = this.getSavedGeometry()
     if (geometry) {
@@ -255,7 +290,6 @@ class Visualize extends Vue {
       button.setAttribute('download', `${this.wGeometryKey}.geojson`)
     }
   }
-
   getSavedGeometry() {
     const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
     if (skopeGeometry) {
@@ -263,35 +297,30 @@ class Visualize extends Vue {
     }
     return false
   }
-
   gotoFirstYear() {
     if (this.selectedLayer === null) {
       return
     }
     this.setYear(this.minYear)
   }
-
   gotoLastYear() {
     if (this.selectedLayer === null) {
       return
     }
     this.setYear(this.maxYear)
   }
-
   nextYear() {
     if (this.selectedLayer === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear))
   }
-
   previousYear() {
     if (this.selectedLayer === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear))
   }
-
   togglePlay(event) {
     this.isAnimationPlaying = !this.isAnimationPlaying
     if (this.isAnimationPlaying) {
@@ -305,7 +334,6 @@ class Visualize extends Vue {
       }, this.animationSpeed)
     }
   }
-
   loadGeoJson(event) {
     const file = event.target.files[0]
     file.text().then((text) => {
@@ -320,15 +348,20 @@ class Visualize extends Vue {
       }
     })
   }
-
   selectGeoJsonFile() {
     document.getElementById('loadGeoJsonFile').click()
   }
-
   setYear(year) {
     this.yearSelected = year
   }
-
+  set layer(l) {
+    l = this.layers.find((layer) => layer.id === l)
+    this.$api().datasets.selectVariable(l.id)
+    this.$api().dataset.setLayer(l)
+  }
+  get layer() {
+    return this.$api().dataset.layer
+  }
   async updateTimeSeries() {
     const api = this.$api()
     await api.dataset.retrieveTimeSeries({
@@ -339,7 +372,6 @@ class Visualize extends Vue {
       zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
     })
   }
-
   @Watch()
   async changeTimeSeries(data) {
     if (data.datasetUri && data.selectedGeometry.type !== 'None') {
@@ -348,7 +380,6 @@ class Visualize extends Vue {
     }
   }
 }
-
 export default Visualize
 </script>
 
@@ -357,33 +388,17 @@ export default Visualize
   text-decoration: none;
   color: inherit;
 }
-
 #map-flex {
-  height: 70vh;
+  height: 520px;
   margin-bottom: 2rem;
 }
-
-#timeseries {
-  height: 70vh;
-  margin-bottom: 2rem;
-}
-
 @media all and (max-width: 960px) {
   #map-flex {
     height: 400px;
   }
-
-  #timeseries {
-    height: 400px;
-  }
 }
-
 @media all and (max-width: 600px) {
   #map-flex {
-    height: 350px;
-  }
-
-  #timeseries {
     height: 350px;
   }
 }
