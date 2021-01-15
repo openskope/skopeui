@@ -385,7 +385,7 @@ export default Map
 }
 
 .map {
-  height: 100%;
+  height: calc(100% - 48px);
   position: relative;
   z-index: 1;
 }

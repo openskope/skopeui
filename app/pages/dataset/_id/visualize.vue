@@ -34,74 +34,70 @@
         />
       </v-col>
       <template v-else>
-        <v-col id="map-flex">
-          <Map :year="yearSelected" :opacity="opacity" />
-          <v-toolbar color="indigo" dark dense>
-            <v-toolbar-title>Opacity: </v-toolbar-title>
-            <v-btn icon @click="decreaseOpacity">
-              <v-icon>fas fa-minus</v-icon>
-            </v-btn>
-            <v-btn icon @click="increaseOpacity">
-              <v-icon>fas fa-plus</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-select
-              v-model="layer"
-              :items="layers"
-              item-text="class"
-              item-value="id"
-              label="Select"
-              single-line
-            >
-            </v-select>
-          </v-toolbar>
+        <v-col>
+          <v-card id="map-flex">
+            <Map :year="yearSelected" :opacity="opacity" />
+            <v-toolbar color="indigo" dark dense>
+              <v-toolbar-title>Opacity: </v-toolbar-title>
+              <v-btn icon @click="decreaseOpacity">
+                <v-icon>fas fa-minus</v-icon>
+              </v-btn>
+              <v-btn icon @click="increaseOpacity">
+                <v-icon>fas fa-plus</v-icon>
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-select
+                v-model="layer"
+                :items="layers"
+                item-text="name"
+                item-value="id"
+                label="Select"
+                single-line
+              >
+                <template v-slot:selection="{ item }">
+                  <span class="d-flex justify-center" style="width: 100%">
+                    {{ item.name }}
+                  </span>
+                </template>
+              </v-select>
+            </v-toolbar>
+          </v-card>
         </v-col>
         <v-col>
-          <template v-if="hasTimeSeries">
-            <TimeSeriesPlot
-              :time-series="timeSeries"
-              :year-selected="yearSelected"
-              @yearSelected="setYear"
-            />
-            <v-toolbar color="indigo" dark dense>
-              <v-spacer></v-spacer>
-              <v-toolbar-items>
-                <v-btn icon @click="gotoFirstYear">
-                  <v-icon>skip_previous</v-icon>
-                </v-btn>
-                <v-btn icon @click="previousYear">
-                  <v-icon>arrow_left</v-icon>
-                </v-btn>
-                <v-btn-toggle icon background-color="indigo">
-                  <v-btn text @click="togglePlay">
-                    <v-icon>{{ playIcon }}</v-icon>
+          <v-card id="timeseries">
+            <template v-if="hasTimeSeries">
+              <TimeSeriesPlot
+                :time-series="timeSeries"
+                :year-selected="yearSelected"
+                @yearSelected="setYear"
+              />
+              <v-toolbar color="indigo" dark dense>
+                <v-spacer></v-spacer>
+                <v-toolbar-items>
+                  <v-btn icon @click="gotoFirstYear">
+                    <v-icon>skip_previous</v-icon>
                   </v-btn>
-                </v-btn-toggle>
-                <v-btn icon @click="nextYear">
-                  <v-icon>arrow_right</v-icon>
-                </v-btn>
-                <v-btn icon @click="gotoLastYear">
-                  <v-icon>skip_next</v-icon>
-                </v-btn>
-              </v-toolbar-items>
-              <v-spacer></v-spacer>
-            </v-toolbar>
-          </template>
-          <v-alert v-else color="blue lighten-2">
-            A study area needs to be selected for a timeseries to be displayed
-          </v-alert>
-          <v-card>
-            <template v-if="layer">
-              <v-card-title class="blue-grey lighten-5">
-                {{ layer.name }}
-              </v-card-title>
-              <v-card-text>
-                {{ layer.description }}
-              </v-card-text>
+                  <v-btn icon @click="previousYear">
+                    <v-icon>arrow_left</v-icon>
+                  </v-btn>
+                  <v-btn-toggle icon background-color="indigo">
+                    <v-btn text @click="togglePlay">
+                      <v-icon>{{ playIcon }}</v-icon>
+                    </v-btn>
+                  </v-btn-toggle>
+                  <v-btn icon @click="nextYear">
+                    <v-icon>arrow_right</v-icon>
+                  </v-btn>
+                  <v-btn icon @click="gotoLastYear">
+                    <v-icon>skip_next</v-icon>
+                  </v-btn>
+                </v-toolbar-items>
+                <v-spacer></v-spacer>
+              </v-toolbar>
             </template>
-            <template v-else>
-              <v-card-title>No variable selected</v-card-title>
-            </template>
+            <v-alert v-else color="blue lighten-2">
+              A study area needs to be selected for a timeseries to be displayed
+            </v-alert>
           </v-card>
         </v-col>
       </template>
@@ -367,14 +363,27 @@ export default Visualize
   margin-bottom: 2rem;
 }
 
+#timeseries {
+  height: 70vh;
+  margin-bottom: 2rem;
+}
+
 @media all and (max-width: 960px) {
   #map-flex {
+    height: 400px;
+  }
+
+  #timeseries {
     height: 400px;
   }
 }
 
 @media all and (max-width: 600px) {
   #map-flex {
+    height: 350px;
+  }
+
+  #timeseries {
     height: 350px;
   }
 }

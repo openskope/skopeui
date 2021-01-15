@@ -1,6 +1,7 @@
 <template>
   <client-only placeholder="Loading...">
     <Plotly
+      class="timeseries"
       ref="plot"
       :data="timeSeriesData"
       :layout="layoutMetadata"
@@ -102,3 +103,8 @@ class TimeSeriesPlot extends Vue {
 }
 export default TimeSeriesPlot
 </script>
+<style>
+.timeseries {
+  height: calc(100% - 48px);
+}
+</style>
