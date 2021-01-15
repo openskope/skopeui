@@ -44,6 +44,7 @@
             <v-btn icon @click="increaseOpacity">
               <v-icon>fas fa-plus</v-icon>
             </v-btn>
+            <v-spacer></v-spacer>
             <v-select
               v-model="layer"
               :items="layers"
