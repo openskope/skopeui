@@ -124,36 +124,11 @@
             A study area needs to be selected for a timeseries to be displayed
           </v-alert>
           <v-card>
-            <v-card-title class="blue-grey lighten-5"
-              >Selected Variable</v-card-title
-            >
-            <v-card-text>
-              {{ selectedDataset.description }}
-            </v-card-text>
-            <!-- FIXME: extract this to a component and reuse across the detail page -->
-            <v-card-text>Variables</v-card-text>
-            <v-card-text v-if="layer">
-              <v-chip
-                small
-                label
-                class="ma-2"
-                color="indigo"
-                text-color="white"
-              >
-                <v-icon>view_column</v-icon>
-                {{ layer.class }}
-              </v-chip>
+            <v-card-title class="blue-grey lighten-5">
               {{ layer.name }}
-              {{ layer.description }}
-            </v-card-text>
+            </v-card-title>
             <v-card-text>
-              <div class="py-3 citation font-weight-bold">
-                <em> Source: </em>
-                <a target="_blank" :href="selectedDataset.sourceUrl">
-                  {{ selectedDataset.sourceUrl }}
-                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
-                </a>
-              </div>
+              {{ layer.description }}
             </v-card-text>
           </v-card>
         </v-col>
@@ -242,6 +217,16 @@ class Visualize extends Vue {
         this.selectedAreaInSquareMeters / 1000000.0
       ).toFixed(2)
     }
+  }
+
+  set layer(l) {
+    l = this.layers.find((layer) => layer.id === l)
+    this.$api().datasets.selectVariable(l.id)
+    this.$api().dataset.setLayer(l)
+  }
+
+  get layer() {
+    return this.$api().dataset.layer
   }
 
   get layers() {
@@ -376,16 +361,6 @@ class Visualize extends Vue {
     this.yearSelected = year
   }
 
-  set layer(l) {
-    l = this.layers.find((layer) => layer.id === l)
-    this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setLayer(l)
-  }
-
-  get layer() {
-    return this.$api().dataset.layer
-  }
-
   async updateTimeSeries() {
     const api = this.$api()
     await api.dataset.retrieveTimeSeries({
@@ -416,7 +391,7 @@ export default Visualize
 }
 
 #map-flex {
-  height: 520px;
+  height: 70vh;
   margin-bottom: 2rem;
 }
 
