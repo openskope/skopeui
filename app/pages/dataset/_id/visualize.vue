@@ -132,37 +132,6 @@
               A study area needs to be selected for a timeseries to be displayed
             </v-alert>
           </v-card>
-          <v-card class="my-3" flat outlined>
-            <v-card-title class="secondary">Variable Information</v-card-title>
-            <v-card-text>
-              {{ selectedDataset.description }}
-            </v-card-text>
-            <!-- FIXME: extract this to a component and reuse across the detail page -->
-            <v-card-text>Variables</v-card-text>
-            <v-card-text v-if="layer">
-              <v-chip
-                small
-                label
-                class="ma-2"
-                color="accent"
-                text-color="white"
-              >
-                <v-icon>view_column</v-icon>
-                {{ layer.class }}
-              </v-chip>
-              {{ layer.name }}
-              {{ layer.description }}
-            </v-card-text>
-            <v-card-text>
-              <div class="py-3 citation font-weight-bold">
-                <em> Source: </em>
-                <a target="_blank" :href="selectedDataset.sourceUrl">
-                  {{ selectedDataset.sourceUrl }}
-                  <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
-                </a>
-              </div>
-            </v-card-text>
-          </v-card>
         </v-col>
       </template>
     </v-row>
