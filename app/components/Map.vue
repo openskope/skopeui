@@ -355,6 +355,7 @@ class Map extends Vue {
           this.selectedDataset.variables,
           (v) => v.name === event.name
         )
+        this.$api().datasets.selectVariable(variable.id)
         this.$api().dataset.setLayer(variable)
         this.updateWmsLegend(map, layer.wmsParams.layers)
         layer.bringToFront()

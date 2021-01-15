@@ -312,11 +312,13 @@ class DataSets extends VuexModule {
 
   @Mutation
   selectVariable(id) {
-    let selectedVariable = this.selectedDataset.variables.find(
-      (variable) => variable.id === id
-    )
-    selectedVariable.visible = true
-    this.selectedDataset.selectedVariable = selectedVariable
+    let selectVariable = null
+    for (const variable of this.selectedDataset.variables) {
+      variable.visible = variable.id === id
+      if (variable.visible) {
+        this.selectedDataset.selectedVariable = variable
+      }
+    }
   }
 
   @Mutation
