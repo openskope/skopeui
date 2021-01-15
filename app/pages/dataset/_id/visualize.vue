@@ -30,9 +30,9 @@
       </v-col>
       <template v-else>
         <v-col>
-          <v-card flat outlined id="map-flex">
+          <v-card flat outlined>
             <v-card-title class="secondary">Map</v-card-title>
-            <Map :year="yearSelected" :opacity="opacity" />
+            <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
             <v-toolbar flat color="primary" class="px-1" dense>
               <v-toolbar-title class="white--text">Opacity:</v-toolbar-title>
               <v-btn icon color="white" @click="decreaseOpacity">
@@ -62,10 +62,11 @@
           </v-card>
         </v-col>
         <v-col>
-          <v-card flat outlined id="timeseries">
+          <v-card flat outlined>
             <v-card-title class="secondary">Time Series</v-card-title>
             <template v-if="hasTimeSeries">
               <TimeSeriesPlot
+                class="timeseries-flex"
                 :time-series="timeSeries"
                 :year-selected="yearSelected"
                 @yearSelected="setYear"
@@ -172,6 +173,14 @@ class Visualize extends Vue {
         this.selectedAreaInSquareMeters / 1000000.0
       ).toFixed(2)
     }
+  }
+  set layer(l) {
+    l = this.layers.find((layer) => layer.id === l)
+    this.$api().datasets.selectVariable(l.id)
+    this.$api().dataset.setLayer(l)
+  }
+  get layer() {
+    return this.$api().dataset.layer
   }
   get layers() {
     return this.selectedDataset.variables
@@ -289,14 +298,6 @@ class Visualize extends Vue {
   setYear(year) {
     this.yearSelected = year
   }
-  set layer(l) {
-    l = this.layers.find((layer) => layer.id === l)
-    this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setLayer(l)
-  }
-  get layer() {
-    return this.$api().dataset.layer
-  }
   async updateTimeSeries() {
     const api = this.$api()
     await api.dataset.retrieveTimeSeries({
@@ -323,27 +324,25 @@ export default Visualize
   text-decoration: none;
   color: inherit;
 }
-#map-flex {
+.map-flex {
   height: calc(70vh - 96px);
-  margin-bottom: 2rem;
 }
-#timeseries {
+.timeseries-flex {
   height: calc(70vh - 96px);
-  margin-bottom: 2rem;
 }
 @media all and (max-width: 960px) {
-  #map-flex {
+  .map-flex {
     height: 400px;
   }
-  #timeseries {
+  .timeseries-flex {
     height: 400px;
   }
 }
 @media all and (max-width: 600px) {
-  #map-flex {
+  .map-flex {
     height: 350px;
   }
-  #timeseries {
+  .timeseries-flex {
     height: 350px;
   }
 }
