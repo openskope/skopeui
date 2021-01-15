@@ -42,6 +42,9 @@
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
+              <v-toolbar-title class="white--text"
+                >Year: {{ yearSelected }}CE
+              </v-toolbar-title>
               <v-spacer></v-spacer>
               <v-select
                 v-model="layer"
