@@ -63,6 +63,7 @@ import { stringify } from 'query-string'
 const Dataset = namespace('dataset')
 const Datasets = namespace('datasets')
 const fillTemplate = require('es6-dynamic-template')
+import _ from 'lodash'
 
 @Component({
   components: {},
@@ -79,6 +80,8 @@ class Map extends Vue {
   defaultRegionOpacity = 0.05
   defaultCircleToPolygonEdges = 32
   legendImage = null
+  legendControl = null
+  legendPosition = 'bottomleft'
   selectedAreaInSquareMeters = 0.0
   wGeometryKey = 'skope:geometry'
   wMinTemporalRangeKey = 'skope:temporal-range-min'
@@ -175,6 +178,10 @@ class Map extends Vue {
     this.drawControlEditOnly.addTo(map)
   }
 
+  setLegendImage(htmlElement) {
+    this.legendImage = htmlElement
+  }
+
   generateWmsLegendUrl(layerName) {
     const query = {
       REQUEST: 'GetLegendGraphic',
@@ -268,7 +275,7 @@ class Map extends Vue {
   updateWmsLegend(map, layerName) {
     const L = this.$L
     const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
-    if (this.legendControl === null) {
+    if (_.isNil(this.legendControl)) {
       const legend = L.control({ position: this.legendPosition })
       legend.onAdd = (map) => {
         const controlCss = 'leaflet-control-wms-legend'
