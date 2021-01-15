@@ -63,61 +63,27 @@
               @yearSelected="setYear"
             />
             <v-toolbar color="indigo" dark dense>
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    v-on="on"
-                    @click="exportSelectedGeometry"
-                  >
-                    <a id="exportSelectedGeometry">
-                      <v-icon>fas fa-download</v-icon>
-                    </a>
-                  </v-btn>
-                </template>
-                <span>Download selected geometry as a GeoJSON file</span>
-              </v-tooltip>
-              <input
-                id="loadGeoJsonFile"
-                type="file"
-                style="display: none"
-                @change="loadGeoJson"
-              />
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    v-on="on"
-                    @click="selectGeoJsonFile"
-                  >
-                    <v-icon>fas fa-upload</v-icon>
-                  </v-btn>
-                </template>
-                <span>Upload a GeoJSON file</span>
-              </v-tooltip>
-              <template v-if="selectedArea > 0">
-                Selected area: {{ selectedArea }} km<sup>2</sup>
-              </template>
               <v-spacer></v-spacer>
-              <v-btn icon @click="gotoFirstYear">
-                <v-icon>skip_previous</v-icon>
-              </v-btn>
-              <v-btn icon @click="previousYear">
-                <v-icon>arrow_left</v-icon>
-              </v-btn>
-              <v-btn-toggle icon background-color="indigo">
-                <v-btn text @click="togglePlay">
-                  <v-icon>{{ playIcon }}</v-icon>
+              <v-toolbar-items>
+                <v-btn icon @click="gotoFirstYear">
+                  <v-icon>skip_previous</v-icon>
                 </v-btn>
-              </v-btn-toggle>
-              <v-btn icon @click="nextYear">
-                <v-icon>arrow_right</v-icon>
-              </v-btn>
-              <v-btn icon @click="gotoLastYear">
-                <v-icon>skip_next</v-icon>
-              </v-btn>
+                <v-btn icon @click="previousYear">
+                  <v-icon>arrow_left</v-icon>
+                </v-btn>
+                <v-btn-toggle icon background-color="indigo">
+                  <v-btn text @click="togglePlay">
+                    <v-icon>{{ playIcon }}</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
+                <v-btn icon @click="nextYear">
+                  <v-icon>arrow_right</v-icon>
+                </v-btn>
+                <v-btn icon @click="gotoLastYear">
+                  <v-icon>skip_next</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+              <v-spacer></v-spacer>
             </v-toolbar>
           </template>
           <v-alert v-else color="blue lighten-2">
