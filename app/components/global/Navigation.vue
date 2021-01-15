@@ -32,7 +32,7 @@
         step="4"
         editable
         edit-icon="$complete"
-        @click="selectStep(4)"
+        @click="goToAnalyze(4)"
         >Export</v-stepper-step
       >
     </v-stepper-header>
@@ -62,9 +62,19 @@ class Navigation extends Vue {
       name: 'dataset-id-visualize',
       label: 'Visualize Data',
     },
+    {
+      step: 4,
+      name: 'dataset-id-analyze',
+      label: 'Analyze Data',
+    },
   ]
 
-  step_names = ['index', 'dataset-id', 'dataset-id-visualize']
+  step_names = [
+    'index',
+    'dataset-id',
+    'dataset-id-visualize',
+    'dataset-id-analyze',
+  ]
 
   complete(index) {
     return this.currentStep > index
@@ -92,6 +102,13 @@ class Navigation extends Vue {
       return
     }
     this.$router.push({ name: 'dataset-id-visualize', params: { id } })
+  }
+
+  goToAnalyze(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
   }
 
   get currentStep() {
