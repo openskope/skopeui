@@ -26,7 +26,7 @@ class TimeSeriesPlot extends Vue {
   @Prop()
   timeSeries
 
-  @Prop()
+  @Prop({ default: null })
   yearSelected
 
   get variableName() {
@@ -35,9 +35,9 @@ class TimeSeriesPlot extends Vue {
   }
 
   get layoutMetadata() {
-    const xaxisTitle = `Year (currently ${
-      _.isEmpty(this.yearSelected) ? `${this.yearSelected}CE` : 'None'
-    })`
+    const xaxisTitle = !_.isNil(this.yearSelected)
+      ? `Year (currently ${this.yearSelected})`
+      : 'Year'
     return {
       margin: {
         l: 60,
