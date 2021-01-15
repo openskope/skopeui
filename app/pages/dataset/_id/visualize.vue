@@ -324,11 +324,11 @@ export default Visualize
   color: inherit;
 }
 #map-flex {
-  height: 65vh;
+  height: calc(70vh - 96px);
   margin-bottom: 2rem;
 }
 #timeseries {
-  height: 65vh;
+  height: calc(70vh - 96px);
   margin-bottom: 2rem;
 }
 @media all and (max-width: 960px) {
