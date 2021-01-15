@@ -322,7 +322,7 @@ class Visualize extends Vue {
 export default Visualize
 </script>
 
-<style>
+<style scoped>
 #exportSelectedGeometry {
   text-decoration: none;
   color: inherit;
