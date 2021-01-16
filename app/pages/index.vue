@@ -48,8 +48,13 @@ class LandingPage extends Vue {
     return this.$api().datasets.filteredDatasets
   }
 
+  get selectedDataset() {
+    return this.$api().dataset
+  }
+
   created() {
     this.$api().datasets.retrieveData()
+    this.selectedDataset.clearTimeSeries()
   }
 }
 export default LandingPage

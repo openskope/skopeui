@@ -88,6 +88,10 @@ class DataSet extends VuexModule {
   geometry = { type: 'None', coordinates: [] }
   layer = null
 
+  get hasGeometry() {
+    return this.geometry.type != 'None'
+  }
+
   @Mutation
   setIsLoading(value) {
     this.isLoadingData = value

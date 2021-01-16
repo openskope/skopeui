@@ -1,10 +1,12 @@
 <template>
-  <v-stepper dark class="primary stepper">
+  <v-stepper :value="currentStep + 1">
     <v-stepper-header nonlinear>
+      <!-- FIXME replace step numbers with icons when step is inactive/incomplete
+      https://github.com/vuetifyjs/vuetify/issues/7049 -->
       <v-stepper-step
         step="1"
         :complete="complete(0)"
-        :editable="$route.name !== 'index'"
+        editable
         edit-icon="$complete"
         @click="goToDataSets"
         >Select Data Set</v-stepper-step
@@ -13,8 +15,8 @@
       <v-stepper-step
         step="2"
         :complete="complete(1)"
-        :editable="hasSelectedDataSet && $route.name !== 'dataset-id'"
-        edit-icon="$complete"
+        :editable="hasSelectedDataSet"
+        edit-icon="map"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
       >
@@ -22,16 +24,19 @@
       <v-stepper-step
         step="3"
         :complete="complete(2)"
-        :editable="hasSelectedDataSet && $route.name !== 'dataset-id-visualize'"
-        edit-icon="$complete"
+        :editable="hasSelectedDataSet && hasValidStudyArea"
+        edit-icon="fas fa-chart-bar"
+        :rules="[() => hasValidStudyArea]"
         @click="goToViz($route.params.id)"
         >Visualize Data</v-stepper-step
       >
       <v-divider></v-divider>
       <v-stepper-step
         step="4"
-        editable
+        :complete="complete(3)"
+        :editable="canAnalyze"
         edit-icon="$complete"
+        :rules="[() => canAnalyze]"
         @click="goToAnalyze($route.params.id)"
         >Analyze Data</v-stepper-step
       >
@@ -69,7 +74,7 @@ class Navigation extends Vue {
     },
   ]
 
-  step_names = [
+  stepNames = [
     'index',
     'dataset-id',
     'dataset-id-visualize',
@@ -82,6 +87,18 @@ class Navigation extends Vue {
 
   get hasSelectedDataSet() {
     return !_.isUndefined(this.$route.params.id)
+  }
+
+  get hasValidStudyArea() {
+    // return whether study area geometry has been defined
+    return this.currentStep == 0 || this.$api().dataset.hasGeometry
+  }
+
+  get canAnalyze() {
+    return (
+      this.currentStep <= 1 ||
+      (this.hasValidStudyArea && this.$api().dataset.hasData)
+    )
   }
 
   // --------- GETTERS ---------
@@ -98,7 +115,7 @@ class Navigation extends Vue {
   }
 
   goToViz(id) {
-    if (_.isUndefined(id)) {
+    if (_.isUndefined(id) || !this.hasValidStudyArea) {
       return
     }
     this.$router.push({ name: 'dataset-id-visualize', params: { id } })
@@ -112,7 +129,7 @@ class Navigation extends Vue {
   }
 
   get currentStep() {
-    return this.step_names.findIndex((x) => x === this.$route.name)
+    return this.stepNames.findIndex((x) => x === this.$route.name)
   }
 
   get isDisabled() {
@@ -122,28 +139,8 @@ class Navigation extends Vue {
   get selectedDatasetId() {
     return this.$api().datasets.selectedDataset.id
   }
-
-  // --------- METHODS ---------
-
-  selectStep(step) {
-    this.e5 = step
-    this.$api().app.disableDrawer(this.e5)
-    this.$api().app.selectStep(this.e5)
-
-    let action = String(this.steps.get(this.e5))
-
-    if (this.e5 != 1) {
-      this.$router.push({
-        name: 'dataset-id-action',
-        params: { id: this.selectedDatasetId, action: action },
-      })
-    } else {
-      this.$router.push({
-        name: 'index',
-      })
-    }
-  }
 }
+
 export default Navigation
 </script>
 

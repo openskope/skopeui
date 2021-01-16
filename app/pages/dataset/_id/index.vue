@@ -1,5 +1,5 @@
 <template>
-  <v-container fill-width height="100%" fluid>
+  <v-container fluid>
     <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
@@ -19,16 +19,18 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-spacer></v-spacer>
+      <v-btn>Next</v-btn>
     </v-row>
-    <v-row
-      height="100%"
-      class="my-5"
-      dense
-      align-content-start
-      justify-space-around
-      wrap
-    >
-      <v-col id="map-flex" height="100%" cols="9" xs12 md7>
+    <v-row>
+      <v-col class="mx-auto">
+        <v-card flat outlined>
+          <v-card-title>Instructions</v-card-title>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-ro class="my-5">
+      <v-col id="map-flex" class="mx-auto" xs12 md7>
         <v-card flat outlined height="100%" class="map">
           <v-card-title class="secondary">Map</v-card-title>
           <Map />
@@ -79,43 +81,10 @@
           </v-sheet>
         </v-card>
       </v-col>
-      <v-col cols="3">
-        <v-card flat outlined>
-          <v-card-title class="secondary">Metadata</v-card-title>
-          <v-subheader
-            >{{ spatialCoverage }} | {{ temporalCoverage }}</v-subheader
-          >
-          <v-card-text>
-            {{ selectedDataset.description }}
-          </v-card-text>
-          <!-- FIXME: extract this to a component and reuse across the detail page -->
-          <v-card-text><h3>Variables</h3></v-card-text>
-          <v-list dense>
-            <v-list-item
-              v-for="(variable, index) in selectedDataset.variables"
-              :key="index"
-            >
-              <v-list-item-content>
-                <v-list-item-title class="variable">
-                  <v-chip small label class="ma-2" color="accent">
-                    <v-icon>view_column</v-icon>
-                    {{ variable.class }}
-                  </v-chip>
-                  {{ variable.name }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-          <v-card-text>
-            <div class="py-3 citation font-weight-bold">
-              <em> Source: </em>
-              <a target="_blank" :href="selectedDataset.sourceUrl">
-                {{ selectedDataset.sourceUrl }}
-                <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
-              </a>
-            </div>
-          </v-card-text>
-        </v-card>
+    </v-ro>
+    <v-row>
+      <v-col class="mx-auto">
+        <v-btn>Select Dataset</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -249,26 +218,20 @@ class DatasetDetail extends Vue {
     return ''
   }
 
+  get selectedArea() {
+    if (this.selectedAreaInSquareMeters > 0) {
+      return Number.parseFloat(
+        this.selectedAreaInSquareMeters / 1000000.0
+      ).toFixed(2)
+    }
+  }
+
   get absoluteUrl() {
     return '/dataset/' + this.selectedDataset.id
   }
 
   get metadata() {
     return '/dataset/' + this.selectedDataset.id + '/metadata'
-  }
-
-  togglePlay(event) {
-    this.isAnimationPlaying = !this.isAnimationPlaying
-    if (this.isAnimationPlaying) {
-      // start an interval
-      const animationInterval = setInterval(() => {
-        if (!this.isAnimationPlaying) {
-          clearInterval(animationInterval)
-          return
-        }
-        this.nextYear()
-      }, this.animationSpeed)
-    }
   }
 
   head() {
