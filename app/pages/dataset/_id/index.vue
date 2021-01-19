@@ -29,7 +29,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-ro class="my-5">
+    <v-row class="my-5">
       <v-col id="map-flex" class="mx-auto" xs12 md7>
         <v-card flat outlined height="100%" class="map">
           <v-card-title class="secondary">Map</v-card-title>
@@ -81,7 +81,7 @@
           </v-sheet>
         </v-card>
       </v-col>
-    </v-ro>
+    </v-row>
     <v-row>
       <v-col class="mx-auto">
         <v-btn>Select Dataset</v-btn>
