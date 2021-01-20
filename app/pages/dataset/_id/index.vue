@@ -36,7 +36,7 @@
     <v-row>
       <v-col class="mx-auto">
         <v-alert
-          :value="instructions"
+          v-model="instructions"
           outlined
           text
           border="left"

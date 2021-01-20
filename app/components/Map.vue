@@ -8,8 +8,12 @@
         :center="selectedDataset.region.center"
         @ready="mapReady"
       >
-        <l-control-attribution position="topright" />
-        <l-control-layers :sort-layers="false" position="topright" />
+        <l-control-attribution v-if="showMapControls" position="topright" />
+        <l-control-layers
+          v-if="showMapControls"
+          :sort-layers="false"
+          position="topright"
+        />
         <l-tile-layer
           v-for="provider of leafletProviders"
           :key="provider.name"
@@ -26,7 +30,11 @@
           :style="selectedDataset.region.style"
           :fill-opacity="defaultRegionOpacity"
         />
-        <l-control-layers :sort-layers="false" position="topright" />
+        <l-control-layers
+          v-if="showMapControls"
+          :sort-layers="false"
+          position="topright"
+        />
         <l-wms-tile-layer
           v-for="variable of selectedDataset.variables"
           ref="wmsLayers"
@@ -86,6 +94,7 @@ class Map extends Vue {
   wGeometryKey = 'skope:geometry'
   wMinTemporalRangeKey = 'skope:temporal-range-min'
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
+  stepNames = _.clone(this.$api().app.stepNames)
 
   @Datasets.State('selectedDataset')
   selectedDataset
@@ -153,6 +162,14 @@ class Map extends Vue {
         self.disableEditOnly(map)
       }
     })
+  }
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name)
+  }
+
+  get showMapControls() {
+    return this.currentStep >= 2
   }
 
   checkAndRestoreSavedGeometry(map) {

@@ -1,19 +1,45 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-// drawer visibility and v-stepper state
-export const STEPS = Object.freeze({
-  SELECT_DATASET: 1,
-  DEFINE_STUDY_AREA: 2,
-  VISUALIZE_DATA: 3,
-  ANALYZE_DATA: 4,
-  VIEW_METADATA: 5,
-})
-
 @Module({ stateFactory: true, namespaced: true, name: 'app' })
 class App extends VuexModule {
   isDisabled = 0
-  currentStep = STEPS.SELECT_DATASET
   isVisible = 1
+
+  steps = [
+    {
+      step: 1,
+      name: 'index',
+      label: 'Select Data Set',
+      instructions:
+        'Welcome to the Synthesizing Knowledge of Past Environments (SKOPE) application! To examine data, click on a dataset name, pan & zoom the map, define your area of interest, then select a variable layer. ',
+    },
+    {
+      step: 2,
+      name: 'dataset-id-studyarea',
+      label: 'Define Study Area',
+      instructions:
+        'To define a study area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisified with your selection, click next.',
+    },
+    {
+      step: 3,
+      name: 'dataset-id-visualize',
+      label: 'Visualize Data',
+      instructions: 'Instructions here',
+    },
+    {
+      step: 4,
+      name: 'dataset-id-analyze',
+      label: 'Analyze Data',
+      instructions: 'Instructions here',
+    },
+  ]
+
+  stepNames = [
+    'index',
+    'dataset-id',
+    'dataset-id-visualize',
+    'dataset-id-analyze',
+  ]
 
   /**
    * Determine if drawer can be toggled.
@@ -37,15 +63,6 @@ class App extends VuexModule {
     this.isVisible = isVisible
   }
 
-  /**
-   * Set step from stepper navigation.
-   * @param {*} step
-   */
-  @Mutation
-  setStep(step) {
-    this.currentStep = step
-  }
-
   @Action({ commit: 'disableDrawer' })
   canShowDrawer(step) {
     this.context.commit('disableDrawer', step)
@@ -59,16 +76,6 @@ class App extends VuexModule {
   @Action({ commit: 'setDrawer' })
   toggleDrawer(isVisible) {
     return isVisible
-  }
-
-  /**
-   * Change current step in app via click.
-   * @param {*} step The step the user clicked on
-   */
-  @Action({ commit: 'setStep' })
-  selectStep(step) {
-    this.context.commit('setStep', step)
-    return step
   }
 }
 

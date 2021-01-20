@@ -51,35 +51,9 @@ import _ from 'lodash'
 
 @Component()
 class Navigation extends Vue {
-  steps = [
-    {
-      step: 1,
-      name: 'index',
-      label: 'Select Data Set',
-    },
-    {
-      step: 2,
-      name: 'dataset-id-studyarea',
-      label: 'Define Study Area',
-    },
-    {
-      step: 3,
-      name: 'dataset-id-visualize',
-      label: 'Visualize Data',
-    },
-    {
-      step: 4,
-      name: 'dataset-id-analyze',
-      label: 'Analyze Data',
-    },
-  ]
+  steps = _.cloneDeep(this.$api().app.steps)
 
-  stepNames = [
-    'index',
-    'dataset-id',
-    'dataset-id-visualize',
-    'dataset-id-analyze',
-  ]
+  stepNames = _.clone(this.$api().app.stepNames)
 
   complete(index) {
     return this.currentStep > index
