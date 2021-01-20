@@ -1,9 +1,20 @@
 <template>
-  <v-container fluid>
+  <v-responsive :aspect-ratio="16 / 9">
     <v-row class="my-5">
-      <h2 class="mx-3">
+      <h2 class="ml-3">
         {{ selectedDataset.title }}
       </h2>
+      <v-tooltip bottom
+        ><template #activator="{ on, attrs }">
+          <v-icon
+            class="mx-2"
+            v-bind="attrs"
+            @click="instructions = !instructions"
+            v-on="on"
+            >info</v-icon
+          > </template
+        ><span>Instructions</span></v-tooltip
+      >
       <v-dialog v-model="dialog" persistent max-width="600px">
         <template #activator="{ on, attrs }">
           <v-btn depressed color="accent" v-bind="attrs" v-on="on"
@@ -12,7 +23,7 @@
         </template>
         <v-card>
           <v-card-title class="accent">Metadata</v-card-title>
-          <v-card-text><Metadata /></v-card-text>
+          <v-card-text class="my-3"><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="dialog = false">Close</v-btn>
@@ -24,15 +35,22 @@
     </v-row>
     <v-row>
       <v-col class="mx-auto">
-        <v-card flat outlined>
-          <v-card-title>Instructions</v-card-title>
-        </v-card>
+        <v-alert
+          :value="instructions"
+          outlined
+          text
+          border="left"
+          dismissible
+          type="info"
+        >
+          These are the dismissable instructions for this page.
+        </v-alert>
       </v-col>
     </v-row>
-    <v-row class="my-5">
-      <v-col id="map-flex" class="mx-auto" xs12 md7>
-        <v-card flat outlined height="100%" class="map">
-          <v-card-title class="secondary">Map</v-card-title>
+    <v-row>
+      <v-col id="map-flex" class="mx-auto">
+        <v-card flat outlined class="map">
+          <v-card-title class="secondary"><h3>Map</h3></v-card-title>
           <Map />
           <v-sheet inset>
             <v-toolbar class="primary" flat dense>
@@ -82,12 +100,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col class="mx-auto">
-        <v-btn>Select Dataset</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+  </v-responsive>
 </template>
 
 <script>
@@ -127,6 +140,7 @@ class DatasetDetail extends Vue {
   selectedDatasetTimeZero
 
   dialog = false
+  instructions = false
 
   // created lifecycle hook
   async created() {

@@ -1,5 +1,5 @@
 <template>
-  <div class="map">
+  <div class="fill-height">
     <client-only placeholder="Loading map, please wait...">
       <l-map
         ref="layerMap"

@@ -4,7 +4,7 @@
     <DiscoverSideBar />
     <v-main>
       <Navigation />
-      <v-container fill-height fluid>
+      <v-container fluid>
         <Messages />
         <nuxt />
       </v-container>
