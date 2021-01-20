@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-responsive :aspect-ratio="16 / 9">
     <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
@@ -15,7 +15,7 @@
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </v-responsive>
 </template>
 
 <script>

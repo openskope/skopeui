@@ -1,35 +1,36 @@
 <template>
-  <v-row justify-center>
-    <v-col xs12 sm8 md6>
-      <v-card>
-        <v-responsive :aspect-ratio="16 / 9">
-          <v-card-title>
-            <v-icon left> fas fa-database </v-icon>
-            <span class="headline"> Datasets </span>
-          </v-card-title>
-          <v-card-text class="title text--primary">
-            Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
-            application! To examine data, click on a dataset name, pan &amp;
-            zoom the map, define your area of interest, then select a variable
-            layer.
-          </v-card-text>
-          <v-list>
-            <template v-for="(dataset, index) in datasets" router exact>
-              <Dataset :key="dataset.absolute_url" v-bind="dataset" />
-              <v-divider
-                v-if="index < datasets.length - 1"
-                :key="index"
-                inset
-              />
-            </template>
-          </v-list>
-          <v-alert v-if="datasets.length === 0" type="info">
-            No datasets found, please refine your filter criteria.
-          </v-alert>
-        </v-responsive>
-      </v-card>
-    </v-col>
-  </v-row>
+  <v-responsive :aspect-ratio="16 / 9">
+    <v-row>
+      <v-col class="mx-auto">
+        <v-alert
+          :value="instructions"
+          prominent
+          outlined
+          text
+          border="left"
+          type="info"
+        >
+          Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
+          application! To examine data, click on a dataset name, pan &amp; zoom
+          the map, define your area of interest, then select a variable layer.
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-card falt outlined>
+      <v-card-title class="secondary"
+        >Datasets<v-icon class="mx-2">fas fa-database</v-icon></v-card-title
+      >
+      <v-list>
+        <template v-for="(dataset, index) in datasets" router exact>
+          <Dataset :key="dataset.absolute_url" v-bind="dataset" class="my-2" />
+          <v-divider v-if="index < datasets.length - 1" :key="index" inset />
+        </template>
+      </v-list>
+      <v-alert v-if="datasets.length === 0" type="info">
+        No datasets found, please refine your filter criteria.
+      </v-alert>
+    </v-card>
+  </v-responsive>
 </template>
 
 <script>
