@@ -1,6 +1,30 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
-    <v-row class="my-5">
+    <v-row justify="space-around" class="my-5">
+      <v-dialog
+        v-model="confirm"
+        transition="dialog-bottom-transition"
+        max-width="600"
+      >
+        <template #default="confirm">
+          <v-card class="pa-6">
+            <v-card-text>
+              <h3>
+                Welcome back! Would you like to clear the current selected
+                geometry?
+              </h3>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn depressed color="info" @click="confirm.value = true"
+                >Keep saved geometry</v-btn
+              >
+              <v-btn depressed color="warning" @click="confirm.value = false"
+                >Clear geometry</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
       <h2 class="ml-3">
         {{ selectedDataset.title }}
       </h2>
@@ -149,6 +173,7 @@ class DatasetDetail extends Vue {
 
   dialog = false
   instructions = false
+  confirm = true
 
   // created lifecycle hook
   async created() {
