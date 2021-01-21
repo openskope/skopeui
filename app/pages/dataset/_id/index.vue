@@ -22,7 +22,7 @@
           >
         </template>
         <v-card>
-          <v-card-title class="accent">Metadata</v-card-title>
+          <v-card-title class="accent text--white">Metadata</v-card-title>
           <v-card-text class="my-3"><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -31,7 +31,13 @@
         </v-card>
       </v-dialog>
       <v-spacer></v-spacer>
-      <v-btn>Next</v-btn>
+      <v-btn
+        depressed
+        color="accent"
+        :disabled="!hasValidStudyArea"
+        @click="goToViz($route.params.id)"
+        >Next</v-btn
+      >
     </v-row>
     <v-row>
       <v-col class="mx-auto">
@@ -139,6 +145,8 @@ class DatasetDetail extends Vue {
   @Datasets.Getter('selectedDatasetTimeZero')
   selectedDatasetTimeZero
 
+  stepNames = _.clone(this.$api().app.stepNames)
+
   dialog = false
   instructions = false
 
@@ -148,6 +156,15 @@ class DatasetDetail extends Vue {
     await d.loadDataset(this.$route.params.id)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear
+  }
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name)
+  }
+
+  get hasValidStudyArea() {
+    // return whether study area geometry has been defined
+    return this.currentStep == 0 || this.$api().dataset.hasGeometry
   }
 
   get selectedArea() {
@@ -598,6 +615,13 @@ class DatasetDetail extends Vue {
 
   validate({ params }) {
     return /^\w+$/.test(params.id)
+  }
+
+  goToViz(id) {
+    if (_.isUndefined(id) || !this.hasValidStudyArea) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-visualize', params: { id } })
   }
 }
 export default DatasetDetail
