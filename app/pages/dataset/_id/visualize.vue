@@ -4,6 +4,17 @@
       <h2 class="mx-3">
         {{ selectedDataset.title }}
       </h2>
+      <v-tooltip bottom
+        ><template #activator="{ on, attrs }">
+          <v-icon
+            class="mx-2"
+            v-bind="attrs"
+            @click="instructions = !instructions"
+            v-on="on"
+            >info</v-icon
+          > </template
+        ><span>Instructions</span></v-tooltip
+      >
       <v-dialog v-model="dialog" persistent max-width="600px">
         <template #activator="{ on, attrs }">
           <v-btn depressed color="accent" v-bind="attrs" v-on="on"
@@ -15,10 +26,32 @@
           <v-card-text><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn text @click="dialog = false">Close</v-btn>
+            <v-btn @click="dialog = false">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-spacer></v-spacer>
+      <v-btn
+        depressed
+        color="accent"
+        :disabled="!hasValidStudyArea"
+        @click="goToAnalyze($route.params.id)"
+        >Next</v-btn
+      >
+    </v-row>
+    <v-row>
+      <v-col class="mx-auto">
+        <v-alert
+          v-model="instructions"
+          outlined
+          text
+          border="left"
+          dismissible
+          type="info"
+        >
+          These are the dismissable instructions for this page.
+        </v-alert>
+      </v-col>
     </v-row>
     <v-row dense align-content-start justify-space-around wrap>
       <v-col v-if="isLoadingData">
@@ -136,6 +169,7 @@ class Visualize extends Vue {
   selectedAreaInSquareMeters = 0
   yearSelected = 1500
   dialog = false
+  instructions = true
   @Dataset.State('geometry')
   selectedGeometry
   @Dataset.State('layer')
@@ -143,6 +177,21 @@ class Visualize extends Vue {
   @Datasets.State('selectedDataset')
   selectedDataset
   timeSeriesUnwatcher = null
+  stepNames = _.clone(this.$api().app.stepNames)
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name)
+  }
+  get hasValidStudyArea() {
+    // return whether study area geometry has been defined
+    return this.currentStep == 0 || this.$api().dataset.hasGeometry
+  }
+  goToAnalyze(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
+  }
   get hasTimeSeries() {
     return this.timeSeries.x.length > 0
   }
