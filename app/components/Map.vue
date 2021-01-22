@@ -395,6 +395,7 @@ class Map extends Vue {
   clearGeometry() {
     console.log('clear selected geometry')
     const L = this.$L
+    this.drawnItems.clearLayers()
     this.drawnItems = new L.FeatureGroup()
     this.clearSelectedGeometry()
   }
