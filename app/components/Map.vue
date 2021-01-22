@@ -398,6 +398,8 @@ class Map extends Vue {
     this.drawnItems.clearLayers()
     this.drawnItems = new L.FeatureGroup()
     this.clearSelectedGeometry()
+    const map = this.$refs.layerMap.mapObject
+    this.addDrawToolbar(map)
   }
 }
 export default Map
