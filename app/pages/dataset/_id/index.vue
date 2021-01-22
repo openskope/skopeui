@@ -2,23 +2,29 @@
   <v-responsive :aspect-ratio="16 / 9">
     <v-row justify="space-around" class="my-5">
       <v-dialog
-        v-model="confirm"
+        v-model="confirmGeometry"
         transition="dialog-bottom-transition"
         max-width="600"
       >
-        <template #default="confirm">
+        <template #default="confirmGeometry">
           <v-card class="pa-6">
             <v-card-text>
               <h3>
-                Welcome back! Would you like to clear the current selected
+                Welcome back! Would you like to clear the currently selected
                 geometry?
               </h3>
             </v-card-text>
             <v-card-actions class="justify-end">
-              <v-btn depressed color="info" @click="confirm.value = true"
+              <v-btn
+                depressed
+                color="info"
+                @click="confirmGeometry.value = false"
                 >Keep saved geometry</v-btn
               >
-              <v-btn depressed color="warning" @click="confirm.value = false"
+              <v-btn
+                depressed
+                color="warning"
+                @click="confirmGeometry.value = false"
                 >Clear geometry</v-btn
               >
             </v-card-actions>
@@ -173,7 +179,7 @@ class DatasetDetail extends Vue {
 
   dialog = false
   instructions = false
-  confirm = true
+  confirmGeometry = false
 
   // created lifecycle hook
   async created() {
@@ -181,6 +187,7 @@ class DatasetDetail extends Vue {
     await d.loadDataset(this.$route.params.id)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear
+    this.confirmGeometry = this.hasValidStudyArea
   }
 
   get currentStep() {
@@ -204,76 +211,6 @@ class DatasetDetail extends Vue {
     return this.isLayerSelected ? this.selectedLayer.name : ''
   }
 
-  get opacityLabel() {
-    return `${this.selectedLayerName} Opacity`
-  }
-
-  get layerOpacity() {
-    return this.opacity / 100.0
-  }
-
-  get timespanMinYear() {
-    return parseInt(this.selectedDatasetTimespan[0])
-  }
-
-  get timespanMaxYear() {
-    return parseInt(this.selectedDatasetTimespan[1])
-  }
-
-  get layerType() {
-    return this.selectedDataset.variables.length > 1 ? 'base' : 'overlay'
-  }
-
-  get isLayerSelected() {
-    return this.selectedLayer !== null
-  }
-
-  get skopeWmsUrl() {
-    return SKOPE_WMS_ENDPOINT
-  }
-
-  get leafletProviders() {
-    return LEAFLET_PROVIDERS
-  }
-
-  get playIcon() {
-    if (this.isAnimationPlaying) {
-      return 'pause_circle_filled'
-    } else {
-      return 'play_circle_filled'
-    }
-  }
-
-  get spatialCoverage() {
-    return `${this.selectedDataset.region.name} at
-     ${this.selectedDataset.region.resolution}`
-  }
-
-  get temporalCoverage() {
-    const ts = this.selectedDataset.timespan
-    const period = ts.period
-    const timespan =
-      period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`
-    return `${timespan}${period.suffix} ${ts.resolutionLabel}`
-  }
-
-  get metadataAttributes() {
-    return {
-      originator: 'Originator',
-      uncertainty: 'Uncertainty',
-      methodSummary: 'Method Summary',
-      references: 'References',
-      contactInformation: 'Contact Information',
-    }
-  }
-
-  get defaultCrs() {
-    if (this.$L) {
-      return this.$L.CRS.EPSG4326
-    }
-    return ''
-  }
-
   get selectedArea() {
     if (this.selectedAreaInSquareMeters > 0) {
       return Number.parseFloat(
@@ -282,54 +219,10 @@ class DatasetDetail extends Vue {
     }
   }
 
-  get absoluteUrl() {
-    return '/dataset/' + this.selectedDataset.id
-  }
-
-  get metadata() {
-    return '/dataset/' + this.selectedDataset.id + '/metadata'
-  }
-
   head() {
     return {
       title: this.selectedDataset.title,
     }
-  }
-
-  nextYear() {
-    if (this.selectedLayer === null) {
-      return
-    }
-    this.updateYear(
-      clamp(this.year + 1, this.minTemporalRange, this.maxTemporalRange)
-    )
-  }
-
-  previousYear() {
-    if (this.selectedLayer === null) {
-      return
-    }
-    this.updateYear(
-      clamp(this.year - 1, this.minTemporalRange, this.maxTemporalRange)
-    )
-  }
-
-  gotoFirstYear() {
-    if (this.selectedLayer === null) {
-      return
-    }
-    this.updateYear(this.minTemporalRange)
-  }
-
-  gotoLastYear() {
-    if (this.selectedLayer === null) {
-      return
-    }
-    this.updateYear(this.maxTemporalRange)
-  }
-
-  setLegendImage(htmlElement) {
-    this.legendImage = htmlElement
   }
 
   loadGeoJson(event) {
@@ -388,45 +281,8 @@ class DatasetDetail extends Vue {
     this.selectedGeometry = data.geometry
   }
 
-  clearSelectedGeometry() {
-    this.selectedGeometry = { type: 'None', coordinates: [] }
-    this.selectedAreaInSquareMeters = 0.0
-    this.$warehouse.remove(this.wGeometryKey)
-  }
-
   saveSelectedGeometry(geoJson) {
     this.$warehouse.set(this.wGeometryKey, JSON.stringify(geoJson))
-  }
-
-  saveTemporalRange() {
-    this.$warehouse.set(this.wMinTemporalRangeKey, this.minTemporalRange)
-    this.$warehouse.set(this.wMaxTemporalRangeKey, this.maxTemporalRange)
-  }
-
-  getSavedTemporalRange() {
-    const minTemporalRange = this.$warehouse.get(
-      this.wMinTemporalRangeKey,
-      this.minTemporalRange
-    )
-    const maxTemporalRange = this.$warehouse.get(
-      this.wMaxTemporalRangeKey,
-      this.maxTemporalRange
-    )
-    if (minTemporalRange || maxTemporalRange) {
-      return [minTemporalRange, maxTemporalRange]
-    }
-    return []
-  }
-
-  checkAndRestoreSavedTemporalRange() {
-    const savedTemporalRange = this.getSavedTemporalRange()
-    if (savedTemporalRange) {
-      this.minTemporalRange = savedTemporalRange[0]
-      this.maxTemporalRange = savedTemporalRange[1]
-      this.updateYear(
-        clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
-      )
-    }
   }
 
   checkAndRestoreSavedGeometry(map) {
@@ -474,170 +330,6 @@ class DatasetDetail extends Vue {
     return false
   }
 
-  disableEditOnly(map) {
-    this.drawControlEditOnly.remove(map)
-    this.drawControlFull.addTo(map)
-  }
-
-  enableEditOnly(map) {
-    this.drawControlFull.remove(map)
-    this.drawControlEditOnly.addTo(map)
-  }
-
-  addDrawToolbar(map) {
-    const L = this.$L
-    this.drawnItems = new L.FeatureGroup()
-    map.addLayer(this.drawnItems)
-    this.drawControlFull = new L.Control.Draw({
-      position: 'topleft',
-      draw: {
-        // disable polylines and circlemarkers, allow polygon, rectangle, circle, and marker
-        polyline: false,
-        circlemarker: false,
-        polygon: {
-          allowIntersection: false,
-          showArea: true,
-        },
-      },
-      edit: {
-        featureGroup: this.drawnItems,
-      },
-    })
-    this.drawControlEditOnly = new L.Control.Draw({
-      edit: {
-        featureGroup: this.drawnItems,
-      },
-      draw: false,
-    })
-    // set custom tooltips on the draw and edit toolbars
-    const drawControlButtons = L.drawLocal.draw.toolbar.buttons
-    drawControlButtons.marker = 'Select a point'
-    drawControlButtons.polygon = 'Select a polygon area'
-    drawControlButtons.circle = 'Select a circular area'
-    drawControlButtons.rectangle = 'Select a rectangular area'
-    const editControlButtons = L.drawLocal.edit.toolbar.buttons
-    editControlButtons.edit = 'Edit spatial selection'
-    editControlButtons.editDisabled = 'No spatial selection to edit'
-    editControlButtons.remove = 'Clear spatial selection'
-    editControlButtons.removeDisabled = 'No spatial selection to remove'
-    const self = this
-    map.addControl(this.drawControlFull)
-    // check for persisted geometry
-    this.checkAndRestoreSavedGeometry(map)
-    // check for persisted temporal range
-    this.checkAndRestoreSavedTemporalRange()
-    map.on(L.Draw.Event.EDITRESIZE, (e) => self.updateSelectedGeometry(e.layer))
-    map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedGeometry(e.layer))
-    map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
-    map.on(L.Draw.Event.CREATED, (event) => {
-      const layer = event.layer
-      self.updateSelectedGeometry(layer)
-      self.drawnItems.addLayer(layer)
-      self.enableEditOnly(map)
-    })
-    map.on(L.Draw.Event.DELETED, (event) => {
-      self.clearSelectedGeometry()
-      if (self.drawnItems.getLayers().length === 0) {
-        self.disableEditOnly(map)
-      }
-    })
-  }
-
-  generateWmsLegendUrl(layerName) {
-    const query = {
-      REQUEST: 'GetLegendGraphic',
-      VERSION: '1.0.0',
-      FORMAT: 'image/png',
-      LAYER: layerName,
-      LEGEND_OPTIONS: 'layout:vertical;dx:10',
-    }
-    const queryString = stringify(query)
-    const legendUrl = this.skopeWmsUrl + queryString
-    return legendUrl
-  }
-
-  updateWmsLegend(map, layerName) {
-    const L = this.$L
-    const wmsLegendUrl = this.generateWmsLegendUrl(layerName)
-    if (this.legendControl === null) {
-      const legend = L.control({ position: this.legendPosition })
-      legend.onAdd = (map) => {
-        const controlCss = 'leaflet-control-wms-legend'
-        const legendCss = 'wms-legend'
-        const div = L.DomUtil.create('div', controlCss)
-        const legendImage = L.DomUtil.create('img', legendCss, div)
-        legendImage.src = wmsLegendUrl
-        this.setLegendImage(legendImage)
-        return div
-      }
-      legend.addTo(map)
-      this.legendControl = legend
-    }
-    if (this.legendImage !== null) {
-      this.legendImage.src = wmsLegendUrl
-    }
-  }
-
-  fillTemplateYear(templateString) {
-    const year = (this.year || this.maxTemporalRange).toString()
-    const layer = fillTemplate(templateString, {
-      year: year.padStart(4, '0'),
-    })
-    return layer
-  }
-
-  updateYear(year) {
-    this.year = year
-    this.updateWmsLayer()
-  }
-
-  updateAnimationYear() {
-    if (this.year !== null && this.year < this.minTemporalRange) {
-      this.updateYear(this.minTemporalRange)
-    }
-  }
-
-  validateMinYear() {
-    this.minTemporalRange = clamp(
-      this.minTemporalRange,
-      this.timespanMinYear,
-      this.timespanMaxYear
-    )
-    this.updateYear(
-      clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
-    )
-    this.saveTemporalRange()
-  }
-
-  validateMaxYear() {
-    this.maxTemporalRange = clamp(
-      this.maxTemporalRange,
-      this.timespanMinYear,
-      this.timespanMaxYear
-    )
-    this.updateYear(
-      clamp(this.minTemporalRange, this.year, this.maxTemporalRange)
-    )
-    this.saveTemporalRange()
-  }
-
-  updateWmsLayer() {
-    // hairy bit of code to:
-    // 1. pull out the currently selected layer's layer template string
-    // 2. update it with the current year
-    // 3. reset the params on the currently selected layer to request the new layer from GeoServer
-    if (this.selectedLayer !== null) {
-      for (const wmsLayerRef of this.$refs.wmsLayers) {
-        if (wmsLayerRef.name === this.selectedLayer.name) {
-          const layerTemplateString = wmsLayerRef.$vnode.data.key
-          const layerName = this.fillTemplateYear(layerTemplateString)
-          const wmsLayer = wmsLayerRef.mapObject
-          wmsLayer.setParams({ layers: layerName }, false)
-        }
-      }
-    }
-  }
-
   validate({ params }) {
     return /^\w+$/.test(params.id)
   }
@@ -664,7 +356,7 @@ export default DatasetDetail
 }
 
 #map-flex {
-  height: 520px;
+  height: 75vh;
   margin-bottom: 2rem;
 }
 
