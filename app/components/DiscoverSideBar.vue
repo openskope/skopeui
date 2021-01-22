@@ -110,6 +110,10 @@ class DiscoverSideBar extends Vue {
     return !!this.$api().app.isVisible
   }
 
+  set isVisible(isVis) {
+    this.$api().app.setDrawer(!isVis)
+  }
+
   get startYearRules() {
     return [
       (v) =>
