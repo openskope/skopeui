@@ -83,6 +83,9 @@ class Map extends Vue {
   @Prop({ default: 0.5 })
   opacity
 
+  @Prop({ default: false })
+  clear
+
   maxTemporalRange = new Date().getFullYear()
 
   defaultRegionOpacity = 0.05
@@ -386,6 +389,14 @@ class Map extends Vue {
     map.on('overlayadd', handler)
     map.on('baselayerchange', handler)
     this.addDrawToolbar(map)
+  }
+
+  @Watch('clear')
+  clearGeometry() {
+    console.log('clear selected geometry')
+    const L = this.$L
+    this.drawnItems = new L.FeatureGroup()
+    this.clearSelectedGeometry()
   }
 }
 export default Map

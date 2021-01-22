@@ -21,10 +21,7 @@
                 @click="confirmGeometry.value = false"
                 >Keep saved geometry</v-btn
               >
-              <v-btn
-                depressed
-                color="warning"
-                @click="confirmGeometry.value = false"
+              <v-btn depressed color="warning" @click="clearGeometry"
                 >Clear geometry</v-btn
               >
             </v-card-actions>
@@ -87,7 +84,7 @@
       <v-col id="map-flex" class="mx-auto">
         <v-card flat outlined class="map">
           <v-card-title class="secondary"><h3>Map</h3></v-card-title>
-          <Map />
+          <Map :clear="clear" />
           <v-sheet inset>
             <v-toolbar class="primary" flat dense>
               <v-tooltip top>
@@ -180,6 +177,7 @@ class DatasetDetail extends Vue {
   dialog = false
   instructions = false
   confirmGeometry = false
+  clear = false
 
   // created lifecycle hook
   async created() {
@@ -205,10 +203,6 @@ class DatasetDetail extends Vue {
         this.selectedAreaInSquareMeters / 1000000.0
       ).toFixed(2)
     }
-  }
-
-  get selectedLayerName() {
-    return this.isLayerSelected ? this.selectedLayer.name : ''
   }
 
   get selectedArea() {
@@ -339,6 +333,11 @@ class DatasetDetail extends Vue {
       return
     }
     this.$router.push({ name: 'dataset-id-visualize', params: { id } })
+  }
+
+  async clearGeometry() {
+    this.confirmGeometry = false
+    this.clear = true
   }
 }
 export default DatasetDetail
