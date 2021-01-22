@@ -2,14 +2,7 @@
   <v-responsive :aspect-ratio="16 / 9">
     <v-row>
       <v-col class="mx-auto">
-        <v-alert
-          :value="instructions"
-          prominent
-          outlined
-          text
-          border="left"
-          type="info"
-        >
+        <v-alert prominent outlined text border="left" type="info">
           Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
           application! To examine data, click on a dataset name, pan &amp; zoom
           the map, define your area of interest, then select a variable layer.
