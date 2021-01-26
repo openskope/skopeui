@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar src="/header.png" shrink-on-scroll flat dense app>
+  <v-app-bar src="/header.png" shrink-on-scroll dense flat app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"
@@ -18,7 +18,7 @@
         </v-img>
       </nuxt-link>
     </v-toolbar-title>
-    <v-spacer />
+    <v-spacer></v-spacer>
     <v-toolbar-items>
       <v-btn icon :href="github.url">
         <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
@@ -29,14 +29,22 @@
         Contact
       </v-btn>
     </v-toolbar-items>
+    <template v-slot:extension>
+      <Navigation class="flex-grow-1" />
+    </template>
   </v-app-bar>
 </template>
 <script>
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
+import Navigation from '@/components/global/Navigation.vue'
 import { Prop, Watch } from 'vue-property-decorator'
 
-@Component()
+@Component({
+  components: {
+    Navigation,
+  },
+})
 class Header extends Vue {
   github = {
     icon: 'fab fa-github',
