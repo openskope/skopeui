@@ -67,7 +67,9 @@
             <v-card-title class="secondary">Map</v-card-title>
             <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
             <v-toolbar flat color="primary" class="px-1" dense>
-              <v-toolbar-title class="white--text">Opacity:</v-toolbar-title>
+              <v-toolbar-title :align="start" class="white--text"
+                >Opacity:</v-toolbar-title
+              >
               <v-btn icon color="white" @click="decreaseOpacity">
                 <v-icon>fas fa-minus</v-icon>
               </v-btn>
@@ -75,20 +77,20 @@
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-toolbar-title class="white--text"
+              <v-toolbar-title :align="center" class="white--text"
                 >Year: {{ yearSelected }}CE
               </v-toolbar-title>
-              <v-spacer></v-spacer>
               <v-select
                 v-model="layer"
                 dense
                 dark
+                :align="end"
                 :items="layers"
                 item-text="class"
                 item-value="id"
-                label="Select"
                 color="accent"
-                class="mt-5 pt-1"
+                class="mt-5 pt-2"
+                label="Variable"
                 single-line
                 filled
                 flat
