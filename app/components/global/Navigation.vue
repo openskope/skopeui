@@ -6,6 +6,7 @@
       <v-stepper-step
         step="1"
         :complete="complete(0)"
+        :color="complete(0) ? 'info' : 'primary'"
         editable
         edit-icon="$complete"
         @click="goToDataSets"
@@ -16,6 +17,7 @@
         step="2"
         :complete="complete(1)"
         :editable="hasSelectedDataSet"
+        :color="complete(1) ? 'info' : 'primary'"
         edit-icon="map"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
@@ -25,6 +27,7 @@
         step="3"
         :complete="complete(2)"
         :editable="hasSelectedDataSet && hasValidStudyArea"
+        :color="complete(2) ? 'info' : 'primary'"
         edit-icon="fas fa-chart-bar"
         :rules="[() => hasValidStudyArea]"
         @click="goToViz($route.params.id)"
@@ -35,6 +38,7 @@
         step="4"
         :complete="complete(3)"
         :editable="canAnalyze"
+        :color="complete(3) ? 'info' : 'primary'"
         edit-icon="$complete"
         :rules="[() => canAnalyze]"
         @click="goToAnalyze($route.params.id)"
