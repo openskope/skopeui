@@ -1,5 +1,5 @@
 <template>
-  <v-stepper :value="currentStep + 1">
+  <v-stepper class="elevation-0 stepper" :value="currentStep + 1">
     <v-stepper-header nonlinear>
       <!-- FIXME replace step numbers with icons when step is inactive/incomplete
       https://github.com/vuetifyjs/vuetify/issues/7049 -->
@@ -121,5 +121,6 @@ export default Navigation
 <style scoped>
 .stepper {
   font-size: 1.2rem;
+  background-color: #f5f5f5;
 }
 </style>

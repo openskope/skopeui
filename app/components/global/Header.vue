@@ -1,22 +1,11 @@
 <template>
-  <v-app-bar src="/header.png" shrink-on-scroll dense flat app>
+  <v-app-bar :style="'height: 125px'" flat app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"
     ></v-app-bar-nav-icon>
     <v-toolbar-title>
-      <nuxt-link class="skope-title" to="/">
-        <v-img
-          class="mb-n10"
-          alt="SKOPE"
-          position="left center"
-          height="120"
-          max-height="120"
-          src="/logo-640x360.png"
-          contain
-        >
-        </v-img>
-      </nuxt-link>
+      <nuxt-link class="skope-title" to="/">SKOPE</nuxt-link>
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
@@ -29,7 +18,7 @@
         Contact
       </v-btn>
     </v-toolbar-items>
-    <template v-slot:extension>
+    <template #extension>
       <Navigation class="flex-grow-1" />
     </template>
   </v-app-bar>
