@@ -1,12 +1,12 @@
 <template>
-  <v-stepper class="elevation-0 stepper" :value="currentStep + 1">
+  <v-stepper :value="currentStep + 1">
     <v-stepper-header nonlinear>
       <!-- FIXME replace step numbers with icons when step is inactive/incomplete
       https://github.com/vuetifyjs/vuetify/issues/7049 -->
       <v-stepper-step
         step="1"
         :complete="complete(0)"
-        :color="complete(0) ? 'info' : 'primary'"
+        :color="complete(0) ? 'info' : 'secondary'"
         editable
         edit-icon="$complete"
         @click="goToDataSets"
@@ -16,8 +16,8 @@
       <v-stepper-step
         step="2"
         :complete="complete(1)"
+        :color="complete(1) ? 'info' : 'secondary'"
         :editable="hasSelectedDataSet"
-        :color="complete(1) ? 'info' : 'primary'"
         edit-icon="map"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
@@ -26,8 +26,8 @@
       <v-stepper-step
         step="3"
         :complete="complete(2)"
+        :color="complete(2) ? 'info' : 'secondary'"
         :editable="hasSelectedDataSet && hasValidStudyArea"
-        :color="complete(2) ? 'info' : 'primary'"
         edit-icon="fas fa-chart-bar"
         :rules="[() => hasValidStudyArea]"
         @click="goToViz($route.params.id)"
@@ -38,7 +38,7 @@
         step="4"
         :complete="complete(3)"
         :editable="canAnalyze"
-        :color="complete(3) ? 'info' : 'primary'"
+        :color="complete(3) ? 'info' : 'secondary'"
         edit-icon="$complete"
         :rules="[() => canAnalyze]"
         @click="goToAnalyze($route.params.id)"
@@ -122,9 +122,11 @@ class Navigation extends Vue {
 export default Navigation
 </script>
 
-<style scoped>
-.stepper {
-  font-size: 1.2rem;
-  background-color: #f5f5f5;
-}
+<style lang="sass">
+@import './assets/style/variables.scss'
+.v-stepper__step--active
+  background-color: #8bbf9f
+
+.v-stepper__label
+  font-size: 1.5rem
 </style>
