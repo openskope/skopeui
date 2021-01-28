@@ -134,10 +134,9 @@ module.exports = {
 
   vuetify: {
     optionsPath: './assets/style/vuetify.js',
+    customVariables: ['./assets/style/variables.scss'],
+    treeShake: true,
     defaultAssets: {
-      font: {
-        family: 'Roboto',
-      },
       icons: 'fa',
     },
   },
