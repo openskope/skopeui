@@ -1,5 +1,6 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
+    <!-- title and instructions -->
     <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
@@ -39,6 +40,7 @@
         >Next</v-btn
       >
     </v-row>
+    <!-- dismissable instructions -->
     <v-row>
       <v-col class="mx-auto">
         <v-alert
@@ -53,7 +55,9 @@
         </v-alert>
       </v-col>
     </v-row>
+    <!-- map and time series plot -->
     <v-row dense align-content-start justify-space-around wrap>
+      <!-- loading animation -->
       <v-col v-if="isLoadingData">
         <v-progress-circular
           v-if="isLoadingData"
@@ -61,13 +65,16 @@
           color="primary"
         />
       </v-col>
+      <!-- map and toolbar controls-->
       <template v-else>
         <v-col>
           <v-card flat outlined>
             <v-card-title class="secondary">Map</v-card-title>
             <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
             <v-toolbar flat color="primary" class="px-1" dense>
-              <v-toolbar-title :align="start" class="white--text"
+              <v-toolbar-title
+                :align="start"
+                class="white--text text-uppercase font-weight-medium"
                 >Opacity:</v-toolbar-title
               >
               <v-btn icon color="white" @click="decreaseOpacity">
@@ -77,9 +84,17 @@
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-toolbar-title :align="center" class="white--text"
+              <v-toolbar-title
+                :align="center"
+                class="white--text text-uppercase font-weight-medium mx-5"
                 >Year: {{ yearSelected }}CE
               </v-toolbar-title>
+              <v-spacer></v-spacer>
+              <span
+                class="white--text text-uppercase ml-5 mr-2 font-weight-medium"
+              >
+                Variable
+              </span>
               <v-select
                 v-model="layer"
                 dense
@@ -89,10 +104,10 @@
                 item-text="class"
                 item-value="id"
                 color="accent"
-                class="mt-5 pt-2"
-                label="Variable"
+                class="my-auto pt-1"
+                :style="'width: 7.5rem'"
                 single-line
-                filled
+                outlined
                 flat
               >
               </v-select>
