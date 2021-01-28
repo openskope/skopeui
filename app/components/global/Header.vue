@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar :style="'height: 125px'" flat app>
+  <v-app-bar extended extension-height="75" flat app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"
