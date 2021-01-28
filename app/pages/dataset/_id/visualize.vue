@@ -97,6 +97,7 @@
               </span>
               <v-select
                 v-model="layer"
+                label="Select a variable"
                 dense
                 dark
                 :align="end"
@@ -249,7 +250,8 @@ class Visualize extends Vue {
     this.$api().dataset.setLayer(l)
   }
   get layer() {
-    return this.$api().dataset.layer
+    if (_.size(this.layers) > 1) return ''
+    else return this.$api().dataset.layer
   }
   get layers() {
     return this.selectedDataset.variables
