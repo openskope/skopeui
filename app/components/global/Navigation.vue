@@ -97,7 +97,7 @@ class Navigation extends Vue {
   }
 
   goToAnalyze(id) {
-    if (_.isUndefined(id)) {
+    if (_.isUndefined(id) || !this.canAnalyze) {
       return
     }
     this.$router.push({ name: 'dataset-id-analyze', params: { id } })
