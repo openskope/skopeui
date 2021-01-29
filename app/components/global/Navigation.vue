@@ -73,10 +73,7 @@ class Navigation extends Vue {
   }
 
   get canAnalyze() {
-    return (
-      this.currentStep <= 1 ||
-      (this.hasValidStudyArea && this.$api().dataset.hasData)
-    )
+    return this.hasValidStudyArea && this.$api().dataset.hasData
   }
 
   // --------- GETTERS ---------
@@ -108,10 +105,6 @@ class Navigation extends Vue {
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name)
-  }
-
-  get isDisabled() {
-    return this.$api().app.isDisabled
   }
 
   get selectedDatasetId() {
