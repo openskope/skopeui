@@ -1,14 +1,14 @@
 <template>
-  <v-app-bar extended extension-height="75" flat app>
+  <v-app-bar extended extension-height="15" flat app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"
     ></v-app-bar-nav-icon>
-    <v-toolbar-title>
+    <v-toolbar-title class="mr-10">
       <nuxt-link class="skope-title" to="/">SKOPE</nuxt-link>
     </v-toolbar-title>
-    <v-spacer></v-spacer>
-    <v-toolbar-items>
+    <Navigation class="mt-3 flex-grow-1" />
+    <v-toolbar-items class="ml-10">
       <v-btn icon :href="github.url">
         <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
       </v-btn>
@@ -18,9 +18,6 @@
         Contact
       </v-btn>
     </v-toolbar-items>
-    <template #extension>
-      <Navigation class="flex-grow-1" />
-    </template>
   </v-app-bar>
 </template>
 <script>
