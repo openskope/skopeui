@@ -73,7 +73,6 @@
             <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
             <v-toolbar flat color="primary" class="px-1" dense>
               <v-toolbar-title
-                :align="start"
                 class="white--text text-uppercase font-weight-medium"
                 >Opacity:</v-toolbar-title
               >
@@ -85,7 +84,6 @@
               </v-btn>
               <v-spacer></v-spacer>
               <v-toolbar-title
-                :align="center"
                 class="white--text text-uppercase font-weight-medium mx-5"
                 >Year: {{ yearSelected }}CE
               </v-toolbar-title>
@@ -100,9 +98,8 @@
                 label="Select a variable"
                 dense
                 dark
-                :align="end"
                 :items="layers"
-                item-text="class"
+                item-text="name"
                 item-value="id"
                 color="accent"
                 class="my-auto pt-1"
