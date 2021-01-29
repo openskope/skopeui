@@ -9,6 +9,7 @@
         :color="complete(0) ? 'info' : 'secondary'"
         editable
         edit-icon="$complete"
+        :class="!isActiveStep(0) ? 'step' : ''"
         @click="goToDataSets"
         >Select Data Set</v-stepper-step
       >
@@ -19,6 +20,7 @@
         :color="complete(1) ? 'info' : 'secondary'"
         :editable="hasSelectedDataSet"
         edit-icon="map"
+        :class="!isActiveStep(1) && hasSelectedDataSet ? 'step' : ''"
         @click="goToStudyArea($route.params.id)"
         >Define Study Area</v-stepper-step
       >
@@ -30,6 +32,11 @@
         :editable="hasSelectedDataSet && hasValidStudyArea"
         edit-icon="fas fa-chart-bar"
         :rules="[() => hasValidStudyArea]"
+        :class="
+          !isActiveStep(1) && hasSelectedDataSet && hasValidStudyArea
+            ? 'step'
+            : ''
+        "
         @click="goToViz($route.params.id)"
         >Visualize Data</v-stepper-step
       >
@@ -41,6 +48,7 @@
         :color="complete(3) ? 'info' : 'secondary'"
         edit-icon="$complete"
         :rules="[() => canAnalyze]"
+        :class="!isActiveStep(1) && canAnalyze ? 'step' : ''"
         @click="goToAnalyze($route.params.id)"
         >Analyze Data</v-stepper-step
       >
@@ -59,9 +67,7 @@ class Navigation extends Vue {
 
   stepNames = _.clone(this.$api().app.stepNames)
 
-  complete(index) {
-    return this.currentStep > index
-  }
+  // --------- GETTERS ---------
 
   get hasSelectedDataSet() {
     return !_.isUndefined(this.$route.params.id)
@@ -76,7 +82,15 @@ class Navigation extends Vue {
     return this.hasValidStudyArea && this.$api().dataset.hasData
   }
 
-  // --------- GETTERS ---------
+  // --------- METHODS ---------
+
+  complete(index) {
+    return this.currentStep > index
+  }
+
+  isActiveStep(index) {
+    return this.currentStep == index
+  }
 
   goToDataSets() {
     this.$router.push({ name: 'index' })
@@ -122,4 +136,12 @@ export default Navigation
 
 .v-stepper__label
   font-size: 1.5rem
+
+.step
+  transition: ease-out 0.3s
+  box-shadow: inset 0 0 0 0 #8bbf9f
+
+.step:hover
+  cursor: pointer
+  box-shadow: inset 300px 0 0 0 #8bbf9f
 </style>
