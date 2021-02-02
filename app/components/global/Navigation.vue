@@ -1,5 +1,5 @@
 <template>
-  <v-stepper :value="currentStep + 1">
+  <v-stepper :style="'background-color: #f5f5f5'" :value="currentStep + 1">
     <v-stepper-header nonlinear>
       <!-- FIXME replace step numbers with icons when step is inactive/incomplete
       https://github.com/vuetifyjs/vuetify/issues/7049 -->
