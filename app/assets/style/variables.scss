@@ -1,6 +1,7 @@
 // src/sass/variables.scss
 
 // Globals
+$header-font-family: 'Roboto', serif;
 $body-font-family: 'Roboto', serif;
 $border-radius-root: 6px;
 $font-size-root: 14px;
@@ -29,7 +30,3 @@ $headings: (
     'line-height': 1.5em
   )
 );
-
-// v-stepper
-$stepper-elevation: 0;
-$stepper-step-step-font-size: 1.25rem;
