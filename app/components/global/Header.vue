@@ -1,23 +1,64 @@
 <template>
-  <v-app-bar extended extension-height="15" flat app>
+  <v-app-bar extended extension-height="25" color="primary" app>
     <v-app-bar-nav-icon
       @disabled="isDisabled"
       @click="toggleDrawer"
     ></v-app-bar-nav-icon>
     <v-toolbar-title class="mr-10">
-      <nuxt-link class="skope-title" to="/">SKOPE</nuxt-link>
+      <nuxt-link class="skope-title" to="/">skope</nuxt-link>
     </v-toolbar-title>
-    <Navigation class="mt-3 flex-grow-1" />
-    <v-toolbar-items class="ml-10">
-      <v-btn icon :href="github.url">
-        <v-icon size="24px" class="mx-3">{{ github.icon }}</v-icon>
-      </v-btn>
-      <v-btn text><v-icon left dark>help</v-icon>Help</v-btn>
-      <v-btn text href="https://www.comses.net/about/contact/" target="_blank">
-        <v-icon left dark>email</v-icon>
-        Contact
-      </v-btn>
-    </v-toolbar-items>
+    <Navigation class="mt-2 flex-grow-1" />
+    <v-tooltip bottom>
+      <template #activator="{ on, attrs }">
+        <v-btn
+          plain
+          color="white"
+          large
+          icon
+          v-bind="attrs"
+          class="mt-3 mx-3 button"
+          :href="github.url"
+          v-on="on"
+        >
+          <v-icon large color="white">{{ github.icon }}</v-icon>
+        </v-btn>
+      </template>
+      <span>GitHub</span>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template #activator="{ on, attrs }">
+        <v-btn
+          plain
+          color="white"
+          large
+          icon
+          class="mt-3 mx-3 button"
+          v-bind="attrs"
+          v-on="on"
+          ><v-icon large color="white">help</v-icon></v-btn
+        >
+      </template>
+      <span>Help</span>
+    </v-tooltip>
+
+    <v-tooltip bottom>
+      <template #activator="{ on, attrs }">
+        <v-btn
+          plain
+          color="white"
+          icon
+          large
+          href="https://www.comses.net/about/contact/"
+          target="_blank"
+          v-bind="attrs"
+          class="mt-3 mx-3 button"
+          v-on="on"
+        >
+          <v-icon large color="white">email</v-icon>
+        </v-btn>
+      </template>
+      <span>Email us</span>
+    </v-tooltip>
   </v-app-bar>
 </template>
 <script>
@@ -69,11 +110,33 @@ class Header extends Vue {
 export default Header
 </script>
 <style scoped>
+.v-app-bar {
+  background: rgb(73, 190, 131);
+  background: linear-gradient(
+    90deg,
+    rgba(73, 190, 131, 1) 0%,
+    rgba(81, 192, 139, 1) 50%,
+    rgba(88, 193, 145, 1) 100%
+  );
+}
+
 .skope-title {
   text-decoration: none;
-  color: rgb(128, 0, 0);
-  font-family: Bitter, serif;
+  color: white;
+  font-family: 'Roboto', serif;
   font-weight: bold;
-  font-size: 1.6em;
+  font-size: 2em;
+}
+
+.button {
+  /*background: rgb(9, 172, 254);*/
+  /*background: linear-gradient(*/
+  /*  90deg,*/
+  /*  rgba(9, 172, 254, 1) 0%,*/
+  /*  rgba(67, 191, 255, 1) 50%*/
+  /*);*/
+  letter-spacing: 0.05em;
+  outline: none;
+  font: 1.25em Raleway, sans-serif;
 }
 </style>

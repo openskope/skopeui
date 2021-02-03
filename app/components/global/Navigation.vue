@@ -1,59 +1,53 @@
 <template>
-  <v-stepper :style="'background-color: #f5f5f5'" :value="currentStep + 1">
-    <v-stepper-header nonlinear>
-      <!-- FIXME replace step numbers with icons when step is inactive/incomplete
-      https://github.com/vuetifyjs/vuetify/issues/7049 -->
-      <v-stepper-step
-        step="1"
-        :complete="complete(0)"
-        :color="complete(0) ? 'info' : 'secondary'"
-        editable
-        edit-icon="$complete"
-        :class="!isActiveStep(0) ? 'step' : ''"
-        @click="goToDataSets"
-        >Select Data Set</v-stepper-step
-      >
-      <v-divider></v-divider>
-      <v-stepper-step
-        step="2"
-        :complete="complete(1)"
-        :color="complete(1) ? 'info' : 'secondary'"
-        :editable="hasSelectedDataSet"
-        edit-icon="map"
-        :class="!isActiveStep(1) && hasSelectedDataSet ? 'step' : ''"
-        @click="goToStudyArea($route.params.id)"
-        >Define Study Area</v-stepper-step
-      >
-      <v-divider></v-divider>
-      <v-stepper-step
-        step="3"
-        :complete="complete(2)"
-        :color="complete(2) ? 'info' : 'secondary'"
-        :editable="hasSelectedDataSet && hasValidStudyArea"
-        edit-icon="fas fa-chart-bar"
-        :rules="[() => hasValidStudyArea]"
-        :class="
-          !isActiveStep(1) && hasSelectedDataSet && hasValidStudyArea
-            ? 'step'
-            : ''
-        "
-        @click="goToViz($route.params.id)"
-        >Visualize Data</v-stepper-step
-      >
-      <v-divider></v-divider>
-      <v-stepper-step
-        step="4"
-        :complete="complete(3)"
-        :editable="canAnalyze"
-        :color="complete(3) ? 'info' : 'secondary'"
-        edit-icon="$complete"
-        :rules="[() => canAnalyze]"
-        :class="!isActiveStep(1) && canAnalyze ? 'step' : ''"
-        @click="goToAnalyze($route.params.id)"
-        >Analyze Data</v-stepper-step
-      >
-    </v-stepper-header>
-  </v-stepper>
+  <v-row align="center" justify="center" align-content="space-around">
+    <v-btn
+      text
+      large
+      color="white"
+      :class="isActiveStep(0) ? 'active' : 'button'"
+      @click="goToDataSets"
+    >
+      <v-icon v-if="!complete(0)">fas fa-database</v-icon>
+      <v-icon v-else>fas fa-check</v-icon>
+      <span class="step">Select Dataset</span>
+    </v-btn>
+    <v-btn
+      text
+      large
+      color="white"
+      :class="isActiveStep(1) ? 'active' : 'button'"
+      :disabled="!hasSelectedDataSet"
+      @click="goToStudyArea($route.params.id)"
+    >
+      <v-icon v-if="!complete(1)">fas fa-map</v-icon>
+      <v-icon v-else>fas fa-check</v-icon>
+      <span class="step">Define Study Area</span>
+    </v-btn>
+    <v-btn
+      text
+      large
+      color="white"
+      :class="isActiveStep(2) ? 'active' : 'button'"
+      :disabled="!hasValidStudyArea || !hasSelectedDataSet"
+      @click="goToViz($route.params.id)"
+    >
+      <v-icon v-if="!complete(2)">fas fa-chart-bar</v-icon>
+      <v-icon v-else>fas fa-check</v-icon>
+      <span class="step">Visualize Data</span>
+    </v-btn>
+    <v-btn
+      text
+      large
+      color="white"
+      :class="isActiveStep(3) ? 'active' : 'button'"
+      :disabled="!hasValidStudyArea || !hasSelectedDataSet"
+      @click="goToAnalyze($route.params.id)"
+    >
+      <v-icon v-if="!complete(3)">fas fa-chart-bar</v-icon>
+      <v-icon v-else>fas fa-check</v-icon>
+      <span class="step">Analyze Data</span>
+    </v-btn>
+  </v-row>
 </template>
 
 <script>
@@ -129,19 +123,43 @@ class Navigation extends Vue {
 export default Navigation
 </script>
 
-<style lang="sass">
+<style scoped lang="sass">
 @import './assets/style/variables.scss'
-.v-stepper__step--active
-  background-color: #8bbf9f
-
-.v-stepper__label
-  font-size: 1.5rem
-
 .step
-  transition: ease-out 0.3s
-  box-shadow: inset 0 0 0 0 #8bbf9f
+  letter-spacing: .05em
+  font: 1.5em 'Roboto', serif
+  text-transform: capitalize
+  margin-left: 1rem
 
-.step:hover
-  cursor: pointer
-  box-shadow: inset 300px 0 0 0 #8bbf9f
+.button::after
+  content: ''
+  position: absolute
+  height: 3px
+  background: #fb7a2c
+  width: 0
+  left: 50%
+  bottom: 0
+  transform: translateX(-50%)
+  transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) all
+
+.button:hover
+  color: #fb7a2c
+
+.button:hover::after
+  width: 100%
+
+.active
+  text-decoration: none
+
+  &::before, &::after
+    content: ''
+    position: absolute
+    height: 3px
+    background: #fb7a2c
+
+  &::after
+    width: 100%
+    left: 0
+    bottom: 0
+    transition: all ease 0.6s
 </style>
