@@ -1,8 +1,9 @@
 <template>
   <v-app-bar extended extension-height="25" color="primary" app>
     <v-app-bar-nav-icon
-      @disabled="isDisabled"
-      @click="toggleDrawer"
+      @click="toggleDrawer(!drawer)"
+      plain
+      color="white"
     ></v-app-bar-nav-icon>
     <v-toolbar-title class="mr-10">
       <nuxt-link class="skope-title" to="/">skope</nuxt-link>
@@ -77,34 +78,17 @@ class Header extends Vue {
     icon: 'fab fa-github',
     url: 'https://github.com/openskope/skopeui',
   }
+
   // --------- GETTERS ---------
 
-  get isDisabled() {
-    return this.$api().app.isDisabled
-  }
-
-  get currentStep() {
-    return this.$api().app.currentStep
-  }
-
-  get isVisible() {
+  get drawer() {
     return this.$api().app.isVisible
   }
 
   // --------- METHODS ---------
 
-  toggleDrawer() {
-    var drawerVisible = 0
-    if (!this.isDisabled) {
-      drawerVisible = this.isVisible
-      if (this.isVisible) {
-        drawerVisible -= 1
-      } else {
-        drawerVisible += 1
-      }
-    }
-    console.debug('visible =  %i', drawerVisible)
-    this.$api().app.toggleDrawer(drawerVisible)
+  toggleDrawer(drawer) {
+    this.$api().app.toggleDrawer(drawer)
   }
 }
 export default Header

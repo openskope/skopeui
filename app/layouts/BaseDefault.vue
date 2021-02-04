@@ -13,19 +13,21 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import { Component } from 'nuxt-property-decorator'
 import Header from '@/components/global/Header'
 import DiscoverSideBar from '@/components/DiscoverSideBar'
 import Messages from '@/components/Messages'
 import Footer from '@/components/global/Footer'
 
-export default {
-  name: 'SKOPE',
-  title: 'SKOPE',
+@Component({
   components: {
     Header,
     DiscoverSideBar,
     Messages,
     Footer,
   },
-}
+})
+class BaseDefault extends Vue {}
+export default BaseDefault
 </script>

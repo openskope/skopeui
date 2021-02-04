@@ -3,7 +3,7 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 @Module({ stateFactory: true, namespaced: true, name: 'app' })
 class App extends VuexModule {
   isDisabled = 0
-  isVisible = 1
+  isVisible = false
 
   steps = [
     {
@@ -59,7 +59,6 @@ class App extends VuexModule {
    */
   @Mutation
   setDrawer(isVisible) {
-    console.log('isVisible: %i', isVisible)
     this.isVisible = isVisible
   }
 
@@ -75,6 +74,7 @@ class App extends VuexModule {
    */
   @Action({ commit: 'setDrawer' })
   toggleDrawer(isVisible) {
+    this.context.commit('setDrawer', isVisible)
     return isVisible
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="isVisible" permanent app>
+  <v-navigation-drawer v-model="isVisible" app>
     <section class="pt-3">
       <div class="container">
         <h2 class="headline font-weight-black">Filter Datasets</h2>
@@ -106,12 +106,7 @@ class DiscoverSideBar extends Vue {
   // --------- GETTERS ---------
 
   get isVisible() {
-    // "!!" - converts value to boolean
-    return !!this.$api().app.isVisible
-  }
-
-  set isVisible(isVis) {
-    this.$api().app.setDrawer(!isVis)
+    return this.$api().app.isVisible
   }
 
   get startYearRules() {
@@ -160,10 +155,9 @@ class DiscoverSideBar extends Vue {
 
   // --------- METHODS ---------
 
-  hideDrawer() {
-    // hide drawer when visible = 0
-    var visible = 0
-    this.$api().app.toggleDrawer(visible)
+  @Watch('isVisible')
+  toggle(isVisible) {
+    console.log(this.isVisible === isVisible)
   }
 
   filterDatasets() {
