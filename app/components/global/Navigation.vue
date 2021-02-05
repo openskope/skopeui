@@ -43,7 +43,7 @@
       :disabled="!hasValidStudyArea || !hasSelectedDataSet"
       @click="goToAnalyze($route.params.id)"
     >
-      <v-icon v-if="!complete(3)">fas fa-chart-bar</v-icon>
+      <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
       <span class="step">Analyze Data</span>
     </v-btn>

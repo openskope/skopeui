@@ -1,9 +1,9 @@
 <template>
   <v-app-bar extended extension-height="25" color="primary" app>
     <v-app-bar-nav-icon
-      @click="toggleDrawer(!drawer)"
       plain
       color="white"
+      @click="toggleDrawer(!drawer)"
     ></v-app-bar-nav-icon>
     <v-toolbar-title class="mr-10">
       <nuxt-link class="skope-title" to="/">skope</nuxt-link>

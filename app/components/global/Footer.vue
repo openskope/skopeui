@@ -1,7 +1,7 @@
 <template>
   <!-- footer -->
   <v-footer app absolute dark padless>
-    <v-card color="indigo" class="flex darken-1 p-2">
+    <v-card color="secondary" class="flex darken-1 p-2">
       <v-card-text class="text-center">
         This material is based upon work supported by the National Science
         Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
