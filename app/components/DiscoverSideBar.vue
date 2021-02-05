@@ -2,7 +2,7 @@
   <v-navigation-drawer v-model="isVisible" app>
     <section class="pt-3">
       <div class="container">
-        <h2 class="headline font-weight-black">Filter Datasets</h2>
+        <h2 class="headline">Filter Datasets</h2>
         <v-form @submit.prevent>
           <v-container>
             <v-row>
@@ -20,7 +20,7 @@
               </v-col>
             </v-row>
             <!-- start and end date range -->
-            <h3 class="title">Year Range</h3>
+            <h3 class="headline my-3">Year Range</h3>
             <v-row>
               <v-col>
                 <v-text-field
@@ -48,12 +48,12 @@
               </v-col>
             </v-row>
             <!-- variable checkbox selector -->
-            <h3 class="title">Variables</h3>
+            <h3 class="headline my-3">Variables</h3>
             <v-row>
               <v-list
                 v-for="(variable, index) in variableClasses"
                 :key="index"
-                class="py-0"
+                class="py-0 my-2"
               >
                 <v-checkbox
                   v-model="selectedVariableClasses"
@@ -65,13 +65,7 @@
                   @change="filterDatasets"
                 >
                   <template #label>
-                    <v-chip
-                      small
-                      label
-                      outlined
-                      class="ma-1 width-50"
-                      color="indigo"
-                    >
+                    <v-chip small label class="ma-1 width-50" color="accent">
                       <v-icon>view_column</v-icon>
                       {{ variable.name }}
                     </v-chip>
