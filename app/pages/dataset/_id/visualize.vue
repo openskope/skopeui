@@ -2,18 +2,20 @@
   <v-responsive :aspect-ratio="16 / 9">
     <!-- title and instructions -->
     <v-row class="my-5">
-      <h2 class="mx-3">
+      <h1 class="ml-5 my-auto font-weight-light">
         {{ selectedDataset.title }}
-      </h2>
+      </h1>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
-          <v-icon
-            class="mx-2"
-            v-bind="attrs"
-            @click="instructions = !instructions"
-            v-on="on"
-            >info</v-icon
-          > </template
+          <v-btn icon color="secondary" class="mx-3">
+            <v-icon
+              v-bind="attrs"
+              large
+              @click="instructions = !instructions"
+              v-on="on"
+              >info</v-icon
+            >
+          </v-btn> </template
         ><span>Instructions</span></v-tooltip
       >
       <v-dialog v-model="dialog" persistent max-width="600px">
@@ -33,11 +35,15 @@
       </v-dialog>
       <v-spacer></v-spacer>
       <v-btn
-        depressed
         color="accent"
+        depressed
         :disabled="!hasValidStudyArea"
+        class="mr-4"
         @click="goToAnalyze($route.params.id)"
-        >Next</v-btn
+        >Go to Analyze
+        <v-icon small class="ml-2" color="white"
+          >fas fa-chevron-right</v-icon
+        ></v-btn
       >
     </v-row>
     <!-- dismissable instructions -->
@@ -45,13 +51,16 @@
       <v-col class="mx-auto">
         <v-alert
           v-model="instructions"
-          outlined
-          text
-          border="left"
-          dismissible
+          color="secondary"
           type="info"
+          text
+          outlined
+          dismissible
         >
-          These are the dismissable instructions for this page.
+          For the geometry of your study area, you can modify the opacity and
+          variable layer. The Time Series chart will automatically update upon
+          selecting a layer. After you are finished, you can continue to the
+          analysis step.
         </v-alert>
       </v-col>
     </v-row>
@@ -68,53 +77,61 @@
       <!-- map and toolbar controls-->
       <template v-else>
         <v-col>
-          <v-card flat outlined>
-            <v-card-title class="secondary">Map</v-card-title>
+          <v-card class="map pa-3" elevation="2" outlined shaped>
+            <v-card-title>
+              <h1 class="headline">Map</h1>
+              <v-spacer></v-spacer>
+              <h3 class="headline">
+                Selected area: {{ selectedArea }} km<sup>2</sup>
+              </h3>
+            </v-card-title>
             <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
-            <v-toolbar flat color="primary" class="px-1" dense>
-              <v-toolbar-title
-                class="white--text text-uppercase font-weight-medium"
-                >Opacity:</v-toolbar-title
-              >
-              <v-btn icon color="white" @click="decreaseOpacity">
-                <v-icon>fas fa-minus</v-icon>
-              </v-btn>
-              <v-btn icon color="white" @click="increaseOpacity">
-                <v-icon>fas fa-plus</v-icon>
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-toolbar-title
-                class="white--text text-uppercase font-weight-medium mx-5"
-                >Year: {{ yearSelected }}CE
-              </v-toolbar-title>
-              <v-spacer></v-spacer>
-              <span
-                class="white--text text-uppercase ml-5 mr-2 font-weight-medium"
-              >
-                Variable
-              </span>
-              <v-select
-                v-model="layer"
-                label="Select a variable"
-                dense
-                dark
-                :items="layers"
-                item-text="name"
-                item-value="id"
-                color="accent"
-                class="my-auto pt-1"
-                :style="'width: 7.5rem'"
-                single-line
-                outlined
-                flat
-              >
-              </v-select>
+            <v-toolbar flat extended extension-height="25" class="mt-10">
+              <v-row>
+                <v-col>
+                  <v-toolbar-title>Opacity</v-toolbar-title>
+                  <v-toolbar-items class="my-auto">
+                    <v-btn icon color="secondary">
+                      <v-icon small @click="decreaseOpacity"
+                        >fas fa-minus</v-icon
+                      >
+                    </v-btn>
+                    <span class="mx-3"> {{ opacity }}</span>
+                    <v-btn icon small color="secondary">
+                      <v-icon @click="increaseOpacity">fas fa-plus</v-icon>
+                    </v-btn>
+                  </v-toolbar-items>
+                </v-col>
+                <v-col>
+                  <v-toolbar-title>Year</v-toolbar-title>
+                  <v-toolbar-items>{{ yearSelected }}CE</v-toolbar-items>
+                </v-col>
+                <v-col>
+                  <v-toolbar-title>Variable</v-toolbar-title>
+                  <v-toolbar-items
+                    ><v-select
+                      v-model="layer"
+                      label="Select a variable"
+                      item-color="accent"
+                      dense
+                      :items="layers"
+                      item-text="name"
+                      item-value="id"
+                      class="my-auto pt-1"
+                      :style="'width: 4rem'"
+                      single-line
+                      outlined
+                    >
+                    </v-select
+                  ></v-toolbar-items>
+                </v-col>
+              </v-row>
             </v-toolbar>
           </v-card>
         </v-col>
         <v-col>
-          <v-card flat outlined>
-            <v-card-title class="secondary">Time Series</v-card-title>
+          <v-card class="pa-3" elevation="2" outlined shaped>
+            <h1 class="headline mt-3 ml-3">Time Series</h1>
             <template v-if="hasTimeSeries">
               <TimeSeriesPlot
                 class="timeseries-flex"
@@ -122,24 +139,24 @@
                 :year-selected="yearSelected"
                 @yearSelected="setYear"
               />
-              <v-toolbar color="primary" dark flat dense>
+              <v-toolbar flat class="mt-5">
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                  <v-btn icon @click="gotoFirstYear">
+                  <v-btn icon color="secondary" @click="gotoFirstYear">
                     <v-icon>skip_previous</v-icon>
                   </v-btn>
-                  <v-btn icon @click="previousYear">
+                  <v-btn icon color="secondary" @click="previousYear">
                     <v-icon>arrow_left</v-icon>
                   </v-btn>
-                  <v-btn-toggle icon background-color="indigo">
-                    <v-btn text @click="togglePlay">
-                      <v-icon>{{ playIcon }}</v-icon>
+                  <v-btn-toggle icon class="my-auto">
+                    <v-btn icon @click="togglePlay">
+                      <v-icon color="secondary">{{ playIcon }}</v-icon>
                     </v-btn>
                   </v-btn-toggle>
-                  <v-btn icon @click="nextYear">
+                  <v-btn icon color="secondary" @click="nextYear">
                     <v-icon>arrow_right</v-icon>
                   </v-btn>
-                  <v-btn icon @click="gotoLastYear">
+                  <v-btn icon color="secondary" @click="gotoLastYear">
                     <v-icon>skip_next</v-icon>
                   </v-btn>
                 </v-toolbar-items>
@@ -286,10 +303,10 @@ class Visualize extends Vue {
     this.timeSeriesUnwatcher()
   }
   decreaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10)
+    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
   }
   increaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
+    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10)
   }
   exportSelectedGeometry(event) {
     const geometry = this.getSavedGeometry()
@@ -413,5 +430,14 @@ export default Visualize
   .timeseries-flex {
     height: 350px;
   }
+}
+.v-toolbar__title {
+  color: #fb7a2c;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: bold;
+}
+.v-toolbar__items {
+  margin-top: 0.5rem;
 }
 </style>

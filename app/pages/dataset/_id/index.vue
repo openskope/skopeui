@@ -28,23 +28,30 @@
           </v-card>
         </template>
       </v-dialog>
-      <h2 class="ml-3">
+      <h1 class="ml-5 my-auto font-weight-light">
         {{ selectedDataset.title }}
-      </h2>
+      </h1>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
-          <v-icon
-            class="mx-2"
-            v-bind="attrs"
-            @click="instructions = !instructions"
-            v-on="on"
-            >info</v-icon
-          > </template
+          <v-btn icon color="secondary" class="mx-3">
+            <v-icon
+              v-bind="attrs"
+              large
+              @click="instructions = !instructions"
+              v-on="on"
+              >info</v-icon
+            >
+          </v-btn> </template
         ><span>Instructions</span></v-tooltip
       >
       <v-dialog v-model="dialog" persistent max-width="600px">
         <template #activator="{ on, attrs }">
-          <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+          <v-btn
+            depressed
+            color="accent"
+            v-bind="attrs"
+            class="my-auto"
+            v-on="on"
             >View Metadata</v-btn
           >
         </template>
@@ -62,74 +69,74 @@
         depressed
         color="accent"
         :disabled="!hasValidStudyArea"
+        class="mr-4"
         @click="goToViz($route.params.id)"
-        >Next</v-btn
+        >Go to Visualize
+        <v-icon small class="ml-2" color="white"
+          >fas fa-chevron-right</v-icon
+        ></v-btn
       >
     </v-row>
     <v-row>
       <v-col class="mx-auto">
         <v-alert
           v-model="instructions"
-          outlined
-          text
-          border="left"
-          dismissible
+          color="secondary"
           type="info"
+          text
+          outlined
+          dismissible
         >
-          These are the dismissable instructions for this page.
+          Select the geometry for the dataset by using the drawing tools on the
+          map. A geometry must be defined in order to visualize and analyze the
+          dataset.
         </v-alert>
       </v-col>
     </v-row>
     <v-row>
       <v-col id="map-flex" class="mx-auto">
-        <v-card flat outlined class="map">
-          <v-card-title class="secondary"><h3>Map</h3></v-card-title>
+        <v-card class="map" elevation="2" outlined shaped>
+          <v-card-title>
+            <h1 class="headline">Map</h1>
+            <v-spacer></v-spacer>
+            <h3 class="headline">
+              Selected area: {{ selectedArea }} km<sup>2</sup>
+            </h3>
+          </v-card-title>
           <Map :clear="clear" />
-          <v-sheet inset>
-            <v-toolbar class="primary" flat dense>
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    color="white"
-                    v-on="on"
-                    @click="exportSelectedGeometry"
-                  >
-                    <a id="exportSelectedGeometry">
-                      <v-icon>fas fa-download</v-icon>
-                    </a>
-                  </v-btn>
-                </template>
-                <span>Download selected geometry as a GeoJSON file</span>
-              </v-tooltip>
-              <input
-                id="loadGeoJsonFile"
-                type="file"
-                style="display: none"
-                @change="loadGeoJson"
-              />
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    color="white"
-                    v-on="on"
-                    @click="selectGeoJsonFile"
-                  >
-                    <v-icon>fas fa-upload</v-icon>
-                  </v-btn>
-                </template>
-                <span>Upload a GeoJSON file</span>
-              </v-tooltip>
-              <template v-if="selectedArea > 0">
-                Selected area: {{ selectedArea }} km<sup>2</sup>
+          <v-toolbar>
+            <v-tooltip top>
+              <template #activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  icon
+                  v-on="on"
+                  @click="exportSelectedGeometry"
+                >
+                  <a id="exportSelectedGeometry">
+                    <v-icon>fas fa-download</v-icon>
+                  </a>
+                </v-btn>
               </template>
-              <v-spacer></v-spacer>
-            </v-toolbar>
-            <!-- end toolbar -->
-          </v-sheet>
+              <span>Download selected geometry as a GeoJSON file</span>
+            </v-tooltip>
+            <input
+              id="loadGeoJsonFile"
+              type="file"
+              style="display: none"
+              @change="loadGeoJson"
+            />
+            <v-tooltip top>
+              <template #activator="{ on, attrs }">
+                <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
+                  <v-icon>fas fa-upload</v-icon>
+                </v-btn>
+              </template>
+              <span>Upload a GeoJSON file</span>
+            </v-tooltip>
+            <v-spacer></v-spacer>
+          </v-toolbar>
+          <!-- end toolbar -->
         </v-card>
       </v-col>
     </v-row>
@@ -175,7 +182,7 @@ class DatasetDetail extends Vue {
   stepNames = _.clone(this.$api().app.stepNames)
 
   dialog = false
-  instructions = false
+  instructions = true
   confirmGeometry = false
   clear = false
 
@@ -195,14 +202,6 @@ class DatasetDetail extends Vue {
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
     return this.currentStep == 0 || this.$api().dataset.hasGeometry
-  }
-
-  get selectedArea() {
-    if (this.selectedAreaInSquareMeters > 0) {
-      return Number.parseFloat(
-        this.selectedAreaInSquareMeters / 1000000.0
-      ).toFixed(2)
-    }
   }
 
   get selectedArea() {
@@ -385,7 +384,13 @@ ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {
   display: none;
 }
 
-.variable {
-  height: 3em;
-}
+/*.card {*/
+/*  background: rgb(73, 190, 131);*/
+/*  background: linear-gradient(*/
+/*    90deg,*/
+/*    rgba(73, 190, 131, 1) 0%,*/
+/*    rgba(81, 192, 139, 1) 50%,*/
+/*    rgba(88, 193, 145, 1) 100%*/
+/*  );*/
+/*}*/
 </style>

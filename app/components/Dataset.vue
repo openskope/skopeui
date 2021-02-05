@@ -1,5 +1,5 @@
 <template>
-  <v-row pa-2 mb-2 align-content-start justify-space-around fill-height>
+  <v-row pa-2 mb-2 align-content-start justify-space-around>
     <v-col xs4>
       <div class="map px-2">
         <client-only>
@@ -21,10 +21,10 @@
     </v-col>
     <v-col xs8>
       <div class="px-2">
-        <v-card>
+        <v-card elevation="0">
           <v-card-title class="pb-0">
             <h2 class="headline">
-              <nuxt-link :to="absoluteUrl" class="blue--text">
+              <nuxt-link :to="absoluteUrl" class="dataset-title">
                 {{ title }}
               </nuxt-link>
             </h2>
@@ -44,7 +44,7 @@
                     small
                     label
                     class="ma-2"
-                    color="indigo"
+                    color="accent"
                     text-color="white"
                   >
                     <v-icon>view_column</v-icon>
@@ -145,5 +145,18 @@ export default Dataset
 }
 .variable {
   height: 3em;
+}
+
+.dataset-title {
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 #09acfe, 0 2px 0 #09acfe;
+  transition: box-shadow 0.3s;
+  color: inherit;
+  overflow: hidden;
+}
+
+.dataset-title:hover {
+  box-shadow: inset 0 -30px 0 #09acfe, 0 2px 0 #09acfe;
+  color: white;
 }
 </style>
