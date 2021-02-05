@@ -21,7 +21,7 @@
     >
       <v-icon v-if="!complete(1)">fas fa-map</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
-      <span class="step">Define Study Area</span>
+      <span class="step">Select Area</span>
     </v-btn>
     <v-btn
       text
