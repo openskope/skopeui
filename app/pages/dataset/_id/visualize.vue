@@ -52,7 +52,6 @@
         <v-alert
           v-model="instructions"
           color="secondary"
-          type="info"
           text
           outlined
           dismissible
@@ -62,6 +61,18 @@
           selecting a layer. After you are finished, you can continue to the
           analysis step.
         </v-alert>
+      </v-col>
+    </v-row>
+    <!-- selected variable -->
+    <v-row>
+      <v-col cols="3" class="mx-auto">
+        <v-alert
+          color="secondary"
+          class="text-center white--text headline"
+          rounded
+          ><v-icon class="mx-4" color="white">{{ layerGroup.icon }}</v-icon
+          >Variable: {{ selectedLayer.name }}</v-alert
+        >
       </v-col>
     </v-row>
     <!-- map and time series plot -->
@@ -112,13 +123,15 @@
                     ><v-select
                       v-model="layer"
                       label="Select a variable"
-                      item-color="accent"
+                      item-color="secondary"
+                      color="secondary"
                       dense
                       :items="layers"
                       item-text="name"
                       item-value="id"
-                      class="my-auto pt-1"
-                      :style="'width: 4rem'"
+                      class="my-auto"
+                      :style="'width: 6rem'"
+                      :prepend-icon="layerGroup.icon"
                       single-line
                       outlined
                     >
@@ -202,6 +215,9 @@ class Visualize extends Vue {
   yearSelected = 1500
   dialog = false
   instructions = true
+  layerGroup = {
+    icon: 'fas fa-layer-group',
+  }
   @Dataset.State('geometry')
   selectedGeometry
   @Dataset.State('layer')
@@ -392,13 +408,6 @@ class Visualize extends Vue {
       maxYear: this.minYear,
       zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
     })
-  }
-  @Watch()
-  async changeTimeSeries(data) {
-    if (data.datasetUri && data.selectedGeometry.type !== 'None') {
-      const api = this.$api()
-      await api.dataset.retrieveTimeSeries(data)
-    }
   }
 }
 export default Visualize
