@@ -63,18 +63,6 @@
         </v-alert>
       </v-col>
     </v-row>
-    <!-- selected variable -->
-    <v-row>
-      <v-col cols="3" class="mx-auto">
-        <v-alert
-          color="secondary"
-          class="text-center white--text headline"
-          rounded
-          ><v-icon class="mx-4" color="white">{{ layerGroup.icon }}</v-icon
-          >Variable: {{ selectedLayer.name }}</v-alert
-        >
-      </v-col>
-    </v-row>
     <!-- map and time series plot -->
     <v-row dense align-content-start justify-space-around wrap>
       <!-- loading animation -->
@@ -90,7 +78,14 @@
         <v-col>
           <v-card class="map pa-3" elevation="2" outlined shaped>
             <v-card-title>
-              <h1 class="headline">Map</h1>
+              <h1 class="headline mr-3">Map</h1>
+              <v-chip label color="secondary" text-color="white">
+                <v-icon class="mr-2" color="white" small>{{
+                  layerGroup.icon
+                }}</v-icon>
+                <span v-if="selectedLayer === null">No variable selected</span>
+                <span v-else>{{ selectedLayer.name }}</span>
+              </v-chip>
               <v-spacer></v-spacer>
               <h3 class="headline">
                 Selected area: {{ selectedArea }} km<sup>2</sup>
@@ -286,6 +281,11 @@ class Visualize extends Vue {
   get layers() {
     return this.selectedDataset.variables
   }
+
+  set selectedLayer(layer) {
+    this.selectedLayer = layer
+  }
+
   async created() {
     const d = this.$api().datasets
     await d.loadDataset(this.$route.params.id)
@@ -316,7 +316,7 @@ class Visualize extends Vue {
     this.hasData = true
   }
   destroyed() {
-    this.timeSeriesUnwatcher()
+    this.timeSeriesUnwatcher
   }
   decreaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
