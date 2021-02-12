@@ -28,7 +28,6 @@ class TimeSeriesPlot extends Vue {
 
   @Prop({ default: null })
   yearSelected
-
   get variableName() {
     const api = this.$api()
     return _.isEmpty(api.dataset.layer) ? '' : api.dataset.layer.name

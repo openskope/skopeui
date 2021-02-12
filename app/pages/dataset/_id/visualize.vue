@@ -86,19 +86,12 @@
                 <span v-if="selectedLayer === null">No variable selected</span>
                 <span v-else>{{ selectedLayer.name }}</span>
               </v-chip>
-              <v-chip label color="info" outlined>{{ yearSelected }}CE</v-chip>
               <v-spacer></v-spacer>
               <h3 class="headline">
                 Study area: {{ selectedArea }} km<sup>2</sup>
               </h3>
             </v-card-title>
-            <Map
-              :year="yearSelected"
-              :opacity="opacity"
-              :min-temporal-range="temporalRange[0]"
-              :max-temporal-range="temporalRange[1]"
-              class="map-flex"
-            />
+            <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
             <v-toolbar flat extended extension-height="25" class="pt-8">
               <v-row>
                 <v-col cols="2">
@@ -184,7 +177,7 @@
               <TimeSeriesPlot
                 class="timeseries-flex"
                 :time-series="timeSeries"
-                :year-selected="yearSelected"
+                :year-selected="temporalRange[0]"
                 @yearSelected="setYear"
               />
               <v-toolbar flat class="mt-5">

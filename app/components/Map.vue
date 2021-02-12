@@ -77,12 +77,6 @@ import _ from 'lodash'
   components: {},
 })
 class Map extends Vue {
-  @Prop()
-  minTemporalRange
-
-  @Prop()
-  maxTemporalRange
-
   @Prop({ default: 2000 })
   year
 
