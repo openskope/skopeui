@@ -277,6 +277,7 @@ class Map extends Vue {
         layer.getLatLngs()[0]
       )
     }
+    this.$api().dataset.setSelectedArea(this.selectedAreaInSquareMeters)
     this.$api().dataset.setGeometry(data.geometry)
   }
 

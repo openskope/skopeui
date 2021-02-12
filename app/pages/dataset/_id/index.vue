@@ -100,7 +100,7 @@
             <h1 class="headline">Map</h1>
             <v-spacer></v-spacer>
             <h3 class="headline">
-              Selected area: {{ selectedArea }} km<sup>2</sup>
+              Study area: {{ selectedArea }} km<sup>2</sup>
             </h3>
           </v-card-title>
           <Map :clear="clear" />
@@ -205,9 +205,9 @@ class DatasetDetail extends Vue {
   }
 
   get selectedArea() {
-    if (this.selectedAreaInSquareMeters > 0) {
+    if (this.$api().dataset.selectedArea > 0) {
       return Number.parseFloat(
-        this.selectedAreaInSquareMeters / 1000000.0
+        this.$api().dataset.selectedArea / 1000000.0
       ).toFixed(2)
     }
   }
