@@ -171,8 +171,8 @@ const ALL_DATA = [
       ],
     },
     timespan: {
-      resolution: 'year',
-      resolutionLabel: 'annually',
+      resolution: 'month',
+      resolutionLabel: 'monthly',
       period: {
         timeZero: 1,
         gte: '0001',
