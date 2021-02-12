@@ -3,6 +3,9 @@
     <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
+        <small class="font-weight-thin"
+          >(selected area: 100km<sup>2</sup>)</small
+        >
       </h2>
     </v-row>
     <v-row dense align-content-start justify-space-around wrap>
@@ -11,37 +14,79 @@
       </v-col>
       <v-col cols="3">
         <v-card flat outlined>
-          <v-card-title class="secondary">Series</v-card-title>
-          <v-select
-            v-model="selectedPlotType"
-            item-text="label"
-            item-value="id"
-            label="Plot Type"
-            :items="plotOpts"
-          ></v-select>
-          <RunningAverage
-            v-if="selectedPlotType === 'trailingAverage'"
-            :dataset="selectedDataset.id"
-            :method="'trailingAverage'"
-            :study-area="selectedStudyArea"
-            :variable="selectedVariable.id"
-            :year-range="[0, 2000]"
-          />
-          <RunningAverage
-            v-else-if="selectedPlotType === 'runningAverage'"
-            :dataset="selectedDataset.id"
-            :method="'runningAverage'"
-            :study-area="selectedStudyArea"
-            :variable="selectedVariable.id"
-            :year-range="[0, 2000]"
-          />
-          <KernelRegression
-            v-else
-            :dataset="selectedDataset.id"
-            :study-area="selectedStudyArea"
-            :variable="selectedVariable.id"
-            :year-range="[0, 2000]"
-          />
+          <v-card-title class="secondary">{{
+            selectedVariable.name
+          }}</v-card-title>
+          <v-form>
+            <v-select
+              v-model="selectedZonalStatistic"
+              item-text="label"
+              item-value="id"
+              label="Zonal Statistic"
+              :items="zonalStatisticOpts"
+            />
+            <v-row v-if="temporalResolution !== ''">
+              <v-col>
+                <v-text-field
+                  v-model="timeRange.lb.year"
+                  dense
+                  label="Year (Lower Bound)"
+                  type="number"
+                />
+              </v-col>
+              <v-col v-if="temporalResolution === 'month'">
+                <v-text-field
+                  v-model="timeRange.lb.month"
+                  dense
+                  label="Month (Lower Bound)"
+                  type="number"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="timeRange.ub.year"
+                  dense
+                  label="Year (Upper Bound)"
+                  type="number"
+                />
+              </v-col>
+              <v-col v-if="temporalResolution === 'month'">
+                <v-text-field
+                  v-model="timeRange.ub.month"
+                  dense
+                  label="Month (Upper Bound)"
+                  type="number"
+                />
+              </v-col>
+            </v-row>
+            <v-select
+              v-model="selectedSmoother"
+              item-text="label"
+              item-value="id"
+              label="Smoother"
+              :items="smootherOpts"
+            ></v-select>
+            <v-text-field
+              v-show="
+                ['trailingAverage', 'centeredAverage'].indexOf(
+                  selectedSmoother
+                ) !== -1
+              "
+              v-model="width"
+              label="Width (# of days)"
+              type="number"
+            />
+            <v-select
+              v-model="selectedScaleTransform"
+              item-text="label"
+              item-value="id"
+              label="Scale Transform"
+              :items="scaleTransformOpts"
+            />
+            <v-btn @click="submit">Submit</v-btn>
+          </v-form>
         </v-card>
       </v-col>
     </v-row>
@@ -76,26 +121,69 @@ class Analyze extends Vue {
   @Dataset.State('geometry')
   selectedStudyArea
 
-  selectedPlotType = 'trailingAverage'
+  selectedZonalStatistic = 'mean'
 
-  plotOpts = [
+  zonalStatisticOpts = [
     {
-      label: 'Trailing Average',
+      label: 'Mean',
+      id: 'mean',
+    },
+    {
+      label: 'Median',
+      id: 'median',
+    },
+  ]
+
+  timeRange = {
+    lb: {
+      year: 1500,
+      month: 1,
+    },
+    ub: {
+      year: 1800,
+      month: 1,
+    },
+  }
+
+  selectedSmoother = 'none'
+
+  smootherOpts = [
+    {
+      label: 'None',
+      id: 'none',
+    },
+    {
+      label: 'Moving Average (Trailing)',
       id: 'trailingAverage',
     },
     {
-      label: 'Running Average',
-      id: 'runningAverage',
+      label: 'Moving Average (Centered)',
+      id: 'centeredAverage',
     },
     {
       label: 'Polynomial Spline',
       id: 'polynomialSpline',
     },
+  ]
+
+  width = 7
+
+  selectedScaleTransform = 'none'
+
+  scaleTransformOpts = [
     {
-      label: 'Kernel Regression',
-      id: 'kernelRegression',
+      label: 'None',
+      id: 'none',
+    },
+    {
+      label: 'Z-Score',
+      id: 'zscore',
     },
   ]
+
+  get temporalResolution() {
+    return this.selectedDataset.timespan.resolution
+  }
 
   get timeSeries() {
     const timeseries = this.$api().dataset.timeseries
@@ -104,6 +192,10 @@ class Analyze extends Vue {
     } else {
       return { x: [], y: [], type: 'scatter' }
     }
+  }
+
+  submit() {
+    console.log('submitting to web service')
   }
 
   async created() {
