@@ -75,7 +75,7 @@
                 ) !== -1
               "
               v-model="width"
-              label="Width (# of days)"
+              :label="smootherWidthLabel"
               type="number"
             />
             <v-select
@@ -180,6 +180,19 @@ class Analyze extends Vue {
       id: 'zscore',
     },
   ]
+
+  get smootherWidthLabel() {
+    let widthUnit = 'Unknowns'
+    switch (this.temporalResolution) {
+      case 'month':
+        widthUnit = 'Months'
+        break
+      case 'year':
+        widthUnit = 'Years'
+        break
+    }
+    return `Smoother Width (# of ${widthUnit})`
+  }
 
   get temporalResolution() {
     return this.selectedDataset.timespan.resolution
