@@ -3,9 +3,10 @@
     <v-row class="my-5">
       <h2 class="mx-3">
         {{ selectedDataset.title }}
-        <small class="font-weight-thin"
-          >(selected area: 100km<sup>2</sup>)</small
-        >
+        <small class="font-weight-thin">
+          (selected area:
+          {{ selectedAreaInSquareKilometers }}km<sup>2</sup>)
+        </small>
       </h2>
     </v-row>
     <v-row dense align-content-start justify-space-around wrap>
@@ -205,6 +206,12 @@ class Analyze extends Vue {
     } else {
       return { x: [], y: [], type: 'scatter' }
     }
+  }
+
+  get selectedAreaInSquareKilometers() {
+    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
+      2
+    )
   }
 
   submit() {

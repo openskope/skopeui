@@ -86,7 +86,7 @@ class DataSet extends VuexModule {
   isLoadingData = false
   hasData = false
   geometry = { type: 'None', coordinates: [] }
-  selectedArea = 0
+  selectedAreaInSquareMeters = 0
   layer = null
 
   get hasGeometry() {
@@ -99,13 +99,15 @@ class DataSet extends VuexModule {
   }
 
   @Mutation
-  setGeometry(geometry) {
+  setGeometry({ geometry, area }) {
     Vue.set(this, 'geometry', geometry)
+    this.selectedAreaInSquareMeters = area
   }
 
   @Mutation
   clearGeometry() {
     Vue.set(this, 'geometry', { type: 'None', coordinates: [] })
+    this.selectedAreaInSquareMeters = 0
   }
 
   @Mutation
@@ -126,11 +128,6 @@ class DataSet extends VuexModule {
       x: [],
       y: [],
     }
-  }
-
-  @Mutation
-  setSelectedArea(selectedArea) {
-    Vue.set(this, 'selectedArea', selectedArea)
   }
 
   @Action

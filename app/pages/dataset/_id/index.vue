@@ -205,11 +205,9 @@ class DatasetDetail extends Vue {
   }
 
   get selectedArea() {
-    if (this.$api().dataset.selectedArea > 0) {
-      return Number.parseFloat(
-        this.$api().dataset.selectedArea / 1000000.0
-      ).toFixed(2)
-    }
+    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
+      2
+    )
   }
 
   head() {

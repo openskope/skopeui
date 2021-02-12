@@ -296,12 +296,11 @@ class Visualize extends Vue {
     }
   }
   get selectedArea() {
-    if (this.$api().dataset.selectedArea > 0) {
-      return Number.parseFloat(
-        this.$api().dataset.selectedArea / 1000000.0
-      ).toFixed(2)
-    }
+    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
+      2
+    )
   }
+
   set layer(l) {
     l = this.layers.find((layer) => layer.id === l)
     this.$api().datasets.selectVariable(l.id)

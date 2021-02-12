@@ -93,7 +93,6 @@ class Map extends Vue {
   legendImage = null
   legendControl = null
   legendPosition = 'bottomleft'
-  selectedAreaInSquareMeters = 0.0
   wGeometryKey = 'skope:geometry'
   wMinTemporalRangeKey = 'skope:temporal-range-min'
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
@@ -184,7 +183,6 @@ class Map extends Vue {
 
   clearSelectedGeometry() {
     this.$api().dataset.clearGeometry()
-    this.selectedAreaInSquareMeters = 0.0
     this.$warehouse.remove(this.wGeometryKey)
   }
 
@@ -256,6 +254,7 @@ class Map extends Vue {
       data.properties.radius = layer.getRadius()
     }
     this.saveSelectedGeometry(data)
+    let area = 0
     if (layer instanceof L.Circle) {
       const geometry = circleToPolygon(
         data.geometry.coordinates,
@@ -263,16 +262,16 @@ class Map extends Vue {
         this.defaultCircleToPolygonEdges
       )
       data.geometry = geometry
-      this.selectedAreaInSquareMeters = layer.getRadius() * Math.PI * Math.PI
+      area = layer.getRadius() * Math.PI * Math.PI
     } else if (layer instanceof L.Marker) {
-      this.selectedAreaInSquareMeters = 0
+      area = 0
     } else {
-      this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
-        layer.getLatLngs()[0]
-      )
+      area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0])
     }
-    this.$api().dataset.setSelectedArea(this.selectedAreaInSquareMeters)
-    this.$api().dataset.setGeometry(data.geometry)
+    this.$api().dataset.setGeometry({
+      geometry: data.geometry,
+      area,
+    })
   }
 
   @Watch('year')
