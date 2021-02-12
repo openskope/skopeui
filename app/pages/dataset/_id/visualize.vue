@@ -76,25 +76,32 @@
       <!-- map and toolbar controls-->
       <template v-else>
         <v-col>
-          <v-card class="map pa-3" elevation="2" outlined shaped>
+          <v-card class="map pa-3 mb-5" elevation="2" outlined shaped>
             <v-card-title>
               <h1 class="headline mr-3">Map</h1>
-              <v-chip label color="secondary" text-color="white">
+              <v-chip label color="secondary" text-color="white" class="mx-2">
                 <v-icon class="mr-2" color="white" small>{{
                   layerGroup.icon
                 }}</v-icon>
                 <span v-if="selectedLayer === null">No variable selected</span>
                 <span v-else>{{ selectedLayer.name }}</span>
               </v-chip>
+              <v-chip label color="info" outlined>{{ yearSelected }}CE</v-chip>
               <v-spacer></v-spacer>
               <h3 class="headline">
                 Selected area: {{ selectedArea }} km<sup>2</sup>
               </h3>
             </v-card-title>
-            <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
-            <v-toolbar flat extended extension-height="25" class="mt-10">
+            <Map
+              :year="yearSelected"
+              :opacity="opacity"
+              :min-temporal-range="temporalRange[0]"
+              :max-temporal-range="temporalRange[1]"
+              class="map-flex"
+            />
+            <v-toolbar flat extended extension-height="25" class="pt-8">
               <v-row>
-                <v-col>
+                <v-col cols="2">
                   <v-toolbar-title>Opacity</v-toolbar-title>
                   <v-toolbar-items class="my-auto">
                     <v-btn icon color="secondary">
@@ -108,9 +115,42 @@
                     </v-btn>
                   </v-toolbar-items>
                 </v-col>
-                <v-col>
-                  <v-toolbar-title>Year</v-toolbar-title>
-                  <v-toolbar-items>{{ yearSelected }}CE</v-toolbar-items>
+                <v-col cols="6" class="mx-3">
+                  <v-toolbar-title>Temporal Range</v-toolbar-title>
+                  <v-toolbar-items>
+                    <v-range-slider
+                      v-model="temporalRange"
+                      dense
+                      track-color="info"
+                      color="accent"
+                      hint="CE"
+                      :max="maxYear"
+                      :min="minYear"
+                    >
+                      <template #prepend>
+                        <v-text-field
+                          :value="temporalRange[0]"
+                          class="mt-0 pt-0"
+                          hide-details
+                          single-line
+                          type="number"
+                          style="width: 60px"
+                          @change="$set(temporalRange, 0, $event)"
+                        ></v-text-field>
+                      </template>
+                      <template #append>
+                        <v-text-field
+                          :value="temporalRange[1]"
+                          class="mt-0 pt-0"
+                          hide-details
+                          single-line
+                          type="number"
+                          style="width: 60px"
+                          @change="$set(temporalRange, 1, $event)"
+                        ></v-text-field>
+                      </template>
+                    </v-range-slider>
+                  </v-toolbar-items>
                 </v-col>
                 <v-col>
                   <v-toolbar-title>Variable</v-toolbar-title>
@@ -221,6 +261,7 @@ class Visualize extends Vue {
   selectedDataset
   timeSeriesUnwatcher = null
   stepNames = _.clone(this.$api().app.stepNames)
+  temporalRange = [1, 2017]
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name)
@@ -297,8 +338,8 @@ class Visualize extends Vue {
         return {
           datasetUri,
           geometry: this.selectedGeometry,
-          minYear: this.minYear,
-          maxYear: this.maxYear,
+          minYear: this.temporalRange[0],
+          maxYear: this.temporalRange[1],
           zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
         }
       },
