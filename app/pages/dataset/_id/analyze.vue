@@ -1,92 +1,351 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
+    <!-- title and instructions -->
     <v-row class="my-5">
-      <h2 class="mx-3">
+      <h1 class="ml-5 my-auto font-weight-light">
         {{ selectedDataset.title }}
-        <small class="font-weight-thin">
-          (selected area:
-          {{ selectedAreaInSquareKilometers }}km<sup>2</sup>)
-        </small>
-      </h2>
+      </h1>
+      <!--      <v-chip outlined label color="secondary" class="ml-3 my-auto">-->
+      <!--        <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>-->
+      <!--        <span v-if="selectedLayer === null">No variable selected</span>-->
+      <!--        <span v-else>{{ selectedLayer.name }}</span>-->
+      <!--      </v-chip>-->
+      <v-tooltip bottom
+        ><template #activator="{ on, attrs }">
+          <v-btn icon color="secondary" class="mx-3">
+            <v-icon
+              v-bind="attrs"
+              large
+              @click="instructions = !instructions"
+              v-on="on"
+              >info</v-icon
+            >
+          </v-btn> </template
+        ><span>Instructions</span></v-tooltip
+      >
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <template #activator="{ on, attrs }">
+          <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+            >View Metadata</v-btn
+          >
+        </template>
+        <v-card>
+          <v-card-title class="accent">Metadata</v-card-title>
+          <v-card-text><Metadata /></v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="dialog = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
-    <v-row dense align-content-start justify-space-around wrap>
-      <v-col cols="9">
-        <TimeSeriesPlot class="timeseries-flex" :time-series="timeSeries" />
+    <!-- dismissable instructions -->
+    <v-row>
+      <v-col class="mx-auto">
+        <v-alert
+          v-model="instructions"
+          color="secondary"
+          text
+          outlined
+          dismissible
+        >
+          For the geometry of your study area, you can modify the opacity and
+          variable layer. The Time Series chart will automatically update upon
+          selecting a layer. After you are finished, you can continue to the
+          analysis step.
+        </v-alert>
       </v-col>
+    </v-row>
+    <!-- time series -->
+
+    <v-row dense align-content-start justify-space-around wrap>
+      <!-- loading animation -->
+      <v-col v-if="isLoadingData">
+        <v-progress-circular
+          v-if="isLoadingData"
+          indeterminate
+          color="primary"
+        />
+      </v-col>
+      <v-col cols="9">
+        <v-card class="pa-3" elevation="2" outlined shaped>
+          <v-card-title><h1 class="headline">Time Series</h1></v-card-title>
+          <TimeSeriesPlot class="timeseries-flex" :time-series="timeSeries" />
+        </v-card>
+      </v-col>
+      <!-- analysis controls -->
       <v-col cols="3">
-        <v-card flat outlined>
-          <v-card-title class="secondary">{{
-            selectedVariable.name
-          }}</v-card-title>
+        <v-card elevation="2" color="primary">
+          <v-card-title>
+            <h1 class="headline white--text">Analysis</h1>
+          </v-card-title>
           <v-form>
-            <v-select
-              v-model="selectedZonalStatistic"
-              item-text="label"
-              item-value="id"
-              label="Zonal Statistic"
-              :items="zonalStatisticOpts"
-            />
-            <v-row v-if="temporalResolution !== ''">
-              <v-col>
-                <v-text-field
-                  v-model="timeRange.lb.year"
-                  dense
-                  label="Year (Lower Bound)"
-                  type="number"
-                />
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined"
+            >
+              <v-col class="outlined" cols="4">
+                <h3 class="ma-3 title">Selected area</h3>
+                <v-row class="mx-3 my-2">
+                  <p class="subtitle">
+                    {{ selectedAreaInSquareKilometers }} km<sup>2</sup>
+                  </p>
+                </v-row>
+                <v-row class="mx-3">
+                  <span class="my-1">
+                    <h3 class="title-2">Pixels</h3>
+                    <p>45.8 km<sup>2</sup> (88 pixels)</p>
+                  </span>
+                </v-row>
+                <v-btn
+                  small
+                  block
+                  depressed
+                  color="accent"
+                  @click="goToStudyArea($route.params.id)"
+                  >Edit</v-btn
+                >
               </v-col>
-              <v-col v-if="temporalResolution === 'month'">
-                <v-text-field
-                  v-model="timeRange.lb.month"
+              <v-col class="outlined" cols="8">
+                <h3 class="ma-3 title">Selected variable</h3>
+                <v-select
+                  v-model="layer"
+                  label="Select a variable"
+                  item-color="accent"
+                  color="accent"
                   dense
-                  label="Month (Lower Bound)"
-                  type="number"
-                />
+                  :items="layers"
+                  item-text="name"
+                  item-value="id"
+                  class="mx-3"
+                  :style="'width: 24rem'"
+                  :prepend-icon="layerGroup.icon"
+                  single-line
+                  outlined
+                >
+                </v-select>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  v-model="timeRange.ub.year"
-                  dense
-                  label="Year (Upper Bound)"
-                  type="number"
-                />
-              </v-col>
-              <v-col v-if="temporalResolution === 'month'">
-                <v-text-field
-                  v-model="timeRange.ub.month"
-                  dense
-                  label="Month (Upper Bound)"
-                  type="number"
-                />
-              </v-col>
+            <!-- temporal range -->
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined end-section"
+            >
+              <h3 class="ma-3 title">Temporal range</h3>
+              <v-row v-if="temporalResolution !== ''" class="mx-1">
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="timeRange.lb.year"
+                    label="Year (Lower Bound)"
+                    outlined
+                    dense
+                    type="number"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="timeRange.ub.year"
+                    label="Year (Upper Bound)"
+                    outlined
+                    dense
+                    type="number"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row v-if="temporalResolution === 'month'">
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="timeRange.lb.month"
+                    dense
+                    outlined
+                    label="Month (Lower Bound)"
+                    type="number"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="timeRange.lb.month"
+                    dense
+                    outlined
+                    label="Month (Lower Bound)"
+                    type="number"
+                  />
+                </v-col>
+              </v-row>
             </v-row>
-            <v-select
-              v-model="selectedSmoother"
-              item-text="label"
-              item-value="id"
-              label="Smoother"
-              :items="smootherOpts"
-            ></v-select>
-            <v-text-field
-              v-show="
-                ['trailingAverage', 'centeredAverage'].indexOf(
-                  selectedSmoother
-                ) !== -1
-              "
-              v-model="width"
-              :label="smootherWidthLabel"
-              type="number"
-            />
-            <v-select
-              v-model="selectedScaleTransform"
-              item-text="label"
-              item-value="id"
-              label="Scale Transform"
-              :items="scaleTransformOpts"
-            />
-            <v-btn @click="submit">Submit</v-btn>
+
+            <!-- select mean | median -->
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined end-section"
+            >
+              <h3 class="mx-3 my-2 title">
+                For each Year step, selected area is summarized as the:
+              </h3>
+              <v-radio-group row mandatory class="mx-3">
+                <v-radio color="accent" label="Mean" value="mean"></v-radio>
+                <v-radio color="accent" label="Median" value="median"></v-radio>
+                <p class="my-auto">of its pixels</p>
+              </v-radio-group>
+            </v-row>
+            <!-- stats for temporal interval -->
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined end-section"
+            >
+              <h3 class="mx-3 my-2 title">
+                Statistics for the Temporal Interval
+              </h3>
+              <v-row class="ma-2">
+                <v-col class="mx-2">
+                  <v-chip color="secondary" large label text-color="white">
+                    Mean: 247.6
+                  </v-chip>
+                </v-col>
+                <v-col class="mx-2">
+                  <v-chip color="secondary" large label text-color="white">
+                    Median: 240.2
+                  </v-chip>
+                </v-col>
+                <v-col class="mx-2">
+                  <v-chip color="secondary" large label text-color="white">
+                    Std. Dev.: 36.4<sup>3</sup>
+                  </v-chip>
+                </v-col>
+              </v-row>
+            </v-row>
+            <!-- smoothing -->
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined end-section"
+            >
+              <h3 class="mx-3 my-2 title">Smoothing</h3>
+              <v-row class="my-5">
+                <v-col>
+                  <v-radio-group v-model="smoothing" column>
+                    <v-radio label="None" value="none"></v-radio>
+                    <v-radio label="Centered running average" value="cra">
+                    </v-radio>
+                    <v-text-field
+                      v-if="smoothing == 'cra'"
+                      label="Year window"
+                      outlined
+                      dense
+                    ></v-text-field>
+                    <v-radio
+                      label="Trailing running average"
+                      value="tra"
+                    ></v-radio>
+                    <v-text-field
+                      v-if="smoothing == 'tra'"
+                      label="Year window"
+                      outlined
+                      dense
+                    ></v-text-field>
+                    <v-radio label="Spline smoothing" value="spline"></v-radio>
+                  </v-radio-group>
+                </v-col>
+              </v-row>
+            </v-row>
+            <!-- display -->
+            <v-row
+              no-gutters
+              :style="'background-color: white'"
+              class="outlined"
+            >
+              <h3 class="mx-3 my-2 title">Display</h3>
+              <v-radio-group v-model="display" column>
+                <v-radio label="Modeled values" value="modeled"></v-radio>
+                <v-radio
+                  label="Z-score wrt Fixed Interval from"
+                  value="fixed"
+                ></v-radio>
+                <v-row v-if="display == 'fixed'">
+                  <v-col>
+                    <v-text-field
+                      v-model="timeRange.lb.year"
+                      label="Year (Lower Bound)"
+                      outlined
+                      dense
+                      type="number"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      v-model="timeRange.ub.year"
+                      label="Year (Upper Bound)"
+                      outlined
+                      dense
+                      type="number"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-radio
+                  label="Z-score wrt Moving Interval of Previous:"
+                  value="moving"
+                ></v-radio>
+                <v-text-field
+                  v-if="display == 'moving'"
+                  label="Years"
+                  outlined
+                  dense
+                ></v-text-field>
+              </v-radio-group>
+            </v-row>
+            <!--            <v-select-->
+            <!--              v-model="selectedZonalStatistic"-->
+            <!--              item-text="label"-->
+            <!--              item-value="id"-->
+            <!--              label="Zonal Statistic"-->
+            <!--              :items="zonalStatisticOpts"-->
+            <!--            />-->
+            <!--            <v-row>-->
+            <!--              <v-col>-->
+            <!--                <v-text-field-->
+            <!--                  v-model="timeRange.ub.year"-->
+            <!--                  dense-->
+            <!--                  label="Year (Upper Bound)"-->
+            <!--                  type="number"-->
+            <!--                />-->
+            <!--              </v-col>-->
+            <!--              <v-col v-if="temporalResolution === 'month'">-->
+            <!--                <v-text-field-->
+            <!--                  v-model="timeRange.ub.month"-->
+            <!--                  dense-->
+            <!--                  label="Month (Upper Bound)"-->
+            <!--                  type="number"-->
+            <!--                />-->
+            <!--              </v-col>-->
+            <!--            </v-row>-->
+            <!--            <v-select-->
+            <!--              v-model="selectedSmoother"-->
+            <!--              item-text="label"-->
+            <!--              item-value="id"-->
+            <!--              label="Smoother"-->
+            <!--              :items="smootherOpts"-->
+            <!--            ></v-select>-->
+            <!--            <v-text-field-->
+            <!--              v-show="-->
+            <!--                ['trailingAverage', 'centeredAverage'].indexOf(-->
+            <!--                  selectedSmoother-->
+            <!--                ) !== -1-->
+            <!--              "-->
+            <!--              v-model="width"-->
+            <!--              :label="smootherWidthLabel"-->
+            <!--              type="number"-->
+            <!--            />-->
+            <!--            <v-select-->
+            <!--              v-model="selectedScaleTransform"-->
+            <!--              item-text="label"-->
+            <!--              item-value="id"-->
+            <!--              label="Scale Transform"-->
+            <!--              :items="scaleTransformOpts"-->
+            <!--            />-->
           </v-form>
         </v-card>
       </v-col>
@@ -121,6 +380,34 @@ class Analyze extends Vue {
 
   @Dataset.State('geometry')
   selectedStudyArea
+
+  layerGroup = {
+    icon: 'fas fa-layer-group',
+  }
+
+  polygon = {
+    icon: 'fas fa-draw-polygon',
+  }
+
+  smoothing = null
+  display = null
+
+  set layer(l) {
+    l = this.layers.find((layer) => layer.id === l)
+    this.$api().datasets.selectVariable(l.id)
+    this.$api().dataset.setLayer(l)
+  }
+  get layer() {
+    if (_.size(this.layers) > 1) return ''
+    else return this.$api().dataset.layer
+  }
+  get layers() {
+    return this.selectedDataset.variables
+  }
+
+  set selectedLayer(layer) {
+    this.selectedVariable = layer
+  }
 
   selectedZonalStatistic = 'mean'
 
@@ -221,6 +508,13 @@ class Analyze extends Vue {
   async created() {
     console.log(this.$route.params.action)
   }
+
+  goToStudyArea(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id', params: { id } })
+  }
 }
 export default Analyze
 </script>
@@ -238,5 +532,27 @@ export default Analyze
   .timeseries-flex {
     height: 350px;
   }
+}
+.outlined {
+  border: solid 1px #f3f3f3;
+}
+
+.title {
+  color: #596d7b;
+  text-transform: uppercase;
+}
+
+.title-2 {
+  color: #596d7b;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  color: #596d7b;
+  font-size: 1.5rem;
+}
+
+.end-section {
+  border-bottom: solid 1rem #f3f3f3;
 }
 </style>

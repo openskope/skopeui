@@ -5,6 +5,11 @@
       <h1 class="ml-5 my-auto font-weight-light">
         {{ selectedDataset.title }}
       </h1>
+      <v-chip outlined label color="secondary" class="ml-3 my-auto">
+        <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>
+        <span v-if="selectedLayer === null">No variable selected</span>
+        <span v-else>{{ selectedLayer.name }}</span>
+      </v-chip>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
           <v-btn icon color="secondary" class="mx-3">
@@ -79,13 +84,6 @@
           <v-card class="map pa-3 mb-5" elevation="2" outlined shaped>
             <v-card-title>
               <h1 class="headline mr-3">Map</h1>
-              <v-chip label color="secondary" text-color="white" class="mx-2">
-                <v-icon class="mr-2" color="white" small>{{
-                  layerGroup.icon
-                }}</v-icon>
-                <span v-if="selectedLayer === null">No variable selected</span>
-                <span v-else>{{ selectedLayer.name }}</span>
-              </v-chip>
               <v-spacer></v-spacer>
               <h3 class="headline">
                 Study area: {{ selectedArea }} km<sup>2</sup>
@@ -171,7 +169,7 @@
           </v-card>
         </v-col>
         <v-col>
-          <v-card class="pa-3" elevation="2" outlined shaped>
+          <v-card class="pa-3 mb-5" elevation="2" outlined shaped>
             <h1 class="headline mt-3 ml-3">Time Series</h1>
             <template v-if="hasTimeSeries">
               <TimeSeriesPlot
@@ -180,7 +178,7 @@
                 :year-selected="temporalRange[0]"
                 @yearSelected="setYear"
               />
-              <v-toolbar flat class="mt-5">
+              <v-toolbar flat extended extension-height="25" class="pt-8">
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
                   <v-btn icon color="secondary" @click="gotoFirstYear">
