@@ -360,6 +360,7 @@ import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
+import _ from 'lodash'
 
 const Datasets = namespace('datasets')
 const Dataset = namespace('dataset')
