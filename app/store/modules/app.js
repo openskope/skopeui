@@ -18,7 +18,7 @@ class App extends VuexModule {
       name: 'dataset-id-studyarea',
       label: 'Define Study Area',
       instructions:
-        'To define a study area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisified with your selection, click next.',
+        'To define a selected area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisified with your selection, click next.',
     },
     {
       step: 3,

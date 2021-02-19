@@ -61,7 +61,7 @@
           outlined
           dismissible
         >
-          For the geometry of your study area, you can modify the opacity and
+          For the geometry of your selected area, you can modify the opacity and
           variable layer. The Time Series chart will automatically update upon
           selecting a layer. After you are finished, you can continue to the
           analysis step.
@@ -86,7 +86,7 @@
               <h1 class="headline mr-3">Map</h1>
               <v-spacer></v-spacer>
               <h3 class="headline">
-                Study area: {{ selectedArea }} km<sup>2</sup>
+                Selected area: {{ selectedArea }} km<sup>2</sup>
               </h3>
             </v-card-title>
             <Map :year="yearSelected" :opacity="opacity" class="map-flex" />

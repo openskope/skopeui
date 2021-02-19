@@ -11,7 +11,7 @@
             <v-card-text>
               <h3>
                 Welcome back! Would you like to clear the currently selected
-                geometry?
+                area?
               </h3>
             </v-card-text>
             <v-card-actions class="justify-end">
@@ -19,10 +19,10 @@
                 depressed
                 color="info"
                 @click="confirmGeometry.value = false"
-                >Keep saved geometry</v-btn
+                >Keep selected area</v-btn
               >
               <v-btn depressed color="warning" @click="clearGeometry"
-                >Clear geometry</v-btn
+                >Clear selected area</v-btn
               >
             </v-card-actions>
           </v-card>
@@ -100,7 +100,7 @@
             <h1 class="headline">Map</h1>
             <v-spacer></v-spacer>
             <h3 class="headline">
-              Study area: {{ selectedArea }} km<sup>2</sup>
+              Selected area: {{ selectedArea }} km<sup>2</sup>
             </h3>
           </v-card-title>
           <Map :clear="clear" />
