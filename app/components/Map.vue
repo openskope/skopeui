@@ -9,11 +9,6 @@
         @ready="mapReady"
       >
         <l-control-attribution v-if="showMapControls" position="topright" />
-        <l-control-layers
-          v-if="showMapControls"
-          :sort-layers="false"
-          position="topright"
-        />
         <l-tile-layer
           v-for="provider of leafletProviders"
           :key="provider.name"
@@ -132,7 +127,7 @@ class Map extends Vue {
       edit: {
         featureGroup: this.drawnItems,
       },
-      draw: false,
+      draw: true,
     })
     // set custom tooltips on the draw and edit toolbars
     const drawControlButtons = L.drawLocal.draw.toolbar.buttons
@@ -399,7 +394,7 @@ class Map extends Vue {
     this.drawnItems = new L.FeatureGroup()
     this.clearSelectedGeometry()
     const map = this.$refs.layerMap.mapObject
-    this.addDrawToolbar(map)
+    // this.addDrawToolbar(map)
   }
 }
 export default Map
