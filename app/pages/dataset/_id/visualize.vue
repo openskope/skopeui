@@ -23,7 +23,7 @@
           </v-btn> </template
         ><span>Instructions</span></v-tooltip
       >
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-dialog v-model="dialog" max-width="600px">
         <template #activator="{ on, attrs }">
           <v-btn depressed color="accent" v-bind="attrs" v-on="on"
             >View Metadata</v-btn

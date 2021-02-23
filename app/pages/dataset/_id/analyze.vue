@@ -5,11 +5,6 @@
       <h1 class="ml-5 my-auto font-weight-light">
         {{ selectedDataset.title }}
       </h1>
-      <!--      <v-chip outlined label color="secondary" class="ml-3 my-auto">-->
-      <!--        <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>-->
-      <!--        <span v-if="selectedLayer === null">No variable selected</span>-->
-      <!--        <span v-else>{{ selectedLayer.name }}</span>-->
-      <!--      </v-chip>-->
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
           <v-btn icon color="secondary" class="mx-3">
@@ -23,7 +18,7 @@
           </v-btn> </template
         ><span>Instructions</span></v-tooltip
       >
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-dialog v-model="dialog" max-width="600px">
         <template #activator="{ on, attrs }">
           <v-btn depressed color="accent" v-bind="attrs" v-on="on"
             >View Metadata</v-btn
