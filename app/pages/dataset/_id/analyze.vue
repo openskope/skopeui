@@ -297,55 +297,6 @@
                 ></v-text-field>
               </v-radio-group>
             </v-row>
-            <!--            <v-select-->
-            <!--              v-model="selectedZonalStatistic"-->
-            <!--              item-text="label"-->
-            <!--              item-value="id"-->
-            <!--              label="Zonal Statistic"-->
-            <!--              :items="zonalStatisticOpts"-->
-            <!--            />-->
-            <!--            <v-row>-->
-            <!--              <v-col>-->
-            <!--                <v-text-field-->
-            <!--                  v-model="timeRange.ub.year"-->
-            <!--                  dense-->
-            <!--                  label="Year (Upper Bound)"-->
-            <!--                  type="number"-->
-            <!--                />-->
-            <!--              </v-col>-->
-            <!--              <v-col v-if="temporalResolution === 'month'">-->
-            <!--                <v-text-field-->
-            <!--                  v-model="timeRange.ub.month"-->
-            <!--                  dense-->
-            <!--                  label="Month (Upper Bound)"-->
-            <!--                  type="number"-->
-            <!--                />-->
-            <!--              </v-col>-->
-            <!--            </v-row>-->
-            <!--            <v-select-->
-            <!--              v-model="selectedSmoother"-->
-            <!--              item-text="label"-->
-            <!--              item-value="id"-->
-            <!--              label="Smoother"-->
-            <!--              :items="smootherOpts"-->
-            <!--            ></v-select>-->
-            <!--            <v-text-field-->
-            <!--              v-show="-->
-            <!--                ['trailingAverage', 'centeredAverage'].indexOf(-->
-            <!--                  selectedSmoother-->
-            <!--                ) !== -1-->
-            <!--              "-->
-            <!--              v-model="width"-->
-            <!--              :label="smootherWidthLabel"-->
-            <!--              type="number"-->
-            <!--            />-->
-            <!--            <v-select-->
-            <!--              v-model="selectedScaleTransform"-->
-            <!--              item-text="label"-->
-            <!--              item-value="id"-->
-            <!--              label="Scale Transform"-->
-            <!--              :items="scaleTransformOpts"-->
-            <!--            />-->
           </v-form>
         </v-card>
       </v-col>
