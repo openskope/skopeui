@@ -299,6 +299,7 @@ import Metadata from '@/components/action/Metadata.vue'
 import KernelRegression from '@/components/chart-form/KernelRegression.vue'
 import RunningAverage from '@/components/chart-form/RunningAverage.vue'
 import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
+import Metadata from '@/components/action/Metadata.vue'
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
@@ -314,6 +315,7 @@ const Dataset = namespace('dataset')
     KernelRegression,
     RunningAverage,
     TimeSeriesPlot,
+    Metadata,
   },
 })
 class Analyze extends Vue {
@@ -342,6 +344,8 @@ class Analyze extends Vue {
 
   smoothing = null
   display = null
+  dialog = false
+  instructions = false
 
   set layer(l) {
     l = this.layers.find((layer) => layer.id === l)
