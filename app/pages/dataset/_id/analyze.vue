@@ -25,7 +25,13 @@
           >
         </template>
         <v-card>
-          <v-card-title class="accent">Metadata</v-card-title>
+          <v-card-title class="accent">
+            Metadata
+            <v-spacer></v-spacer>
+            <v-btn icon @click="dialog = false">
+              <v-icon color="white">fas fa-window-close</v-icon>
+            </v-btn>
+          </v-card-title>
           <v-card-text><Metadata /></v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
