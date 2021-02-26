@@ -59,14 +59,6 @@
     <!-- time series -->
 
     <v-row dense align-content-start justify-space-around wrap>
-      <!-- loading animation -->
-      <v-col v-if="isLoadingData">
-        <v-progress-circular
-          v-if="isLoadingData"
-          indeterminate
-          color="primary"
-        />
-      </v-col>
       <v-col cols="9">
         <v-card class="pa-3" elevation="2" outlined shaped>
           <v-card-title><h1 class="headline">Time Series</h1></v-card-title>
@@ -308,6 +300,7 @@
 </template>
 
 <script>
+import Metadata from '@/components/action/Metadata.vue'
 import KernelRegression from '@/components/chart-form/KernelRegression.vue'
 import RunningAverage from '@/components/chart-form/RunningAverage.vue'
 import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
@@ -322,6 +315,7 @@ const Dataset = namespace('dataset')
 @Component({
   layout: 'BaseDataset',
   components: {
+    Metadata,
     KernelRegression,
     RunningAverage,
     TimeSeriesPlot,
@@ -335,10 +329,13 @@ class Analyze extends Vue {
   selectedDataset
 
   @Dataset.State('layer')
-  selectedVariable
+  selectedLayer
 
   @Dataset.State('geometry')
   selectedStudyArea
+
+  dialog = false
+  instructions = false
 
   layerGroup = {
     icon: 'fas fa-layer-group',
@@ -365,7 +362,7 @@ class Analyze extends Vue {
   }
 
   set selectedLayer(layer) {
-    this.selectedVariable = layer
+    this.$api().dataset.setLayer(layer)
   }
 
   selectedZonalStatistic = 'mean'
