@@ -265,7 +265,7 @@
                   label="Z-score wrt Fixed Interval from"
                   value="fixed"
                 ></v-radio>
-                <v-row v-if="display == 'fixed'">
+                <v-row v-if="display === 'fixed'">
                   <v-col>
                     <v-text-field
                       v-model="timeRange.lb.year"
@@ -290,12 +290,15 @@
                   value="moving"
                 ></v-radio>
                 <v-text-field
-                  v-if="display == 'moving'"
+                  v-if="display === 'moving'"
                   label="Years"
                   outlined
                   dense
                 ></v-text-field>
               </v-radio-group>
+            </v-row>
+            <v-row no-gutters>
+              <v-btn @click="submit">Submit</v-btn>
             </v-row>
           </v-form>
         </v-card>
@@ -313,6 +316,7 @@ import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
 import _ from 'lodash'
 
+const AnalyzeNS = namespace('analyze')
 const Datasets = namespace('datasets')
 const Dataset = namespace('dataset')
 @Component({
@@ -324,6 +328,9 @@ const Dataset = namespace('dataset')
   },
 })
 class Analyze extends Vue {
+  @AnalyzeNS.State('response')
+  response
+
   @Datasets.State('selectedDataset')
   selectedDataset
 
@@ -453,8 +460,19 @@ class Analyze extends Vue {
     )
   }
 
-  submit() {
+  async submit() {
     console.log('submitting to web service')
+    await this.$api().analyze.retrieveAnalysis({
+      dataset_id: 'lbda-v2',
+      variable_id: 'palmer_modified_drought_index',
+      selected_area: this.selectedStudyArea,
+      zonal_statistic: 'mean',
+      transforms: [],
+      time_range: {
+        gte: 1500,
+        lte: 1800,
+      },
+    })
   }
 
   async created() {
