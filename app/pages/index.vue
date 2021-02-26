@@ -17,7 +17,7 @@
         </h1>
         <template v-for="dataset in datasets" router exact>
           <v-card
-            :key="dataset"
+            :key="dataset.absoluteUrl"
             class="pa-4 my-3"
             elevation="2"
             outlined
