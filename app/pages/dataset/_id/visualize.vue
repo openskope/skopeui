@@ -175,7 +175,7 @@
               <TimeSeriesPlot
                 class="timeseries-flex"
                 :time-series="timeSeries"
-                :year-selected="temporalRange[0]"
+                :year-selected="yearSelected"
                 @yearSelected="setYear"
               />
               <v-toolbar flat extended extension-height="25" class="pt-8">
