@@ -50,15 +50,11 @@
           outlined
           dismissible
         >
-          For the geometry of your study area, you can modify the opacity and
-          variable layer. The Time Series chart will automatically update upon
-          selecting a layer. After you are finished, you can continue to the
-          analysis step.
+          This is a placeholder for analysis instructions.
         </v-alert>
       </v-col>
     </v-row>
     <!-- time series -->
-
     <v-row dense align-content-start justify-space-around wrap>
       <v-col cols="9">
         <v-card class="pa-3" elevation="2" outlined shaped>
@@ -73,18 +69,22 @@
             <h1 class="headline white--text">Analysis</h1>
           </v-card-title>
           <v-form>
+            <!-- row 1 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
               class="outlined"
             >
+              <!-- selected area -->
               <v-col class="outlined" cols="4">
                 <h3 class="ma-3 title">Selected area</h3>
+                <!-- area in km2 -->
                 <v-row class="mx-3 my-2">
                   <p class="subtitle">
                     {{ selectedAreaInSquareKilometers }} km<sup>2</sup>
                   </p>
                 </v-row>
+                <!-- area in pixels -->
                 <v-row class="mx-3">
                   <span class="my-1">
                     <h3 class="title-2">Pixels</h3>
@@ -100,6 +100,7 @@
                   >Edit</v-btn
                 >
               </v-col>
+              <!-- selected variable -->
               <v-col class="outlined" cols="8">
                 <h3 class="ma-3 title">Selected variable</h3>
                 <v-select
@@ -120,13 +121,15 @@
                 </v-select>
               </v-col>
             </v-row>
-            <!-- temporal range -->
+            <!-- end row 1 -->
+            <!-- row 2 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
               class="outlined end-section"
             >
               <h3 class="ma-3 title">Temporal range</h3>
+              <!-- temporal range -->
               <v-row v-if="temporalResolution !== ''" class="mx-1">
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
@@ -168,8 +171,9 @@
                 </v-col>
               </v-row>
             </v-row>
+            <!-- end row 2 -->
 
-            <!-- select mean | median -->
+            <!-- row 3 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
@@ -178,13 +182,16 @@
               <h3 class="mx-3 my-2 title">
                 For each Year step, selected area is summarized as the:
               </h3>
+              <!-- select mean | median -->
               <v-radio-group row mandatory class="mx-3">
                 <v-radio color="accent" label="Mean" value="mean"></v-radio>
                 <v-radio color="accent" label="Median" value="median"></v-radio>
                 <p class="my-auto">of its pixels</p>
               </v-radio-group>
             </v-row>
-            <!-- stats for temporal interval -->
+            <!-- end row 3 -->
+
+            <!-- row 4 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
@@ -193,6 +200,7 @@
               <h3 class="mx-3 my-2 title">
                 Statistics for the Temporal Interval
               </h3>
+              <!-- display stats for temporal interval -->
               <v-row class="ma-2">
                 <v-col class="mx-2">
                   <v-chip color="secondary" large label text-color="white">
@@ -211,13 +219,16 @@
                 </v-col>
               </v-row>
             </v-row>
-            <!-- smoothing -->
+            <!-- end row 4 -->
+
+            <!-- row 5 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
               class="outlined end-section"
             >
               <h3 class="mx-3 my-2 title">Smoothing</h3>
+              <!-- smoothing radio selection -->
               <v-row class="my-5">
                 <v-col>
                   <v-radio-group v-model="smoothing" column>
@@ -245,13 +256,16 @@
                 </v-col>
               </v-row>
             </v-row>
-            <!-- display -->
+            <!-- end row 5 -->
+
+            <!-- row 6 -->
             <v-row
               no-gutters
               :style="'background-color: white'"
               class="outlined"
             >
               <h3 class="mx-3 my-2 title">Display</h3>
+              <!-- display radio selection -->
               <v-radio-group v-model="display" column>
                 <v-radio label="Modeled values" value="modeled"></v-radio>
                 <v-radio
@@ -301,7 +315,6 @@
 </template>
 
 <script>
-import Metadata from '@/components/action/Metadata.vue'
 import KernelRegression from '@/components/chart-form/KernelRegression.vue'
 import RunningAverage from '@/components/chart-form/RunningAverage.vue'
 import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
@@ -317,7 +330,6 @@ const Dataset = namespace('dataset')
 @Component({
   layout: 'BaseDataset',
   components: {
-    Metadata,
     KernelRegression,
     RunningAverage,
     TimeSeriesPlot,

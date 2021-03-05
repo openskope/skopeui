@@ -188,7 +188,7 @@ class DatasetDetail extends Vue {
   stepNames = _.clone(this.$api().app.stepNames)
 
   dialog = false
-  instructions = true
+  instructions = false
   confirmGeometry = false
   clear = false
 

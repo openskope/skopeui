@@ -245,7 +245,7 @@ class Visualize extends Vue {
   opacityLevels = _.range(0, 10).map((x) => x * 10)
   yearSelected = 1500
   dialog = false
-  instructions = true
+  instructions = false
   layerGroup = {
     icon: 'fas fa-layer-group',
   }
