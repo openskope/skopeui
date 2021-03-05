@@ -112,44 +112,7 @@
                     </v-btn>
                   </v-toolbar-items>
                 </v-col>
-                <v-col cols="6" class="mx-3">
-                  <v-toolbar-title>Temporal Range</v-toolbar-title>
-                  <v-toolbar-items>
-                    <v-range-slider
-                      v-model="temporalRange"
-                      dense
-                      track-color="info"
-                      color="accent"
-                      hint="CE"
-                      :max="maxYear"
-                      :min="minYear"
-                    >
-                      <template #prepend>
-                        <v-text-field
-                          :value="temporalRange[0]"
-                          class="mt-0 pt-0"
-                          hide-details
-                          single-line
-                          type="number"
-                          style="width: 60px"
-                          @change="$set(temporalRange, 0, $event)"
-                        ></v-text-field>
-                      </template>
-                      <template #append>
-                        <v-text-field
-                          :value="temporalRange[1]"
-                          class="mt-0 pt-0"
-                          hide-details
-                          single-line
-                          type="number"
-                          style="width: 60px"
-                          @change="$set(temporalRange, 1, $event)"
-                        ></v-text-field>
-                      </template>
-                    </v-range-slider>
-                  </v-toolbar-items>
-                </v-col>
-                <v-col>
+                <v-col offset="4">
                   <v-toolbar-title>Variable</v-toolbar-title>
                   <v-toolbar-items
                     ><v-select
@@ -185,27 +148,78 @@
                 @yearSelected="setYear"
               />
               <v-toolbar flat extended extension-height="25" class="pt-8">
-                <v-spacer></v-spacer>
-                <v-toolbar-items>
-                  <v-btn icon color="secondary" @click="gotoFirstYear">
-                    <v-icon>skip_previous</v-icon>
-                  </v-btn>
-                  <v-btn icon color="secondary" @click="previousYear">
-                    <v-icon>arrow_left</v-icon>
-                  </v-btn>
-                  <v-btn-toggle icon class="my-auto">
-                    <v-btn icon @click="togglePlay">
-                      <v-icon color="secondary">{{ playIcon }}</v-icon>
-                    </v-btn>
-                  </v-btn-toggle>
-                  <v-btn icon color="secondary" @click="nextYear">
-                    <v-icon>arrow_right</v-icon>
-                  </v-btn>
-                  <v-btn icon color="secondary" @click="gotoLastYear">
-                    <v-icon>skip_next</v-icon>
-                  </v-btn>
-                </v-toolbar-items>
-                <v-spacer></v-spacer>
+                <v-row>
+                  <v-col cols="4">
+                    <v-toolbar-items class="my-auto">
+                      <v-text-field
+                        v-model="formTemporalRange[0]"
+                        class="mt-0 pt-3"
+                        label="Min Year"
+                        hide-details
+                        type="number"
+                        style="width: 60px"
+                      ></v-text-field>
+                      <v-spacer />
+                      <v-text-field
+                        v-model="formTemporalRange[1]"
+                        class="mt-0 pt-3"
+                        label="Max Year"
+                        hide-details
+                        type="number"
+                        style="width: 60px"
+                      ></v-text-field>
+                      <v-spacer />
+                      <v-btn
+                        class="mt-1 py-3"
+                        color="secondary"
+                        @click="setTemporalRange"
+                      >
+                        Update
+                      </v-btn>
+                    </v-toolbar-items>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-toolbar-items>
+                      <v-btn
+                        icon
+                        class="mt-2"
+                        color="secondary"
+                        @click="gotoFirstYear"
+                      >
+                        <v-icon>skip_previous</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        class="mt-2"
+                        color="secondary"
+                        @click="previousYear"
+                      >
+                        <v-icon>arrow_left</v-icon>
+                      </v-btn>
+                      <v-btn-toggle icon class="my-auto">
+                        <v-btn icon @click="togglePlay">
+                          <v-icon color="secondary">{{ playIcon }}</v-icon>
+                        </v-btn>
+                      </v-btn-toggle>
+                      <v-btn
+                        icon
+                        class="mt-2"
+                        color="secondary"
+                        @click="nextYear"
+                      >
+                        <v-icon>arrow_right</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        class="mt-2"
+                        color="secondary"
+                        @click="gotoLastYear"
+                      >
+                        <v-icon>skip_next</v-icon>
+                      </v-btn>
+                    </v-toolbar-items>
+                  </v-col>
+                </v-row>
               </v-toolbar>
             </template>
             <v-alert v-else color="warning">
@@ -228,6 +242,11 @@ import _ from 'lodash'
 import { namespace } from 'vuex-class'
 const Dataset = namespace('dataset')
 const Datasets = namespace('datasets')
+
+const setYearSelected = _.debounce(function (vue) {
+  vue.yearSelected = vue.formYearSelected
+}, 350)
+
 @Component({
   layout: 'BaseDataset',
   components: {
@@ -257,28 +276,35 @@ class Visualize extends Vue {
   selectedDataset
   timeSeriesUnwatcher = null
   stepNames = _.clone(this.$api().app.stepNames)
-  temporalRange = [1, 2017]
+  formTemporalRange = [1, 2017]
+  formYearSelected = 1500
+  selectedTemporalRange = [1, 2017]
+
+  get temporalRange() {
+    return this.$api().datasets.selectedDatasetTimespan
+  }
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name)
   }
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeometry
+    return this.currentStep === 0 || this.$api().dataset.hasGeometry
   }
-  goToAnalyze(id) {
-    if (_.isUndefined(id)) {
-      return
-    }
-    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
-  }
+
   get hasTimeSeries() {
     return this.timeSeries.x.length > 0
   }
   get timeSeries() {
-    const timeseries = this.$api().dataset.timeseries
+    const api = this.$api()
+    const timeseries = api.dataset.timeseries
     if (timeseries.x.length > 0) {
-      return { ...this.$api().dataset.timeseries, type: 'scatter' }
+      const minOffset = this.selectedTemporalRange[0] - this.temporalRange[0]
+      const maxOffset = this.selectedTemporalRange[1] - this.temporalRange[0]
+      const x = timeseries.x.slice(minOffset, maxOffset)
+      const y = timeseries.y.slice(minOffset, maxOffset)
+      console.log({ x, y })
+      return { x, y, type: 'scatter' }
     } else {
       return { x: [], y: [], type: 'scatter' }
     }
@@ -354,6 +380,14 @@ class Visualize extends Vue {
   destroyed() {
     this.timeSeriesUnwatcher
   }
+
+  goToAnalyze(id) {
+    if (_.isUndefined(id)) {
+      return
+    }
+    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
+  }
+
   decreaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
   }
@@ -378,6 +412,16 @@ class Visualize extends Vue {
     }
     return false
   }
+
+  setTemporalRange() {
+    this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange)
+  }
+
+  setYearSelected(formYearSelected) {
+    this.formYearSelected = formYearSelected
+    setYearSelected(this)
+  }
+
   gotoFirstYear() {
     if (this.selectedLayer === null) {
       return

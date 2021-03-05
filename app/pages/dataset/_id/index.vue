@@ -151,10 +151,8 @@
 
 <script>
 import circleToPolygon from 'circle-to-polygon'
-import { clamp } from 'lodash'
+import _ from 'lodash'
 import { Component } from 'nuxt-property-decorator'
-import { Prop } from 'vue-property-decorator'
-import { stringify } from 'query-string'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
 
