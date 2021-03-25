@@ -1,5 +1,5 @@
 import { find } from 'lodash'
-export const DEPLOY_HOST_URL = 'https://app.openskope.org/' // FIXME: this should be parameterized at build / deployment
+export const DEPLOY_HOST_URL = 'https://api.openskope.org/' // FIXME: this should be parameterized at build / deployment
 export const WMS_SERVER_URI = 'geoserver/SKOPE/wms?'
 export const TIMESERIES_SERVICE_URI = 'timeseries-service/api/v1/timeseries/'
 export const SKOPE_WMS_ENDPOINT = `${DEPLOY_HOST_URL}${WMS_SERVER_URI}`
