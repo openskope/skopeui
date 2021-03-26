@@ -31,18 +31,18 @@
           position="topright"
         />
         <l-wms-tile-layer
-          v-for="variable of metadata.variables"
+          v-for="v of metadata.variables"
           ref="wmsLayers"
-          :key="variable.wmsLayer"
+          :key="v.id"
           :base-url="skopeWmsUrl"
-          :layers="fillTemplateYear(variable.wmsLayer)"
-          :name="variable.name"
+          :layers="fillTemplateYear(v.wmsLayer)"
+          :name="v.name"
           :crs="defaultCrs"
           :transparent="true"
           :opacity="layerOpacity"
           layer-type="base"
-          :attribution="variable.name"
-          :visible="variable.visible"
+          :attribution="v.name"
+          :visible="v.visible"
           version="1.3.0"
           format="image/png"
         />
@@ -63,8 +63,9 @@ import {
 } from '@/store/modules/constants'
 import circleToPolygon from 'circle-to-polygon'
 import { stringify } from 'query-string'
+
+const App = namespace('app')
 const Dataset = namespace('dataset')
-const Datasets = namespace('datasets')
 const fillTemplate = require('es6-dynamic-template')
 import _ from 'lodash'
 
@@ -91,8 +92,9 @@ class Map extends Vue {
   wGeometryKey = 'skope:geometry'
   wMinTemporalRangeKey = 'skope:temporal-range-min'
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
-  stepNames = _.clone(this.$api().app.stepNames)
 
+  @App.State('stepNames')
+  stepNames
   @Dataset.State('metadata')
   metadata
   @Dataset.Getter('timespan')

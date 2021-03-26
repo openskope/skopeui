@@ -244,6 +244,8 @@ import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Vue from 'vue'
 import _ from 'lodash'
 import { namespace } from 'vuex-class'
+import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
+
 const Dataset = namespace('dataset')
 
 const setYearSelected = _.debounce(function (vue) {
@@ -282,6 +284,8 @@ class Visualize extends Vue {
   variable
   @Dataset.State('metadata')
   metadata
+  @Dataset.Getter('canHandleTimeSeriesRequest')
+  canHandleTimeSeriesRequest
 
   get isLoading() {
     return _.isNull(this.metadata)
@@ -345,30 +349,34 @@ class Visualize extends Vue {
     return this.metadata.variables
   }
 
-  async created() {
-    const datasetStore = this.$api().dataset
-    await datasetStore.loadMetadata(this.$route.params.id)
+  async fetch() {
+    const api = this.$api()
+    await api.dataset.loadMetadata(this.$route.params.id)
+    await loadTimeSeries(api)
+  }
+
+  async mounted() {
     this.timeSeriesUnwatcher = this.$watch(
       function () {
-        const variableId = this.variable ? this.variable.id : null
-        return {
-          datasetId: this.metadata.id,
-          variableId,
-          geometry: this.selectedGeometry,
-          minYear: this.temporalRange[0],
-          maxYear: this.temporalRange[1],
-          zeroYearOffset: this.metadata.timespan.period.timeZero,
+        if (this.canHandleTimeSeriesRequest) {
+          return {
+            datasetId: this.metadata.id,
+            variableId: this.variable.id,
+            geometry: this.selectedGeometry,
+            minYear: this.temporalRange[0],
+            maxYear: this.temporalRange[1],
+            zeroYearOffset: this.metadata.timespan.period.timeZero,
+          }
+        } else {
+          return null
         }
       },
       async function (data) {
-        if (data.variableId) {
-          await datasetStore.retrieveTimeSeries(data)
+        if (!_.isNull(data)) {
+          await retrieveTimeSeries(data)
         }
       }
     )
-  }
-  async mounted() {
-    // await this.updateTimeSeries()
     this.yearSelected = this.minYear
     this.isLoadingData = false
     this.hasData = true
