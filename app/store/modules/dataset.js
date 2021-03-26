@@ -108,7 +108,6 @@ class DataSet extends VuexModule {
   loadMetadata(id) {
     if (_.isNull(this.metadata) || this.metadata.id !== id) {
       const metadata = ALL_DATA.find((m) => m.id === id)
-      console.log({ metadata })
       if (metadata) {
         this.context.commit('setMetadata', metadata)
       }

@@ -1,234 +1,238 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
-    <!-- title and instructions -->
-    <v-row class="my-5">
-      <h1 class="ml-5 my-auto font-weight-light">
-        {{ selectedMetadata.title }}
-      </h1>
-      <v-chip outlined label color="secondary" class="ml-3 my-auto">
-        <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>
-        <span v-if="selectedVariable === null">No variable selected</span>
-        <span v-else>{{ selectedVariable.name }}</span>
-      </v-chip>
-      <v-tooltip bottom
-        ><template #activator="{ on, attrs }">
-          <v-btn icon color="secondary" class="mx-3">
-            <v-icon
-              v-bind="attrs"
-              large
-              @click="instructions = !instructions"
-              v-on="on"
-              >info</v-icon
-            >
-          </v-btn> </template
-        ><span>Instructions</span></v-tooltip
-      >
-      <v-dialog v-model="dialog" max-width="600px">
-        <template #activator="{ on, attrs }">
-          <v-btn depressed color="accent" v-bind="attrs" v-on="on"
-            >View Metadata</v-btn
-          >
-        </template>
-        <v-card>
-          <v-card-title class="accent">
-            Metadata
-            <v-spacer></v-spacer>
-            <v-btn icon @click="dialog = false">
-              <v-icon color="white">fas fa-window-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-card-text><Metadata /></v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="dialog = false">Close</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-spacer></v-spacer>
-      <v-btn
-        color="accent"
-        depressed
-        :disabled="!hasValidStudyArea"
-        class="mr-4"
-        @click="goToAnalyze($route.params.id)"
-        >Go to Analyze
-        <v-icon small class="ml-2" color="white"
-          >fas fa-chevron-right</v-icon
-        ></v-btn
-      >
-    </v-row>
-    <!-- dismissable instructions -->
-    <v-row>
-      <v-col class="mx-auto">
-        <v-alert
-          v-model="instructions"
-          color="secondary"
-          text
-          outlined
-          dismissible
+    <LoadingSpinner v-if="isLoading" />
+    <template v-else>
+      <!-- title and instructions -->
+      <v-row class="my-5">
+        <h1 class="ml-5 my-auto font-weight-light">
+          {{ metadata.title }}
+        </h1>
+        <v-chip outlined label color="secondary" class="ml-3 my-auto">
+          <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>
+          <span v-if="variable === null">No variable selected</span>
+          <span v-else>{{ variable.name }}</span>
+        </v-chip>
+        <v-tooltip bottom
+          ><template #activator="{ on, attrs }">
+            <v-btn icon color="secondary" class="mx-3">
+              <v-icon
+                v-bind="attrs"
+                large
+                @click="instructions = !instructions"
+                v-on="on"
+                >info</v-icon
+              >
+            </v-btn> </template
+          ><span>Instructions</span></v-tooltip
         >
-          For the geometry of your selected area, you can modify the opacity and
-          variable layer. The Time Series chart will automatically update upon
-          selecting a layer. After you are finished, you can continue to the
-          analysis step.
-        </v-alert>
-      </v-col>
-    </v-row>
-    <!-- map and time series plot -->
-    <v-row dense align-content-start justify-space-around wrap>
-      <!-- loading animation -->
-      <v-col v-if="isLoadingData">
-        <v-progress-circular
-          v-if="isLoadingData"
-          indeterminate
-          color="primary"
-        />
-      </v-col>
-      <!-- map and toolbar controls-->
-      <template v-else>
-        <v-col>
-          <v-card class="map pa-3 mb-5" elevation="2" outlined shaped>
-            <v-card-title>
-              <h1 class="headline mr-3">Map</h1>
+        <v-dialog v-model="dialog" max-width="600px">
+          <template #activator="{ on, attrs }">
+            <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+              >View Metadata</v-btn
+            >
+          </template>
+          <v-card>
+            <v-card-title class="accent">
+              Metadata
               <v-spacer></v-spacer>
-              <h3 class="headline">
-                Selected area: {{ selectedArea }} km<sup>2</sup>
-              </h3>
+              <v-btn icon @click="dialog = false">
+                <v-icon color="white">fas fa-window-close</v-icon>
+              </v-btn>
             </v-card-title>
-            <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
-            <v-toolbar flat extended extension-height="25" class="pt-8">
-              <v-row>
-                <v-col cols="2">
-                  <v-toolbar-title>Opacity</v-toolbar-title>
-                  <v-toolbar-items class="my-auto">
-                    <v-btn icon color="secondary">
-                      <v-icon small @click="decreaseOpacity"
-                        >fas fa-minus</v-icon
-                      >
-                    </v-btn>
-                    <span class="mx-3"> {{ opacity }}</span>
-                    <v-btn icon small color="secondary">
-                      <v-icon @click="increaseOpacity">fas fa-plus</v-icon>
-                    </v-btn>
-                  </v-toolbar-items>
-                </v-col>
-                <v-col offset="4">
-                  <v-toolbar-title>Variable</v-toolbar-title>
-                  <v-toolbar-items
-                    ><v-select
-                      v-model="variable"
-                      label="Select a variable"
-                      item-color="secondary"
-                      color="secondary"
-                      dense
-                      :items="variables"
-                      item-text="name"
-                      item-value="id"
-                      class="my-auto"
-                      :style="'width: 6rem'"
-                      :prepend-icon="layerGroup.icon"
-                      single-line
-                      outlined
-                    >
-                    </v-select
-                  ></v-toolbar-items>
-                </v-col>
-              </v-row>
-            </v-toolbar>
+            <v-card-text><Metadata /></v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="dialog = false">Close</v-btn>
+            </v-card-actions>
           </v-card>
+        </v-dialog>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="accent"
+          depressed
+          :disabled="!hasValidStudyArea"
+          class="mr-4"
+          @click="goToAnalyze($route.params.id)"
+          >Go to Analyze
+          <v-icon small class="ml-2" color="white"
+            >fas fa-chevron-right</v-icon
+          ></v-btn
+        >
+      </v-row>
+      <!-- dismissable instructions -->
+      <v-row>
+        <v-col class="mx-auto">
+          <v-alert
+            v-model="instructions"
+            color="secondary"
+            text
+            outlined
+            dismissible
+          >
+            For the geometry of your selected area, you can modify the opacity
+            and variable layer. The Time Series chart will automatically update
+            upon selecting a layer. After you are finished, you can continue to
+            the analysis step.
+          </v-alert>
         </v-col>
-        <v-col>
-          <v-card class="pa-3 mb-5" elevation="2" outlined shaped>
-            <h1 class="headline mt-3 ml-3">Time Series</h1>
-            <template v-if="hasTimeSeries">
-              <TimeSeriesPlot
-                class="timeseries-flex"
-                :time-series="timeSeries"
-                :year-selected="yearSelected"
-                @yearSelected="setYear"
-              />
+      </v-row>
+      <!-- map and time series plot -->
+      <v-row dense align-content-start justify-space-around wrap>
+        <!-- loading animation -->
+        <v-col v-if="isLoadingData">
+          <v-progress-circular
+            v-if="isLoadingData"
+            indeterminate
+            color="primary"
+          />
+        </v-col>
+        <!-- map and toolbar controls-->
+        <template v-else>
+          <v-col>
+            <v-card class="map pa-3 mb-5" elevation="2" outlined shaped>
+              <v-card-title>
+                <h1 class="headline mr-3">Map</h1>
+                <v-spacer></v-spacer>
+                <h3 class="headline">
+                  Selected area: {{ selectedArea }} km<sup>2</sup>
+                </h3>
+              </v-card-title>
+              <Map :year="yearSelected" :opacity="opacity" class="map-flex" />
               <v-toolbar flat extended extension-height="25" class="pt-8">
                 <v-row>
-                  <v-col cols="4">
+                  <v-col cols="2">
+                    <v-toolbar-title>Opacity</v-toolbar-title>
                     <v-toolbar-items class="my-auto">
-                      <v-text-field
-                        v-model="formTemporalRange[0]"
-                        class="mt-0 pt-3"
-                        label="Min Year"
-                        hide-details
-                        type="number"
-                        style="width: 60px"
-                      ></v-text-field>
-                      <v-spacer />
-                      <v-text-field
-                        v-model="formTemporalRange[1]"
-                        class="mt-0 pt-3"
-                        label="Max Year"
-                        hide-details
-                        type="number"
-                        style="width: 60px"
-                      ></v-text-field>
-                      <v-spacer />
-                      <v-btn
-                        class="mt-1 py-3"
-                        color="secondary"
-                        @click="setTemporalRange"
-                      >
-                        Update
+                      <v-btn icon color="secondary">
+                        <v-icon small @click="decreaseOpacity"
+                          >fas fa-minus</v-icon
+                        >
+                      </v-btn>
+                      <span class="mx-3"> {{ opacity }}</span>
+                      <v-btn icon small color="secondary">
+                        <v-icon @click="increaseOpacity">fas fa-plus</v-icon>
                       </v-btn>
                     </v-toolbar-items>
                   </v-col>
-                  <v-col cols="4">
-                    <v-toolbar-items>
-                      <v-btn
-                        icon
-                        class="mt-2"
+                  <v-col offset="4">
+                    <v-toolbar-title>Variable</v-toolbar-title>
+                    <v-toolbar-items
+                      ><v-select
+                        v-model="variable"
+                        label="Select a variable"
+                        item-color="secondary"
                         color="secondary"
-                        @click="gotoFirstYear"
+                        dense
+                        :items="variables"
+                        item-text="name"
+                        item-value="id"
+                        class="my-auto"
+                        :style="'width: 6rem'"
+                        :prepend-icon="layerGroup.icon"
+                        single-line
+                        outlined
                       >
-                        <v-icon>skip_previous</v-icon>
-                      </v-btn>
-                      <v-btn
-                        icon
-                        class="mt-2"
-                        color="secondary"
-                        @click="previousYear"
-                      >
-                        <v-icon>arrow_left</v-icon>
-                      </v-btn>
-                      <v-btn-toggle icon class="my-auto">
-                        <v-btn icon @click="togglePlay">
-                          <v-icon color="secondary">{{ playIcon }}</v-icon>
-                        </v-btn>
-                      </v-btn-toggle>
-                      <v-btn
-                        icon
-                        class="mt-2"
-                        color="secondary"
-                        @click="nextYear"
-                      >
-                        <v-icon>arrow_right</v-icon>
-                      </v-btn>
-                      <v-btn
-                        icon
-                        class="mt-2"
-                        color="secondary"
-                        @click="gotoLastYear"
-                      >
-                        <v-icon>skip_next</v-icon>
-                      </v-btn>
-                    </v-toolbar-items>
+                      </v-select
+                    ></v-toolbar-items>
                   </v-col>
                 </v-row>
               </v-toolbar>
-            </template>
-            <v-alert v-else color="warning">
-              A study area needs to be selected for a timeseries to be displayed
-            </v-alert>
-          </v-card>
-        </v-col>
-      </template>
-    </v-row>
+            </v-card>
+          </v-col>
+          <v-col>
+            <v-card class="pa-3 mb-5" elevation="2" outlined shaped>
+              <h1 class="headline mt-3 ml-3">Time Series</h1>
+              <template v-if="hasTimeSeries">
+                <TimeSeriesPlot
+                  class="timeseries-flex"
+                  :time-series="timeSeries"
+                  :year-selected="yearSelected"
+                  @yearSelected="setYear"
+                />
+                <v-toolbar flat extended extension-height="25" class="pt-8">
+                  <v-row>
+                    <v-col cols="4">
+                      <v-toolbar-items class="my-auto">
+                        <v-text-field
+                          v-model="formTemporalRange[0]"
+                          class="mt-0 pt-3"
+                          label="Min Year"
+                          hide-details
+                          type="number"
+                          style="width: 60px"
+                        ></v-text-field>
+                        <v-spacer />
+                        <v-text-field
+                          v-model="formTemporalRange[1]"
+                          class="mt-0 pt-3"
+                          label="Max Year"
+                          hide-details
+                          type="number"
+                          style="width: 60px"
+                        ></v-text-field>
+                        <v-spacer />
+                        <v-btn
+                          class="mt-1 py-3"
+                          color="secondary"
+                          @click="setTemporalRange"
+                        >
+                          Update
+                        </v-btn>
+                      </v-toolbar-items>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-toolbar-items>
+                        <v-btn
+                          icon
+                          class="mt-2"
+                          color="secondary"
+                          @click="gotoFirstYear"
+                        >
+                          <v-icon>skip_previous</v-icon>
+                        </v-btn>
+                        <v-btn
+                          icon
+                          class="mt-2"
+                          color="secondary"
+                          @click="previousYear"
+                        >
+                          <v-icon>arrow_left</v-icon>
+                        </v-btn>
+                        <v-btn-toggle icon class="my-auto">
+                          <v-btn icon @click="togglePlay">
+                            <v-icon color="secondary">{{ playIcon }}</v-icon>
+                          </v-btn>
+                        </v-btn-toggle>
+                        <v-btn
+                          icon
+                          class="mt-2"
+                          color="secondary"
+                          @click="nextYear"
+                        >
+                          <v-icon>arrow_right</v-icon>
+                        </v-btn>
+                        <v-btn
+                          icon
+                          class="mt-2"
+                          color="secondary"
+                          @click="gotoLastYear"
+                        >
+                          <v-icon>skip_next</v-icon>
+                        </v-btn>
+                      </v-toolbar-items>
+                    </v-col>
+                  </v-row>
+                </v-toolbar>
+              </template>
+              <v-alert v-else color="warning">
+                A study area needs to be selected for a timeseries to be
+                displayed
+              </v-alert>
+            </v-card>
+          </v-col>
+        </template>
+      </v-row>
+    </template>
   </v-responsive>
 </template>
 
@@ -241,7 +245,6 @@ import Vue from 'vue'
 import _ from 'lodash'
 import { namespace } from 'vuex-class'
 const Dataset = namespace('dataset')
-const Datasets = namespace('datasets')
 
 const setYearSelected = _.debounce(function (vue) {
   vue.yearSelected = vue.formYearSelected
@@ -268,20 +271,24 @@ class Visualize extends Vue {
   layerGroup = {
     icon: 'fas fa-layer-group',
   }
-  @Dataset.State('geometry')
-  selectedGeometry
-  @Dataset.State('variable')
-  selectedVariable
-  @Dataset.State('metadata')
-  selectedMetadata
   timeSeriesUnwatcher = null
   stepNames = _.clone(this.$api().app.stepNames)
   formTemporalRange = [1, 2017]
   formYearSelected = 1500
   selectedTemporalRange = [1, 2017]
+  @Dataset.State('geometry')
+  geometry
+  @Dataset.State('variable')
+  variable
+  @Dataset.State('metadata')
+  metadata
+
+  get isLoading() {
+    return _.isNull(this.metadata)
+  }
 
   get temporalRange() {
-    return this.$api().datasets.selectedDatasetTimespan
+    return this.metadata.timespan
   }
 
   get currentStep() {
@@ -310,10 +317,10 @@ class Visualize extends Vue {
     }
   }
   get minYear() {
-    return parseInt(this.selectedMetadata.timespan.period.gte)
+    return parseInt(this.metadata.timespan.period.gte)
   }
   get maxYear() {
-    return parseInt(this.selectedMetadata.timespan.period.lte)
+    return parseInt(this.metadata.timespan.period.lte)
   }
   get opacity() {
     return this.opacityLevels[this.opacityIndex]
@@ -331,26 +338,16 @@ class Visualize extends Vue {
     )
   }
 
-  set variable(l) {
-    l = this.variables.find((layer) => layer.id === l)
-    this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setVariable(l)
-  }
-  get variable() {
-    if (_.size(this.variables) > 1) return ''
-    else return this.$api().dataset.selectedVariable
+  set variable(id) {
+    this.$api().dataset.setVariable(id)
   }
   get variables() {
-    return this.selectedMetadata.variables
-  }
-
-  set selectedVariable(layer) {
-    this.selectedVariable = layer
+    return this.metadata.variables
   }
 
   async created() {
-    const d = this.$api().datasets
-    await d.loadMetadata(this.$route.params.id)
+    const datasetStore = this.$api().dataset
+    await datasetStore.loadMetadata(this.$route.params.id)
     this.timeSeriesUnwatcher = this.$watch(
       function () {
         const variableId = this.variable ? this.variable.id : null
@@ -365,7 +362,7 @@ class Visualize extends Vue {
       },
       async function (data) {
         if (data.variableId) {
-          await this.$api().dataset.retrieveTimeSeries(data)
+          await datasetStore.retrieveTimeSeries(data)
         }
       }
     )
@@ -422,25 +419,25 @@ class Visualize extends Vue {
   }
 
   gotoFirstYear() {
-    if (this.selectedVariable === null) {
+    if (this.variable === null) {
       return
     }
     this.setYear(this.minYear)
   }
   gotoLastYear() {
-    if (this.selectedVariable === null) {
+    if (this.variable === null) {
       return
     }
     this.setYear(this.maxYear)
   }
   nextYear() {
-    if (this.selectedVariable === null) {
+    if (this.variable === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear))
   }
   previousYear() {
-    if (this.selectedVariable === null) {
+    if (this.variable === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear))
@@ -481,16 +478,16 @@ class Visualize extends Vue {
   async updateTimeSeries() {
     console.log('calling timeseries updates')
     const api = this.$api()
-    console.log({ layer: this.selectedVariable })
-    if (this.selectedVariable && !this.selectedMetadata.atemporal) {
+    console.log({ layer: this.variable })
+    if (this.variable && !this.metadata.atemporal) {
       console.log('invoking retrieveTimeSeries')
       await api.dataset.retrieveTimeSeries({
-        datasetId: this.selectedMetadata.id,
-        variableId: this.selectedVariable.id,
-        geometry: this.selectedGeometry,
+        datasetId: this.metadata.id,
+        variableId: this.variable.id,
+        geometry: this.geometry,
         minYear: this.minYear,
         maxYear: this.minYear,
-        zeroYearOffset: this.selectedMetadata.timespan.period.timeZero,
+        zeroYearOffset: this.metadata.timespan.period.timeZero,
       })
     }
   }
