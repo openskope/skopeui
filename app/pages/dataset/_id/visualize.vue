@@ -284,15 +284,11 @@ class Visualize extends Vue {
   variable
   @Dataset.State('metadata')
   metadata
-  @Dataset.Getter('canHandleTimeSeriesRequest')
-  canHandleTimeSeriesRequest
+  @Dataset.State('timespan')
+  timespan
 
   get isLoading() {
     return _.isNull(this.metadata)
-  }
-
-  get temporalRange() {
-    return this.metadata.timespan
   }
 
   get currentStep() {
@@ -310,8 +306,8 @@ class Visualize extends Vue {
     const api = this.$api()
     const timeseries = api.dataset.timeseries
     if (timeseries.x.length > 0) {
-      const minOffset = this.selectedTemporalRange[0] - this.temporalRange[0]
-      const maxOffset = this.selectedTemporalRange[1] - this.temporalRange[0]
+      const minOffset = this.selectedTemporalRange[0] - this.minYear
+      const maxOffset = this.selectedTemporalRange[1] - this.minYear
       const x = timeseries.x.slice(minOffset, maxOffset)
       const y = timeseries.y.slice(minOffset, maxOffset)
       console.log({ x, y })
@@ -352,10 +348,10 @@ class Visualize extends Vue {
   async fetch() {
     const api = this.$api()
     await api.dataset.loadMetadata(this.$route.params.id)
-    await loadTimeSeries(api)
   }
 
   async mounted() {
+    await loadTimeSeries(this.$api())
     this.timeSeriesUnwatcher = this.$watch(
       function () {
         if (this.canHandleTimeSeriesRequest) {
@@ -363,18 +359,21 @@ class Visualize extends Vue {
             datasetId: this.metadata.id,
             variableId: this.variable.id,
             geometry: this.selectedGeometry,
-            minYear: this.temporalRange[0],
-            maxYear: this.temporalRange[1],
-            zeroYearOffset: this.metadata.timespan.period.timeZero,
+            minYear: this.minYear,
+            maxYear: this.maxYear,
           }
         } else {
-          return null
+          return {
+            datasetId: null,
+            variableId: null,
+            geometry: null,
+            minYear: null,
+            maxYear: null,
+          }
         }
       },
       async function (data) {
-        if (!_.isNull(data)) {
-          await retrieveTimeSeries(data)
-        }
+        await retrieveTimeSeries(data)
       }
     )
     this.yearSelected = this.minYear
@@ -489,7 +488,7 @@ class Visualize extends Vue {
     console.log({ layer: this.variable })
     if (this.variable && !this.metadata.atemporal) {
       console.log('invoking retrieveTimeSeries')
-      await api.dataset.retrieveTimeSeries({
+      await retrieveTimeSeries({
         datasetId: this.metadata.id,
         variableId: this.variable.id,
         geometry: this.geometry,

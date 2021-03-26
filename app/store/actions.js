@@ -6,11 +6,21 @@ import _ from 'lodash'
 import { API } from '@/plugins/store'
 import { TIMESERIES_ENDPOINT } from '@/store/modules/constants'
 
-async function updateTimeSeries(
-  api,
-  { datasetId, variableId, geometry, minYear, maxYear, zeroYearOffset }
-) {
-  api.dataset.setIsLoading(true)
+async function updateTimeSeries(api, data) {
+  const dataset = api.dataset
+  const messages = api.messages
+  console.log({ timeseriesRequestData: data })
+  const { datasetId, variableId, geometry, minYear, maxYear } = data
+  console.log({
+    metadata: dataset.metadata,
+    geometry: dataset.geometry,
+    variable: dataset.variable,
+  })
+  if (!dataset.canHandleTimeSeriesRequest) {
+    console.log('Cannot handle timeseries request. Aborting.')
+    return
+  }
+  dataset.setIsLoading(true)
   const start = minYear.toString().padStart(4, '0')
   const end = maxYear.toString().padStart(4, '0')
   if (start > end) {
@@ -27,19 +37,21 @@ async function updateTimeSeries(
   const url = TIMESERIES_ENDPOINT
   try {
     const response = await api.store.$axios.$post(url, body)
-    const timeZeroOffset = zeroYearOffset
+    const timeZeroOffset = dataset.metadata.timespan.period.timeZero
     const timeseries = {
       x: _.range(
-        response.startIndex + timeZeroOffset,
-        response.endIndex + timeZeroOffset + 1
+        parseInt(response.start) + timeZeroOffset,
+        parseInt(response.end) + timeZeroOffset + 1
       ),
       y: response.values,
     }
-    api.messages.clearMessages()
-    api.dataset.setTimeSeries(timeseries)
+    console.log({ timeseries })
+    messages.clearMessages()
+    dataset.setTimeSeries(timeseries)
   } catch (e) {
-    api.messages.clearMessages()
-    api.dataset.clearTimeSeries()
+    console.error(e)
+    messages.clearMessages()
+    dataset.clearTimeSeries()
     let errorMessage =
       'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
     if (e.response) {
@@ -54,9 +66,9 @@ async function updateTimeSeries(
       console.log('did not receive a server response: ', { e })
       errorMessage += ` Cause: ${e.message}`
     }
-    api.messages.error(errorMessage)
+    messages.error(errorMessage)
   }
-  api.dataset.setIsLoading(false)
+  dataset.setIsLoading(false)
 }
 
 export const retrieveTimeSeries = _.debounce(updateTimeSeries, 300)

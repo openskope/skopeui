@@ -79,9 +79,6 @@ class Map extends Vue {
   @Prop({ default: 0.5 })
   opacity
 
-  @Prop({ default: false })
-  clear
-
   maxTemporalRange = new Date().getFullYear()
 
   defaultRegionOpacity = 0.05
@@ -105,6 +102,53 @@ class Map extends Vue {
   variable
   @Dataset.State('geometry')
   geometry
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name)
+  }
+
+  get showMapControls() {
+    return this.currentStep >= 2
+  }
+
+  get selectedLayerName() {
+    return this.isLayerSelected ? this.variable.name : ''
+  }
+
+  get opacityLabel() {
+    return `${this.selectedLayerName} Opacity`
+  }
+
+  get layerOpacity() {
+    return this.opacity / 100.0
+  }
+
+  get layerType() {
+    return this.metadata.variables.length > 1 ? 'base' : 'overlay'
+  }
+
+  get isLayerSelected() {
+    return this.variable !== null
+  }
+
+  get skopeWmsUrl() {
+    return SKOPE_WMS_ENDPOINT
+  }
+
+  get leafletProviders() {
+    return LEAFLET_PROVIDERS
+  }
+
+  get defaultCrs() {
+    if (this.$L) {
+      return this.$L.CRS.EPSG4326
+    }
+    return ''
+  }
+
+  set variable(id) {
+    this.$api().dataset.setVariable(id)
+  }
 
   addDrawToolbar(map) {
     const L = this.$L
@@ -161,14 +205,6 @@ class Map extends Vue {
         self.disableEditOnly(map)
       }
     })
-  }
-
-  get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name)
-  }
-
-  get showMapControls() {
-    return this.currentStep >= 2
   }
 
   checkAndRestoreSavedGeometry(map) {
@@ -232,7 +268,7 @@ class Map extends Vue {
     })
     this.enableEditOnly(map)
     let padding = [5, 5]
-    console.log(geoJsonLayer)
+    console.log({ geoJsonLayer })
     if (geoJsonLayer instanceof L.Marker) {
       console.log('Setting padding for marker')
       padding = [30, 30]
@@ -311,47 +347,12 @@ class Map extends Vue {
     }
   }
 
-  get defaultCrs() {
-    if (this.$L) {
-      return this.$L.CRS.EPSG4326
-    }
-    return ''
-  }
-
   getSavedGeometry() {
     const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
     if (skopeGeometry) {
       return JSON.parse(skopeGeometry)
     }
     return false
-  }
-
-  get selectedLayerName() {
-    return this.isLayerSelected ? this.variable.name : ''
-  }
-
-  get opacityLabel() {
-    return `${this.selectedLayerName} Opacity`
-  }
-
-  get layerOpacity() {
-    return this.opacity / 100.0
-  }
-
-  get layerType() {
-    return this.metadata.variables.length > 1 ? 'base' : 'overlay'
-  }
-
-  get isLayerSelected() {
-    return this.variable !== null
-  }
-
-  get skopeWmsUrl() {
-    return SKOPE_WMS_ENDPOINT
-  }
-
-  get leafletProviders() {
-    return LEAFLET_PROVIDERS
   }
 
   fillTemplateYear(templateString) {
@@ -362,8 +363,7 @@ class Map extends Vue {
     return layer
   }
 
-  mapReady(m) {
-    const map = this.$refs.layerMap.mapObject
+  mapReady(map) {
     const handler = (event) => {
       const layer = event.layer
       const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
@@ -377,24 +377,19 @@ class Map extends Vue {
         layer.bringToFront()
       }
     }
-    if (this.metadata.variables.length === 1) {
-      let defaultVariable = this.metadata.variables[0]
-      this.$api().dataset.setVariable(defaultVariable.id)
-    }
     map.on('overlayadd', handler)
     map.on('baselayerchange', handler)
     this.addDrawToolbar(map)
   }
 
-  @Watch('clear')
-  clearGeometry() {
-    console.log('clear selected geometry')
-    const L = this.$L
-    this.drawnItems.clearLayers()
-    this.drawnItems = new L.FeatureGroup()
-    this.clearSelectedGeometry()
-    const map = this.$refs.layerMap.mapObject
-    // this.addDrawToolbar(map)
+  @Watch('geometry')
+  clearGeometry(geometry) {
+    if (geometry.type === 'None') {
+      console.log('clear selected geometry')
+      const L = this.$L
+      this.drawnItems.clearLayers()
+      this.clearSelectedGeometry()
+    }
   }
 }
 export default Map
