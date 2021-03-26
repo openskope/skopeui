@@ -29,7 +29,7 @@
         </template>
       </v-dialog>
       <h1 class="ml-5 my-auto font-weight-light">
-        {{ selectedDataset.title }}
+        {{ metadata.title }}
       </h1>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
@@ -156,15 +156,12 @@ import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
 
-import {
-  LEAFLET_PROVIDERS,
-  SKOPE_WMS_ENDPOINT,
-} from '@/store/modules/constants.js'
 import Metadata from '@/components/action/Metadata.vue'
 import Map from '@/components/Map.vue'
 
 const fillTemplate = require('es6-dynamic-template')
 const Datasets = namespace('datasets')
+const Dataset = namespace('dataset')
 
 @Component({
   layout: 'BaseDataset',
@@ -176,11 +173,11 @@ const Datasets = namespace('datasets')
   },
 })
 class DatasetDetail extends Vue {
-  @Datasets.State('selectedDataset')
-  selectedDataset
-  @Datasets.Getter('selectedDatasetTimespan')
+  @Dataset.State('metadata')
+  metadata
+  @Dataset.Getter('timespan')
   selectedDatasetTimespan
-  @Datasets.Getter('selectedDatasetTimeZero')
+  @Dataset.Getter('timeZero')
   selectedDatasetTimeZero
 
   stepNames = _.clone(this.$api().app.stepNames)
@@ -192,8 +189,12 @@ class DatasetDetail extends Vue {
 
   // created lifecycle hook
   async created() {
-    const d = this.$api().datasets
-    await d.loadDataset(this.$route.params.id)
+    const api = this.$api()
+    const metadata = _.find(
+      api.datasets.all,
+      (ds) => ds.id === this.$route.params.id
+    )
+    api.dataset.setMetadata(metadata)
     this.minTemporalRange = this.timespanMinYear
     this.maxTemporalRange = this.timespanMaxYear
     this.confirmGeometry = this.hasValidStudyArea
@@ -216,7 +217,7 @@ class DatasetDetail extends Vue {
 
   head() {
     return {
-      title: this.selectedDataset.title,
+      title: this.metadata.title,
     }
   }
 

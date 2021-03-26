@@ -17,13 +17,9 @@ import Vue from 'vue'
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 const updateDataset = _.debounce(async function (
   vuex,
-  datasetUri,
-  geometry,
-  minYear,
-  maxYear,
-  zeroYearOffset
+  { datasetId, variableId, geometry, minYear, maxYear, zeroYearOffset }
 ) {
-  console.log({ vuex })
+  console.log({ datasetId, variableId })
   const api = new API(vuex.store)
   api.dataset.setIsLoading(true)
   const start = minYear.toString().padStart(4, '0')
@@ -32,16 +28,16 @@ const updateDataset = _.debounce(async function (
     api.messages.info('Please select a start year before the end year')
     return
   }
-  const qs = {
+  const body = {
+    datasetId,
+    variableName: variableId,
     start: start,
     end: end,
     timeResolution: 'year',
     timeZero: zeroYearOffset,
-  }
-  const body = {
     boundaryGeometry: geometry,
   }
-  const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
+  const url = `${TIMESERIES_ENDPOINT}${datasetUri}`
   try {
     const response = await vuex.store.$axios.$post(url, body)
     const timeZeroOffset = zeroYearOffset
@@ -83,11 +79,46 @@ class DataSet extends VuexModule {
     x: [],
     y: [],
   }
+  metadata = null
   isLoadingData = false
   hasData = false
   geometry = { type: 'None', coordinates: [] }
   selectedAreaInSquareMeters = 0
-  layer = null
+  variable = null
+
+  get timeZero() {
+    if (this.metadata) {
+      return this.metadata.timespan.period.timeZero || 0
+    }
+    return 0
+  }
+
+  get timespan() {
+    if (this.metadata) {
+      return [
+        this.metadata.timespan.period.gte,
+        this.metadata.timespan.period.lte,
+      ]
+    }
+    console.log('No selected dataset, returning default year range')
+    return [1, new Date().getFullYear()]
+  }
+
+  @Mutation
+  setMetadata(metadata) {
+    this.metadata = metadata
+  }
+
+  @Mutation
+  setVariable(id) {
+    for (const variable of this.metadata.variables) {
+      variable.visible = variable.id === id
+      if (variable.visible) {
+        this.metadata.variable = variable
+        Vue.set(this, 'selectedVariable', variable)
+      }
+    }
+  }
 
   get hasGeometry() {
     return this.geometry.type != 'None'
@@ -111,11 +142,6 @@ class DataSet extends VuexModule {
   }
 
   @Mutation
-  setLayer(layer) {
-    Vue.set(this, 'layer', layer)
-  }
-
-  @Mutation
   setTimeSeries(timeseries) {
     this.hasData = true
     this.timeseries = timeseries
@@ -132,13 +158,21 @@ class DataSet extends VuexModule {
 
   @Action
   retrieveTimeSeries({
-    datasetUri,
+    datasetId,
+    variableId,
     geometry,
     minYear,
     maxYear,
     zeroYearOffset,
   }) {
-    updateDataset(this, datasetUri, geometry, minYear, maxYear, zeroYearOffset)
+    updateDataset(this, {
+      datasetId,
+      variableId,
+      geometry,
+      minYear,
+      maxYear,
+      zeroYearOffset,
+    })
   }
 }
 

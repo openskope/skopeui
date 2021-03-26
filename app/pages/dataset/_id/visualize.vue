@@ -3,12 +3,12 @@
     <!-- title and instructions -->
     <v-row class="my-5">
       <h1 class="ml-5 my-auto font-weight-light">
-        {{ selectedDataset.title }}
+        {{ selectedMetadata.title }}
       </h1>
       <v-chip outlined label color="secondary" class="ml-3 my-auto">
         <v-icon class="mr-2" small>{{ layerGroup.icon }}</v-icon>
-        <span v-if="selectedLayer === null">No variable selected</span>
-        <span v-else>{{ selectedLayer.name }}</span>
+        <span v-if="selectedVariable === null">No variable selected</span>
+        <span v-else>{{ selectedVariable.name }}</span>
       </v-chip>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
@@ -116,12 +116,12 @@
                   <v-toolbar-title>Variable</v-toolbar-title>
                   <v-toolbar-items
                     ><v-select
-                      v-model="layer"
+                      v-model="variable"
                       label="Select a variable"
                       item-color="secondary"
                       color="secondary"
                       dense
-                      :items="layers"
+                      :items="variables"
                       item-text="name"
                       item-value="id"
                       class="my-auto"
@@ -270,10 +270,10 @@ class Visualize extends Vue {
   }
   @Dataset.State('geometry')
   selectedGeometry
-  @Dataset.State('layer')
-  selectedLayer
-  @Datasets.State('selectedDataset')
-  selectedDataset
+  @Dataset.State('variable')
+  selectedVariable
+  @Datasets.State('metadata')
+  selectedMetadata
   timeSeriesUnwatcher = null
   stepNames = _.clone(this.$api().app.stepNames)
   formTemporalRange = [1, 2017]
@@ -310,10 +310,10 @@ class Visualize extends Vue {
     }
   }
   get minYear() {
-    return parseInt(this.selectedDataset.timespan.period.gte)
+    return parseInt(this.selectedMetadata.timespan.period.gte)
   }
   get maxYear() {
-    return parseInt(this.selectedDataset.timespan.period.lte)
+    return parseInt(this.selectedMetadata.timespan.period.lte)
   }
   get opacity() {
     return this.opacityLevels[this.opacityIndex]
@@ -331,21 +331,21 @@ class Visualize extends Vue {
     )
   }
 
-  set layer(l) {
-    l = this.layers.find((layer) => layer.id === l)
+  set variable(l) {
+    l = this.variables.find((layer) => layer.id === l)
     this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setLayer(l)
+    this.$api().dataset.setVariable(l)
   }
-  get layer() {
-    if (_.size(this.layers) > 1) return ''
-    else return this.$api().dataset.layer
+  get variable() {
+    if (_.size(this.variables) > 1) return ''
+    else return this.$api().dataset.selectedVariable
   }
-  get layers() {
-    return this.selectedDataset.variables
+  get variables() {
+    return this.selectedMetadata.variables
   }
 
-  set selectedLayer(layer) {
-    this.selectedLayer = layer
+  set selectedVariable(layer) {
+    this.selectedVariable = layer
   }
 
   async created() {
@@ -353,26 +353,25 @@ class Visualize extends Vue {
     await d.loadDataset(this.$route.params.id)
     this.timeSeriesUnwatcher = this.$watch(
       function () {
-        const datasetUri = this.selectedLayer
-          ? this.selectedLayer.timeseriesServiceUri
-          : null
+        const variableId = this.variable ? this.variable.id : null
         return {
-          datasetUri,
+          datasetId: this.metadata.id,
+          variableId,
           geometry: this.selectedGeometry,
           minYear: this.temporalRange[0],
           maxYear: this.temporalRange[1],
-          zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
+          zeroYearOffset: this.metadata.timespan.period.timeZero,
         }
       },
       async function (data) {
-        if (data.datasetUri) {
+        if (data.variableId) {
           await this.$api().dataset.retrieveTimeSeries(data)
         }
       }
     )
   }
   async mounted() {
-    await this.updateTimeSeries()
+    // await this.updateTimeSeries()
     this.yearSelected = this.minYear
     this.isLoadingData = false
     this.hasData = true
@@ -423,25 +422,25 @@ class Visualize extends Vue {
   }
 
   gotoFirstYear() {
-    if (this.selectedLayer === null) {
+    if (this.selectedVariable === null) {
       return
     }
     this.setYear(this.minYear)
   }
   gotoLastYear() {
-    if (this.selectedLayer === null) {
+    if (this.selectedVariable === null) {
       return
     }
     this.setYear(this.maxYear)
   }
   nextYear() {
-    if (this.selectedLayer === null) {
+    if (this.selectedVariable === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear))
   }
   previousYear() {
-    if (this.selectedLayer === null) {
+    if (this.selectedVariable === null) {
       return
     }
     this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear))
@@ -480,14 +479,20 @@ class Visualize extends Vue {
     this.yearSelected = year
   }
   async updateTimeSeries() {
+    console.log('calling timeseries updates')
     const api = this.$api()
-    await api.dataset.retrieveTimeSeries({
-      datasetUri: this.selectedDataset.timeseriesServiceUri,
-      geometry: this.selectedGeometry,
-      minYear: this.minYear,
-      maxYear: this.minYear,
-      zeroYearOffset: this.selectedDataset.timespan.period.timeZero,
-    })
+    console.log({ layer: this.selectedVariable })
+    if (this.selectedVariable && !this.selectedMetadata.atemporal) {
+      console.log('invoking retrieveTimeSeries')
+      await api.dataset.retrieveTimeSeries({
+        datasetId: this.selectedMetadata.id,
+        variableId: this.selectedVariable.id,
+        geometry: this.selectedGeometry,
+        minYear: this.minYear,
+        maxYear: this.minYear,
+        zeroYearOffset: this.selectedMetadata.timespan.period.timeZero,
+      })
+    }
   }
 }
 export default Visualize

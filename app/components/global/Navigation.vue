@@ -116,7 +116,7 @@ class Navigation extends Vue {
   }
 
   get selectedDatasetId() {
-    return this.$api().datasets.selectedDataset.id
+    return this.$api().datasets.metadata.id
   }
 }
 

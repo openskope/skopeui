@@ -53,6 +53,7 @@ const ALL_DATA = [
         [24, -67],
       ],
     },
+    atemporal: false,
     timespan: {
       resolution: 'year',
       resolutionLabel: 'annually',
@@ -73,7 +74,7 @@ const ALL_DATA = [
       '> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513',
     variables: [
       {
-        id: 'lbda_precitation',
+        id: 'palmer_modified_drought_index',
         class: 'Precipitation',
         name: 'Palmer Modified Drought Index',
         wmsLayer: 'SKOPE:pmdi_${year}-01-01',
@@ -81,7 +82,6 @@ const ALL_DATA = [
         max: 6.0,
         visible: false,
         styles: 'default',
-        timeseriesServiceUri: 'lbda-v2/palmer_modified_drought_index',
         description:
           'Palmer’s Modified Drought Index: Jun–Aug.; <=-4.00 extreme drought; -3.00 to-3.99 severe drought; -2.00 to -2.99 moderate dought, -1.99 to 1.99 midrange; 2.00 to 2.99 moderately moist; 3.00 to 3.99 very moist; >=4.00 extremely moist.',
       },
@@ -116,6 +116,7 @@ const ALL_DATA = [
         [25, -65],
       ],
     },
+    atemporal: true,
     timespan: {
       resolution: '',
       resolutionLabel: '',
@@ -170,6 +171,7 @@ const ALL_DATA = [
         [31, -102],
       ],
     },
+    atemporal: false,
     timespan: {
       resolution: 'month',
       resolutionLabel: 'monthly',
@@ -182,10 +184,9 @@ const ALL_DATA = [
     },
     variables: [
       {
-        id: 'paleocar_temperature',
+        id: 'growing_degree_days',
         class: 'Temperature',
         name: 'Growing Degree Days (F, May-Sept)',
-        timeseriesServiceUri: 'paleocar_2/growing_degree_days',
         wmsLayer: 'SKOPE:paleocar_gdd_${year}-01-01',
         min: 0.0,
         max: 10.0,
@@ -194,10 +195,9 @@ const ALL_DATA = [
         description: 'F deg.; Growing Season: May–Sept.',
       },
       {
-        id: 'paleocar_precipitation',
+        id: 'water_year_precipitation',
         class: 'Precipitation',
         name: 'Water-year (Oct-Sept) Precipitation (mm)',
-        timeseriesServiceUri: 'paleocar_2/water_year_precipitation',
         wmsLayer: 'SKOPE:paleocar_ppt_${year}-01-01',
         min: 0.0,
         max: 10.0,
@@ -206,10 +206,9 @@ const ALL_DATA = [
         description: '(prev. Oct through listed year Sept)',
       },
       {
-        id: 'paleocar_crop_niche',
+        id: 'maize_farming_niche',
         class: 'Crop Niche',
         name: 'Maize Farming Niche (Direct Precip.)',
-        timeseriesServiceUri: 'paleocar_2/maize_farming_niche',
         wmsLayer: 'SKOPE:niche_${year}',
         min: 0.0,
         max: 1.0,
@@ -226,28 +225,13 @@ const ALL_DATA = [
 class DataSets extends VuexModule {
   loading = false
   all = []
-  selectedDataset = {}
   filterCriteria = {
     selectedVariableClasses: [],
     yearStart: 1,
     yearEnd: 2019,
     query: '',
   }
-  get selectedDatasetTimeZero() {
-    const dataset = this.selectedDataset
-    if (dataset.id) {
-      return dataset.timespan.period.timeZero || 0
-    }
-    return 0
-  }
-  get selectedDatasetTimespan() {
-    const dataset = this.selectedDataset
-    if (dataset.id) {
-      return [dataset.timespan.period.gte, dataset.timespan.period.lte]
-    }
-    console.log('No selected dataset, returning default year range')
-    return [1, new Date().getFullYear()]
-  }
+
   get filteredDatasets() {
     return this.all.filter((dataset) => {
       const selectedVariableClasses = this.filterCriteria
@@ -279,7 +263,7 @@ class DataSets extends VuexModule {
 
   @Action
   loadDataset(id) {
-    if (this.selectedDataset.id !== id) {
+    if (this.metadata.id !== id) {
       if (this.all === undefined || this.all.length === 0) {
         this.load(ALL_DATA)
       }
@@ -292,7 +276,7 @@ class DataSets extends VuexModule {
     if (this.all === undefined || this.all.length === 0) {
       this.load(ALL_DATA)
     }
-    if (state.selectedDataset) {
+    if (state.metadata) {
       this.selectVariable(id)
     }
   }
@@ -303,22 +287,6 @@ class DataSets extends VuexModule {
     // FIXME: eventually this should get loaded from the backend from an async call
     this.all = data
     this.loading = false
-  }
-
-  @Mutation
-  selectDataset(id) {
-    this.selectedDataset = this.all.find((dataset) => dataset.id === id)
-  }
-
-  @Mutation
-  selectVariable(id) {
-    let selectVariable = null
-    for (const variable of this.selectedDataset.variables) {
-      variable.visible = variable.id === id
-      if (variable.visible) {
-        this.selectedDataset.selectedVariable = variable
-      }
-    }
   }
 
   @Mutation

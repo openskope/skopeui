@@ -52,7 +52,7 @@ import { Component } from 'nuxt-property-decorator'
 })
 class Metadata extends Vue {
   get selectedDataset() {
-    return this.$api().datasets.selectedDataset
+    return this.$api().datasets.metadata
   }
 
   get metadataAttributes() {
