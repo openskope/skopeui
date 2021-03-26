@@ -1,5 +1,5 @@
 <template>
-  <div class="fill-height">
+  <v-row class="fill-height">
     <client-only placeholder="Loading map, please wait...">
       <l-map
         ref="layerMap"
@@ -49,7 +49,7 @@
         <l-control-scale position="bottomright" />
       </l-map>
     </client-only>
-  </div>
+  </v-row>
 </template>
 
 <script>
@@ -388,13 +388,10 @@ class Map extends Vue {
 
   @Watch('clear')
   clearGeometry() {
-    console.log('clear selected geometry')
+    console.log('clear selected area')
     const L = this.$L
     this.drawnItems.clearLayers()
-    this.drawnItems = new L.FeatureGroup()
     this.clearSelectedGeometry()
-    const map = this.$refs.layerMap.mapObject
-    // this.addDrawToolbar(map)
   }
 }
 export default Map
