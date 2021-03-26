@@ -272,7 +272,7 @@ class Visualize extends Vue {
   selectedGeometry
   @Dataset.State('variable')
   selectedVariable
-  @Datasets.State('metadata')
+  @Dataset.State('metadata')
   selectedMetadata
   timeSeriesUnwatcher = null
   stepNames = _.clone(this.$api().app.stepNames)
@@ -350,7 +350,7 @@ class Visualize extends Vue {
 
   async created() {
     const d = this.$api().datasets
-    await d.loadDataset(this.$route.params.id)
+    await d.loadMetadata(this.$route.params.id)
     this.timeSeriesUnwatcher = this.$watch(
       function () {
         const variableId = this.variable ? this.variable.id : null

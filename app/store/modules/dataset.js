@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { TIMESERIES_ENDPOINT } from '@/store/modules/constants'
-import * as queryString from 'query-string'
+import { ALL_DATA } from '@/store/data'
 import {
   Module,
   VuexModule,
@@ -104,6 +104,36 @@ class DataSet extends VuexModule {
     return [1, new Date().getFullYear()]
   }
 
+  @Action
+  loadMetadata(id) {
+    if (_.isNull(this.metadata) || this.metadata.id !== id) {
+      const metadata = ALL_DATA.find((m) => m.id === id)
+      console.log({ metadata })
+      if (metadata) {
+        this.context.commit('setMetadata', metadata)
+      }
+    }
+  }
+
+  @Action
+  retrieveTimeSeries({
+    datasetId,
+    variableId,
+    geometry,
+    minYear,
+    maxYear,
+    zeroYearOffset,
+  }) {
+    updateDataset(this, {
+      datasetId,
+      variableId,
+      geometry,
+      minYear,
+      maxYear,
+      zeroYearOffset,
+    })
+  }
+
   @Mutation
   setMetadata(metadata) {
     this.metadata = metadata
@@ -154,25 +184,6 @@ class DataSet extends VuexModule {
       x: [],
       y: [],
     }
-  }
-
-  @Action
-  retrieveTimeSeries({
-    datasetId,
-    variableId,
-    geometry,
-    minYear,
-    maxYear,
-    zeroYearOffset,
-  }) {
-    updateDataset(this, {
-      datasetId,
-      variableId,
-      geometry,
-      minYear,
-      maxYear,
-      zeroYearOffset,
-    })
   }
 }
 

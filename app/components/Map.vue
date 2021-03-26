@@ -5,7 +5,7 @@
         ref="layerMap"
         :min-zoom="3"
         :zoom="4"
-        :center="selectedDataset.region.center"
+        :center="metadata.region.center"
         @ready="mapReady"
       >
         <l-control-attribution v-if="showMapControls" position="topright" />
@@ -21,8 +21,8 @@
           layer-type="base"
         />
         <l-rectangle
-          :bounds="selectedDataset.region.extents"
-          :style="selectedDataset.region.style"
+          :bounds="metadata.region.extents"
+          :style="metadata.region.style"
           :fill-opacity="defaultRegionOpacity"
         />
         <l-control-layers
@@ -31,7 +31,7 @@
           position="topright"
         />
         <l-wms-tile-layer
-          v-for="variable of selectedDataset.variables"
+          v-for="variable of metadata.variables"
           ref="wmsLayers"
           :key="variable.wmsLayer"
           :base-url="skopeWmsUrl"
@@ -93,16 +93,16 @@ class Map extends Vue {
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
   stepNames = _.clone(this.$api().app.stepNames)
 
-  @Datasets.State('selectedDataset')
-  selectedDataset
-  @Datasets.Getter('selectedDatasetTimespan')
-  selectedDatasetTimespan
-  @Datasets.Getter('selectedDatasetTimeZero')
-  selectedDatasetTimeZero
-  @Dataset.State('layer')
-  selectedLayer
+  @Dataset.State('metadata')
+  metadata
+  @Dataset.Getter('timespan')
+  timespan
+  @Dataset.Getter('timeZero')
+  timeZero
+  @Dataset.State('variable')
+  variable
   @Dataset.State('geometry')
-  selectedGeometry
+  geometry
 
   addDrawToolbar(map) {
     const L = this.$L
@@ -275,9 +275,9 @@ class Map extends Vue {
     // 1. pull out the currently selected layer's layer template string
     // 2. update it with the current year
     // 3. reset the params on the currently selected layer to request the new layer from GeoServer
-    if (this.selectedLayer !== null) {
+    if (this.variable !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
-        if (wmsLayerRef.name === this.selectedLayer.name) {
+        if (wmsLayerRef.name === this.variable.name) {
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
           const wmsLayer = wmsLayerRef.mapObject
@@ -325,7 +325,7 @@ class Map extends Vue {
   }
 
   get selectedLayerName() {
-    return this.isLayerSelected ? this.selectedLayer.name : ''
+    return this.isLayerSelected ? this.variable.name : ''
   }
 
   get opacityLabel() {
@@ -337,11 +337,11 @@ class Map extends Vue {
   }
 
   get layerType() {
-    return this.selectedDataset.variables.length > 1 ? 'base' : 'overlay'
+    return this.metadata.variables.length > 1 ? 'base' : 'overlay'
   }
 
   get isLayerSelected() {
-    return this.selectedLayer !== null
+    return this.variable !== null
   }
 
   get skopeWmsUrl() {
@@ -367,19 +367,17 @@ class Map extends Vue {
       const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
       if (isSkopeLayer) {
         const variable = _.find(
-          this.selectedDataset.variables,
+          this.metadata.variables,
           (v) => v.name === event.name
         )
-        this.$api().datasets.selectVariable(variable.id)
-        this.$api().dataset.setLayer(variable)
+        this.$api().dataset.setVariable(variable.id)
         this.updateWmsLegend(map, layer.wmsParams.layers)
         layer.bringToFront()
       }
     }
-    if (this.selectedDataset.variables.length === 1) {
-      let defaultVariable = this.selectedDataset.variables[0]
-      this.$api().datasets.selectVariable(defaultVariable.id)
-      this.$api().dataset.setLayer(defaultVariable)
+    if (this.metadata.variables.length === 1) {
+      let defaultVariable = this.metadata.variables[0]
+      this.$api().dataset.setVariable(defaultVariable.id)
     }
     map.on('overlayadd', handler)
     map.on('baselayerchange', handler)
