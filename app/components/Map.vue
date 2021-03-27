@@ -25,11 +25,6 @@
           :style="metadata.region.style"
           :fill-opacity="defaultRegionOpacity"
         />
-        <l-control-layers
-          v-if="showMapControls"
-          :sort-layers="false"
-          position="topright"
-        />
         <l-wms-tile-layer
           v-for="v of metadata.variables"
           ref="wmsLayers"
@@ -40,11 +35,16 @@
           :crs="defaultCrs"
           :transparent="true"
           :opacity="layerOpacity"
-          layer-type="base"
+          layer-type="overlay"
           :attribution="v.name"
           :visible="v.visible"
           version="1.3.0"
           format="image/png"
+        />
+        <l-control-layers
+          v-if="showMapControls"
+          :sort-layers="false"
+          position="topright"
         />
         <l-control-scale position="bottomright" />
       </l-map>
@@ -121,10 +121,6 @@ class Map extends Vue {
 
   get layerOpacity() {
     return this.opacity / 100.0
-  }
-
-  get layerType() {
-    return this.metadata.variables.length > 1 ? 'base' : 'overlay'
   }
 
   get isLayerSelected() {
@@ -363,11 +359,14 @@ class Map extends Vue {
     return layer
   }
 
+  isSkopeLayer(leafletLayer) {
+    return (leafletLayer.options.layers || '').startsWith('SKOPE')
+  }
+
   mapReady(map) {
     const handler = (event) => {
       const layer = event.layer
-      const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
-      if (isSkopeLayer) {
+      if (this.isSkopeLayer(layer)) {
         const variable = _.find(
           this.metadata.variables,
           (v) => v.name === event.name

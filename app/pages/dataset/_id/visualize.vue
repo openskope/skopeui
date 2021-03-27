@@ -280,8 +280,6 @@ class Visualize extends Vue {
   selectedTemporalRange = [1, 2017]
   @Dataset.State('geometry')
   geometry
-  @Dataset.State('variable')
-  variable
   @Dataset.State('metadata')
   metadata
   @Dataset.State('timespan')
@@ -336,6 +334,10 @@ class Visualize extends Vue {
     return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
       2
     )
+  }
+
+  get variable() {
+    return this.$api().dataset.variable
   }
 
   set variable(id) {
