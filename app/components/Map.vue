@@ -1,5 +1,5 @@
 <template>
-  <div class="fill-height">
+  <v-row class="fill-height">
     <client-only placeholder="Loading map, please wait...">
       <l-map
         ref="layerMap"
@@ -49,7 +49,7 @@
         <l-control-scale position="bottomright" />
       </l-map>
     </client-only>
-  </div>
+  </v-row>
 </template>
 
 <script>
