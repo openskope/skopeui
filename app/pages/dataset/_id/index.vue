@@ -1,151 +1,159 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
-    <v-row justify="space-around" class="my-5">
-      <v-dialog
-        v-model="confirmGeometry"
-        transition="dialog-bottom-transition"
-        max-width="600"
-      >
-        <template #default="confirmGeometry">
-          <v-card class="pa-6">
-            <v-card-text>
-              <h3>
-                Welcome back! Would you like to clear the currently selected
-                area?
-              </h3>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-              <v-btn
-                depressed
-                color="info"
-                @click="confirmGeometry.value = false"
-                >Keep selected area</v-btn
+    <LoadingSpinner v-if="isLoading" />
+    <template v-else>
+      <v-row justify="space-around" class="my-5">
+        <v-dialog
+          v-model="confirmGeometry"
+          transition="dialog-bottom-transition"
+          max-width="600"
+        >
+          <template #default="confirmGeometry">
+            <v-card class="pa-6">
+              <v-card-text>
+                <h3>
+                  Welcome back! Would you like to clear the currently selected
+                  area?
+                </h3>
+              </v-card-text>
+              <v-card-actions class="justify-end">
+                <v-btn
+                  depressed
+                  color="info"
+                  @click="confirmGeometry.value = false"
+                  >Keep selected area</v-btn
+                >
+                <v-btn depressed color="warning" @click="clearGeometry"
+                  >Clear selected area</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
+        <h1 class="ml-5 my-auto font-weight-light">
+          {{ metadata.title }}
+        </h1>
+        <v-tooltip bottom
+          ><template #activator="{ on, attrs }">
+            <v-btn icon color="secondary" class="mx-3">
+              <v-icon
+                v-bind="attrs"
+                large
+                @click="instructions = !instructions"
+                v-on="on"
+                >info</v-icon
               >
-              <v-btn depressed color="warning" @click="clearGeometry"
-                >Clear selected area</v-btn
-              >
+            </v-btn> </template
+          ><span>Instructions</span></v-tooltip
+        >
+        <v-dialog v-model="dialog" max-width="600px">
+          <template #activator="{ on, attrs }">
+            <v-btn
+              depressed
+              color="accent"
+              v-bind="attrs"
+              class="my-auto"
+              v-on="on"
+              >View Metadata</v-btn
+            >
+          </template>
+          <v-card>
+            <v-card-title class="accent text--white">
+              Metadata
+              <v-spacer></v-spacer>
+              <v-btn icon @click="dialog = false">
+                <v-icon color="white">fas fa-window-close</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-card-text class="my-3"><Metadata /></v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text @click="dialog = false">Close</v-btn>
             </v-card-actions>
           </v-card>
-        </template>
-      </v-dialog>
-      <h1 class="ml-5 my-auto font-weight-light">
-        {{ selectedDataset.title }}
-      </h1>
-      <v-tooltip bottom
-        ><template #activator="{ on, attrs }">
-          <v-btn icon color="secondary" class="mx-3">
-            <v-icon
-              v-bind="attrs"
-              large
-              @click="instructions = !instructions"
-              v-on="on"
-              >info</v-icon
-            >
-          </v-btn> </template
-        ><span>Instructions</span></v-tooltip
-      >
-      <v-dialog v-model="dialog" max-width="600px">
-        <template #activator="{ on, attrs }">
-          <v-btn
-            depressed
-            color="accent"
-            v-bind="attrs"
-            class="my-auto"
-            v-on="on"
-            >View Metadata</v-btn
-          >
-        </template>
-        <v-card>
-          <v-card-title class="accent text--white">
-            Metadata
-            <v-spacer></v-spacer>
-            <v-btn icon @click="dialog = false">
-              <v-icon color="white">fas fa-window-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-card-text class="my-3"><Metadata /></v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="dialog = false">Close</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-spacer></v-spacer>
-      <v-btn
-        depressed
-        color="accent"
-        :disabled="!hasValidStudyArea"
-        class="mr-4"
-        @click="goToViz($route.params.id)"
-        >Go to Visualize
-        <v-icon small class="ml-2" color="white"
-          >fas fa-chevron-right</v-icon
-        ></v-btn
-      >
-    </v-row>
-    <v-row>
-      <v-col class="mx-auto">
-        <v-alert
-          v-model="instructions"
-          color="secondary"
-          type="info"
-          text
-          outlined
-          dismissible
+        </v-dialog>
+        <v-spacer></v-spacer>
+        <v-btn
+          depressed
+          color="accent"
+          :disabled="!hasValidStudyArea"
+          class="mr-4"
+          @click="goToViz($route.params.id)"
+          >Go to Visualize
+          <v-icon small class="ml-2" color="white"
+            >fas fa-chevron-right</v-icon
+          ></v-btn
         >
-          Select the geometry for the dataset by using the drawing tools on the
-          map. A geometry must be defined in order to visualize and analyze the
-          dataset.
-        </v-alert>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col id="map-flex" class="mx-auto">
-        <v-card class="map" elevation="2" outlined shaped>
-          <v-card-title>
-            <h1 class="headline">Map</h1>
-            <v-spacer></v-spacer>
-            <h3 class="headline">
-              Selected area: {{ selectedArea }} km<sup>2</sup>
-            </h3>
-          </v-card-title>
-          <Map :clear="clear" />
-          <v-toolbar>
-            <v-tooltip top>
-              <template #activator="{ on, attrs }">
-                <v-btn
-                  v-bind="attrs"
-                  icon
-                  v-on="on"
-                  @click="exportSelectedGeometry"
-                >
-                  <a id="exportSelectedGeometry">
-                    <v-icon>fas fa-download</v-icon>
-                  </a>
-                </v-btn>
-              </template>
-              <span>Download selected geometry as a GeoJSON file</span>
-            </v-tooltip>
-            <input
-              id="loadGeoJsonFile"
-              type="file"
-              style="display: none"
-              @change="loadGeoJson"
-            />
-            <v-tooltip top>
-              <template #activator="{ on, attrs }">
-                <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
-                  <v-icon>fas fa-upload</v-icon>
-                </v-btn>
-              </template>
-              <span>Upload a GeoJSON file</span>
-            </v-tooltip>
-            <v-spacer></v-spacer>
-          </v-toolbar>
-          <!-- end toolbar -->
-        </v-card>
-      </v-col>
-    </v-row>
+      </v-row>
+      <v-row>
+        <v-col class="mx-auto">
+          <v-alert
+            v-model="instructions"
+            color="secondary"
+            type="info"
+            text
+            outlined
+            dismissible
+          >
+            Select the geometry for the dataset by using the drawing tools on
+            the map. A geometry must be defined in order to visualize and
+            analyze the dataset.
+          </v-alert>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col id="map-flex" class="mx-auto">
+          <v-card class="map" elevation="2" outlined shaped>
+            <v-card-title>
+              <h1 class="headline">Map</h1>
+              <v-spacer></v-spacer>
+              <h3 class="headline">
+                Selected area: {{ selectedArea }} km<sup>2</sup>
+              </h3>
+            </v-card-title>
+            <Map :clear="clear" />
+            <v-toolbar>
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    icon
+                    v-on="on"
+                    @click="exportSelectedGeometry"
+                  >
+                    <a id="exportSelectedGeometry">
+                      <v-icon>fas fa-download</v-icon>
+                    </a>
+                  </v-btn>
+                </template>
+                <span>Download selected geometry as a GeoJSON file</span>
+              </v-tooltip>
+              <input
+                id="loadGeoJsonFile"
+                type="file"
+                style="display: none"
+                @change="loadGeoJson"
+              />
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    icon
+                    v-on="on"
+                    @click="selectGeoJsonFile"
+                  >
+                    <v-icon>fas fa-upload</v-icon>
+                  </v-btn>
+                </template>
+                <span>Upload a GeoJSON file</span>
+              </v-tooltip>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <!-- end toolbar -->
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
   </v-responsive>
 </template>
 
@@ -156,32 +164,30 @@ import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
 import Vue from 'vue'
 
-import {
-  LEAFLET_PROVIDERS,
-  SKOPE_WMS_ENDPOINT,
-} from '@/store/modules/constants.js'
+import LoadingSpinner from '@/components/global/LoadingSpinner.vue'
 import Metadata from '@/components/action/Metadata.vue'
 import Map from '@/components/Map.vue'
 
 const fillTemplate = require('es6-dynamic-template')
-const Datasets = namespace('datasets')
+const Dataset = namespace('dataset')
 
 @Component({
   layout: 'BaseDataset',
   components: {
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
+    LoadingSpinner,
     Metadata,
     Map,
   },
 })
 class DatasetDetail extends Vue {
-  @Datasets.State('selectedDataset')
-  selectedDataset
-  @Datasets.Getter('selectedDatasetTimespan')
-  selectedDatasetTimespan
-  @Datasets.Getter('selectedDatasetTimeZero')
-  selectedDatasetTimeZero
+  @Dataset.State('metadata')
+  metadata
+  @Dataset.Getter('timespan')
+  timespan
+  @Dataset.Getter('timeZero')
+  timeZero
 
   stepNames = _.clone(this.$api().app.stepNames)
 
@@ -190,13 +196,8 @@ class DatasetDetail extends Vue {
   confirmGeometry = false
   clear = false
 
-  // created lifecycle hook
-  async created() {
-    const d = this.$api().datasets
-    await d.loadDataset(this.$route.params.id)
-    this.minTemporalRange = this.timespanMinYear
-    this.maxTemporalRange = this.timespanMaxYear
-    this.confirmGeometry = this.hasValidStudyArea
+  get isLoading() {
+    return _.isNull(this.metadata)
   }
 
   get currentStep() {
@@ -214,9 +215,18 @@ class DatasetDetail extends Vue {
     )
   }
 
+  // created lifecycle hook
+  async created() {
+    const api = this.$api()
+    api.dataset.loadMetadata(this.$route.params.id)
+    this.minTemporalRange = this.timespanMinYear
+    this.maxTemporalRange = this.timespanMaxYear
+    this.confirmGeometry = this.hasValidStudyArea
+  }
+
   head() {
     return {
-      title: this.selectedDataset.title,
+      title: this.metadata.title,
     }
   }
 

@@ -1,81 +1,8 @@
 import _ from 'lodash'
-import { TIMESERIES_ENDPOINT } from '@/store/modules/constants'
-import * as queryString from 'query-string'
-import {
-  Module,
-  VuexModule,
-  Action,
-  Mutation,
-  MutationAction,
-} from 'vuex-module-decorators'
-import { API } from '@/plugins/store'
+import { ALL_DATA } from '@/store/data'
+import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import Vue from 'vue'
-
-// Would need to make a custom debounce decorator so
-// that debounced methods can exist in a vue-class-component
-//
-// Could use or take from https://github.com/bvaughn/debounce-decorator
-const updateDataset = _.debounce(async function (
-  vuex,
-  datasetUri,
-  geometry,
-  minYear,
-  maxYear,
-  zeroYearOffset
-) {
-  console.log({ vuex })
-  const api = new API(vuex.store)
-  api.dataset.setIsLoading(true)
-  const start = minYear.toString().padStart(4, '0')
-  const end = maxYear.toString().padStart(4, '0')
-  if (start > end) {
-    api.messages.info('Please select a start year before the end year')
-    return
-  }
-  const qs = {
-    start: start,
-    end: end,
-    timeResolution: 'year',
-    timeZero: zeroYearOffset,
-  }
-  const body = {
-    boundaryGeometry: geometry,
-  }
-  const url = `${TIMESERIES_ENDPOINT}${datasetUri}?${queryString.stringify(qs)}`
-  try {
-    const response = await vuex.store.$axios.$post(url, body)
-    const timeZeroOffset = zeroYearOffset
-    const timeseries = {
-      x: _.range(
-        response.startIndex + timeZeroOffset,
-        response.endIndex + timeZeroOffset + 1
-      ),
-      y: response.values,
-    }
-    api.messages.clearMessages()
-    api.dataset.setTimeSeries(timeseries)
-  } catch (e) {
-    api.messages.clearMessages()
-    api.dataset.clearTimeSeries()
-    let errorMessage =
-      'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.'
-    if (e.response) {
-      console.error('received error response from server: ', e)
-      const responseData = e.response.data
-      if (responseData.status === 400) {
-        // bad request
-        errorMessage = responseData.message
-      }
-    } else if (e.request) {
-      // browser made a request but didn't see a response, likely a timeout / client network error
-      console.log('did not receive a server response: ', { e })
-      errorMessage += ` Cause: ${e.message}`
-    }
-    api.messages.error(errorMessage)
-  }
-  api.dataset.setIsLoading(false)
-},
-300)
+import { retrieveTimeSeries } from '@/store/actions'
 
 @Module({ stateFactory: true, name: 'dataset', namespaced: true })
 class DataSet extends VuexModule {
@@ -83,14 +10,70 @@ class DataSet extends VuexModule {
     x: [],
     y: [],
   }
+  metadata = null
   isLoadingData = false
   hasData = false
   geometry = { type: 'None', coordinates: [] }
   selectedAreaInSquareMeters = 0
-  layer = null
+  variable = null
+
+  get canHandleTimeSeriesRequest() {
+    return (
+      !_.isNull(this.metadata) &&
+      this.geometry.type !== 'None' &&
+      !_.isNull(this.variable)
+    )
+  }
+
+  get timeZero() {
+    if (this.metadata) {
+      return this.metadata.timespan.period.timeZero || 0
+    }
+    return 0
+  }
+
+  get timespan() {
+    if (this.metadata) {
+      return [
+        this.metadata.timespan.period.gte,
+        this.metadata.timespan.period.lte,
+      ]
+    }
+    console.log('No selected dataset, returning default year range')
+    return [1, new Date().getFullYear()]
+  }
+
+  @Action
+  loadMetadata(id) {
+    if (_.isNull(this.metadata) || this.metadata.id !== id) {
+      const metadata = ALL_DATA.find((m) => m.id === id)
+      if (metadata) {
+        this.context.commit('setMetadata', metadata)
+        console.log({ variables: metadata.variables })
+        if (metadata.variables.length > 0) {
+          this.context.commit('setVariable', metadata.variables[0].id)
+        }
+      }
+    }
+  }
+
+  @Mutation
+  setMetadata(metadata) {
+    this.metadata = metadata
+  }
+
+  @Mutation
+  setVariable(id) {
+    for (const variable of this.metadata.variables) {
+      variable.visible = variable.id === id
+      if (variable.visible) {
+        this.variable = variable
+      }
+    }
+  }
 
   get hasGeometry() {
-    return this.geometry.type != 'None'
+    return this.geometry.type !== 'None'
   }
 
   @Mutation
@@ -100,19 +83,14 @@ class DataSet extends VuexModule {
 
   @Mutation
   setGeometry({ geometry, area }) {
-    Vue.set(this, 'geometry', geometry)
+    this.geometry = geometry
     this.selectedAreaInSquareMeters = area
   }
 
   @Mutation
   clearGeometry() {
-    Vue.set(this, 'geometry', { type: 'None', coordinates: [] })
+    this.geometry = { type: 'None', coordinates: [] }
     this.selectedAreaInSquareMeters = 0
-  }
-
-  @Mutation
-  setLayer(layer) {
-    Vue.set(this, 'layer', layer)
   }
 
   @Mutation
@@ -128,17 +106,6 @@ class DataSet extends VuexModule {
       x: [],
       y: [],
     }
-  }
-
-  @Action
-  retrieveTimeSeries({
-    datasetUri,
-    geometry,
-    minYear,
-    maxYear,
-    zeroYearOffset,
-  }) {
-    updateDataset(this, datasetUri, geometry, minYear, maxYear, zeroYearOffset)
   }
 }
 

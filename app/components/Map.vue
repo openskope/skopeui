@@ -5,7 +5,7 @@
         ref="layerMap"
         :min-zoom="3"
         :zoom="4"
-        :center="selectedDataset.region.center"
+        :center="metadata.region.center"
         @ready="mapReady"
       >
         <l-control-attribution v-if="showMapControls" position="topright" />
@@ -21,30 +21,30 @@
           layer-type="base"
         />
         <l-rectangle
-          :bounds="selectedDataset.region.extents"
-          :style="selectedDataset.region.style"
+          :bounds="metadata.region.extents"
+          :style="metadata.region.style"
           :fill-opacity="defaultRegionOpacity"
+        />
+        <l-wms-tile-layer
+          v-for="v of metadata.variables"
+          ref="wmsLayers"
+          :key="v.id"
+          :base-url="skopeWmsUrl"
+          :layers="fillTemplateYear(v.wmsLayer)"
+          :name="v.name"
+          :crs="defaultCrs"
+          :transparent="true"
+          :opacity="layerOpacity"
+          layer-type="overlay"
+          :attribution="v.name"
+          :visible="v.visible"
+          version="1.3.0"
+          format="image/png"
         />
         <l-control-layers
           v-if="showMapControls"
           :sort-layers="false"
           position="topright"
-        />
-        <l-wms-tile-layer
-          v-for="variable of selectedDataset.variables"
-          ref="wmsLayers"
-          :key="variable.wmsLayer"
-          :base-url="skopeWmsUrl"
-          :layers="fillTemplateYear(variable.wmsLayer)"
-          :name="variable.name"
-          :crs="defaultCrs"
-          :transparent="true"
-          :opacity="layerOpacity"
-          layer-type="base"
-          :attribution="variable.name"
-          :visible="variable.visible"
-          version="1.3.0"
-          format="image/png"
         />
         <l-control-scale position="bottomright" />
       </l-map>
@@ -63,8 +63,9 @@ import {
 } from '@/store/modules/constants'
 import circleToPolygon from 'circle-to-polygon'
 import { stringify } from 'query-string'
+
+const App = namespace('app')
 const Dataset = namespace('dataset')
-const Datasets = namespace('datasets')
 const fillTemplate = require('es6-dynamic-template')
 import _ from 'lodash'
 
@@ -78,9 +79,6 @@ class Map extends Vue {
   @Prop({ default: 0.5 })
   opacity
 
-  @Prop({ default: false })
-  clear
-
   maxTemporalRange = new Date().getFullYear()
 
   defaultRegionOpacity = 0.05
@@ -91,18 +89,62 @@ class Map extends Vue {
   wGeometryKey = 'skope:geometry'
   wMinTemporalRangeKey = 'skope:temporal-range-min'
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
-  stepNames = _.clone(this.$api().app.stepNames)
 
-  @Datasets.State('selectedDataset')
-  selectedDataset
-  @Datasets.Getter('selectedDatasetTimespan')
-  selectedDatasetTimespan
-  @Datasets.Getter('selectedDatasetTimeZero')
-  selectedDatasetTimeZero
-  @Dataset.State('layer')
-  selectedLayer
+  @App.State('stepNames')
+  stepNames
+  @Dataset.State('metadata')
+  metadata
+  @Dataset.Getter('timespan')
+  timespan
+  @Dataset.Getter('timeZero')
+  timeZero
+  @Dataset.State('variable')
+  variable
   @Dataset.State('geometry')
-  selectedGeometry
+  geometry
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name)
+  }
+
+  get showMapControls() {
+    return this.currentStep >= 2
+  }
+
+  get selectedLayerName() {
+    return this.isLayerSelected ? this.variable.name : ''
+  }
+
+  get opacityLabel() {
+    return `${this.selectedLayerName} Opacity`
+  }
+
+  get layerOpacity() {
+    return this.opacity / 100.0
+  }
+
+  get isLayerSelected() {
+    return this.variable !== null
+  }
+
+  get skopeWmsUrl() {
+    return SKOPE_WMS_ENDPOINT
+  }
+
+  get leafletProviders() {
+    return LEAFLET_PROVIDERS
+  }
+
+  get defaultCrs() {
+    if (this.$L) {
+      return this.$L.CRS.EPSG4326
+    }
+    return ''
+  }
+
+  set variable(id) {
+    this.$api().dataset.setVariable(id)
+  }
 
   addDrawToolbar(map) {
     const L = this.$L
@@ -159,14 +201,6 @@ class Map extends Vue {
         self.disableEditOnly(map)
       }
     })
-  }
-
-  get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name)
-  }
-
-  get showMapControls() {
-    return this.currentStep >= 2
   }
 
   checkAndRestoreSavedGeometry(map) {
@@ -230,7 +264,7 @@ class Map extends Vue {
     })
     this.enableEditOnly(map)
     let padding = [5, 5]
-    console.log(geoJsonLayer)
+    console.log({ geoJsonLayer })
     if (geoJsonLayer instanceof L.Marker) {
       console.log('Setting padding for marker')
       padding = [30, 30]
@@ -275,9 +309,9 @@ class Map extends Vue {
     // 1. pull out the currently selected layer's layer template string
     // 2. update it with the current year
     // 3. reset the params on the currently selected layer to request the new layer from GeoServer
-    if (this.selectedLayer !== null) {
+    if (this.variable !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
-        if (wmsLayerRef.name === this.selectedLayer.name) {
+        if (wmsLayerRef.name === this.variable.name) {
           const layerTemplateString = wmsLayerRef.$vnode.data.key
           const layerName = this.fillTemplateYear(layerTemplateString)
           const wmsLayer = wmsLayerRef.mapObject
@@ -309,47 +343,12 @@ class Map extends Vue {
     }
   }
 
-  get defaultCrs() {
-    if (this.$L) {
-      return this.$L.CRS.EPSG4326
-    }
-    return ''
-  }
-
   getSavedGeometry() {
     const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
     if (skopeGeometry) {
       return JSON.parse(skopeGeometry)
     }
     return false
-  }
-
-  get selectedLayerName() {
-    return this.isLayerSelected ? this.selectedLayer.name : ''
-  }
-
-  get opacityLabel() {
-    return `${this.selectedLayerName} Opacity`
-  }
-
-  get layerOpacity() {
-    return this.opacity / 100.0
-  }
-
-  get layerType() {
-    return this.selectedDataset.variables.length > 1 ? 'base' : 'overlay'
-  }
-
-  get isLayerSelected() {
-    return this.selectedLayer !== null
-  }
-
-  get skopeWmsUrl() {
-    return SKOPE_WMS_ENDPOINT
-  }
-
-  get leafletProviders() {
-    return LEAFLET_PROVIDERS
   }
 
   fillTemplateYear(templateString) {
@@ -360,38 +359,36 @@ class Map extends Vue {
     return layer
   }
 
-  mapReady(m) {
-    const map = this.$refs.layerMap.mapObject
+  isSkopeLayer(leafletLayer) {
+    return (leafletLayer.options.layers || '').startsWith('SKOPE')
+  }
+
+  mapReady(map) {
     const handler = (event) => {
       const layer = event.layer
-      const isSkopeLayer = (layer.options.layers || '').startsWith('SKOPE')
-      if (isSkopeLayer) {
+      if (this.isSkopeLayer(layer)) {
         const variable = _.find(
-          this.selectedDataset.variables,
+          this.metadata.variables,
           (v) => v.name === event.name
         )
-        this.$api().datasets.selectVariable(variable.id)
-        this.$api().dataset.setLayer(variable)
+        this.$api().dataset.setVariable(variable.id)
         this.updateWmsLegend(map, layer.wmsParams.layers)
         layer.bringToFront()
       }
-    }
-    if (this.selectedDataset.variables.length === 1) {
-      let defaultVariable = this.selectedDataset.variables[0]
-      this.$api().datasets.selectVariable(defaultVariable.id)
-      this.$api().dataset.setLayer(defaultVariable)
     }
     map.on('overlayadd', handler)
     map.on('baselayerchange', handler)
     this.addDrawToolbar(map)
   }
 
-  @Watch('clear')
-  clearGeometry() {
-    console.log('clear selected area')
-    const L = this.$L
-    this.drawnItems.clearLayers()
-    this.clearSelectedGeometry()
+  @Watch('geometry')
+  clearGeometry(geometry) {
+    if (geometry.type === 'None') {
+      console.log('clear selected geometry')
+      const L = this.$L
+      this.drawnItems.clearLayers()
+      this.clearSelectedGeometry()
+    }
   }
 }
 export default Map

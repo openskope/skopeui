@@ -16,7 +16,7 @@
       large
       color="white"
       :class="isActiveStep(1) ? 'active' : 'button'"
-      :disabled="!hasSelectedDataSet"
+      :disabled="!hasMetadata"
       @click="goToStudyArea($route.params.id)"
     >
       <v-icon v-if="!complete(1)">fas fa-map</v-icon>
@@ -28,7 +28,7 @@
       large
       color="white"
       :class="isActiveStep(2) ? 'active' : 'button'"
-      :disabled="!hasValidStudyArea || !hasSelectedDataSet"
+      :disabled="!hasValidStudyArea || !hasMetadata"
       @click="goToViz($route.params.id)"
     >
       <v-icon v-if="!complete(2)">fas fa-chart-bar</v-icon>
@@ -40,7 +40,7 @@
       large
       color="white"
       :class="isActiveStep(3) ? 'active' : 'button'"
-      :disabled="!hasValidStudyArea || !hasSelectedDataSet"
+      :disabled="!hasValidStudyArea || !hasMetadata"
       @click="goToAnalyze($route.params.id)"
     >
       <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
@@ -63,7 +63,7 @@ class Navigation extends Vue {
 
   // --------- GETTERS ---------
 
-  get hasSelectedDataSet() {
+  get hasMetadata() {
     return !_.isUndefined(this.$route.params.id)
   }
 
@@ -116,7 +116,7 @@ class Navigation extends Vue {
   }
 
   get selectedDatasetId() {
-    return this.$api().datasets.selectedDataset.id
+    return this.$api().datasets.metadata.id
   }
 }
 

@@ -3,7 +3,7 @@
     <!-- title and instructions -->
     <v-row class="my-5">
       <h1 class="ml-5 my-auto font-weight-light">
-        {{ selectedDataset.title }}
+        {{ metadata.title }}
       </h1>
       <v-tooltip bottom
         ><template #activator="{ on, attrs }">
@@ -340,14 +340,14 @@ class Analyze extends Vue {
   @AnalyzeNS.State('response')
   response
 
-  @Datasets.State('selectedDataset')
-  selectedDataset
+  @Dataset.State('metadata')
+  metadata
 
-  @Dataset.State('layer')
-  selectedLayer
+  @Dataset.State('variable')
+  variable
 
   @Dataset.State('geometry')
-  selectedStudyArea
+  studyArea
 
   dialog = false
   instructions = false
@@ -375,7 +375,7 @@ class Analyze extends Vue {
     else return this.$api().dataset.layer
   }
   get layers() {
-    return this.selectedDataset.variables
+    return this.metadata.variables
   }
 
   set selectedLayer(layer) {
@@ -456,7 +456,7 @@ class Analyze extends Vue {
   }
 
   get temporalResolution() {
-    return this.selectedDataset.timespan.resolution
+    return this.metadata.timespan.resolution
   }
 
   get timeSeries() {
@@ -479,7 +479,7 @@ class Analyze extends Vue {
     await this.$api().analyze.retrieveAnalysis({
       dataset_id: 'lbda-v2',
       variable_id: 'palmer_modified_drought_index',
-      selected_area: this.selectedStudyArea,
+      selected_area: this.studyArea,
       zonal_statistic: 'mean',
       transforms: [],
       time_range: {
