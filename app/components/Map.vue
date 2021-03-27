@@ -25,6 +25,11 @@
           :style="metadata.region.style"
           :fill-opacity="defaultRegionOpacity"
         />
+        <l-control-layers
+          v-if="showMapControls"
+          :sort-layers="false"
+          position="topright"
+        />
         <l-wms-tile-layer
           v-for="v of metadata.variables"
           ref="wmsLayers"
@@ -40,11 +45,6 @@
           :visible="v.visible"
           version="1.3.0"
           format="image/png"
-        />
-        <l-control-layers
-          v-if="showMapControls"
-          :sort-layers="false"
-          position="topright"
         />
         <l-control-scale position="bottomright" />
       </l-map>
