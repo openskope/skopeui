@@ -212,7 +212,6 @@ class Map extends Vue {
 
   clearSelectedGeometry() {
     this.$api().dataset.clearGeometry()
-    this.$warehouse.remove(this.wGeometryKey)
   }
 
   disableEditOnly(map) {
@@ -387,7 +386,7 @@ class Map extends Vue {
       console.log('clear selected geometry')
       const L = this.$L
       this.drawnItems.clearLayers()
-      this.clearSelectedGeometry()
+      this.$warehouse.remove(this.wGeometryKey)
     }
   }
 }

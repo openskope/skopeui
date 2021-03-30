@@ -111,7 +111,7 @@
                 Selected area: {{ selectedArea }} km<sup>2</sup>
               </h3>
             </v-card-title>
-            <Map :clear="clear" />
+            <Map />
             <v-toolbar>
               <v-tooltip top>
                 <template #activator="{ on, attrs }">
@@ -194,7 +194,6 @@ class DatasetDetail extends Vue {
   dialog = false
   instructions = false
   confirmGeometry = false
-  clear = false
 
   get isLoading() {
     return _.isNull(this.metadata)
@@ -348,7 +347,7 @@ class DatasetDetail extends Vue {
 
   async clearGeometry() {
     this.confirmGeometry = false
-    this.clear = true
+    this.$api().dataset.clearGeometry()
   }
 }
 export default DatasetDetail
