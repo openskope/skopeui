@@ -3,7 +3,6 @@
 //
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 import _ from 'lodash'
-import { API } from '@/plugins/store'
 import { TIMESERIES_ENDPOINT } from '@/store/modules/constants'
 
 async function updateTimeSeries(api, data) {
