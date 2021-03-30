@@ -311,8 +311,8 @@ class Map extends Vue {
     if (this.variable !== null) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         if (wmsLayerRef.name === this.variable.name) {
-          const layerTemplateString = wmsLayerRef.$vnode.data.key
-          const layerName = this.fillTemplateYear(layerTemplateString)
+          const layerName = this.fillTemplateYear(this.variable.wmsLayer)
+          console.log('layer name: ', layerName)
           const wmsLayer = wmsLayerRef.mapObject
           wmsLayer.setParams({ layers: layerName }, false)
         }

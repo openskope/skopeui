@@ -90,7 +90,9 @@ class TimeSeriesPlot extends Vue {
 
   @Watch('timeSeriesData')
   getTimeSeriesData(timeSeriesData) {
-    this.$refs.plot.update(timeSeriesData, this.layoutMetadata)
+    if (this.$refs.plot) {
+      this.$refs.plot.update(timeSeriesData, this.layoutMetadata)
+    }
   }
 
   @Watch('layoutMetadata')

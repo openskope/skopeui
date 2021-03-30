@@ -274,7 +274,8 @@ class DatasetDetail extends Vue {
         this.defaultCircleToPolygonEdges
       )
       data.geometry = geometry
-      this.selectedAreaInSquareMeters = layer.getRadius() * Math.PI * Math.PI
+      this.selectedAreaInSquareMeters =
+        layer.getRadius() * layer.getRadius() * Math.PI
     } else if (layer instanceof L.Marker) {
       this.selectedAreaInSquareMeters = 0
     } else {
@@ -282,7 +283,10 @@ class DatasetDetail extends Vue {
         layer.getLatLngs()[0]
       )
     }
-    this.selectedGeometry = data.geometry
+    this.$api().dataset.setGeometry({
+      geometry: data.geometry,
+      area: this.selectedAreaInSquareMeters,
+    })
   }
 
   saveSelectedGeometry(geoJson) {

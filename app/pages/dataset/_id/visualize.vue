@@ -284,6 +284,8 @@ class Visualize extends Vue {
   metadata
   @Dataset.State('timespan')
   timespan
+  @Dataset.Getter('canHandleTimeSeriesRequest')
+  canHandleTimeSeriesRequest
 
   get isLoading() {
     return _.isNull(this.metadata)
@@ -360,7 +362,7 @@ class Visualize extends Vue {
           return {
             datasetId: this.metadata.id,
             variableId: this.variable.id,
-            geometry: this.selectedGeometry,
+            geometry: this.geometry,
             minYear: this.minYear,
             maxYear: this.maxYear,
           }
@@ -375,7 +377,8 @@ class Visualize extends Vue {
         }
       },
       async function (data) {
-        await retrieveTimeSeries(data)
+        console.log({ data })
+        await retrieveTimeSeries(this.$api(), data)
       }
     )
     this.yearSelected = this.minYear
@@ -383,7 +386,7 @@ class Visualize extends Vue {
     this.hasData = true
   }
   destroyed() {
-    this.timeSeriesUnwatcher
+    this.timeSeriesUnwatcher()
   }
 
   goToAnalyze(id) {
