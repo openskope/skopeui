@@ -250,7 +250,9 @@ class DatasetDetail extends Vue {
 
   exportSelectedGeometry(event) {
     const geometry = this.getSavedGeometry()
+    console.log(' saved geometry ', { geometry })
     if (geometry) {
+      console.log('exporting selected geometry: ', { geometry })
       const convertedArea =
         'text/json;charset=utf-8,' +
         encodeURIComponent(JSON.stringify(geometry))

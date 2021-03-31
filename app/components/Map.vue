@@ -186,11 +186,15 @@ class Map extends Vue {
     map.addControl(this.drawControlFull)
     // check for persisted geometry
     this.checkAndRestoreSavedGeometry(map)
-    map.on(L.Draw.Event.EDITRESIZE, (e) => self.updateSelectedGeometry(e.layer))
-    map.on(L.Draw.Event.EDITMOVE, (e) => self.updateSelectedGeometry(e.layer))
+    map.on(L.Draw.Event.EDITRESIZE, (e) =>
+      self.updateSelectedGeometry(e.variable)
+    )
+    map.on(L.Draw.Event.EDITMOVE, (e) =>
+      self.updateSelectedGeometry(e.variable)
+    )
     map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
     map.on(L.Draw.Event.CREATED, (event) => {
-      const layer = event.layer
+      const layer = event.variable
       self.updateSelectedGeometry(layer)
       self.drawnItems.addLayer(layer)
       self.enableEditOnly(map)
@@ -312,7 +316,6 @@ class Map extends Vue {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         if (wmsLayerRef.name === this.variable.name) {
           const layerName = this.fillTemplateYear(this.variable.wmsLayer)
-          console.log('layer name: ', layerName)
           const wmsLayer = wmsLayerRef.mapObject
           wmsLayer.setParams({ layers: layerName }, false)
         }
@@ -364,15 +367,16 @@ class Map extends Vue {
 
   mapReady(map) {
     const handler = (event) => {
-      const layer = event.layer
-      if (this.isSkopeLayer(layer)) {
+      console.log('handling layer change event ', { event })
+      const leafletLayer = event.layer
+      if (this.isSkopeLayer(leafletLayer)) {
         const variable = _.find(
           this.metadata.variables,
           (v) => v.name === event.name
         )
         this.$api().dataset.setVariable(variable.id)
-        this.updateWmsLegend(map, layer.wmsParams.layers)
-        layer.bringToFront()
+        this.updateWmsLegend(map, leafletLayer.wmsParams.layers)
+        leafletLayer.bringToFront()
       }
     }
     map.on('overlayadd', handler)

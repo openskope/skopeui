@@ -1,8 +1,6 @@
 import _ from 'lodash'
 import { ALL_DATA } from '@/store/data'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
-import Vue from 'vue'
-import { retrieveTimeSeries } from '@/store/actions'
 
 @Module({ stateFactory: true, name: 'dataset', namespaced: true })
 class DataSet extends VuexModule {
@@ -16,6 +14,34 @@ class DataSet extends VuexModule {
   geometry = { type: 'None', coordinates: [] }
   selectedAreaInSquareMeters = 0
   variable = null
+
+  @Action
+  async loadDefaultVariable(metadataId) {
+    if (_.isNull(this.metadata)) {
+      await this.context.dispatch('loadMetadata', metadataId)
+    }
+    if (_.isNull(this.variable)) {
+      this.context.commit('setVariable', this.metadata.variables[0].id)
+    }
+  }
+
+  @Action
+  loadMetadata(id) {
+    if (_.isNull(this.metadata) || this.metadata.id !== id) {
+      const metadata = ALL_DATA.find((m) => m.id === id)
+      if (metadata) {
+        this.context.commit('setMetadata', metadata)
+        console.log({ variables: metadata.variables })
+        if (metadata.variables.length > 0) {
+          this.context.commit('setVariable', metadata.variables[0].id)
+        }
+      }
+    }
+  }
+
+  get hasGeometry() {
+    return this.geometry.type !== 'None'
+  }
 
   get canHandleTimeSeriesRequest() {
     return (
@@ -43,20 +69,6 @@ class DataSet extends VuexModule {
     return [1, new Date().getFullYear()]
   }
 
-  @Action
-  loadMetadata(id) {
-    if (_.isNull(this.metadata) || this.metadata.id !== id) {
-      const metadata = ALL_DATA.find((m) => m.id === id)
-      if (metadata) {
-        this.context.commit('setMetadata', metadata)
-        console.log({ variables: metadata.variables })
-        if (metadata.variables.length > 0) {
-          this.context.commit('setVariable', metadata.variables[0].id)
-        }
-      }
-    }
-  }
-
   @Mutation
   setMetadata(metadata) {
     this.metadata = metadata
@@ -70,10 +82,6 @@ class DataSet extends VuexModule {
         this.variable = variable
       }
     }
-  }
-
-  get hasGeometry() {
-    return this.geometry.type !== 'None'
   }
 
   @Mutation

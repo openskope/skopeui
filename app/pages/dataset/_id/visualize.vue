@@ -425,11 +425,6 @@ class Visualize extends Vue {
     this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange)
   }
 
-  setYearSelected(formYearSelected) {
-    this.formYearSelected = formYearSelected
-    setYearSelected(this)
-  }
-
   gotoFirstYear() {
     if (this.variable === null) {
       return
@@ -467,41 +462,9 @@ class Visualize extends Vue {
       }, this.animationSpeed)
     }
   }
-  loadGeoJson(event) {
-    const file = event.target.files[0]
-    file.text().then((text) => {
-      console.log('received possible geojson to load: ', text)
-      try {
-        let area = JSON.parse(text)
-        this.restoreSelectedGeometry(area)
-      } catch (error) {
-        console.error(error)
-        // FIXME: this should be a toast or other notification
-        alert("Sorry! We couldn't re-import this file: " + text)
-      }
-    })
-  }
-  selectGeoJsonFile() {
-    document.getElementById('loadGeoJsonFile').click()
-  }
+
   setYear(year) {
     this.yearSelected = year
-  }
-  async updateTimeSeries() {
-    console.log('calling timeseries updates')
-    const api = this.$api()
-    console.log({ layer: this.variable })
-    if (this.variable && !this.metadata.atemporal) {
-      console.log('invoking retrieveTimeSeries')
-      await retrieveTimeSeries({
-        datasetId: this.metadata.id,
-        variableId: this.variable.id,
-        geometry: this.geometry,
-        minYear: this.minYear,
-        maxYear: this.minYear,
-        zeroYearOffset: this.metadata.timespan.period.timeZero,
-      })
-    }
   }
 }
 export default Visualize

@@ -104,12 +104,12 @@
               <v-col class="outlined" cols="8">
                 <h3 class="ma-3 title">Selected variable</h3>
                 <v-select
-                  v-model="layer"
+                  v-model="variable"
                   label="Select a variable"
                   item-color="accent"
                   color="accent"
                   dense
-                  :items="layers"
+                  :items="variables"
                   item-text="name"
                   item-value="id"
                   class="mx-3"
@@ -322,10 +322,10 @@ import Metadata from '@/components/action/Metadata.vue'
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
 import { namespace } from 'vuex-class'
+import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
 import _ from 'lodash'
 
 const AnalyzeNS = namespace('analyze')
-const Datasets = namespace('datasets')
 const Dataset = namespace('dataset')
 @Component({
   layout: 'BaseDataset',
@@ -343,14 +343,17 @@ class Analyze extends Vue {
   @Dataset.State('metadata')
   metadata
 
-  @Dataset.State('variable')
-  variable
-
   @Dataset.State('geometry')
   studyArea
 
+  @Dataset.Getter('canHandleTimeSeriesRequest')
+  canHandleTimeSeriesRequest
+
   dialog = false
   instructions = false
+  smoothing = null
+  display = null
+  timeSeriesUnWatcher = null
 
   layerGroup = {
     icon: 'fas fa-layer-group',
@@ -360,26 +363,16 @@ class Analyze extends Vue {
     icon: 'fas fa-draw-polygon',
   }
 
-  smoothing = null
-  display = null
-  dialog = false
-  instructions = false
+  get variable() {
+    return this.$api().dataset.variable
+  }
 
-  set layer(l) {
-    l = this.layers.find((layer) => layer.id === l)
-    this.$api().datasets.selectVariable(l.id)
-    this.$api().dataset.setLayer(l)
+  set variable(v) {
+    this.$api().dataset.setVariable(v)
   }
-  get layer() {
-    if (_.size(this.layers) > 1) return ''
-    else return this.$api().dataset.layer
-  }
-  get layers() {
+
+  get variables() {
     return this.metadata.variables
-  }
-
-  set selectedLayer(layer) {
-    this.$api().dataset.setLayer(layer)
   }
 
   selectedZonalStatistic = 'mean'
@@ -474,6 +467,13 @@ class Analyze extends Vue {
     )
   }
 
+  get minYear() {
+    return parseInt(this.metadata.timespan.period.gte)
+  }
+  get maxYear() {
+    return parseInt(this.metadata.timespan.period.lte)
+  }
+
   async submit() {
     console.log('submitting to web service')
     await this.$api().analyze.retrieveAnalysis({
@@ -489,8 +489,43 @@ class Analyze extends Vue {
     })
   }
 
-  async created() {
-    console.log(this.$route.params.action)
+  async updated() {
+    console.log('variable: ', this.variable)
+  }
+
+  async mounted() {
+    // load default variable
+    this.$api().dataset.loadDefaultVariable(this.$route.params.id)
+    await loadTimeSeries(this.$api())
+    this.timeSeriesUnWatcher = this.$watch(
+      function () {
+        if (this.canHandleTimeSeriesRequest) {
+          return {
+            datasetId: this.metadata.id,
+            variableId: this.variable.id,
+            geometry: this.geometry,
+            minYear: this.minYear,
+            maxYear: this.maxYear,
+          }
+        } else {
+          return {
+            datasetId: null,
+            variableId: null,
+            geometry: null,
+            minYear: null,
+            maxYear: null,
+          }
+        }
+      },
+      async function (data) {
+        console.log({ data })
+        await retrieveTimeSeries(this.$api(), data)
+      }
+    )
+  }
+
+  destroyed() {
+    this.timeSeriesUnWatcher()
   }
 
   goToStudyArea(id) {
