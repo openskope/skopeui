@@ -59,7 +59,12 @@
       <v-col cols="9">
         <v-card class="pa-3" elevation="2" outlined shaped>
           <v-card-title><h1 class="headline">Time Series</h1></v-card-title>
-          <TimeSeriesPlot class="timeseries-flex" :time-series="timeSeries" />
+          <TimeSeriesPlot
+            class="timeseries-flex"
+            :time-series="timeSeries"
+            :year-selected="yearSelected"
+            @yearSelected="setYear"
+          />
         </v-card>
       </v-col>
       <!-- analysis controls -->
@@ -354,6 +359,7 @@ class Analyze extends Vue {
   smoothing = null
   display = null
   timeSeriesUnWatcher = null
+  yearSelected = 1500
 
   layerGroup = {
     icon: 'fas fa-layer-group',
@@ -361,18 +367,6 @@ class Analyze extends Vue {
 
   polygon = {
     icon: 'fas fa-draw-polygon',
-  }
-
-  get variable() {
-    return this.$api().dataset.variable
-  }
-
-  set variable(v) {
-    this.$api().dataset.setVariable(v)
-  }
-
-  get variables() {
-    return this.metadata.variables
   }
 
   selectedZonalStatistic = 'mean'
@@ -435,6 +429,18 @@ class Analyze extends Vue {
     },
   ]
 
+  get variable() {
+    return this.$api().dataset.variable
+  }
+
+  set variable(id) {
+    this.$api().dataset.setVariable(id)
+  }
+
+  get variables() {
+    return this.metadata.variables
+  }
+
   get smootherWidthLabel() {
     let widthUnit = 'Unknowns'
     switch (this.temporalResolution) {
@@ -474,6 +480,10 @@ class Analyze extends Vue {
     return parseInt(this.metadata.timespan.period.lte)
   }
 
+  setYear(year) {
+    this.yearSelected = year
+  }
+
   async submit() {
     console.log('submitting to web service')
     await this.$api().analyze.retrieveAnalysis({
@@ -489,13 +499,19 @@ class Analyze extends Vue {
     })
   }
 
+  async fetch() {
+    const api = this.$api()
+    await api.dataset.loadMetadata(this.$route.params.id)
+  }
+
   async updated() {
     console.log('variable: ', this.variable)
   }
 
   async mounted() {
+    const api = this.$api()
     // load default variable
-    this.$api().dataset.loadDefaultVariable(this.$route.params.id)
+    api.dataset.loadDefaultVariable(this.$route.params.id)
     await loadTimeSeries(this.$api())
     this.timeSeriesUnWatcher = this.$watch(
       function () {
@@ -503,7 +519,7 @@ class Analyze extends Vue {
           return {
             datasetId: this.metadata.id,
             variableId: this.variable.id,
-            geometry: this.geometry,
+            geometry: this.studyArea,
             minYear: this.minYear,
             maxYear: this.maxYear,
           }
@@ -519,9 +535,10 @@ class Analyze extends Vue {
       },
       async function (data) {
         console.log({ data })
-        await retrieveTimeSeries(this.$api(), data)
+        await retrieveTimeSeries(api, data)
       }
     )
+    this.yearSelected = this.timeRange.lb.year
   }
 
   destroyed() {

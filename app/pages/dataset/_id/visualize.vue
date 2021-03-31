@@ -345,6 +345,7 @@ class Visualize extends Vue {
   set variable(id) {
     this.$api().dataset.setVariable(id)
   }
+
   get variables() {
     return this.metadata.variables
   }
