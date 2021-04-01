@@ -186,15 +186,15 @@ class Map extends Vue {
     map.addControl(this.drawControlFull)
     // check for persisted geometry
     this.checkAndRestoreSavedGeometry(map)
-    map.on(L.Draw.Event.EDITRESIZE, (e) =>
-      self.updateSelectedGeometry(e.variable)
+    map.on(L.Draw.Event.EDITRESIZE, (event) =>
+      self.updateSelectedGeometry(event.layer)
     )
-    map.on(L.Draw.Event.EDITMOVE, (e) =>
-      self.updateSelectedGeometry(e.variable)
+    map.on(L.Draw.Event.EDITMOVE, (event) =>
+      self.updateSelectedGeometry(event.layer)
     )
     map.on(L.Draw.Event.EDITVERTEX, (e) => self.updateSelectedGeometry(e.poly))
     map.on(L.Draw.Event.CREATED, (event) => {
-      const layer = event.variable
+      const layer = event.layer
       self.updateSelectedGeometry(layer)
       self.drawnItems.addLayer(layer)
       self.enableEditOnly(map)
