@@ -278,14 +278,22 @@ class Visualize extends Vue {
   formTemporalRange = [1, 2017]
   formYearSelected = 1500
   selectedTemporalRange = [1, 2017]
-  @Dataset.State('geometry')
-  geometry
-  @Dataset.State('metadata')
-  metadata
-  @Dataset.State('timespan')
-  timespan
-  @Dataset.Getter('canHandleTimeSeriesRequest')
-  canHandleTimeSeriesRequest
+
+  get geometry() {
+    return this.$api().dataset.geometry
+  }
+
+  get metadata() {
+    return this.$api().dataset.metadata
+  }
+
+  get timespan() {
+    return this.$api().dataset.timespan
+  }
+
+  get canHandleTimeSeriesRequest() {
+    return this.$api().dataset.canHandleTimeSeriesRequest
+  }
 
   get isLoading() {
     return _.isNull(this.metadata)

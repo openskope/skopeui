@@ -182,13 +182,6 @@ const Dataset = namespace('dataset')
   },
 })
 class DatasetDetail extends Vue {
-  @Dataset.State('metadata')
-  metadata
-  @Dataset.Getter('timespan')
-  timespan
-  @Dataset.Getter('timeZero')
-  timeZero
-
   stepNames = _.clone(this.$api().app.stepNames)
 
   dialog = false
@@ -203,6 +196,18 @@ class DatasetDetail extends Vue {
     return this.stepNames.findIndex((x) => x === this.$route.name)
   }
 
+  get metadata() {
+    return this.$api().dataset.metadata
+  }
+
+  get timespan() {
+    return this.$api().dataset.timespan
+  }
+
+  get timeZero() {
+    return this.$api().dataset.timeZero
+  }
+
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
     return this.currentStep == 0 || this.$api().dataset.hasGeometry
@@ -212,6 +217,16 @@ class DatasetDetail extends Vue {
     return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
       2
     )
+  }
+
+  get savedGeometry() {
+    const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
+    console.log('skope geometry: ', skopeGeometry)
+    if (skopeGeometry) {
+      return JSON.parse(skopeGeometry)
+    } else {
+      return false
+    }
   }
 
   // created lifecycle hook
@@ -249,7 +264,7 @@ class DatasetDetail extends Vue {
   }
 
   exportSelectedGeometry(event) {
-    const geometry = this.getSavedGeometry()
+    const geometry = this.savedGeometry
     console.log(' saved geometry ', { geometry })
     if (geometry) {
       console.log('exporting selected geometry: ', { geometry })
@@ -296,7 +311,7 @@ class DatasetDetail extends Vue {
   }
 
   checkAndRestoreSavedGeometry(map) {
-    const savedGeometry = this.getSavedGeometry()
+    const savedGeometry = this.savedGeometry
     if (savedGeometry) {
       this.restoreSelectedGeometry(savedGeometry, map)
     }
@@ -330,14 +345,6 @@ class DatasetDetail extends Vue {
       padding = [30, 30]
     }
     map.fitBounds(this.drawnItems.getBounds(), { padding })
-  }
-
-  getSavedGeometry() {
-    const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
-    if (skopeGeometry) {
-      return JSON.parse(skopeGeometry)
-    }
-    return false
   }
 
   validate({ params }) {

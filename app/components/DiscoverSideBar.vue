@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="isVisible" app>
+  <v-navigation-drawer :value="isVisible" app>
     <section class="pt-3">
       <div class="container">
         <h2 class="headline">Filter Datasets</h2>

@@ -342,18 +342,6 @@ const Dataset = namespace('dataset')
   },
 })
 class Analyze extends Vue {
-  @AnalyzeNS.State('response')
-  response
-
-  @Dataset.State('metadata')
-  metadata
-
-  @Dataset.State('geometry')
-  studyArea
-
-  @Dataset.Getter('canHandleTimeSeriesRequest')
-  canHandleTimeSeriesRequest
-
   dialog = false
   instructions = false
   smoothing = null
@@ -428,6 +416,22 @@ class Analyze extends Vue {
       id: 'zscore',
     },
   ]
+
+  get response() {
+    return this.$api().analyze.response
+  }
+
+  get metadata() {
+    return this.$api().dataset.metadata
+  }
+
+  get studyArea() {
+    return this.$api().dataset.geometry
+  }
+
+  get canHandleTimeSeriesRequest() {
+    return this.$api().dataset.canHandleTimeSeriesRequest
+  }
 
   get variable() {
     return this.$api().dataset.variable

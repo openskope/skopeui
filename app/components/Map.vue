@@ -90,18 +90,29 @@ class Map extends Vue {
   wMinTemporalRangeKey = 'skope:temporal-range-min'
   wMaxTemporalRangeKey = 'skope:temporal-range-max'
 
-  @App.State('stepNames')
-  stepNames
-  @Dataset.State('metadata')
-  metadata
-  @Dataset.Getter('timespan')
-  timespan
-  @Dataset.Getter('timeZero')
-  timeZero
-  @Dataset.State('variable')
-  variable
-  @Dataset.State('geometry')
-  geometry
+  get stepNames() {
+    return this.$api().app.stepNames
+  }
+
+  get metadata() {
+    return this.$api().dataset.metadata
+  }
+
+  get timespan() {
+    return this.$api().dataset.timespan
+  }
+
+  get timeZero() {
+    return this.$api().dataset.timeZero
+  }
+
+  get variable() {
+    return this.$api().dataset.variable
+  }
+
+  get geometry() {
+    return this.$api().dataset.geometry
+  }
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name)
