@@ -3,8 +3,8 @@
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
       <!-- title and instructions -->
-      <v-row class="my-5">
-        <h1 class="ml-5 my-auto font-weight-light">
+      <v-row class="my-2">
+        <h1 class="ml-5 font-weight-light">
           {{ metadata.title }}
         </h1>
         <v-chip outlined label color="secondary" class="ml-3 my-auto">
@@ -243,10 +243,7 @@ import Metadata from '@/components/action/Metadata.vue'
 import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Vue from 'vue'
 import _ from 'lodash'
-import { namespace } from 'vuex-class'
 import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
-
-const Dataset = namespace('dataset')
 
 const setYearSelected = _.debounce(function (vue) {
   vue.yearSelected = vue.formYearSelected

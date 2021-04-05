@@ -1,8 +1,8 @@
 <template>
-  <v-responsive :aspect-ratio="16 / 9">
+  <v-responsive :aspect-ratio="16 / 9" height="100vh" width="100vw">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <v-row justify="space-around" class="my-5">
+      <v-row justify="space-around" class="my-2">
         <v-dialog
           v-model="confirmGeometry"
           transition="dialog-bottom-transition"
@@ -30,7 +30,7 @@
             </v-card>
           </template>
         </v-dialog>
-        <h1 class="ml-5 my-auto font-weight-light">
+        <h1 class="ml-5 font-weight-light">
           {{ metadata.title }}
         </h1>
         <v-tooltip bottom
@@ -161,7 +161,6 @@
 import circleToPolygon from 'circle-to-polygon'
 import _ from 'lodash'
 import { Component } from 'nuxt-property-decorator'
-import { namespace } from 'vuex-class'
 import Vue from 'vue'
 
 import LoadingSpinner from '@/components/global/LoadingSpinner.vue'
@@ -169,7 +168,6 @@ import Metadata from '@/components/action/Metadata.vue'
 import Map from '@/components/Map.vue'
 
 const fillTemplate = require('es6-dynamic-template')
-const Dataset = namespace('dataset')
 
 @Component({
   layout: 'BaseDataset',

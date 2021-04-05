@@ -56,7 +56,6 @@
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
 import { Prop, Watch } from 'vue-property-decorator'
-import { namespace } from 'vuex-class'
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
@@ -64,8 +63,6 @@ import {
 import circleToPolygon from 'circle-to-polygon'
 import { stringify } from 'query-string'
 
-const App = namespace('app')
-const Dataset = namespace('dataset')
 const fillTemplate = require('es6-dynamic-template')
 import _ from 'lodash'
 

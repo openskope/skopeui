@@ -1,8 +1,8 @@
 <template>
   <v-responsive :aspect-ratio="16 / 9">
     <!-- title and instructions -->
-    <v-row class="my-5">
-      <h1 class="ml-5 my-auto font-weight-light">
+    <v-row class="my-2">
+      <h1 class="ml-5 font-weight-light">
         {{ metadata.title }}
       </h1>
       <v-tooltip bottom
@@ -326,12 +326,9 @@ import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Metadata from '@/components/action/Metadata.vue'
 import Vue from 'vue'
 import { Component } from 'nuxt-property-decorator'
-import { namespace } from 'vuex-class'
 import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
 import _ from 'lodash'
 
-const AnalyzeNS = namespace('analyze')
-const Dataset = namespace('dataset')
 @Component({
   layout: 'BaseDataset',
   components: {
