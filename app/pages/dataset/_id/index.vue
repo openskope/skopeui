@@ -84,7 +84,7 @@
           >
         </v-col>
         <!-- instructions -->
-        <v-col class="flex-grow-0 flex-shrink-1">
+        <v-col class="flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0">
           <v-alert
             v-model="instructions"
             color="secondary"
