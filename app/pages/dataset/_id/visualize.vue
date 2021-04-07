@@ -76,8 +76,8 @@
             depressed
             color="accent"
             :disabled="!hasValidStudyArea"
-            @click="goToViz($route.params.id)"
-            >Go to Visualize
+            @click="goToAnalyze($route.params.id)"
+            >Go to Analyze
             <v-icon small class="ml-2" color="white"
               >fas fa-chevron-right</v-icon
             ></v-btn
@@ -120,11 +120,7 @@
                       Selected area: {{ selectedArea }} km<sup>2</sup>
                     </h3>
                   </v-card-title>
-                  <Map
-                    :year="yearSelected"
-                    :opacity="opacity"
-                    class="map-flex"
-                  />
+                  <Map :year="yearSelected" :opacity="opacity" />
                   <v-toolbar flat extended extension-height="25" class="pt-8">
                     <v-row>
                       <v-col cols="2">
@@ -173,7 +169,6 @@
                   <h1 class="headline mt-3 ml-3">Time Series</h1>
                   <template v-if="hasTimeSeries">
                     <TimeSeriesPlot
-                      class="timeseries-flex"
                       :time-series="timeSeries"
                       :year-selected="yearSelected"
                       @yearSelected="setYear"
