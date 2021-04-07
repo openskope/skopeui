@@ -99,10 +99,7 @@
           </v-alert>
         </v-col>
         <!-- map + time series plot -->
-        <v-col
-          class="flex-grow-1 flex-shrink-0 ma-0 pa-0"
-          style="background-color: blue"
-        >
+        <v-col class="flex-grow-1 flex-shrink-0 ma-0 pa-0">
           <v-row class="mx-5" style="height: 100%">
             <!-- loading animation -->
             <v-col v-if="isLoadingData">
