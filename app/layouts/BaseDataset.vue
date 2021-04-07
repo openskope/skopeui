@@ -1,11 +1,9 @@
 <template>
   <v-app light>
     <Header />
-    <v-main>
-      <v-container class="mt-5" fluid>
-        <Messages />
-        <nuxt />
-      </v-container>
+    <v-main class="flex-grow-1">
+      <Messages />
+      <nuxt />
     </v-main>
     <Footer />
   </v-app>

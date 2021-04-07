@@ -1,92 +1,90 @@
 <template>
-  <v-responsive :aspect-ratio="16 / 9" height="100vh" width="100vw">
+  <v-responsive height="100%" width="100%">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <v-row justify="space-around" class="my-2">
-        <v-dialog
-          v-model="confirmGeometry"
-          transition="dialog-bottom-transition"
-          max-width="600"
+      <v-row class="d-flex flex-column" style="height: 100%">
+        <!-- title -->
+        <v-col
+          class="d-flex flex-row flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0 pt-10"
         >
-          <template #default="confirmGeometry">
-            <v-card class="pa-6">
-              <v-card-text>
-                <h3>
-                  Welcome back! Would you like to clear the currently selected
-                  area?
-                </h3>
-              </v-card-text>
-              <v-card-actions class="justify-end">
-                <v-btn
-                  depressed
-                  color="info"
-                  @click="confirmGeometry.value = false"
-                  >Keep selected area</v-btn
+          <v-dialog
+            v-model="confirmGeometry"
+            transition="dialog-bottom-transition"
+            max-width="600"
+          >
+            <template #default="confirmGeometry">
+              <v-card class="pa-6">
+                <v-card-text>
+                  <h3>
+                    Welcome back! Would you like to clear the currently selected
+                    area?
+                  </h3>
+                </v-card-text>
+                <v-card-actions class="justify-end">
+                  <v-btn
+                    depressed
+                    color="info"
+                    @click="confirmGeometry.value = false"
+                    >Keep selected area</v-btn
+                  >
+                  <v-btn depressed color="warning" @click="clearGeometry"
+                    >Clear selected area</v-btn
+                  >
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog>
+          <h1 class="font-weight-light">
+            {{ metadata.title }}
+          </h1>
+          <v-tooltip bottom
+            ><template #activator="{ on, attrs }">
+              <v-btn icon color="secondary" class="mx-3">
+                <v-icon
+                  v-bind="attrs"
+                  large
+                  @click="instructions = !instructions"
+                  v-on="on"
+                  >info</v-icon
                 >
-                <v-btn depressed color="warning" @click="clearGeometry"
-                  >Clear selected area</v-btn
-                >
+              </v-btn> </template
+            ><span>Instructions</span></v-tooltip
+          >
+          <v-dialog v-model="dialog" max-width="600px">
+            <template #activator="{ on, attrs }">
+              <v-btn depressed color="accent" v-bind="attrs" v-on="on"
+                >View Metadata</v-btn
+              >
+            </template>
+            <v-card>
+              <v-card-title class="accent text--white">
+                Metadata
+                <v-spacer></v-spacer>
+                <v-btn icon @click="dialog = false">
+                  <v-icon color="white">fas fa-window-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text><Metadata /></v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click="dialog = false">Close</v-btn>
               </v-card-actions>
             </v-card>
-          </template>
-        </v-dialog>
-        <h1 class="ml-5 font-weight-light">
-          {{ metadata.title }}
-        </h1>
-        <v-tooltip bottom
-          ><template #activator="{ on, attrs }">
-            <v-btn icon color="secondary" class="mx-3">
-              <v-icon
-                v-bind="attrs"
-                large
-                @click="instructions = !instructions"
-                v-on="on"
-                >info</v-icon
-              >
-            </v-btn> </template
-          ><span>Instructions</span></v-tooltip
-        >
-        <v-dialog v-model="dialog" max-width="600px">
-          <template #activator="{ on, attrs }">
-            <v-btn
-              depressed
-              color="accent"
-              v-bind="attrs"
-              class="my-auto"
-              v-on="on"
-              >View Metadata</v-btn
-            >
-          </template>
-          <v-card>
-            <v-card-title class="accent text--white">
-              Metadata
-              <v-spacer></v-spacer>
-              <v-btn icon @click="dialog = false">
-                <v-icon color="white">fas fa-window-close</v-icon>
-              </v-btn>
-            </v-card-title>
-            <v-card-text class="my-3"><Metadata /></v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn text @click="dialog = false">Close</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-spacer></v-spacer>
-        <v-btn
-          depressed
-          color="accent"
-          :disabled="!hasValidStudyArea"
-          class="mr-4"
-          @click="goToViz($route.params.id)"
-          >Go to Visualize
-          <v-icon small class="ml-2" color="white"
-            >fas fa-chevron-right</v-icon
-          ></v-btn
-        >
-      </v-row>
-      <v-row>
-        <v-col class="mx-auto">
+          </v-dialog>
+          <v-spacer></v-spacer>
+          <v-btn
+            depressed
+            color="accent"
+            :disabled="!hasValidStudyArea"
+            @click="goToViz($route.params.id)"
+            >Go to Visualize
+            <v-icon small class="ml-2" color="white"
+              >fas fa-chevron-right</v-icon
+            ></v-btn
+          >
+        </v-col>
+        <!-- instructions -->
+        <v-col class="flex-grow-0 flex-shrink-1">
           <v-alert
             v-model="instructions"
             color="secondary"
@@ -100,10 +98,15 @@
             analyze the dataset.
           </v-alert>
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col id="map-flex" class="mx-auto">
-          <v-card class="map" elevation="2" outlined shaped>
+        <!-- map -->
+        <v-col id="map-flex" class="flex-grow-1 flex-shrink-0 ma-0 pa-0">
+          <v-card
+            class="mx-10"
+            height="85%"
+            elevation="2"
+            style="z-index: 1"
+            outlined
+          >
             <v-card-title>
               <h1 class="headline">Map</h1>
               <v-spacer></v-spacer>
@@ -111,7 +114,7 @@
                 Selected area: {{ selectedArea }} km<sup>2</sup>
               </h3>
             </v-card-title>
-            <Map />
+            <Map class="mx-0" />
             <v-toolbar>
               <v-tooltip top>
                 <template #activator="{ on, attrs }">
@@ -373,11 +376,6 @@ export default DatasetDetail
 #exportSelectedGeometry {
   text-decoration: none;
   color: inherit;
-}
-
-#map-flex {
-  height: 75vh;
-  margin-bottom: 2rem;
 }
 
 @media all and (max-width: 960px) {
