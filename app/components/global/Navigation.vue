@@ -5,7 +5,7 @@
       large
       color="white"
       :class="isActiveStep(0) ? 'active' : 'button'"
-      @click="goToDataSets"
+      @click="gotoDatasets"
     >
       <v-icon v-if="!complete(0)">fas fa-database</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
@@ -86,7 +86,7 @@ class Navigation extends Vue {
     return this.currentStep == index
   }
 
-  goToDataSets() {
+  gotoDatasets() {
     this.$router.push({ name: 'index' })
   }
 

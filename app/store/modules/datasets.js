@@ -34,7 +34,7 @@ function matchesQueryFilter(query, dataset) {
 }
 
 @Module({ stateFactory: true, name: 'datasets', namespaced: true })
-class DataSets extends VuexModule {
+class Datasets extends VuexModule {
   loading = false
   all = []
   filterCriteria = {
@@ -97,4 +97,4 @@ class DataSets extends VuexModule {
   }
 }
 
-export { DataSets }
+export { Datasets }

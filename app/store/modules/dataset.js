@@ -4,7 +4,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import area from '@turf/area'
 
 @Module({ stateFactory: true, name: 'dataset', namespaced: true })
-class DataSet extends VuexModule {
+class Dataset extends VuexModule {
   timeseries = {
     x: [],
     y: [],
@@ -123,4 +123,4 @@ class DataSet extends VuexModule {
   }
 }
 
-export { DataSet }
+export { Dataset }
