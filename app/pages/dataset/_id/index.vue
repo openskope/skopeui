@@ -24,12 +24,13 @@
                   <v-btn
                     depressed
                     color="info"
-                    @click="confirmGeometry.value = false"
-                    >Keep selected area</v-btn
+                    @click="confirmGeometry = false"
                   >
-                  <v-btn depressed color="warning" @click="clearGeometry"
-                    >Clear selected area</v-btn
-                  >
+                    Keep selected area
+                  </v-btn>
+                  <v-btn depressed color="warning" @click="clearGeoJson">
+                    Clear selected area
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </template>
@@ -37,24 +38,27 @@
           <h1 class="font-weight-light">
             {{ metadata.title }}
           </h1>
-          <v-tooltip bottom
-            ><template #activator="{ on, attrs }">
-              <v-btn icon color="secondary" class="mx-3">
-                <v-icon
-                  v-bind="attrs"
-                  large
-                  @click="instructions = !instructions"
-                  v-on="on"
-                  >info</v-icon
-                >
-              </v-btn> </template
-            ><span>Instructions</span></v-tooltip
-          >
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                icon
+                color="secondary"
+                class="mx-3"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon large @click="instructions = !instructions">
+                  info
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Instructions</span>
+          </v-tooltip>
           <v-dialog v-model="dialog" max-width="600px">
             <template #activator="{ on, attrs }">
-              <v-btn depressed color="accent" v-bind="attrs" v-on="on"
-                >View Metadata</v-btn
-              >
+              <v-btn depressed color="accent" v-bind="attrs" v-on="on">
+                View Metadata
+              </v-btn>
             </template>
             <v-card>
               <v-card-title class="accent text--white">
@@ -77,11 +81,12 @@
             color="accent"
             :disabled="!hasValidStudyArea"
             @click="goToViz($route.params.id)"
-            >Go to Visualize
-            <v-icon small class="ml-2" color="white"
-              >fas fa-chevron-right</v-icon
-            ></v-btn
           >
+            Go to Visualize
+            <v-icon small class="ml-2" color="white">
+              fas fa-chevron-right
+            </v-icon>
+          </v-btn>
         </v-col>
         <!-- instructions -->
         <v-col class="flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0">
@@ -108,7 +113,6 @@
 </template>
 
 <script>
-import circleToPolygon from "circle-to-polygon";
 import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
@@ -116,6 +120,8 @@ import Vue from "vue";
 import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 import Metadata from "@/components/action/Metadata.vue";
 import Map from "@/components/Map.vue";
+
+import { clearGeoJson } from "@/store/actions";
 
 const fillTemplate = require("es6-dynamic-template");
 
@@ -158,7 +164,7 @@ class DatasetDetail extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeoJson;
+    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
   }
 
   get selectedArea() {
@@ -193,9 +199,9 @@ class DatasetDetail extends Vue {
     this.$router.push({ name: "dataset-id-visualize", params: { id } });
   }
 
-  async clearGeometry() {
+  clearGeoJson() {
     this.confirmGeometry = false;
-    this.$api().dataset.clearGeometry();
+    clearGeoJson(this.$warehouse, this.$api());
   }
 }
 export default DatasetDetail;
@@ -237,14 +243,4 @@ export default DatasetDetail;
 ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title="Save changes"] {
   display: none;
 }
-
-/*.card {*/
-/*  background: rgb(73, 190, 131);*/
-/*  background: linear-gradient(*/
-/*    90deg,*/
-/*    rgba(73, 190, 131, 1) 0%,*/
-/*    rgba(81, 192, 139, 1) 50%,*/
-/*    rgba(88, 193, 145, 1) 100%*/
-/*  );*/
-/*}*/
 </style>

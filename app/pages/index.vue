@@ -54,9 +54,12 @@ class LandingPage extends Vue {
     return this.$api().datasets.filteredDatasets;
   }
 
+  async fetch() {
+    this.$api().datasets.retrieveData();
+  }
+
   created() {
     const api = this.$api();
-    api.datasets.retrieveData();
     api.dataset.clearTimeSeries();
     api.dataset.setMetadata(null);
   }
