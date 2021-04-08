@@ -12,32 +12,32 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
-import { Prop } from 'vue-property-decorator'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
+import { Prop } from 'vue-property-decorator';
 
 @Component()
 class RunningAverage extends Vue {
   @Prop()
-  dataset
+  dataset;
 
   @Prop()
-  variable
+  variable;
 
   @Prop()
-  studyArea
+  studyArea;
 
   @Prop()
-  yearRange
+  yearRange;
 
   @Prop({
     validator(value) {
-      return ['runningAverage', 'trailingAverage'].indexOf(value) !== -1
+      return ['runningAverage', 'trailingAverage'].indexOf(value) !== -1;
     },
   })
-  method
+  method;
 
-  width = 7
+  width = 7;
 
   addVariable() {
     this.$emit('submit', {
@@ -49,9 +49,9 @@ class RunningAverage extends Vue {
         method: this.method,
         width: this.width,
       },
-    })
+    });
   }
 }
-export default RunningAverage
+export default RunningAverage;
 </script>
 <style scoped></style>

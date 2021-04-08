@@ -71,62 +71,62 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
-import { Prop } from 'vue-property-decorator'
-import { BaseMapProvider } from '@/store/modules/constants'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
+import { Prop } from 'vue-property-decorator';
+import { BaseMapProvider } from '@/store/modules/constants';
 
 @Component()
 class Dataset extends Vue {
   @Prop()
-  title //: String
+  title; //: String
 
   @Prop()
-  status //: String
+  status; //: String
 
   @Prop()
-  revised //: String
+  revised; //: String
 
   @Prop()
-  region //: Object
+  region; //: Object
 
   @Prop()
-  timespan //: Object
+  timespan; //: Object
 
   @Prop()
-  description //: String
+  description; //: String
 
   @Prop()
-  id //: String
+  id; //: String
 
   @Prop()
-  sourceUrl //: String
+  sourceUrl; //: String
 
   @Prop()
-  variables
+  variables;
 
   // --------- GETTERS ---------
 
   get defaultBaseMap() {
-    return BaseMapProvider.default
+    return BaseMapProvider.default;
   }
   get spatialCoverage() {
-    return `${this.region.name} at ${this.region.resolution}`
+    return `${this.region.name} at ${this.region.resolution}`;
   }
   get temporalCoverage() {
-    const period = this.timespan.period
+    const period = this.timespan.period;
     const timespan =
-      period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`
-    return `${timespan}${period.suffix} ${this.timespan.resolutionLabel}`
+      period.gte === period.lte ? period.gte : `${period.gte}-${period.lte}`;
+    return `${timespan}${period.suffix} ${this.timespan.resolutionLabel}`;
   }
   get absoluteUrl() {
-    return `/dataset/${this.id}`
+    return `/dataset/${this.id}`;
   }
   get defaultCrs() {
     if (this.$L) {
-      return this.$L.CRS.EPSG4326
+      return this.$L.CRS.EPSG4326;
     }
-    return ''
+    return '';
   }
 
   // --------- METHODS ---------
@@ -135,7 +135,7 @@ class Dataset extends Vue {
 
   initLayers() {}
 }
-export default Dataset
+export default Dataset;
 </script>
 <style scoped>
 .map {

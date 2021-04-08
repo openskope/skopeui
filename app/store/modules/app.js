@@ -1,9 +1,9 @@
-import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
+import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 @Module({ stateFactory: true, namespaced: true, name: 'app' })
 class App extends VuexModule {
-  isDisabled = 0
-  isVisible = false
+  isDisabled = 0;
+  isVisible = false;
 
   steps = [
     {
@@ -32,14 +32,14 @@ class App extends VuexModule {
       label: 'Analyze Data',
       instructions: 'Instructions here',
     },
-  ]
+  ];
 
   stepNames = [
     'index',
     'dataset-id',
     'dataset-id-visualize',
     'dataset-id-analyze',
-  ]
+  ];
 
   /**
    * Determine if drawer can be toggled.
@@ -47,9 +47,9 @@ class App extends VuexModule {
   @Mutation
   disableDrawer(step) {
     if (step == 1) {
-      return (this.isDisabled = 0)
+      return (this.isDisabled = 0);
     } else {
-      return (this.isDisabled = 1)
+      return (this.isDisabled = 1);
     }
   }
 
@@ -59,13 +59,13 @@ class App extends VuexModule {
    */
   @Mutation
   setDrawer(isVisible) {
-    this.isVisible = isVisible
+    this.isVisible = isVisible;
   }
 
   @Action({ commit: 'disableDrawer' })
   canShowDrawer(step) {
-    this.context.commit('disableDrawer', step)
-    return isDisabled
+    this.context.commit('disableDrawer', step);
+    return isDisabled;
   }
 
   /**
@@ -74,9 +74,9 @@ class App extends VuexModule {
    */
   @Action({ commit: 'setDrawer' })
   toggleDrawer(isVisible) {
-    this.context.commit('setDrawer', isVisible)
-    return isVisible
+    this.context.commit('setDrawer', isVisible);
+    return isVisible;
   }
 }
 
-export { App }
+export { App };

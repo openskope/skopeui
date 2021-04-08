@@ -108,16 +108,16 @@
 </template>
 
 <script>
-import circleToPolygon from 'circle-to-polygon'
-import _ from 'lodash'
-import { Component } from 'nuxt-property-decorator'
-import Vue from 'vue'
+import circleToPolygon from 'circle-to-polygon';
+import _ from 'lodash';
+import { Component } from 'nuxt-property-decorator';
+import Vue from 'vue';
 
-import LoadingSpinner from '@/components/global/LoadingSpinner.vue'
-import Metadata from '@/components/action/Metadata.vue'
-import Map from '@/components/Map.vue'
+import LoadingSpinner from '@/components/global/LoadingSpinner.vue';
+import Metadata from '@/components/action/Metadata.vue';
+import Map from '@/components/Map.vue';
 
-const fillTemplate = require('es6-dynamic-template')
+const fillTemplate = require('es6-dynamic-template');
 
 @Component({
   layout: 'BaseDataset',
@@ -130,75 +130,75 @@ const fillTemplate = require('es6-dynamic-template')
   },
 })
 class DatasetDetail extends Vue {
-  stepNames = _.clone(this.$api().app.stepNames)
+  stepNames = _.clone(this.$api().app.stepNames);
 
-  dialog = false
-  instructions = false
-  confirmGeometry = false
+  dialog = false;
+  instructions = false;
+  confirmGeometry = false;
 
   get isLoading() {
-    return _.isNull(this.metadata)
+    return this.metadata == null;
   }
 
   get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name)
+    return this.stepNames.findIndex((x) => x === this.$route.name);
   }
 
   get metadata() {
-    return this.$api().dataset.metadata
+    return this.$api().dataset.metadata;
   }
 
   get timespan() {
-    return this.$api().dataset.timespan
+    return this.$api().dataset.timespan;
   }
 
   get timeZero() {
-    return this.$api().dataset.timeZero
+    return this.$api().dataset.timeZero;
   }
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeoJson
+    return this.currentStep == 0 || this.$api().dataset.hasGeoJson;
   }
 
   get selectedArea() {
     return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
       2
-    )
+    );
   }
 
   // created lifecycle hook
   async created() {
-    const api = this.$api()
-    api.dataset.loadMetadata(this.$route.params.id)
-    this.minTemporalRange = this.timespanMinYear
-    this.maxTemporalRange = this.timespanMaxYear
-    this.confirmGeometry = this.hasValidStudyArea
+    const api = this.$api();
+    api.dataset.loadMetadata(this.$route.params.id);
+    this.minTemporalRange = this.timespanMinYear;
+    this.maxTemporalRange = this.timespanMaxYear;
+    this.confirmGeometry = this.hasValidStudyArea;
   }
 
   head() {
     return {
       title: this.metadata.title,
-    }
+    };
   }
 
   validate({ params }) {
-    return /^\w+$/.test(params.id)
+    return /^\w+$/.test(params.id);
   }
 
   goToViz(id) {
     if (_.isUndefined(id) || !this.hasValidStudyArea) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id-visualize', params: { id } })
+    this.$router.push({ name: 'dataset-id-visualize', params: { id } });
   }
 
   async clearGeometry() {
-    this.confirmGeometry = false
-    this.$api().dataset.clearGeometry()
+    this.confirmGeometry = false;
+    this.$api().dataset.clearGeometry();
   }
 }
-export default DatasetDetail
+export default DatasetDetail;
 </script>
 <style>
 .leaflet-top.leaflet-right

@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import Header from '@/components/global/Header'
-import Footer from '@/components/global/Footer'
-import Messages from '@/components/Messages'
+import Header from '@/components/global/Header';
+import Footer from '@/components/global/Footer';
+import Messages from '@/components/Messages';
 
 export default {
   name: 'SKOPE',
@@ -22,5 +22,5 @@ export default {
     Header,
     Messages,
   },
-}
+};
 </script>

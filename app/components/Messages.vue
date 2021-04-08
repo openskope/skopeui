@@ -23,23 +23,23 @@
 </template>
 
 <script>
-import { Component } from 'nuxt-property-decorator'
-import Vue from 'vue'
+import { Component } from 'nuxt-property-decorator';
+import Vue from 'vue';
 
 @Component()
 class Messages extends Vue {
   // --------- GETTERS ---------
 
   get messages() {
-    return this.$api().messages.messages
+    return this.$api().messages.messages;
   }
 
   // --------- METHODS ---------
 
   dismiss(index) {
-    this.$api().messages.dismiss(index)
+    this.$api().messages.dismiss(index);
   }
 }
 
-export default Messages
+export default Messages;
 </script>

@@ -185,4 +185,4 @@ export const ALL_DATA = [
       },
     ],
   },
-]
+];

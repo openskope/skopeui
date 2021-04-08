@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import { Component } from 'nuxt-property-decorator'
-import Vue from 'vue'
-import Dataset from '@/components/Dataset.vue'
+import { Component } from 'nuxt-property-decorator';
+import Vue from 'vue';
+import Dataset from '@/components/Dataset.vue';
 
 @Component({
   layout: 'BaseDefault',
@@ -51,15 +51,15 @@ import Dataset from '@/components/Dataset.vue'
 })
 class LandingPage extends Vue {
   get datasets() {
-    return this.$api().datasets.filteredDatasets
+    return this.$api().datasets.filteredDatasets;
   }
 
   created() {
-    const api = this.$api()
-    api.datasets.retrieveData()
-    api.dataset.clearTimeSeries()
-    api.dataset.setMetadata(null)
+    const api = this.$api();
+    api.datasets.retrieveData();
+    api.dataset.clearTimeSeries();
+    api.dataset.setMetadata(null);
   }
 }
-export default LandingPage
+export default LandingPage;
 </script>

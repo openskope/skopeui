@@ -63,10 +63,10 @@
   </v-app-bar>
 </template>
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
-import Navigation from '@/components/global/Navigation.vue'
-import { Prop, Watch } from 'vue-property-decorator'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
+import Navigation from '@/components/global/Navigation.vue';
+import { Prop, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -77,21 +77,21 @@ class Header extends Vue {
   github = {
     icon: 'fab fa-github',
     url: 'https://github.com/openskope/skopeui',
-  }
+  };
 
   // --------- GETTERS ---------
 
   get drawer() {
-    return this.$api().app.isVisible
+    return this.$api().app.isVisible;
   }
 
   // --------- METHODS ---------
 
   toggleDrawer(drawer) {
-    this.$api().app.toggleDrawer(drawer)
+    this.$api().app.toggleDrawer(drawer);
   }
 }
-export default Header
+export default Header;
 </script>
 <style scoped>
 .v-app-bar {

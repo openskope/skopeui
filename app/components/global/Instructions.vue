@@ -3,13 +3,13 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
 
 @Component({})
 class Instructions extends Vue {
   // generate instructions at top of page based on step
 }
 
-export default Instructions
+export default Instructions;
 </script>

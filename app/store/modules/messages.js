@@ -4,41 +4,41 @@ import {
   Action,
   Mutation,
   MutationAction,
-} from 'vuex-module-decorators'
+} from 'vuex-module-decorators';
 
 @Module({ stateFactory: true, namespaced: true, name: 'messages' })
 class Messages extends VuexModule {
-  messages = []
+  messages = [];
 
   @Mutation
   info(message) {
-    this.messages.push({ type: 'info', message })
+    this.messages.push({ type: 'info', message });
   }
 
   @Mutation
   error(message) {
-    this.messages.push({ type: 'error', message })
+    this.messages.push({ type: 'error', message });
   }
 
   @Mutation
   dismiss(index) {
-    this.messages.splice(index, 1)
+    this.messages.splice(index, 1);
   }
 
   @Mutation
   clearMessages() {
-    this.messages.splice(0, this.messages.length)
+    this.messages.splice(0, this.messages.length);
   }
 
   @Mutation
   addMessage(alert) {
-    this.messages.push(alert)
+    this.messages.push(alert);
   }
 
   @Mutation
   removeMessage(index) {
-    this.messages.splice(index, 1)
+    this.messages.splice(index, 1);
   }
 }
 
-export { Messages }
+export { Messages };

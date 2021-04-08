@@ -193,21 +193,21 @@
 </template>
 
 <script>
-import { Component, Watch } from 'nuxt-property-decorator'
-import Map from '@/components/Map.vue'
-import Metadata from '@/components/action/Metadata.vue'
-import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
-import Vue from 'vue'
-import _ from 'lodash'
+import { Component, Watch } from 'nuxt-property-decorator';
+import Map from '@/components/Map.vue';
+import Metadata from '@/components/action/Metadata.vue';
+import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue';
+import Vue from 'vue';
+import _ from 'lodash';
 import {
   loadTimeSeries,
   retrieveTimeSeries,
   initializeDatasetGeoJson,
-} from '@/store/actions'
+} from '@/store/actions';
 
 const setYearSelected = _.debounce(function (vue) {
-  vue.yearSelected = vue.formYearSelected
-}, 350)
+  vue.yearSelected = vue.formYearSelected;
+}, 350);
 
 @Component({
   layout: 'BaseDataset',
@@ -218,105 +218,105 @@ const setYearSelected = _.debounce(function (vue) {
   },
 })
 class Visualize extends Vue {
-  animationSpeed = 2000
-  hasData = false
-  isAnimationPlaying = false
-  isLoadingData = true
-  opacityIndex = 3
-  opacityLevels = _.range(0, 10).map((x) => x * 10)
-  yearSelected = 1500
-  dialog = false
-  instructions = false
+  animationSpeed = 2000;
+  hasData = false;
+  isAnimationPlaying = false;
+  isLoadingData = true;
+  opacityIndex = 3;
+  opacityLevels = _.range(0, 10).map((x) => x * 10);
+  yearSelected = 1500;
+  dialog = false;
+  instructions = false;
   layerGroup = {
     icon: 'fas fa-layer-group',
-  }
-  timeSeriesUnwatcher = null
-  stepNames = _.clone(this.$api().app.stepNames)
-  formTemporalRange = [1, 2017]
-  formYearSelected = 1500
-  selectedTemporalRange = [1, 2017]
+  };
+  timeSeriesUnwatcher = null;
+  stepNames = _.clone(this.$api().app.stepNames);
+  formTemporalRange = [1, 2017];
+  formYearSelected = 1500;
+  selectedTemporalRange = [1, 2017];
 
   get geometry() {
-    return this.$api().dataset.geoJson?.geometry ?? null
+    return this.$api().dataset.geoJson?.geometry ?? null;
   }
 
   get metadata() {
-    return this.$api().dataset.metadata
+    return this.$api().dataset.metadata;
   }
 
   get timespan() {
-    return this.$api().dataset.timespan
+    return this.$api().dataset.timespan;
   }
 
   get canHandleTimeSeriesRequest() {
-    return this.$api().dataset.canHandleTimeSeriesRequest
+    return this.$api().dataset.canHandleTimeSeriesRequest;
   }
 
   get isLoading() {
-    return _.isNull(this.metadata)
+    return _.isNull(this.metadata);
   }
 
   get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name)
+    return this.stepNames.findIndex((x) => x === this.$route.name);
   }
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep === 0 || this.$api().dataset.hasGeoJson
+    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
   }
 
   get hasTimeSeries() {
-    return this.timeSeries.x.length > 0
+    return this.timeSeries.x.length > 0;
   }
   get timeSeries() {
-    const api = this.$api()
-    const timeseries = api.dataset.timeseries
+    const api = this.$api();
+    const timeseries = api.dataset.timeseries;
     if (timeseries.x.length > 0) {
-      const minOffset = this.selectedTemporalRange[0] - this.minYear
-      const maxOffset = this.selectedTemporalRange[1] - this.minYear
-      const x = timeseries.x.slice(minOffset, maxOffset)
-      const y = timeseries.y.slice(minOffset, maxOffset)
-      console.log({ x, y })
-      return { x, y, type: 'scatter' }
+      const minOffset = this.selectedTemporalRange[0] - this.minYear;
+      const maxOffset = this.selectedTemporalRange[1] - this.minYear;
+      const x = timeseries.x.slice(minOffset, maxOffset);
+      const y = timeseries.y.slice(minOffset, maxOffset);
+      console.log({ x, y });
+      return { x, y, type: 'scatter' };
     } else {
-      return { x: [], y: [], type: 'scatter' }
+      return { x: [], y: [], type: 'scatter' };
     }
   }
   get minYear() {
-    return parseInt(this.metadata.timespan.period.gte)
+    return parseInt(this.metadata.timespan.period.gte);
   }
   get maxYear() {
-    return parseInt(this.metadata.timespan.period.lte)
+    return parseInt(this.metadata.timespan.period.lte);
   }
   get opacity() {
-    return this.opacityLevels[this.opacityIndex]
+    return this.opacityLevels[this.opacityIndex];
   }
   get playIcon() {
     if (this.isAnimationPlaying) {
-      return 'pause_circle_filled'
+      return 'pause_circle_filled';
     } else {
-      return 'play_circle_filled'
+      return 'play_circle_filled';
     }
   }
 
   get variable() {
-    return this.$api().dataset.variable
+    return this.$api().dataset.variable;
   }
 
   set variable(id) {
-    this.$api().dataset.setVariable(id)
+    this.$api().dataset.setVariable(id);
   }
 
   get variables() {
-    return this.metadata.variables
+    return this.metadata.variables;
   }
 
   async fetch() {
-    const api = this.$api()
-    await api.dataset.loadMetadata(this.$route.params.id)
+    const api = this.$api();
+    await api.dataset.loadMetadata(this.$route.params.id);
   }
 
   async mounted() {
-    await loadTimeSeries(this.$api())
+    await loadTimeSeries(this.$api());
     this.timeSeriesUnwatcher = this.$watch(
       function () {
         if (this.canHandleTimeSeriesRequest) {
@@ -326,7 +326,7 @@ class Visualize extends Vue {
             geometry: this.geometry,
             minYear: this.minYear,
             maxYear: this.maxYear,
-          }
+          };
         } else {
           return {
             datasetId: null,
@@ -334,83 +334,83 @@ class Visualize extends Vue {
             geometry: null,
             minYear: null,
             maxYear: null,
-          }
+          };
         }
       },
       async function (data) {
-        console.log({ data })
-        await retrieveTimeSeries(this.$api(), data)
+        console.log({ data });
+        await retrieveTimeSeries(this.$api(), data);
       }
-    )
-    this.yearSelected = this.minYear
-    this.isLoadingData = false
-    this.hasData = true
+    );
+    this.yearSelected = this.minYear;
+    this.isLoadingData = false;
+    this.hasData = true;
   }
   destroyed() {
-    this.timeSeriesUnwatcher()
+    this.timeSeriesUnwatcher();
   }
 
   goToAnalyze(id) {
     if (_.isUndefined(id)) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
+    this.$router.push({ name: 'dataset-id-analyze', params: { id } });
   }
 
   decreaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10)
+    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10);
   }
   increaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10)
+    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10);
   }
 
   setTemporalRange() {
-    this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange)
+    this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange);
   }
 
   gotoFirstYear() {
     if (this.variable === null) {
-      return
+      return;
     }
-    this.setYear(this.minYear)
+    this.setYear(this.minYear);
   }
   gotoLastYear() {
     if (this.variable === null) {
-      return
+      return;
     }
-    this.setYear(this.maxYear)
+    this.setYear(this.maxYear);
   }
   nextYear() {
     if (this.variable === null) {
-      return
+      return;
     }
-    this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear))
+    this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear));
   }
   previousYear() {
     if (this.variable === null) {
-      return
+      return;
     }
-    this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear))
+    this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear));
   }
   togglePlay(event) {
-    this.isAnimationPlaying = !this.isAnimationPlaying
+    this.isAnimationPlaying = !this.isAnimationPlaying;
     if (this.isAnimationPlaying) {
       // start an interval
       const animationInterval = setInterval(() => {
         if (!this.isAnimationPlaying) {
-          clearInterval(animationInterval)
-          return
+          clearInterval(animationInterval);
+          return;
         }
-        this.nextYear()
-      }, this.animationSpeed)
+        this.nextYear();
+      }, this.animationSpeed);
     }
   }
 
   setYear(year) {
-    this.yearSelected = year
+    this.yearSelected = year;
   }
 }
-export default Visualize
+export default Visualize;
 </script>
 
 <style scoped>

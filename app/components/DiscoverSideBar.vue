@@ -82,25 +82,25 @@
   </v-navigation-drawer>
 </template>
 <script>
-import { Component } from 'nuxt-property-decorator'
-import { Prop, Watch } from 'vue-property-decorator'
-import Vue from 'vue'
+import { Component } from 'nuxt-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
 
 @Component()
 class DiscoverSideBar extends Vue {
-  currentYear = new Date().getFullYear()
+  currentYear = new Date().getFullYear();
 
-  search = ''
-  startYear = 1
-  endYear = this.currentYear
-  selectedVariableClasses = []
-  minYear = 1
-  maxYear = this.currentYear
+  search = '';
+  startYear = 1;
+  endYear = this.currentYear;
+  selectedVariableClasses = [];
+  minYear = 1;
+  maxYear = this.currentYear;
 
   // --------- GETTERS ---------
 
   get isVisible() {
-    return this.$api().app.isVisible
+    return this.$api().app.isVisible;
   }
 
   get startYearRules() {
@@ -111,7 +111,7 @@ class DiscoverSideBar extends Vue {
       (v) =>
         v <= this.endYear ||
         `Please enter a valid start year before ${this.endYear}`,
-    ]
+    ];
   }
 
   get endYearRules() {
@@ -122,36 +122,36 @@ class DiscoverSideBar extends Vue {
       (v) =>
         v <= this.maxYear ||
         `Please enter a valid end year before ${this.maxYear}`,
-    ]
+    ];
   }
 
   get variableClasses() {
-    const datasets = this.$api().datasets.all
-    const variableClassSet = new Set()
+    const datasets = this.$api().datasets.all;
+    const variableClassSet = new Set();
     for (const dataset of datasets) {
       for (const variable of dataset.variables) {
-        variableClassSet.add(variable.class)
+        variableClassSet.add(variable.class);
       }
     }
-    const variableClasses = []
+    const variableClasses = [];
     for (const variableClass of variableClassSet) {
       variableClasses.push({
         name: variableClass,
         checked: false,
-      })
+      });
     }
-    return variableClasses
+    return variableClasses;
   }
 
   created() {
-    this.$api().datasets.retrieveData()
+    this.$api().datasets.retrieveData();
   }
 
   // --------- METHODS ---------
 
   @Watch('isVisible')
   toggle(isVisible) {
-    console.log(this.isVisible === isVisible)
+    console.log(this.isVisible === isVisible);
   }
 
   filterDatasets() {
@@ -162,10 +162,10 @@ class DiscoverSideBar extends Vue {
       yearStart: this.startYear,
       yearEnd: this.endYear,
       query: this.search,
-    })
+    });
   }
 }
 
-export default DiscoverSideBar
+export default DiscoverSideBar;
 </script>
 <style scoped></style>

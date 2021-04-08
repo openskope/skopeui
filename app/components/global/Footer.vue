@@ -23,7 +23,7 @@ export default {
         icon: 'fab fa-github',
         url: 'https://github.com/openskope/skopeui',
       },
-    }
+    };
   },
-}
+};
 </script>

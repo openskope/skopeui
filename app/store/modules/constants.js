@@ -1,9 +1,9 @@
-import { find } from 'lodash'
-export const API_HOST_URL = 'https://api.openskope.org/' // FIXME: this should be parameterized at build / deployment
-export const WMS_SERVER_URI = 'geoserver/SKOPE/wms?'
-export const TIMESERIES_SERVICE_URI = 'timeseries-service/api/v1/timeseries/'
-export const SKOPE_WMS_ENDPOINT = `https://app.openskope.org/${WMS_SERVER_URI}`
-export const TIMESERIES_ENDPOINT = `${API_HOST_URL}${TIMESERIES_SERVICE_URI}`
+import { find } from 'lodash';
+export const API_HOST_URL = 'https://api.openskope.org/'; // FIXME: this should be parameterized at build / deployment
+export const WMS_SERVER_URI = 'geoserver/SKOPE/wms?';
+export const TIMESERIES_SERVICE_URI = 'timeseries-service/api/v1/timeseries/';
+export const SKOPE_WMS_ENDPOINT = `https://app.openskope.org/${WMS_SERVER_URI}`;
+export const TIMESERIES_ENDPOINT = `${API_HOST_URL}${TIMESERIES_SERVICE_URI}`;
 export const LEAFLET_PROVIDERS = [
   {
     name: 'CartoDB.Positron',
@@ -40,13 +40,13 @@ export const LEAFLET_PROVIDERS = [
     attribution: 'Tiles &copy; Esri et al',
     visible: true,
   },
-]
+];
 
 export class BaseMapProvider {
   static get default() {
-    return LEAFLET_PROVIDERS[0]
+    return LEAFLET_PROVIDERS[0];
   }
   static get(name) {
-    return find(LEAFLET_PROVIDERS, { name })
+    return find(LEAFLET_PROVIDERS, { name });
   }
 }

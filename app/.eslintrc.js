@@ -12,9 +12,9 @@ module.exports = {
   // add custom rules here
   rules: {
     'no-console': 'off',
-    semi: [2, 'never'],
+    semi: ['error', 'always'],
     'vue/max-attributes-per-line': 'off',
-    'prettier/prettier': ['error', { semi: false }],
+    'prettier/prettier': ['error', { semi: true }],
     'no-template-curly-in-string': 'off',
   },
-}
+};

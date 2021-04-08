@@ -44,15 +44,15 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
 
 @Component({
   name: 'Metadata',
 })
 class Metadata extends Vue {
   get metadata() {
-    return this.$api().dataset.metadata
+    return this.$api().dataset.metadata;
   }
 
   get metadataAttributes() {
@@ -62,11 +62,11 @@ class Metadata extends Vue {
       methodSummary: 'Method Summary',
       references: 'References',
       contactInformation: 'Contact Information',
-    }
+    };
   }
 }
 
-export default Metadata
+export default Metadata;
 </script>
 
 <style scoped></style>

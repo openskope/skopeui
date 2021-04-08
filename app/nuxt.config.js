@@ -1,4 +1,4 @@
-const pkg = require('./package')
+const pkg = require('./package');
 
 module.exports = {
   /*
@@ -149,7 +149,7 @@ module.exports = {
       presets({ isServer }) {
         return [
           ['@nuxt/babel-preset-app', { loose: true, corejs: { version: 3 } }],
-        ]
+        ];
       },
     },
     transpile: ['vuetify/lib'],
@@ -158,17 +158,17 @@ module.exports = {
      ** You can extend webpack config here
      */
     extend(config, { isDev, isClient }) {
-      config.node = { fs: 'empty' }
+      config.node = { fs: 'empty' };
       // Run ESLint on save
       config.module.rules.push({
         enforce: 'pre',
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         exclude: /(node_modules)/,
-      })
+      });
       if (isClient) {
-        config.devtool = 'source-map'
+        config.devtool = 'source-map';
       }
     },
   },
-}
+};

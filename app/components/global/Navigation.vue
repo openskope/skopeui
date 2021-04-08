@@ -51,76 +51,76 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
-import _ from 'lodash'
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
+import _ from 'lodash';
 
 @Component()
 class Navigation extends Vue {
-  steps = _.cloneDeep(this.$api().app.steps)
+  steps = _.cloneDeep(this.$api().app.steps);
 
-  stepNames = _.clone(this.$api().app.stepNames)
+  stepNames = _.clone(this.$api().app.stepNames);
 
   // --------- GETTERS ---------
 
   get hasMetadata() {
-    return !_.isUndefined(this.$route.params.id)
+    return !_.isUndefined(this.$route.params.id);
   }
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeoJson
+    return this.currentStep == 0 || this.$api().dataset.hasGeoJson;
   }
 
   get canAnalyze() {
-    return this.hasValidStudyArea && this.$api().dataset.hasData
+    return this.hasValidStudyArea && this.$api().dataset.hasData;
   }
 
   // --------- METHODS ---------
 
   complete(index) {
-    return this.currentStep > index
+    return this.currentStep > index;
   }
 
   isActiveStep(index) {
-    return this.currentStep == index
+    return this.currentStep == index;
   }
 
   gotoDatasets() {
-    this.$router.push({ name: 'index' })
+    this.$router.push({ name: 'index' });
   }
 
   goToStudyArea(id) {
     if (_.isUndefined(id)) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id', params: { id } })
+    this.$router.push({ name: 'dataset-id', params: { id } });
   }
 
   goToViz(id) {
     if (_.isUndefined(id) || !this.hasValidStudyArea) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id-visualize', params: { id } })
+    this.$router.push({ name: 'dataset-id-visualize', params: { id } });
   }
 
   goToAnalyze(id) {
     if (_.isUndefined(id) || !this.canAnalyze) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id-analyze', params: { id } })
+    this.$router.push({ name: 'dataset-id-analyze', params: { id } });
   }
 
   get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name)
+    return this.stepNames.findIndex((x) => x === this.$route.name);
   }
 
   get selectedDatasetId() {
-    return this.$api().datasets.metadata.id
+    return this.$api().datasets.metadata.id;
   }
 }
 
-export default Navigation
+export default Navigation;
 </script>
 
 <style scoped lang="sass">

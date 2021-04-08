@@ -5,8 +5,8 @@ const saveSpatialBoundsRoute = {
     // FIXME: persist geometries to firebase or mongodb associated with username
     return {
       works: true,
-    }
+    };
   },
-}
+};
 
-module.exports = [saveSpatialBoundsRoute]
+module.exports = [saveSpatialBoundsRoute];

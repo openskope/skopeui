@@ -320,14 +320,14 @@
 </template>
 
 <script>
-import KernelRegression from '@/components/chart-form/KernelRegression.vue'
-import RunningAverage from '@/components/chart-form/RunningAverage.vue'
-import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
-import Metadata from '@/components/action/Metadata.vue'
-import Vue from 'vue'
-import { Component } from 'nuxt-property-decorator'
-import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
-import _ from 'lodash'
+import KernelRegression from '@/components/chart-form/KernelRegression.vue';
+import RunningAverage from '@/components/chart-form/RunningAverage.vue';
+import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue';
+import Metadata from '@/components/action/Metadata.vue';
+import Vue from 'vue';
+import { Component } from 'nuxt-property-decorator';
+import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions';
+import _ from 'lodash';
 
 @Component({
   layout: 'BaseDataset',
@@ -339,22 +339,22 @@ import _ from 'lodash'
   },
 })
 class Analyze extends Vue {
-  dialog = false
-  instructions = false
-  smoothing = null
-  display = null
-  timeSeriesUnWatcher = null
-  yearSelected = 1500
+  dialog = false;
+  instructions = false;
+  smoothing = null;
+  display = null;
+  timeSeriesUnWatcher = null;
+  yearSelected = 1500;
 
   layerGroup = {
     icon: 'fas fa-layer-group',
-  }
+  };
 
   polygon = {
     icon: 'fas fa-draw-polygon',
-  }
+  };
 
-  selectedZonalStatistic = 'mean'
+  selectedZonalStatistic = 'mean';
 
   zonalStatisticOpts = [
     {
@@ -365,7 +365,7 @@ class Analyze extends Vue {
       label: 'Median',
       id: 'median',
     },
-  ]
+  ];
 
   timeRange = {
     lb: {
@@ -376,9 +376,9 @@ class Analyze extends Vue {
       year: 1800,
       month: 1,
     },
-  }
+  };
 
-  selectedSmoother = 'none'
+  selectedSmoother = 'none';
 
   smootherOpts = [
     {
@@ -397,11 +397,11 @@ class Analyze extends Vue {
       label: 'Polynomial Spline',
       id: 'polynomialSpline',
     },
-  ]
+  ];
 
-  width = 7
+  width = 7;
 
-  selectedScaleTransform = 'none'
+  selectedScaleTransform = 'none';
 
   scaleTransformOpts = [
     {
@@ -412,81 +412,81 @@ class Analyze extends Vue {
       label: 'Z-Score',
       id: 'zscore',
     },
-  ]
+  ];
 
   get response() {
-    return this.$api().analyze.response
+    return this.$api().analyze.response;
   }
 
   get metadata() {
-    return this.$api().dataset.metadata
+    return this.$api().dataset.metadata;
   }
 
   get studyArea() {
-    return this.$api().dataset.geoJson
+    return this.$api().dataset.geoJson;
   }
 
   get canHandleTimeSeriesRequest() {
-    return this.$api().dataset.canHandleTimeSeriesRequest
+    return this.$api().dataset.canHandleTimeSeriesRequest;
   }
 
   get variable() {
-    return this.$api().dataset.variable
+    return this.$api().dataset.variable;
   }
 
   set variable(id) {
-    this.$api().dataset.setVariable(id)
+    this.$api().dataset.setVariable(id);
   }
 
   get variables() {
-    return this.metadata.variables
+    return this.metadata.variables;
   }
 
   get smootherWidthLabel() {
-    let widthUnit = 'Unknowns'
+    let widthUnit = 'Unknowns';
     switch (this.temporalResolution) {
       case 'month':
-        widthUnit = 'Months'
-        break
+        widthUnit = 'Months';
+        break;
       case 'year':
-        widthUnit = 'Years'
-        break
+        widthUnit = 'Years';
+        break;
     }
-    return `Smoother Width (# of ${widthUnit})`
+    return `Smoother Width (# of ${widthUnit})`;
   }
 
   get temporalResolution() {
-    return this.metadata.timespan.resolution
+    return this.metadata.timespan.resolution;
   }
 
   get timeSeries() {
-    const timeseries = this.$api().dataset.timeseries
+    const timeseries = this.$api().dataset.timeseries;
     if (timeseries.x.length > 0) {
-      return { ...this.$api().dataset.timeseries, type: 'scatter' }
+      return { ...this.$api().dataset.timeseries, type: 'scatter' };
     } else {
-      return { x: [], y: [], type: 'scatter' }
+      return { x: [], y: [], type: 'scatter' };
     }
   }
 
   get selectedAreaInSquareKilometers() {
     return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
       2
-    )
+    );
   }
 
   get minYear() {
-    return parseInt(this.metadata.timespan.period.gte)
+    return parseInt(this.metadata.timespan.period.gte);
   }
   get maxYear() {
-    return parseInt(this.metadata.timespan.period.lte)
+    return parseInt(this.metadata.timespan.period.lte);
   }
 
   setYear(year) {
-    this.yearSelected = year
+    this.yearSelected = year;
   }
 
   async submit() {
-    console.log('submitting to web service')
+    console.log('submitting to web service');
     await this.$api().analyze.retrieveAnalysis({
       dataset_id: 'lbda-v2',
       variable_id: 'palmer_modified_drought_index',
@@ -497,23 +497,23 @@ class Analyze extends Vue {
         gte: 1500,
         lte: 1800,
       },
-    })
+    });
   }
 
   async fetch() {
-    const api = this.$api()
-    await api.dataset.loadMetadata(this.$route.params.id)
+    const api = this.$api();
+    await api.dataset.loadMetadata(this.$route.params.id);
   }
 
   async updated() {
-    console.log('variable: ', this.variable)
+    console.log('variable: ', this.variable);
   }
 
   async mounted() {
-    const api = this.$api()
+    const api = this.$api();
     // load default variable
-    api.dataset.loadDefaultVariable(this.$route.params.id)
-    await loadTimeSeries(this.$api())
+    api.dataset.loadDefaultVariable(this.$route.params.id);
+    await loadTimeSeries(this.$api());
     this.timeSeriesUnWatcher = this.$watch(
       function () {
         if (this.canHandleTimeSeriesRequest) {
@@ -523,7 +523,7 @@ class Analyze extends Vue {
             geometry: this.studyArea.geometry,
             minYear: this.minYear,
             maxYear: this.maxYear,
-          }
+          };
         } else {
           return {
             datasetId: null,
@@ -531,29 +531,29 @@ class Analyze extends Vue {
             geometry: null,
             minYear: null,
             maxYear: null,
-          }
+          };
         }
       },
       async function (data) {
-        console.log({ data })
-        await retrieveTimeSeries(api, data)
+        console.log({ data });
+        await retrieveTimeSeries(api, data);
       }
-    )
-    this.yearSelected = this.timeRange.lb.year
+    );
+    this.yearSelected = this.timeRange.lb.year;
   }
 
   destroyed() {
-    this.timeSeriesUnWatcher()
+    this.timeSeriesUnWatcher();
   }
 
   goToStudyArea(id) {
     if (_.isUndefined(id)) {
-      return
+      return;
     }
-    this.$router.push({ name: 'dataset-id', params: { id } })
+    this.$router.push({ name: 'dataset-id', params: { id } });
   }
 }
-export default Analyze
+export default Analyze;
 </script>
 
 <style scoped>

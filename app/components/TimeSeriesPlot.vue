@@ -12,10 +12,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import _ from 'lodash'
-import { Component } from 'nuxt-property-decorator'
-import { Prop, Watch } from 'vue-property-decorator'
+import Vue from 'vue';
+import _ from 'lodash';
+import { Component } from 'nuxt-property-decorator';
+import { Prop, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -24,19 +24,19 @@ import { Prop, Watch } from 'vue-property-decorator'
 })
 class TimeSeriesPlot extends Vue {
   @Prop()
-  timeSeries
+  timeSeries;
 
   @Prop({ default: null })
-  yearSelected
+  yearSelected;
   get variableName() {
-    const api = this.$api()
-    return _.isEmpty(api.dataset.layer) ? '' : api.dataset.layer.name
+    const api = this.$api();
+    return _.isEmpty(api.dataset.layer) ? '' : api.dataset.layer.name;
   }
 
   get layoutMetadata() {
     const xaxisTitle = !_.isNil(this.yearSelected)
       ? `Year (currently ${this.yearSelected})`
-      : 'Year'
+      : 'Year';
     return {
       margin: {
         l: 60,
@@ -52,14 +52,14 @@ class TimeSeriesPlot extends Vue {
       yaxis: {
         title: this.variableName,
       },
-    }
+    };
   }
 
   get options() {
     return {
       modeBarButtonsToRemove: ['toImage'],
       // responsive: true
-    }
+    };
   }
 
   get yearSelectedSeries() {
@@ -68,41 +68,41 @@ class TimeSeriesPlot extends Vue {
         x: [this.yearSelected, this.yearSelected],
         y: [_.min(this.timeSeries.y), _.max(this.timeSeries.y)],
         type: 'scatter',
-      }
+      };
     } else {
       return {
         x: [],
         y: [],
         type: 'scatter',
-      }
+      };
     }
   }
 
   get timeSeriesData() {
     return this.yearSelectedSeries.x.length === 0
       ? [this.timeSeries]
-      : [this.timeSeries, this.yearSelectedSeries]
+      : [this.timeSeries, this.yearSelectedSeries];
   }
 
   setYear(data) {
-    this.$emit('yearSelected', data.points[0].x)
+    this.$emit('yearSelected', data.points[0].x);
   }
 
   @Watch('timeSeriesData')
   getTimeSeriesData(timeSeriesData) {
     if (this.$refs.plot) {
-      this.$refs.plot.update(timeSeriesData, this.layoutMetadata)
+      this.$refs.plot.update(timeSeriesData, this.layoutMetadata);
     }
   }
 
   @Watch('layoutMetadata')
   getLayoutMetadata(layoutMetadata) {
     if (this.$refs.plot) {
-      this.$refs.plot.update(this.timeSeriesData, layoutMetadata)
+      this.$refs.plot.update(this.timeSeriesData, layoutMetadata);
     }
   }
 }
-export default TimeSeriesPlot
+export default TimeSeriesPlot;
 </script>
 <style>
 .timeseries {
