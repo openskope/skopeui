@@ -7,33 +7,6 @@
         <v-col
           class="d-flex flex-row flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0 pt-10"
         >
-          <v-dialog
-            v-model="confirmGeometry"
-            transition="dialog-bottom-transition"
-            max-width="600"
-          >
-            <template #default="confirmGeometry">
-              <v-card class="pa-6">
-                <v-card-text>
-                  <h3>
-                    Welcome back! Would you like to clear the currently selected
-                    area?
-                  </h3>
-                </v-card-text>
-                <v-card-actions class="justify-end">
-                  <v-btn
-                    depressed
-                    color="info"
-                    @click="confirmGeometry.value = false"
-                    >Keep selected area</v-btn
-                  >
-                  <v-btn depressed color="warning" @click="clearGeometry"
-                    >Clear selected area</v-btn
-                  >
-                </v-card-actions>
-              </v-card>
-            </template>
-          </v-dialog>
           <h1 class="font-weight-light">
             {{ metadata.title }}
           </h1>
@@ -93,13 +66,16 @@
             outlined
             dismissible
           >
-            Select the geometry for the dataset by using the drawing tools on
-            the map. A geometry must be defined in order to visualize and
+            Select the study area for the dataset by using the drawing tools on
+            the map. A study area must be defined in order to visualize and
             analyze the dataset.
           </v-alert>
         </v-col>
         <!-- map + time series plot -->
-        <v-col class="flex-grow-1 flex-shrink-0 ma-0 pa-0">
+        <v-col
+          class="flex-grow-1 flex-shrink-0 ma-0 pa-0"
+          style="background-color: blue"
+        >
           <v-row class="mx-5" style="height: 100%">
             <!-- loading animation -->
             <v-col v-if="isLoadingData">
@@ -111,61 +87,13 @@
             </v-col>
             <!-- map and toolbar controls-->
             <template v-else>
+              <!-- map -->
               <v-col style="height: 100%">
-                <v-card class="map pa-3 mb-5" elevation="2" outlined>
-                  <v-card-title>
-                    <h1 class="headline mr-3">Map</h1>
-                    <v-spacer></v-spacer>
-                    <h3 class="headline">
-                      Selected area: {{ selectedArea }} km<sup>2</sup>
-                    </h3>
-                  </v-card-title>
-                  <Map :year="yearSelected" :opacity="opacity" />
-                  <v-toolbar flat extended extension-height="25" class="pt-8">
-                    <v-row>
-                      <v-col cols="2">
-                        <v-toolbar-title>Opacity</v-toolbar-title>
-                        <v-toolbar-items class="my-auto">
-                          <v-btn icon color="secondary">
-                            <v-icon small @click="decreaseOpacity"
-                              >fas fa-minus</v-icon
-                            >
-                          </v-btn>
-                          <span class="mx-3"> {{ opacity }}</span>
-                          <v-btn icon small color="secondary">
-                            <v-icon @click="increaseOpacity"
-                              >fas fa-plus</v-icon
-                            >
-                          </v-btn>
-                        </v-toolbar-items>
-                      </v-col>
-                      <v-col offset="4">
-                        <v-toolbar-title>Variable</v-toolbar-title>
-                        <v-toolbar-items
-                          ><v-select
-                            v-model="variable"
-                            label="Select a variable"
-                            item-color="secondary"
-                            color="secondary"
-                            dense
-                            :items="variables"
-                            item-text="name"
-                            item-value="id"
-                            class="my-auto"
-                            :style="'width: 6rem'"
-                            :prepend-icon="layerGroup.icon"
-                            single-line
-                            outlined
-                          >
-                          </v-select
-                        ></v-toolbar-items>
-                      </v-col>
-                    </v-row>
-                  </v-toolbar>
-                </v-card>
+                <Map />
               </v-col>
+              <!-- time series plot -->
               <v-col style="height: 100%">
-                <v-card class="pa-3 mb-5" elevation="2" outlined>
+                <v-card height="85%" elevation="2" outlined>
                   <h1 class="headline mt-3 ml-3">Time Series</h1>
                   <template v-if="hasTimeSeries">
                     <TimeSeriesPlot
@@ -271,7 +199,11 @@ import Metadata from '@/components/action/Metadata.vue'
 import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue'
 import Vue from 'vue'
 import _ from 'lodash'
-import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions'
+import {
+  loadTimeSeries,
+  retrieveTimeSeries,
+  initializeDatasetGeoJson,
+} from '@/store/actions'
 
 const setYearSelected = _.debounce(function (vue) {
   vue.yearSelected = vue.formYearSelected
@@ -305,7 +237,7 @@ class Visualize extends Vue {
   selectedTemporalRange = [1, 2017]
 
   get geometry() {
-    return this.$api().dataset.geometry
+    return this.$api().dataset.geoJson?.geometry ?? null
   }
 
   get metadata() {
@@ -329,7 +261,7 @@ class Visualize extends Vue {
   }
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep === 0 || this.$api().dataset.hasGeometry
+    return this.currentStep === 0 || this.$api().dataset.hasGeoJson
   }
 
   get hasTimeSeries() {
@@ -364,11 +296,6 @@ class Visualize extends Vue {
     } else {
       return 'play_circle_filled'
     }
-  }
-  get selectedArea() {
-    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
-      2
-    )
   }
 
   get variable() {
@@ -436,24 +363,6 @@ class Visualize extends Vue {
   increaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10)
   }
-  exportSelectedGeometry(event) {
-    const geometry = this.getSavedGeometry()
-    if (geometry) {
-      const convertedArea =
-        'text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(geometry))
-      const button = document.getElementById('exportSelectedGeometry')
-      button.setAttribute('href', 'data:' + convertedArea)
-      button.setAttribute('download', `${this.wGeometryKey}.geojson`)
-    }
-  }
-  getSavedGeometry() {
-    const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
-    if (skopeGeometry) {
-      return JSON.parse(skopeGeometry)
-    }
-    return false
-  }
 
   setTemporalRange() {
     this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange)
@@ -505,10 +414,6 @@ export default Visualize
 </script>
 
 <style scoped>
-#exportSelectedGeometry {
-  text-decoration: none;
-  color: inherit;
-}
 .map-flex {
   height: calc(70vh - 96px);
 }

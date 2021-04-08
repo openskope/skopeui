@@ -69,7 +69,7 @@ class Navigation extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeometry
+    return this.currentStep == 0 || this.$api().dataset.hasGeoJson
   }
 
   get canAnalyze() {

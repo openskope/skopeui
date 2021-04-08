@@ -423,7 +423,7 @@ class Analyze extends Vue {
   }
 
   get studyArea() {
-    return this.$api().dataset.geometry
+    return this.$api().dataset.geoJson
   }
 
   get canHandleTimeSeriesRequest() {
@@ -520,7 +520,7 @@ class Analyze extends Vue {
           return {
             datasetId: this.metadata.id,
             variableId: this.variable.id,
-            geometry: this.studyArea,
+            geometry: this.studyArea.geometry,
             minYear: this.minYear,
             maxYear: this.maxYear,
           }

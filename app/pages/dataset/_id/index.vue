@@ -100,60 +100,7 @@
         </v-col>
         <!-- map -->
         <v-col id="map-flex" class="flex-grow-1 flex-shrink-0 ma-0 pa-0">
-          <v-card
-            class="mx-10"
-            height="85%"
-            elevation="2"
-            style="z-index: 1"
-            outlined
-          >
-            <v-card-title>
-              <h1 class="headline">Map</h1>
-              <v-spacer></v-spacer>
-              <h3 class="headline">
-                Selected area: {{ selectedArea }} km<sup>2</sup>
-              </h3>
-            </v-card-title>
-            <Map class="mx-0" />
-            <v-toolbar>
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    v-on="on"
-                    @click="exportSelectedGeometry"
-                  >
-                    <a id="exportSelectedGeometry">
-                      <v-icon>fas fa-download</v-icon>
-                    </a>
-                  </v-btn>
-                </template>
-                <span>Download selected geometry as a GeoJSON file</span>
-              </v-tooltip>
-              <input
-                id="loadGeoJsonFile"
-                type="file"
-                style="display: none"
-                @change="loadGeoJson"
-              />
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    v-on="on"
-                    @click="selectGeoJsonFile"
-                  >
-                    <v-icon>fas fa-upload</v-icon>
-                  </v-btn>
-                </template>
-                <span>Upload a GeoJSON file</span>
-              </v-tooltip>
-              <v-spacer></v-spacer>
-            </v-toolbar>
-            <!-- end toolbar -->
-          </v-card>
+          <Map class="mx-0" />
         </v-col>
       </v-row>
     </template>
@@ -211,23 +158,13 @@ class DatasetDetail extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeometry
+    return this.currentStep == 0 || this.$api().dataset.hasGeoJson
   }
 
   get selectedArea() {
     return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
       2
     )
-  }
-
-  get savedGeometry() {
-    const skopeGeometry = this.$warehouse.get(this.wGeometryKey)
-    console.log('skope geometry: ', skopeGeometry)
-    if (skopeGeometry) {
-      return JSON.parse(skopeGeometry)
-    } else {
-      return false
-    }
   }
 
   // created lifecycle hook
@@ -243,109 +180,6 @@ class DatasetDetail extends Vue {
     return {
       title: this.metadata.title,
     }
-  }
-
-  loadGeoJson(event) {
-    const file = event.target.files[0]
-    file.text().then((text) => {
-      console.log('received possible geojson to load: ', text)
-      try {
-        let area = JSON.parse(text)
-        this.restoreSelectedGeometry(area)
-      } catch (error) {
-        console.error(error)
-        // FIXME: this should be a toast or other notification
-        alert("Sorry! We couldn't re-import this file: " + text)
-      }
-    })
-  }
-
-  selectGeoJsonFile() {
-    document.getElementById('loadGeoJsonFile').click()
-  }
-
-  exportSelectedGeometry(event) {
-    const geometry = this.savedGeometry
-    console.log(' saved geometry ', { geometry })
-    if (geometry) {
-      console.log('exporting selected geometry: ', { geometry })
-      const convertedArea =
-        'text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(geometry))
-      const button = document.getElementById('exportSelectedGeometry')
-      button.setAttribute('href', 'data:' + convertedArea)
-      button.setAttribute('download', `${this.wGeometryKey}.geojson`)
-    }
-  }
-
-  updateSelectedGeometry(layer) {
-    const data = layer.toGeoJSON()
-    // store geoJSON in local storage
-    if (layer instanceof L.Circle) {
-      data.properties.radius = layer.getRadius()
-    }
-    this.saveSelectedGeometry(data)
-    if (layer instanceof L.Circle) {
-      const geometry = circleToPolygon(
-        data.geometry.coordinates,
-        layer.getRadius(),
-        this.defaultCircleToPolygonEdges
-      )
-      data.geometry = geometry
-      this.selectedAreaInSquareMeters =
-        layer.getRadius() * layer.getRadius() * Math.PI
-    } else if (layer instanceof L.Marker) {
-      this.selectedAreaInSquareMeters = 0
-    } else {
-      this.selectedAreaInSquareMeters = L.GeometryUtil.geodesicArea(
-        layer.getLatLngs()[0]
-      )
-    }
-    this.$api().dataset.setGeometry({
-      geometry: data.geometry,
-      area: this.selectedAreaInSquareMeters,
-    })
-  }
-
-  saveSelectedGeometry(geoJson) {
-    this.$warehouse.set(this.wGeometryKey, JSON.stringify(geoJson))
-  }
-
-  checkAndRestoreSavedGeometry(map) {
-    const savedGeometry = this.savedGeometry
-    if (savedGeometry) {
-      this.restoreSelectedGeometry(savedGeometry, map)
-    }
-  }
-
-  restoreSelectedGeometry(savedGeometry, map) {
-    const L = this.$L
-    if (!map) {
-      map = this.$refs.layerMap.mapObject
-    }
-    const geoJsonLayer = L.geoJson(savedGeometry, {
-      pointToLayer: (feature, latlng) => {
-        if (feature.properties.radius) {
-          return new L.Circle(latlng, feature.properties.radius)
-        } else {
-          return new L.Marker(latlng)
-        }
-      },
-    })
-    // remove all existing layers from the FeatureGroup
-    this.drawnItems.clearLayers()
-    geoJsonLayer.eachLayer((l) => {
-      this.drawnItems.addLayer(l)
-      this.updateSelectedGeometry(l)
-    })
-    this.enableEditOnly(map)
-    let padding = [5, 5]
-    console.log(geoJsonLayer)
-    if (geoJsonLayer instanceof L.Marker) {
-      console.log('Setting padding for marker')
-      padding = [30, 30]
-    }
-    map.fitBounds(this.drawnItems.getBounds(), { padding })
   }
 
   validate({ params }) {
