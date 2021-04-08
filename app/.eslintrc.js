@@ -5,16 +5,16 @@ module.exports = {
     node: true,
   },
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: "babel-eslint",
   },
-  extends: ['plugin:vue/recommended', 'plugin:prettier/recommended'],
-  plugins: ['vue', 'prettier'],
+  extends: ["plugin:vue/recommended", "plugin:prettier/recommended"],
+  plugins: ["vue"],
   // add custom rules here
   rules: {
-    'no-console': 'off',
-    semi: ['error', 'always'],
-    'vue/max-attributes-per-line': 'off',
-    'prettier/prettier': ['error', { semi: true }],
-    'no-template-curly-in-string': 'off',
+    "no-console": "off",
+    semi: ["error", "always"],
+    "vue/max-attributes-per-line": "off",
+    "prettier/prettier": ["error"],
+    "no-template-curly-in-string": "off",
   },
 };

@@ -71,10 +71,10 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import { Prop } from 'vue-property-decorator';
-import { BaseMapProvider } from '@/store/modules/constants';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import { Prop } from "vue-property-decorator";
+import { BaseMapProvider } from "@/store/modules/constants";
 
 @Component()
 class Dataset extends Vue {
@@ -126,7 +126,7 @@ class Dataset extends Vue {
     if (this.$L) {
       return this.$L.CRS.EPSG4326;
     }
-    return '';
+    return "";
   }
 
   // --------- METHODS ---------

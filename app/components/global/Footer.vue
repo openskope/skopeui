@@ -16,12 +16,12 @@
 
 <script>
 export default {
-  name: 'Footer',
+  name: "Footer",
   data() {
     return {
       github: {
-        icon: 'fab fa-github',
-        url: 'https://github.com/openskope/skopeui',
+        icon: "fab fa-github",
+        url: "https://github.com/openskope/skopeui",
       },
     };
   },

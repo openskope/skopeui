@@ -193,24 +193,24 @@
 </template>
 
 <script>
-import { Component, Watch } from 'nuxt-property-decorator';
-import Map from '@/components/Map.vue';
-import Metadata from '@/components/action/Metadata.vue';
-import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue';
-import Vue from 'vue';
-import _ from 'lodash';
+import { Component, Watch } from "nuxt-property-decorator";
+import Map from "@/components/Map.vue";
+import Metadata from "@/components/action/Metadata.vue";
+import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
+import Vue from "vue";
+import _ from "lodash";
 import {
   loadTimeSeries,
   retrieveTimeSeries,
   initializeDatasetGeoJson,
-} from '@/store/actions';
+} from "@/store/actions";
 
 const setYearSelected = _.debounce(function (vue) {
   vue.yearSelected = vue.formYearSelected;
 }, 350);
 
 @Component({
-  layout: 'BaseDataset',
+  layout: "BaseDataset",
   components: {
     Map,
     TimeSeriesPlot,
@@ -228,7 +228,7 @@ class Visualize extends Vue {
   dialog = false;
   instructions = false;
   layerGroup = {
-    icon: 'fas fa-layer-group',
+    icon: "fas fa-layer-group",
   };
   timeSeriesUnwatcher = null;
   stepNames = _.clone(this.$api().app.stepNames);
@@ -276,9 +276,9 @@ class Visualize extends Vue {
       const x = timeseries.x.slice(minOffset, maxOffset);
       const y = timeseries.y.slice(minOffset, maxOffset);
       console.log({ x, y });
-      return { x, y, type: 'scatter' };
+      return { x, y, type: "scatter" };
     } else {
-      return { x: [], y: [], type: 'scatter' };
+      return { x: [], y: [], type: "scatter" };
     }
   }
   get minYear() {
@@ -292,9 +292,9 @@ class Visualize extends Vue {
   }
   get playIcon() {
     if (this.isAnimationPlaying) {
-      return 'pause_circle_filled';
+      return "pause_circle_filled";
     } else {
-      return 'play_circle_filled';
+      return "play_circle_filled";
     }
   }
 
@@ -354,7 +354,7 @@ class Visualize extends Vue {
     if (_.isUndefined(id)) {
       return;
     }
-    this.$router.push({ name: 'dataset-id-analyze', params: { id } });
+    this.$router.push({ name: "dataset-id-analyze", params: { id } });
   }
 
   decreaseOpacity() {

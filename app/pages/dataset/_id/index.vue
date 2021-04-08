@@ -108,19 +108,19 @@
 </template>
 
 <script>
-import circleToPolygon from 'circle-to-polygon';
-import _ from 'lodash';
-import { Component } from 'nuxt-property-decorator';
-import Vue from 'vue';
+import circleToPolygon from "circle-to-polygon";
+import _ from "lodash";
+import { Component } from "nuxt-property-decorator";
+import Vue from "vue";
 
-import LoadingSpinner from '@/components/global/LoadingSpinner.vue';
-import Metadata from '@/components/action/Metadata.vue';
-import Map from '@/components/Map.vue';
+import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
+import Metadata from "@/components/action/Metadata.vue";
+import Map from "@/components/Map.vue";
 
-const fillTemplate = require('es6-dynamic-template');
+const fillTemplate = require("es6-dynamic-template");
 
 @Component({
-  layout: 'BaseDataset',
+  layout: "BaseDataset",
   components: {
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
@@ -190,7 +190,7 @@ class DatasetDetail extends Vue {
     if (_.isUndefined(id) || !this.hasValidStudyArea) {
       return;
     }
-    this.$router.push({ name: 'dataset-id-visualize', params: { id } });
+    this.$router.push({ name: "dataset-id-visualize", params: { id } });
   }
 
   async clearGeometry() {
@@ -234,7 +234,7 @@ export default DatasetDetail;
   color: white;
 }
 
-ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {
+ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title="Save changes"] {
   display: none;
 }
 

@@ -13,12 +13,12 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import Header from '@/components/global/Header';
-import DiscoverSideBar from '@/components/DiscoverSideBar';
-import Messages from '@/components/Messages';
-import Footer from '@/components/global/Footer';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import Header from "@/components/global/Header";
+import DiscoverSideBar from "@/components/DiscoverSideBar";
+import Messages from "@/components/Messages";
+import Footer from "@/components/global/Footer";
 
 @Component({
   components: {

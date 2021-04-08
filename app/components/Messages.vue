@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import { Component } from 'nuxt-property-decorator';
-import Vue from 'vue';
+import { Component } from "nuxt-property-decorator";
+import Vue from "vue";
 
 @Component()
 class Messages extends Vue {

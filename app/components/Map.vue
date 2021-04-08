@@ -85,19 +85,23 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import { Prop, Watch } from 'vue-property-decorator';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,
-} from '@/store/modules/constants';
-import circleToPolygon from 'circle-to-polygon';
-import { stringify } from 'query-string';
-import { initializeDatasetGeoJson, saveGeoJson } from '@/store/actions';
+} from "@/store/modules/constants";
+import circleToPolygon from "circle-to-polygon";
+import { stringify } from "query-string";
+import {
+  initializeDatasetGeoJson,
+  clearGeoJson,
+  saveGeoJson,
+} from "@/store/actions";
 
-const fillTemplate = require('es6-dynamic-template');
-import _ from 'lodash';
+const fillTemplate = require("es6-dynamic-template");
+import _ from "lodash";
 
 @Component({
   components: {},
@@ -115,9 +119,9 @@ class Map extends Vue {
   defaultCircleToPolygonEdges = 32;
   legendImage = null;
   legendControl = null;
-  legendPosition = 'bottomleft';
-  wMinTemporalRangeKey = 'skope:temporal-range-min';
-  wMaxTemporalRangeKey = 'skope:temporal-range-max';
+  legendPosition = "bottomleft";
+  wMinTemporalRangeKey = "skope:temporal-range-min";
+  wMaxTemporalRangeKey = "skope:temporal-range-max";
 
   get stepNames() {
     return this.$api().app.stepNames;
@@ -158,7 +162,7 @@ class Map extends Vue {
   }
 
   get selectedLayerName() {
-    return this.isLayerSelected ? this.variable.name : '';
+    return this.isLayerSelected ? this.variable.name : "";
   }
 
   get opacityLabel() {
@@ -185,7 +189,7 @@ class Map extends Vue {
     if (this.$L) {
       return this.$L.CRS.EPSG4326;
     }
-    return '';
+    return "";
   }
 
   set variable(id) {
@@ -194,7 +198,7 @@ class Map extends Vue {
 
   mapReady(map) {
     const handler = (event) => {
-      console.log('handling layer change event ', { event });
+      console.log("handling layer change event ", { event });
       const leafletLayer = event.layer;
       if (this.isSkopeLayer(leafletLayer)) {
         const variable = _.find(
@@ -206,14 +210,14 @@ class Map extends Vue {
         leafletLayer.bringToFront();
       }
     };
-    map.on('overlayadd', handler);
-    map.on('baselayerchange', handler);
+    map.on("overlayadd", handler);
+    map.on("baselayerchange", handler);
     this.addDrawToolbar(map);
     initializeDatasetGeoJson(this.$warehouse, this.$api());
     this.registerToolbarHandlers(map);
   }
 
-  @Watch('geoJson') updateGeometry(geoJson) {
+  @Watch("geoJson") updateGeometry(geoJson) {
     if (geoJson === null) {
       this.drawnItems.clearLayers();
     } else {
@@ -226,7 +230,7 @@ class Map extends Vue {
     this.drawnItems = new L.FeatureGroup();
     map.addLayer(this.drawnItems);
     this.drawControlFull = new L.Control.Draw({
-      position: 'topleft',
+      position: "topleft",
       draw: {
         // disable polylines and circlemarkers, allow polygon, rectangle, circle, and marker
         polyline: false,
@@ -248,15 +252,15 @@ class Map extends Vue {
     });
     // set custom tooltips on the draw and edit toolbars
     const drawControlButtons = L.drawLocal.draw.toolbar.buttons;
-    drawControlButtons.marker = 'Select a point';
-    drawControlButtons.polygon = 'Select a polygon area';
-    drawControlButtons.circle = 'Select a circular area';
-    drawControlButtons.rectangle = 'Select a rectangular area';
+    drawControlButtons.marker = "Select a point";
+    drawControlButtons.polygon = "Select a polygon area";
+    drawControlButtons.circle = "Select a circular area";
+    drawControlButtons.rectangle = "Select a rectangular area";
     const editControlButtons = L.drawLocal.edit.toolbar.buttons;
-    editControlButtons.edit = 'Edit spatial selection';
-    editControlButtons.editDisabled = 'No spatial selection to edit';
-    editControlButtons.remove = 'Clear spatial selection';
-    editControlButtons.removeDisabled = 'No spatial selection to remove';
+    editControlButtons.edit = "Edit spatial selection";
+    editControlButtons.editDisabled = "No spatial selection to edit";
+    editControlButtons.remove = "Clear spatial selection";
+    editControlButtons.removeDisabled = "No spatial selection to remove";
     map.addControl(this.drawControlFull);
   }
 
@@ -273,15 +277,11 @@ class Map extends Vue {
       this.enableEditOnly(map);
     });
     map.on(L.Draw.Event.DELETED, (event) => {
-      this.clearSelectedGeometry();
+      clearGeoJson(this.$warehouse, this.$api());
       if (this.drawnItems.getLayers().length === 0) {
         this.disableEditOnly(map);
       }
     });
-  }
-
-  clearSelectedGeometry() {
-    this.$api().dataset.clearGeometry();
   }
 
   renderSelectedArea(geoJson, map) {
@@ -352,18 +352,18 @@ class Map extends Vue {
 
   generateWmsLegendUrl(layerName) {
     const query = {
-      REQUEST: 'GetLegendGraphic',
-      VERSION: '1.0.0',
-      FORMAT: 'image/png',
+      REQUEST: "GetLegendGraphic",
+      VERSION: "1.0.0",
+      FORMAT: "image/png",
       LAYER: layerName,
-      LEGEND_OPTIONS: 'layout:vertical;dx:10',
+      LEGEND_OPTIONS: "layout:vertical;dx:10",
     };
     const queryString = stringify(query);
     const legendUrl = this.skopeWmsUrl + queryString;
     return legendUrl;
   }
 
-  @Watch('year')
+  @Watch("year")
   updateWmsLayer() {
     // hairy bit of code to:
     // 1. pull out the currently selected layer's layer template string
@@ -386,10 +386,10 @@ class Map extends Vue {
     if (_.isNil(this.legendControl)) {
       const legend = L.control({ position: this.legendPosition });
       legend.onAdd = (map) => {
-        const controlCss = 'leaflet-control-wms-legend';
-        const legendCss = 'wms-legend';
-        const div = L.DomUtil.create('div', controlCss);
-        const legendImage = L.DomUtil.create('img', legendCss, div);
+        const controlCss = "leaflet-control-wms-legend";
+        const legendCss = "wms-legend";
+        const div = L.DomUtil.create("div", controlCss);
+        const legendImage = L.DomUtil.create("img", legendCss, div);
         legendImage.src = wmsLegendUrl;
         this.setLegendImage(legendImage);
         return div;
@@ -405,19 +405,19 @@ class Map extends Vue {
   fillTemplateYear(templateString) {
     const year = (this.year || this.maxTemporalRange).toString();
     const layer = fillTemplate(templateString, {
-      year: year.padStart(4, '0'),
+      year: year.padStart(4, "0"),
     });
     return layer;
   }
 
   isSkopeLayer(leafletLayer) {
-    return (leafletLayer.options.layers || '').startsWith('SKOPE');
+    return (leafletLayer.options.layers || "").startsWith("SKOPE");
   }
 
   loadGeoJson(event) {
     const file = event.target.files[0];
     file.text().then((text) => {
-      console.log('received possible geojson to load: ', text);
+      console.log("received possible geojson to load: ", text);
       try {
         const geojson = JSON.parse(text);
         this.$api().dataset.setGeoJson(geojson);
@@ -430,20 +430,20 @@ class Map extends Vue {
   }
 
   selectGeoJsonFile() {
-    document.getElementById('loadGeoJsonFile').click();
+    document.getElementById("loadGeoJsonFile").click();
   }
 
   exportSelectedGeometry(event) {
     const geoJson = this.$api().dataset.geoJson;
     if (geoJson) {
-      console.log('exporting selected geoJson: ', { geoJson });
+      console.log("exporting selected geoJson: ", { geoJson });
       const convertedArea =
-        'text/json;charset=utf-8,' +
+        "text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(geoJson));
-      const button = document.getElementById('exportSelectedGeometry');
-      button.setAttribute('href', 'data:' + convertedArea);
+      const button = document.getElementById("exportSelectedGeometry");
+      button.setAttribute("href", "data:" + convertedArea);
       // FIXME: generate a more unique name using the lat lngs or similar
-      button.setAttribute('download', `${this.metadata.id}.geojson`);
+      button.setAttribute("download", `${this.metadata.id}.geojson`);
     }
   }
 }
@@ -467,7 +467,7 @@ export default Map;
   z-index: 1;
 }
 
-ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title='Save changes'] {
+ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title="Save changes"] {
   display: none;
 }
 </style>

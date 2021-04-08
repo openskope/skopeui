@@ -39,12 +39,12 @@
 </template>
 
 <script>
-import { Component } from 'nuxt-property-decorator';
-import Vue from 'vue';
-import Dataset from '@/components/Dataset.vue';
+import { Component } from "nuxt-property-decorator";
+import Vue from "vue";
+import Dataset from "@/components/Dataset.vue";
 
 @Component({
-  layout: 'BaseDefault',
+  layout: "BaseDefault",
   components: {
     Dataset,
   },

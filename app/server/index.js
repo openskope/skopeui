@@ -1,12 +1,12 @@
-const { Server } = require('@hapi/hapi');
-const ApiRoutes = require('../api');
-const consola = require('consola');
-const HapiNuxt = require('@nuxtjs/hapi');
-const Bell = require('@hapi/bell');
-let config = require('../nuxt.config.js');
+const { Server } = require("@hapi/hapi");
+const ApiRoutes = require("../api");
+const consola = require("consola");
+const HapiNuxt = require("@nuxtjs/hapi");
+const Bell = require("@hapi/bell");
+let config = require("../nuxt.config.js");
 
 const server = new Server({
-  host: process.env.HOST || '0.0.0.0',
+  host: process.env.HOST || "0.0.0.0",
   port: process.env.PORT || 3000,
 });
 

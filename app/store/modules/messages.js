@@ -4,20 +4,20 @@ import {
   Action,
   Mutation,
   MutationAction,
-} from 'vuex-module-decorators';
+} from "vuex-module-decorators";
 
-@Module({ stateFactory: true, namespaced: true, name: 'messages' })
+@Module({ stateFactory: true, namespaced: true, name: "messages" })
 class Messages extends VuexModule {
   messages = [];
 
   @Mutation
   info(message) {
-    this.messages.push({ type: 'info', message });
+    this.messages.push({ type: "info", message });
   }
 
   @Mutation
   error(message) {
-    this.messages.push({ type: 'error', message });
+    this.messages.push({ type: "error", message });
   }
 
   @Mutation

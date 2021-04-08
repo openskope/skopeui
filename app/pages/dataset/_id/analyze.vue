@@ -320,17 +320,17 @@
 </template>
 
 <script>
-import KernelRegression from '@/components/chart-form/KernelRegression.vue';
-import RunningAverage from '@/components/chart-form/RunningAverage.vue';
-import TimeSeriesPlot from '@/components/TimeSeriesPlot.vue';
-import Metadata from '@/components/action/Metadata.vue';
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import { loadTimeSeries, retrieveTimeSeries } from '@/store/actions';
-import _ from 'lodash';
+import KernelRegression from "@/components/chart-form/KernelRegression.vue";
+import RunningAverage from "@/components/chart-form/RunningAverage.vue";
+import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
+import Metadata from "@/components/action/Metadata.vue";
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
+import _ from "lodash";
 
 @Component({
-  layout: 'BaseDataset',
+  layout: "BaseDataset",
   components: {
     KernelRegression,
     RunningAverage,
@@ -347,23 +347,23 @@ class Analyze extends Vue {
   yearSelected = 1500;
 
   layerGroup = {
-    icon: 'fas fa-layer-group',
+    icon: "fas fa-layer-group",
   };
 
   polygon = {
-    icon: 'fas fa-draw-polygon',
+    icon: "fas fa-draw-polygon",
   };
 
-  selectedZonalStatistic = 'mean';
+  selectedZonalStatistic = "mean";
 
   zonalStatisticOpts = [
     {
-      label: 'Mean',
-      id: 'mean',
+      label: "Mean",
+      id: "mean",
     },
     {
-      label: 'Median',
-      id: 'median',
+      label: "Median",
+      id: "median",
     },
   ];
 
@@ -378,39 +378,39 @@ class Analyze extends Vue {
     },
   };
 
-  selectedSmoother = 'none';
+  selectedSmoother = "none";
 
   smootherOpts = [
     {
-      label: 'None',
-      id: 'none',
+      label: "None",
+      id: "none",
     },
     {
-      label: 'Moving Average (Trailing)',
-      id: 'trailingAverage',
+      label: "Moving Average (Trailing)",
+      id: "trailingAverage",
     },
     {
-      label: 'Moving Average (Centered)',
-      id: 'centeredAverage',
+      label: "Moving Average (Centered)",
+      id: "centeredAverage",
     },
     {
-      label: 'Polynomial Spline',
-      id: 'polynomialSpline',
+      label: "Polynomial Spline",
+      id: "polynomialSpline",
     },
   ];
 
   width = 7;
 
-  selectedScaleTransform = 'none';
+  selectedScaleTransform = "none";
 
   scaleTransformOpts = [
     {
-      label: 'None',
-      id: 'none',
+      label: "None",
+      id: "none",
     },
     {
-      label: 'Z-Score',
-      id: 'zscore',
+      label: "Z-Score",
+      id: "zscore",
     },
   ];
 
@@ -443,13 +443,13 @@ class Analyze extends Vue {
   }
 
   get smootherWidthLabel() {
-    let widthUnit = 'Unknowns';
+    let widthUnit = "Unknowns";
     switch (this.temporalResolution) {
-      case 'month':
-        widthUnit = 'Months';
+      case "month":
+        widthUnit = "Months";
         break;
-      case 'year':
-        widthUnit = 'Years';
+      case "year":
+        widthUnit = "Years";
         break;
     }
     return `Smoother Width (# of ${widthUnit})`;
@@ -462,9 +462,9 @@ class Analyze extends Vue {
   get timeSeries() {
     const timeseries = this.$api().dataset.timeseries;
     if (timeseries.x.length > 0) {
-      return { ...this.$api().dataset.timeseries, type: 'scatter' };
+      return { ...this.$api().dataset.timeseries, type: "scatter" };
     } else {
-      return { x: [], y: [], type: 'scatter' };
+      return { x: [], y: [], type: "scatter" };
     }
   }
 
@@ -486,12 +486,12 @@ class Analyze extends Vue {
   }
 
   async submit() {
-    console.log('submitting to web service');
+    console.log("submitting to web service");
     await this.$api().analyze.retrieveAnalysis({
-      dataset_id: 'lbda-v2',
-      variable_id: 'palmer_modified_drought_index',
+      dataset_id: "lbda-v2",
+      variable_id: "palmer_modified_drought_index",
       selected_area: this.studyArea,
-      zonal_statistic: 'mean',
+      zonal_statistic: "mean",
       transforms: [],
       time_range: {
         gte: 1500,
@@ -506,7 +506,7 @@ class Analyze extends Vue {
   }
 
   async updated() {
-    console.log('variable: ', this.variable);
+    console.log("variable: ", this.variable);
   }
 
   async mounted() {
@@ -550,7 +550,7 @@ class Analyze extends Vue {
     if (_.isUndefined(id)) {
       return;
     }
-    this.$router.push({ name: 'dataset-id', params: { id } });
+    this.$router.push({ name: "dataset-id", params: { id } });
   }
 }
 export default Analyze;

@@ -1,5 +1,5 @@
-import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { ALL_DATA } from '@/store/data';
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { ALL_DATA } from "@/store/data";
 
 function matchesYearFilter(minYear, maxYear, dataset) {
   const dMinYear = parseInt(dataset.timespan.period.gte);
@@ -33,7 +33,7 @@ function matchesQueryFilter(query, dataset) {
     : true;
 }
 
-@Module({ stateFactory: true, name: 'datasets', namespaced: true })
+@Module({ stateFactory: true, name: "datasets", namespaced: true })
 class Datasets extends VuexModule {
   loading = false;
   all = [];
@@ -41,7 +41,7 @@ class Datasets extends VuexModule {
     selectedVariableClasses: [],
     yearStart: 1,
     yearEnd: 2019,
-    query: '',
+    query: "",
   };
 
   get filteredDatasets() {
@@ -50,7 +50,7 @@ class Datasets extends VuexModule {
         .selectedVariableClasses;
       const minYear = this.filterCriteria.yearStart;
       const maxYear = this.filterCriteria.yearEnd;
-      const query = this.filterCriteria.query || '';
+      const query = this.filterCriteria.query || "";
 
       return (
         matchesYearFilter(minYear, maxYear, dataset) &&
@@ -60,15 +60,15 @@ class Datasets extends VuexModule {
     });
   }
 
-  @Action({ commit: 'load' })
+  @Action({ commit: "load" })
   retrieveData() {
     if (this.loading) {
-      console.debug('already loading - ignoring request');
+      console.debug("already loading - ignoring request");
     }
     return ALL_DATA;
   }
 
-  @Action({ commit: 'applyFilterCriteria' })
+  @Action({ commit: "applyFilterCriteria" })
   filter(filterCriteria) {
     return filterCriteria;
   }
@@ -79,7 +79,7 @@ class Datasets extends VuexModule {
       this.load(ALL_DATA);
     }
     if (state.metadata) {
-      this.context.commit('selectVariable', id);
+      this.context.commit("selectVariable", id);
     }
   }
 

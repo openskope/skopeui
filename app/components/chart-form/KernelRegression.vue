@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import { Prop } from 'vue-property-decorator';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import { Prop } from "vue-property-decorator";
 
 @Component()
 class RunningAverage extends Vue {
@@ -43,21 +43,21 @@ class RunningAverage extends Vue {
   @Prop()
   yearRange;
 
-  bandwidthOptions = ['Manual', 'AMISE'];
-  bandwidthSelection = 'Manual';
+  bandwidthOptions = ["Manual", "AMISE"];
+  bandwidthSelection = "Manual";
   width = 7;
-  kernelOptions = ['Epanechnikov', 'Triangle', 'Uniform'];
-  kernel = 'Epanechnikov';
+  kernelOptions = ["Epanechnikov", "Triangle", "Uniform"];
+  kernel = "Epanechnikov";
 
   addVariable() {
-    this.$emit('submit', {
+    this.$emit("submit", {
       dataset: this.dataset,
       variable: this.variable,
       studyArea: this.studyArea,
       timeSeries: {
         yearRange: this.yearRange,
-        method: 'kernelRegression',
-        submethod: 'localLinear',
+        method: "kernelRegression",
+        submethod: "localLinear",
         selection: {
           method: this.bandwidthSelection,
           width: this.width,

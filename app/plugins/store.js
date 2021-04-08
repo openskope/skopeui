@@ -1,9 +1,9 @@
-import { App } from '@/store/modules/app';
-import { Datasets } from '@/store/modules/datasets';
-import { Messages } from '@/store/modules/messages';
-import { getModule } from 'vuex-module-decorators';
-import { Dataset } from '@/store/modules/dataset';
-import { Analyze } from '@/store/modules/analyze';
+import { App } from "@/store/modules/app";
+import { Datasets } from "@/store/modules/datasets";
+import { Messages } from "@/store/modules/messages";
+import { getModule } from "vuex-module-decorators";
+import { Dataset } from "@/store/modules/dataset";
+import { Analyze } from "@/store/modules/analyze";
 
 export class API {
   constructor(store) {
@@ -32,7 +32,7 @@ export class API {
 }
 
 export default ({ store }, inject) => {
-  inject('api', function () {
+  inject("api", function () {
     return new API(store);
   });
 };

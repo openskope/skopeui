@@ -51,9 +51,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import _ from 'lodash';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import _ from "lodash";
 
 @Component()
 class Navigation extends Vue {
@@ -87,28 +87,28 @@ class Navigation extends Vue {
   }
 
   gotoDatasets() {
-    this.$router.push({ name: 'index' });
+    this.$router.push({ name: "index" });
   }
 
   goToStudyArea(id) {
     if (_.isUndefined(id)) {
       return;
     }
-    this.$router.push({ name: 'dataset-id', params: { id } });
+    this.$router.push({ name: "dataset-id", params: { id } });
   }
 
   goToViz(id) {
     if (_.isUndefined(id) || !this.hasValidStudyArea) {
       return;
     }
-    this.$router.push({ name: 'dataset-id-visualize', params: { id } });
+    this.$router.push({ name: "dataset-id-visualize", params: { id } });
   }
 
   goToAnalyze(id) {
     if (_.isUndefined(id) || !this.canAnalyze) {
       return;
     }
-    this.$router.push({ name: 'dataset-id-analyze', params: { id } });
+    this.$router.push({ name: "dataset-id-analyze", params: { id } });
   }
 
   get currentStep() {

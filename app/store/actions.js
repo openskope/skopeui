@@ -2,8 +2,8 @@
 // that debounced methods can exist in a vue-class-component
 //
 // Could use or take from https://github.com/bvaughn/debounce-decorator
-import _ from 'lodash';
-import { TIMESERIES_ENDPOINT } from '@/store/modules/constants';
+import _ from "lodash";
+import { TIMESERIES_ENDPOINT } from "@/store/modules/constants";
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
@@ -16,14 +16,14 @@ async function updateTimeSeries(api, data) {
     variable: dataset.variable,
   });
   if (!dataset.canHandleTimeSeriesRequest) {
-    console.log('Cannot handle timeseries request. Aborting.');
+    console.log("Cannot handle timeseries request. Aborting.");
     return;
   }
   dataset.setIsLoading(true);
-  const start = minYear.toString().padStart(4, '0');
-  const end = maxYear.toString().padStart(4, '0');
+  const start = minYear.toString().padStart(4, "0");
+  const end = maxYear.toString().padStart(4, "0");
   if (start > end) {
-    api.messages.info('Please select a start year before the end year');
+    api.messages.info("Please select a start year before the end year");
     return;
   }
   const body = {
@@ -52,9 +52,9 @@ async function updateTimeSeries(api, data) {
     messages.clearMessages();
     dataset.clearTimeSeries();
     let errorMessage =
-      'Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.';
+      "Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.";
     if (e.response) {
-      console.error('received error response from server: ', e);
+      console.error("received error response from server: ", e);
       const responseData = e.response.data;
       if (responseData.status === 400) {
         // bad request
@@ -62,7 +62,7 @@ async function updateTimeSeries(api, data) {
       }
     } else if (e.request) {
       // browser made a request but didn't see a response, likely a timeout / client network error
-      console.log('did not receive a server response: ', { e });
+      console.log("did not receive a server response: ", { e });
       errorMessage += ` Cause: ${e.message}`;
     }
     messages.error(errorMessage);
@@ -74,7 +74,7 @@ export const retrieveTimeSeries = _.debounce(updateTimeSeries, 300);
 
 export const loadTimeSeries = _.debounce(async function (api) {
   const dataset = api.dataset;
-  console.log('loading time series...', dataset.canHandleTimeSeriesRequest);
+  console.log("loading time series...", dataset.canHandleTimeSeriesRequest);
   if (dataset.canHandleTimeSeriesRequest) {
     const timeseriesReqData = {
       datasetId: dataset.metadata.id,
@@ -98,6 +98,11 @@ export function initializeDatasetGeoJson(warehouse, api) {
     return;
   }
   const geoJson = warehouse.get(api.dataset.geoJsonKey) || null;
-  console.log('setting geo json: ', geoJson);
+  console.log("setting geo json: ", geoJson);
   api.dataset.setGeoJson(geoJson);
+}
+
+export function clearGeoJson(warehouse, api) {
+  warehouse.remove(api.dataset.geoJsonKey);
+  api.dataset.clearGeoJson();
 }

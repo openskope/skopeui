@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import { ALL_DATA } from '@/store/data';
-import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import area from '@turf/area';
+import _ from "lodash";
+import { ALL_DATA } from "@/store/data";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import area from "@turf/area";
 
-@Module({ stateFactory: true, name: 'dataset', namespaced: true })
+@Module({ stateFactory: true, name: "dataset", namespaced: true })
 class Dataset extends VuexModule {
   timeseries = {
     x: [],
@@ -19,10 +19,10 @@ class Dataset extends VuexModule {
   @Action
   async loadDefaultVariable(metadataId) {
     if (_.isNull(this.metadata)) {
-      await this.context.dispatch('loadMetadata', metadataId);
+      await this.context.dispatch("loadMetadata", metadataId);
     }
     if (_.isNull(this.variable)) {
-      this.context.commit('setVariable', this.metadata.variables[0].id);
+      this.context.commit("setVariable", this.metadata.variables[0].id);
     }
   }
 
@@ -31,10 +31,10 @@ class Dataset extends VuexModule {
     if (_.isNull(this.metadata) || this.metadata.id !== id) {
       const metadata = ALL_DATA.find((m) => m.id === id);
       if (metadata) {
-        this.context.commit('setMetadata', metadata);
+        this.context.commit("setMetadata", metadata);
         console.log({ variables: metadata.variables });
         if (metadata.variables.length > 0) {
-          this.context.commit('setVariable', metadata.variables[0].id);
+          this.context.commit("setVariable", metadata.variables[0].id);
         }
       }
     }
@@ -46,7 +46,7 @@ class Dataset extends VuexModule {
 
   get geoJsonKey() {
     if (this.metadata === null) {
-      return 'skope:geometry';
+      return "skope:geometry";
     }
     return `geojson:${this.metadata.id}`;
   }
@@ -71,7 +71,7 @@ class Dataset extends VuexModule {
         this.metadata.timespan.period.lte,
       ];
     }
-    console.log('No selected dataset, returning default year range');
+    console.log("No selected dataset, returning default year range");
     return [1, new Date().getFullYear()];
   }
 
@@ -102,7 +102,7 @@ class Dataset extends VuexModule {
   }
 
   @Mutation
-  clearGeometry() {
+  clearGeoJson() {
     this.geoJson = null;
     this.selectedAreaInSquareMeters = 0;
   }

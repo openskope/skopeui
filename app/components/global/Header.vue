@@ -63,10 +63,10 @@
   </v-app-bar>
 </template>
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
-import Navigation from '@/components/global/Navigation.vue';
-import { Prop, Watch } from 'vue-property-decorator';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
+import Navigation from "@/components/global/Navigation.vue";
+import { Prop, Watch } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -75,8 +75,8 @@ import { Prop, Watch } from 'vue-property-decorator';
 })
 class Header extends Vue {
   github = {
-    icon: 'fab fa-github',
-    url: 'https://github.com/openskope/skopeui',
+    icon: "fab fa-github",
+    url: "https://github.com/openskope/skopeui",
   };
 
   // --------- GETTERS ---------
@@ -107,7 +107,7 @@ export default Header;
 .skope-title {
   text-decoration: none;
   color: white;
-  font-family: 'Roboto', serif;
+  font-family: "Roboto", serif;
   font-weight: bold;
   font-size: 2em;
 }

@@ -82,15 +82,15 @@
   </v-navigation-drawer>
 </template>
 <script>
-import { Component } from 'nuxt-property-decorator';
-import { Prop, Watch } from 'vue-property-decorator';
-import Vue from 'vue';
+import { Component } from "nuxt-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
+import Vue from "vue";
 
 @Component()
 class DiscoverSideBar extends Vue {
   currentYear = new Date().getFullYear();
 
-  search = '';
+  search = "";
   startYear = 1;
   endYear = this.currentYear;
   selectedVariableClasses = [];
@@ -149,7 +149,7 @@ class DiscoverSideBar extends Vue {
 
   // --------- METHODS ---------
 
-  @Watch('isVisible')
+  @Watch("isVisible")
   toggle(isVisible) {
     console.log(this.isVisible === isVisible);
   }

@@ -44,11 +44,11 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { Component } from 'nuxt-property-decorator';
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
 
 @Component({
-  name: 'Metadata',
+  name: "Metadata",
 })
 class Metadata extends Vue {
   get metadata() {
@@ -57,11 +57,11 @@ class Metadata extends Vue {
 
   get metadataAttributes() {
     return {
-      originator: 'Originator',
-      uncertainty: 'Uncertainty',
-      methodSummary: 'Method Summary',
-      references: 'References',
-      contactInformation: 'Contact Information',
+      originator: "Originator",
+      uncertainty: "Uncertainty",
+      methodSummary: "Method Summary",
+      references: "References",
+      contactInformation: "Contact Information",
     };
   }
 }
