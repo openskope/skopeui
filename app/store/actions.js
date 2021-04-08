@@ -12,7 +12,7 @@ async function updateTimeSeries(api, data) {
   const { datasetId, variableId, geometry, minYear, maxYear } = data
   console.log({
     metadata: dataset.metadata,
-    geometry: dataset.geometry,
+    geoJson: dataset.geoJson,
     variable: dataset.variable,
   })
   if (!dataset.canHandleTimeSeriesRequest) {
@@ -79,7 +79,7 @@ export const loadTimeSeries = _.debounce(async function (api) {
     const timeseriesReqData = {
       datasetId: dataset.metadata.id,
       variableId: dataset.variable.id,
-      geometry: dataset.geometry,
+      geometry: dataset.geoJson.geometry,
       minYear: dataset.timespan[0],
       maxYear: dataset.timespan[1],
       zeroYearOffset: dataset.metadata.timespan.period.timeZero,
@@ -87,3 +87,17 @@ export const loadTimeSeries = _.debounce(async function (api) {
     updateTimeSeries(api, timeseriesReqData)
   }
 }, 300)
+
+export function saveGeoJson(warehouse, api, geoJson) {
+  warehouse.set(api.dataset.geoJsonKey, geoJson)
+  api.dataset.setGeoJson(geoJson)
+}
+
+export function initializeDatasetGeoJson(warehouse, api) {
+  if (api.dataset.hasGeoJson) {
+    return
+  }
+  const geoJson = warehouse.get(api.dataset.geoJsonKey) || null
+  console.log('setting geo json: ', geoJson)
+  api.dataset.setGeoJson(geoJson)
+}

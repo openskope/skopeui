@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { ALL_DATA } from '@/store/data'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
+import area from '@turf/area'
 
 @Module({ stateFactory: true, name: 'dataset', namespaced: true })
 class DataSet extends VuexModule {
@@ -11,7 +12,7 @@ class DataSet extends VuexModule {
   metadata = null
   isLoadingData = false
   hasData = false
-  geometry = { type: 'None', coordinates: [] }
+  geoJson = null
   selectedAreaInSquareMeters = 0
   variable = null
 
@@ -39,15 +40,20 @@ class DataSet extends VuexModule {
     }
   }
 
-  get hasGeometry() {
-    return this.geometry.type !== 'None'
+  get hasGeoJson() {
+    return this.geoJson !== null
+  }
+
+  get geoJsonKey() {
+    if (this.metadata === null) {
+      return 'skope:geometry'
+    }
+    return `geojson:${this.metadata.id}`
   }
 
   get canHandleTimeSeriesRequest() {
     return (
-      !_.isNull(this.metadata) &&
-      this.geometry.type !== 'None' &&
-      !_.isNull(this.variable)
+      !_.isNull(this.metadata) && this.hasGeoJson && !_.isNull(this.variable)
     )
   }
 
@@ -90,14 +96,14 @@ class DataSet extends VuexModule {
   }
 
   @Mutation
-  setGeometry({ geometry, area }) {
-    this.geometry = geometry
-    this.selectedAreaInSquareMeters = area
+  setGeoJson(geoJson) {
+    this.geoJson = geoJson
+    this.selectedAreaInSquareMeters = geoJson ? area(geoJson) : 0
   }
 
   @Mutation
   clearGeometry() {
-    this.geometry = { type: 'None', coordinates: [] }
+    this.geoJson = null
     this.selectedAreaInSquareMeters = 0
   }
 

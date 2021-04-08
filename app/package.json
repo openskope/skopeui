@@ -22,6 +22,7 @@
     "@nuxtjs/markdownit": "^1.2.10",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/vuetify": "^1.11.3",
+    "@turf/turf": "^6.3.0",
     "circle-to-polygon": "^2.0.2",
     "cross-env": "^7.0.3",
     "es6-dynamic-template": "2.0.0",
