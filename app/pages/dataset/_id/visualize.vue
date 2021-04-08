@@ -202,7 +202,7 @@ import _ from "lodash";
 import {
   loadTimeSeries,
   retrieveTimeSeries,
-  initializeDatasetGeoJson,
+  initializeDataset,
 } from "@/store/actions";
 
 const setYearSelected = _.debounce(function (vue) {
@@ -311,8 +311,8 @@ class Visualize extends Vue {
   }
 
   async fetch() {
-    const api = this.$api();
-    await api.dataset.loadMetadata(this.$route.params.id);
+    const datasetId = this.$route.params.id;
+    initializeDataset(this.$warehouse, this.$api(), datasetId);
   }
 
   async mounted() {

@@ -197,7 +197,9 @@ class Map extends Vue {
   }
 
   destroyed() {
-    this.geoJsonUnwatcher();
+    if (this.geoJsonUnwatcher) {
+      this.geoJsonUnwatcher();
+    }
   }
 
   mapReady(map) {

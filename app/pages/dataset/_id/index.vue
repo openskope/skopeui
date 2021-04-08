@@ -82,7 +82,7 @@
             depressed
             color="accent"
             :disabled="!hasValidStudyArea"
-            @click="goToViz($route.params.id)"
+            @click="gotoViz()"
           >
             Go to Visualize
             <v-icon small class="ml-2" color="white">
@@ -175,19 +175,16 @@ class DatasetDetail extends Vue {
     );
   }
 
-  // created lifecycle hook
-  created() {
+  async fetch() {
     const datasetId = this.$route.params.id;
     // this.$api().dataset.loadMetadata(datasetId);
     initializeDataset(this.$warehouse, this.$api(), datasetId);
-    this.minTemporalRange = this.timespanMinYear;
-    this.maxTemporalRange = this.timespanMaxYear;
     this.confirmGeometry = this.hasValidStudyArea;
   }
 
   head() {
     return {
-      title: this.metadata.title,
+      title: this.metadata?.title ?? "Select Area",
     };
   }
 
@@ -195,7 +192,8 @@ class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id);
   }
 
-  goToViz(id) {
+  gotoViz() {
+    const id = this.$route.params.id;
     if (_.isUndefined(id) || !this.hasValidStudyArea) {
       return;
     }
