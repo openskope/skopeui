@@ -196,6 +196,10 @@ class Map extends Vue {
     this.$api().dataset.setVariable(id);
   }
 
+  destroyed() {
+    this.geoJsonUnwatcher();
+  }
+
   mapReady(map) {
     const handler = (event) => {
       console.log("handling layer change event ", { event });
@@ -215,14 +219,18 @@ class Map extends Vue {
     this.addDrawToolbar(map);
     initializeDatasetGeoJson(this.$warehouse, this.$api());
     this.registerToolbarHandlers(map);
-  }
-
-  @Watch("geoJson") updateGeometry(geoJson) {
-    if (geoJson === null) {
-      this.drawnItems.clearLayers();
-    } else {
-      this.renderSelectedArea(geoJson);
-    }
+    this.geoJsonUnwatcher = this.$watch(
+      "geoJson",
+      function (geoJson) {
+        console.log("watcher updating geojson", geoJson);
+        if (geoJson === null) {
+          this.drawnItems.clearLayers();
+        } else {
+          this.renderSelectedArea(geoJson, map);
+        }
+      },
+      { immediate: true }
+    );
   }
 
   addDrawToolbar(map) {

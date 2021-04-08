@@ -93,8 +93,17 @@ export function saveGeoJson(warehouse, api, geoJson) {
   api.dataset.setGeoJson(geoJson);
 }
 
+export function initializeDataset(warehouse, api, datasetId) {
+  console.log("initializing dataset ", datasetId);
+  api.dataset.loadMetadata(datasetId);
+  if (process.client) {
+    initializeDatasetGeoJson(warehouse, api);
+  }
+}
+
 export function initializeDatasetGeoJson(warehouse, api) {
   if (api.dataset.hasGeoJson) {
+    console.log("dataset store already has geojson, no-op");
     return;
   }
   const geoJson = warehouse.get(api.dataset.geoJsonKey) || null;

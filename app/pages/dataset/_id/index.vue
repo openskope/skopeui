@@ -7,34 +7,36 @@
         <v-col
           class="d-flex flex-row flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0 pt-10"
         >
-          <v-dialog
-            v-model="confirmGeometry"
-            transition="dialog-bottom-transition"
-            max-width="600"
-          >
-            <template #default="confirmGeometry">
-              <v-card class="pa-6">
-                <v-card-text>
-                  <h3>
-                    Welcome back! Would you like to clear the currently selected
-                    area?
-                  </h3>
-                </v-card-text>
-                <v-card-actions class="justify-end">
-                  <v-btn
-                    depressed
-                    color="info"
-                    @click="confirmGeometry = false"
-                  >
-                    Keep selected area
-                  </v-btn>
-                  <v-btn depressed color="warning" @click="clearGeoJson">
-                    Clear selected area
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </template>
-          </v-dialog>
+          <client-only>
+            <v-dialog
+              v-model="confirmGeometry"
+              transition="dialog-bottom-transition"
+              max-width="600"
+            >
+              <template #default="confirmGeometry">
+                <v-card class="pa-6">
+                  <v-card-text>
+                    <h3>
+                      Welcome back! Would you like to clear the currently
+                      selected area?
+                    </h3>
+                  </v-card-text>
+                  <v-card-actions class="justify-end">
+                    <v-btn
+                      depressed
+                      color="info"
+                      @click="confirmGeometry.value = false"
+                    >
+                      Keep selected area
+                    </v-btn>
+                    <v-btn depressed color="warning" @click="clearGeoJson">
+                      Clear selected area
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
+          </client-only>
           <h1 class="font-weight-light">
             {{ metadata.title }}
           </h1>
@@ -121,7 +123,7 @@ import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 import Metadata from "@/components/action/Metadata.vue";
 import Map from "@/components/Map.vue";
 
-import { clearGeoJson } from "@/store/actions";
+import { initializeDataset, clearGeoJson } from "@/store/actions";
 
 const fillTemplate = require("es6-dynamic-template");
 
@@ -174,9 +176,10 @@ class DatasetDetail extends Vue {
   }
 
   // created lifecycle hook
-  async created() {
-    const api = this.$api();
-    api.dataset.loadMetadata(this.$route.params.id);
+  created() {
+    const datasetId = this.$route.params.id;
+    // this.$api().dataset.loadMetadata(datasetId);
+    initializeDataset(this.$warehouse, this.$api(), datasetId);
     this.minTemporalRange = this.timespanMinYear;
     this.maxTemporalRange = this.timespanMaxYear;
     this.confirmGeometry = this.hasValidStudyArea;
