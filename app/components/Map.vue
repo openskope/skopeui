@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-10" height="100%" elevation="2" style="z-index: 1" outlined>
+  <v-card height="100%" width="100%" elevation="2" style="z-index: 1" outlined>
     <v-card-title>
       <v-tooltip top>
         <template #activator="{ on, attrs }">
@@ -30,7 +30,7 @@
       <v-spacer></v-spacer>
       <h3 class="headline">Selected area: {{ selectedArea }} km<sup>2</sup></h3>
     </v-card-title>
-    <v-card-text style="height: 90%">
+    <v-card-text :style="isVisualize ? 'height: 80%' : 'height: 90%'">
       <client-only placeholder="Loading map, please wait...">
         <l-map
           ref="layerMap"
@@ -81,6 +81,49 @@
         </l-map>
       </client-only>
     </v-card-text>
+    <v-toolbar
+      v-if="isVisualize"
+      flat
+      extended
+      extension-height="25"
+      class="pt-8"
+    >
+      <v-row>
+        <v-col cols="2">
+          <v-toolbar-title>Opacity</v-toolbar-title>
+          <v-toolbar-items class="my-auto">
+            <v-btn icon color="secondary">
+              <v-icon small @click="decreaseOpacity">fas fa-minus</v-icon>
+            </v-btn>
+            <span class="mx-3"> {{ opacity }}</span>
+            <v-btn icon small color="secondary">
+              <v-icon @click="increaseOpacity">fas fa-plus</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-col>
+        <v-col offset="4">
+          <v-toolbar-title>Variable</v-toolbar-title>
+          <v-toolbar-items
+            ><v-select
+              v-model="variable"
+              label="Select a variable"
+              item-color="secondary"
+              color="secondary"
+              dense
+              :items="variables"
+              item-text="name"
+              item-value="id"
+              class="my-auto"
+              :style="'width: 6rem'"
+              :prepend-icon="layerGroup.icon"
+              single-line
+              outlined
+            >
+            </v-select
+          ></v-toolbar-items>
+        </v-col>
+      </v-row>
+    </v-toolbar>
   </v-card>
 </template>
 
@@ -122,6 +165,11 @@ class Map extends Vue {
   legendPosition = "bottomleft";
   wMinTemporalRangeKey = "skope:temporal-range-min";
   wMaxTemporalRangeKey = "skope:temporal-range-max";
+  opacityIndex = 3;
+  opacityLevels = _.range(0, 10).map((x) => x * 10);
+  layerGroup = {
+    icon: "fas fa-layer-group",
+  };
 
   get stepNames() {
     return this.$api().app.stepNames;
@@ -200,6 +248,33 @@ class Map extends Vue {
     if (this.geoJsonUnwatcher) {
       this.geoJsonUnwatcher();
     }
+  }
+
+  get isVisualize() {
+    return this.stepNames.findIndex((x) => x === this.$route.name) === 2;
+  }
+
+  get selectedDataset() {
+    return this.$api().datasets.selectedDataset;
+  }
+
+  get variable() {
+    return this.$api().dataset.variable;
+  }
+
+  set variable(id) {
+    this.$api().dataset.setVariable(id);
+  }
+
+  get variables() {
+    return this.metadata.variables;
+  }
+
+  decreaseOpacity() {
+    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10);
+  }
+  increaseOpacity() {
+    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10);
   }
 
   mapReady(map) {
