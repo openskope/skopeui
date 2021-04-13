@@ -6,7 +6,7 @@
           <v-btn v-bind="attrs" text v-on="on" @click="exportSelectedGeometry">
             <a id="exportSelectedGeometry">
               <v-icon>fas fa-download</v-icon>
-              Download study area as a GeoJSON file
+              Download study area
             </a>
           </v-btn>
         </template>
@@ -22,7 +22,7 @@
         <template #activator="{ on, attrs }">
           <v-btn v-bind="attrs" text v-on="on" @click="selectGeoJsonFile">
             <v-icon>fas fa-upload</v-icon>
-            Upload a GeoJSON file
+            Upload GeoJSON
           </v-btn>
         </template>
         <span>Upload a GeoJSON file</span>

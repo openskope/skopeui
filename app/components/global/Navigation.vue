@@ -1,47 +1,51 @@
 <template>
   <v-row align="center" justify="center" align-content="space-around">
     <v-btn
+      nuxt
       text
       large
       color="white"
       :class="isActiveStep(0) ? 'active' : 'button'"
-      @click="gotoDatasets"
+      :to="selectDatasetLocation"
     >
       <v-icon v-if="!complete(0)">fas fa-database</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
       <span class="step">Select Dataset</span>
     </v-btn>
     <v-btn
+      nuxt
       text
       large
       color="white"
       :class="isActiveStep(1) ? 'active' : 'button'"
       :disabled="!hasMetadata"
-      @click="goToStudyArea($route.params.id)"
+      :to="selectAreaLocation"
     >
       <v-icon v-if="!complete(1)">fas fa-map</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
       <span class="step">Select Area</span>
     </v-btn>
     <v-btn
+      nuxt
       text
       large
       color="white"
       :class="isActiveStep(2) ? 'active' : 'button'"
       :disabled="!hasValidStudyArea || !hasMetadata"
-      @click="goToViz($route.params.id)"
+      :to="visualizeLocation"
     >
       <v-icon v-if="!complete(2)">fas fa-chart-bar</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
       <span class="step">Visualize Data</span>
     </v-btn>
     <v-btn
+      nuxt
       text
       large
       color="white"
       :class="isActiveStep(3) ? 'active' : 'button'"
       :disabled="!hasValidStudyArea || !hasMetadata"
-      @click="goToAnalyze($route.params.id)"
+      :to="analyzeLocation"
     >
       <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
       <v-icon v-else>fas fa-check</v-icon>
@@ -58,10 +62,29 @@ import _ from "lodash";
 @Component()
 class Navigation extends Vue {
   steps = _.cloneDeep(this.$api().app.steps);
-
   stepNames = _.clone(this.$api().app.stepNames);
 
   // --------- GETTERS ---------
+
+  get selectDatasetLocation() {
+    const id = this.$route.params.id;
+    return { name: "index", params: { id } };
+  }
+
+  get selectAreaLocation() {
+    const id = this.$route.params.id;
+    return { name: "dataset-id", params: { id } };
+  }
+
+  get visualizeLocation() {
+    const id = this.$route.params.id;
+    return { name: "dataset-id-visualize", params: { id } };
+  }
+
+  get analyzeLocation() {
+    const id = this.$route.params.id;
+    return { name: "dataset-id-analyze", params: { id } };
+  }
 
   get hasMetadata() {
     return !_.isUndefined(this.$route.params.id);
@@ -69,7 +92,7 @@ class Navigation extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep == 0 || this.$api().dataset.hasGeoJson;
+    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
   }
 
   get canAnalyze() {
@@ -83,40 +106,11 @@ class Navigation extends Vue {
   }
 
   isActiveStep(index) {
-    return this.currentStep == index;
-  }
-
-  gotoDatasets() {
-    this.$router.push({ name: "index" });
-  }
-
-  goToStudyArea(id) {
-    if (_.isUndefined(id)) {
-      return;
-    }
-    this.$router.push({ name: "dataset-id", params: { id } });
-  }
-
-  goToViz(id) {
-    if (_.isUndefined(id) || !this.hasValidStudyArea) {
-      return;
-    }
-    this.$router.push({ name: "dataset-id-visualize", params: { id } });
-  }
-
-  goToAnalyze(id) {
-    if (_.isUndefined(id) || !this.canAnalyze) {
-      return;
-    }
-    this.$router.push({ name: "dataset-id-analyze", params: { id } });
+    return this.currentStep === index;
   }
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
-  }
-
-  get selectedDatasetId() {
-    return this.$api().datasets.metadata.id;
   }
 }
 

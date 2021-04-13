@@ -78,12 +78,7 @@
             </v-card>
           </v-dialog>
           <v-spacer></v-spacer>
-          <v-btn
-            depressed
-            color="accent"
-            :disabled="!hasValidStudyArea"
-            @click="gotoViz()"
-          >
+          <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
             Go to Visualize
             <v-icon small class="ml-2" color="white">
               fas fa-chevron-right
@@ -177,7 +172,6 @@ class DatasetDetail extends Vue {
 
   async fetch() {
     const datasetId = this.$route.params.id;
-    // this.$api().dataset.loadMetadata(datasetId);
     initializeDataset(this.$warehouse, this.$api(), datasetId);
     this.confirmGeometry = this.hasValidStudyArea;
   }
@@ -192,12 +186,9 @@ class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id);
   }
 
-  gotoViz() {
+  get visualizeLocation() {
     const id = this.$route.params.id;
-    if (_.isUndefined(id) || !this.hasValidStudyArea) {
-      return;
-    }
-    this.$router.push({ name: "dataset-id-visualize", params: { id } });
+    return { name: "dataset-id-visualize", params: { id } };
   }
 
   clearGeoJson() {
