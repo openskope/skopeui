@@ -106,8 +106,8 @@
           </v-alert>
         </v-col>
         <!-- map -->
-        <v-col id="map-flex" class="flex-grow-1 flex-shrink-0 ma-0 pa-0">
-          <Map class="mx-0" />
+        <v-col id="map-flex" class="flex-grow-1 flex-shrink-0 ma-0 px-10">
+          <Map class="mx-auto" />
         </v-col>
       </v-row>
     </template>
