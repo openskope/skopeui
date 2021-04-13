@@ -60,9 +60,7 @@
             analyze the dataset.
           </v-alert>
         </v-col>
-        <v-col
-          class="d-flex flex-grow flex-grow-1 flex-shrink-0 mx-auto"
-        >
+        <v-col class="d-flex flex-grow flex-grow-1 flex-shrink-0 mx-auto">
           <v-row class="mx-auto pa-0" style="height: 100%; width: 100%">
             <!--            <v-col v-if="isLoadingData">-->
             <!--              <v-progress-circular-->
