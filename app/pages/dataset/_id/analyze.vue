@@ -111,14 +111,6 @@
                           <p>45.8 km<sup>2</sup> (88 pixels)</p>
                         </span>
                       </v-row>
-                      <v-btn
-                        small
-                        block
-                        depressed
-                        color="accent"
-                        @click="goToStudyArea($route.params.id)"
-                        >Edit</v-btn
-                      >
                     </v-col>
                     <!-- selected variable -->
                     <v-col class="outlined" cols="8">
@@ -371,7 +363,11 @@ import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
 import Metadata from "@/components/action/Metadata.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
+import {
+  loadTimeSeries,
+  retrieveTimeSeries,
+  initializeDataset,
+} from "@/store/actions";
 import _ from "lodash";
 
 @Component({
@@ -551,9 +547,9 @@ class Analyze extends Vue {
     });
   }
 
-  async fetch() {
-    const api = this.$api();
-    await api.dataset.loadMetadata(this.$route.params.id);
+  created() {
+    console.log("route params: ", this.$route.params.id);
+    initializeDataset(this.$warehouse, this.$api(), this.$route.params.id);
   }
 
   async updated() {
@@ -594,14 +590,9 @@ class Analyze extends Vue {
   }
 
   destroyed() {
-    this.timeSeriesUnWatcher();
-  }
-
-  goToStudyArea(id) {
-    if (_.isUndefined(id)) {
-      return;
+    if (this.timeSeriesUnWatcher !== null) {
+      this.timeSeriesUnWatcher();
     }
-    this.$router.push({ name: "dataset-id", params: { id } });
   }
 }
 export default Analyze;
