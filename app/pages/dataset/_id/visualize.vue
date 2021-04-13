@@ -72,11 +72,8 @@
           </v-alert>
         </v-col>
         <!-- map + time series plot -->
-        <v-col
-          class="flex-grow-1 flex-shrink-0 ma-0 pa-0"
-          style="background-color: blue"
-        >
-          <v-row class="mx-5" style="height: 100%">
+        <v-col class="flex-grow-1 flex-shrink-0 mx-auto">
+          <v-row class="mx-auto pa-0" style="height: 100%; width: 100%">
             <!-- loading animation -->
             <v-col v-if="isLoadingData">
               <v-progress-circular
@@ -88,12 +85,12 @@
             <!-- map and toolbar controls-->
             <template v-else>
               <!-- map -->
-              <v-col style="height: 100%">
+              <v-col cols="6" no-gutters>
                 <Map />
               </v-col>
               <!-- time series plot -->
-              <v-col style="height: 100%">
-                <v-card height="85%" elevation="2" outlined>
+              <v-col cols="6" style="height: 100%">
+                <v-card elevation="2" outlined height="92%">
                   <h1 class="headline mt-3 ml-3">Time Series</h1>
                   <template v-if="hasTimeSeries">
                     <TimeSeriesPlot
