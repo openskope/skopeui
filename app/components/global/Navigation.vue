@@ -31,7 +31,7 @@
       large
       color="white"
       :class="isActiveStep(2) ? 'active' : 'button'"
-      :disabled="!hasValidStudyArea || !hasMetadata"
+      :disabled="!hasValidStudyArea"
       :to="visualizeLocation"
     >
       <v-icon v-if="!complete(2)">fas fa-chart-bar</v-icon>
@@ -44,7 +44,7 @@
       large
       color="white"
       :class="isActiveStep(3) ? 'active' : 'button'"
-      :disabled="!hasValidStudyArea || !hasMetadata"
+      :disabled="!canAnalyze"
       :to="analyzeLocation"
     >
       <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
@@ -67,23 +67,31 @@ class Navigation extends Vue {
   // --------- GETTERS ---------
 
   get selectDatasetLocation() {
-    const id = this.$route.params.id;
-    return { name: "index", params: { id } };
+    return { name: "index" };
   }
 
   get selectAreaLocation() {
-    const id = this.$route.params.id;
-    return { name: "dataset-id", params: { id } };
+    if (this.hasMetadata) {
+      const id = this.$route.params.id;
+      return { name: "dataset-id", params: { id } };
+    }
+    return {};
   }
 
   get visualizeLocation() {
-    const id = this.$route.params.id;
-    return { name: "dataset-id-visualize", params: { id } };
+    if (this.hasValidStudyArea) {
+      const id = this.$route.params.id;
+      return { name: "dataset-id-visualize", params: { id } };
+    }
+    return {};
   }
 
   get analyzeLocation() {
-    const id = this.$route.params.id;
-    return { name: "dataset-id-analyze", params: { id } };
+    if (this.canAnalyze) {
+      const id = this.$route.params.id;
+      return { name: "dataset-id-analyze", params: { id } };
+    }
+    return {};
   }
 
   get hasMetadata() {
@@ -92,7 +100,7 @@ class Navigation extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
+    return this.hasMetadata && this.$api().dataset.hasGeoJson;
   }
 
   get canAnalyze() {
