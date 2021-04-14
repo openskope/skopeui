@@ -1,5 +1,12 @@
 <template>
-  <v-card height="100%" width="100%" elevation="2" style="z-index: 1" outlined>
+  <v-card
+    class="flex-grow-1"
+    height="100%"
+    width="100%"
+    elevation="2"
+    style="z-index: 1"
+    outlined
+  >
     <v-card-title>
       <v-tooltip top>
         <template #activator="{ on, attrs }">
