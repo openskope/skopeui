@@ -59,7 +59,7 @@
           analyze the dataset.
         </v-alert>
       </v-col>
-      <v-col class="d-flex flex-grow-1 flex-shrink-0 mx-auto">
+      <v-col class="d-fl ex flex-grow-1 flex-shrink-0 mx-auto">
         <v-row class="mx-auto pa-0" style="height: 100%; width: 100%">
           <v-col no-gutters cols="7" style="height: 100%">
             <v-card class="pa-3" elevation="2" outlined style="height: 100%">

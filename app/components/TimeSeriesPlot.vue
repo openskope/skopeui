@@ -1,7 +1,7 @@
 <template>
   <v-card class="flex-grow-1" elevation="2" outlined>
     <v-card-title>Time Series</v-card-title>
-    <v-card-text v-if="hasTimeSeries">
+    <v-card-text v-if="hasTimeSeries" style="height: 90%">
       <client-only placeholder="Loading...">
         <Plotly
           ref="plot"
@@ -14,7 +14,7 @@
       </client-only>
       <v-toolbar flat extended extension-height="25" class="pt-8">
         <v-row>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-toolbar-items class="my-auto">
               <v-text-field
                 v-model="formTemporalRange[0]"
@@ -43,7 +43,7 @@
               </v-btn>
             </v-toolbar-items>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-toolbar-items>
               <v-btn icon class="mt-2" color="secondary" @click="gotoFirstYear">
                 <v-icon>skip_previous</v-icon>
