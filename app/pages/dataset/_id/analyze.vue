@@ -72,8 +72,7 @@
         </v-alert>
       </v-col>
     </v-row>
-    <LoadingSpinner v-if="isLoading" />
-    <v-row v-else class="mx-1 mt-0" style="height: 100%">
+    <v-row class="mx-1 mt-0" style="height: 100%">
       <!-- time series -->
       <v-col cols="7" no-gutters class="d-flex timeseries-flex" lg="6" md="12">
         <TimeSeriesPlot
@@ -491,10 +490,6 @@ class Analyze extends Vue {
 
   get maxYear() {
     return parseInt(this.metadata.timespan.period.lte);
-  }
-
-  get isLoading() {
-    return _.isNull(this.metadata);
   }
 
   setYear(year) {

@@ -8,12 +8,12 @@
           <v-tooltip bottom>
             <!-- FIXME: replace instructions alert popup with a tooltip popup -->
             <template #activator="{ on, attrs }">
-              <v-btn icon color="secondary" class="mx-3">
+              <v-btn class="mx-3" color="secondary" icon>
                 <v-icon
                   v-bind="attrs"
                   large
-                  @click="instructions = !instructions"
                   v-on="on"
+                  @click="instructions = !instructions"
                   >info
                 </v-icon>
               </v-btn>
@@ -22,7 +22,7 @@
           </v-tooltip>
           <v-dialog v-model="dialog" max-width="600px">
             <template #activator="{ on, attrs }">
-              <v-btn depressed color="accent" v-bind="attrs" v-on="on">
+              <v-btn v-bind="attrs" color="accent" depressed v-on="on">
                 View Metadata
               </v-btn>
             </template>
@@ -34,7 +34,9 @@
                   <v-icon color="white">fas fa-window-close</v-icon>
                 </v-btn>
               </v-card-title>
-              <v-card-text><Metadata /></v-card-text>
+              <v-card-text>
+                <Metadata />
+              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text @click="dialog = false">Close</v-btn>
@@ -42,13 +44,13 @@
             </v-card>
           </v-dialog>
           <v-btn
-            class="float-right mr-3"
             :disabled="!hasValidStudyArea"
             :to="analyzeLocation"
+            class="float-right mr-3"
             nuxt
           >
             Go to Analyze
-            <v-icon small class="ml-2" color="white">
+            <v-icon class="ml-2" color="white" small>
               fas fa-chevron-right
             </v-icon>
           </v-btn>
@@ -61,10 +63,10 @@
         <v-alert
           v-model="instructions"
           color="secondary"
-          type="info"
-          text
-          outlined
           dismissible
+          outlined
+          text
+          type="info"
         >
           Select the study area for the dataset by using the drawing tools on
           the map. A study area must be defined in order to visualize and
@@ -72,8 +74,7 @@
         </v-alert>
       </v-col>
     </v-row>
-    <LoadingSpinner v-if="isLoading" />
-    <v-row v-else class="mx-1 mt-0" style="height: 100%">
+    <v-row class="mx-1 mt-0" style="height: 100%">
       <!-- map + time series plot -->
       <!-- map and toolbar controls-->
       <v-col class="d-flex map-flex" lg="6" md="12" no-gutters>
@@ -137,13 +138,11 @@ class Visualize extends Vue {
   get timespan() {
     return this.$api().dataset.timespan;
   }
-  get isLoading() {
-    return _.isNull(this.metadata);
-  }
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
   }
+
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
     return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
@@ -152,9 +151,11 @@ class Visualize extends Vue {
   get minYear() {
     return parseInt(this.metadata.timespan.period.gte);
   }
+
   get maxYear() {
     return parseInt(this.metadata.timespan.period.lte);
   }
+
   get opacity() {
     return this.opacityLevels[this.opacityIndex];
   }
@@ -191,6 +192,7 @@ class Visualize extends Vue {
   decreaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10);
   }
+
   increaseOpacity() {
     this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10);
   }
@@ -199,6 +201,7 @@ class Visualize extends Vue {
     this.yearSelected = year;
   }
 }
+
 export default Visualize;
 </script>
 
@@ -206,22 +209,26 @@ export default Visualize;
 .map-flex {
   height: calc(85vh - 96px);
 }
+
 @media all and (max-width: 960px) {
   .map-flex {
     height: 400px;
   }
 }
+
 @media all and (max-width: 600px) {
   .map-flex {
     height: 350px;
   }
 }
+
 .v-toolbar__title {
   color: #fb7a2c;
   text-transform: uppercase;
   font-size: 1rem;
   font-weight: bold;
 }
+
 .v-toolbar__items {
   margin-top: 0.5rem;
 }

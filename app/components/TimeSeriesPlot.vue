@@ -1,7 +1,8 @@
 <template>
   <v-card class="flex-grow-1" elevation="2" outlined>
     <v-card-title>Time Series</v-card-title>
-    <v-card-text v-if="hasTimeSeries" style="height: 90%">
+    <LoadingSpinner v-if="!hasTimeSeries"></LoadingSpinner>
+    <v-card-text v-else-if="hasTimeSeries" style="height: 90%">
       <client-only placeholder="Loading...">
         <Plotly
           ref="plot"
@@ -67,9 +68,6 @@
         </v-row>
       </v-toolbar>
     </v-card-text>
-    <v-alert v-else color="warning">
-      Please select a study area to display a timeseries.
-    </v-alert>
   </v-card>
 </template>
 
@@ -79,10 +77,12 @@ import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
 import { Prop, Watch } from "vue-property-decorator";
 import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
+import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 
 @Component({
   components: {
     Plotly: () => import("vue-plotly").then((p) => p.Plotly),
+    LoadingSpinner,
   },
 })
 class TimeSeriesPlot extends Vue {
