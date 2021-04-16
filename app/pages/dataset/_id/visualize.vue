@@ -1,6 +1,6 @@
 <template>
   <v-responsive height="100%" width="100%">
-    <DatasetTitle>
+    <DatasetTitle :select-variable="true">
       <v-btn
         :disabled="!hasValidStudyArea"
         :to="analyzeLocation"

@@ -103,37 +103,6 @@
         </l-map>
       </client-only>
     </v-card-text>
-    <v-toolbar
-      v-if="isVisualize"
-      flat
-      extended
-      extension-height="25"
-      class="pt-8"
-    >
-      <v-row>
-        <v-col offset="4">
-          <v-toolbar-title>Variable</v-toolbar-title>
-          <v-toolbar-items
-            ><v-select
-              v-model="variable"
-              label="Select a variable"
-              item-color="secondary"
-              color="secondary"
-              dense
-              :items="variables"
-              item-text="name"
-              item-value="id"
-              class="my-auto"
-              :style="'width: 6rem'"
-              :prepend-icon="layerGroup.icon"
-              single-line
-              outlined
-            >
-            </v-select
-          ></v-toolbar-items>
-        </v-col>
-      </v-row>
-    </v-toolbar>
   </v-card>
 </template>
 
@@ -179,9 +148,6 @@ class Map extends Vue {
   legendPosition = "bottomleft";
   wMinTemporalRangeKey = "skope:temporal-range-min";
   wMaxTemporalRangeKey = "skope:temporal-range-max";
-  layerGroup = {
-    icon: "fas fa-layer-group",
-  };
 
   get stepNames() {
     return this.$api().app.stepNames;

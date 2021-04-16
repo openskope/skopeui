@@ -1,8 +1,24 @@
 <template>
-  <v-row>
-    <v-col class="ml-4 mt-2 mb-0">
+  <v-row justify="space-between">
+    <v-col class="ml-5 mr-1 mt-4 mb-0 pb-0">
       <h1 class="font-weight-light">
         {{ metadata.title }}
+        <v-select
+          v-if="selectVariable"
+          v-model="variable"
+          label="Select a variable"
+          item-color="secondary"
+          color="secondary"
+          style="display: inline-flex; width: 30%"
+          dense
+          :items="variables"
+          item-text="name"
+          item-value="id"
+          :prepend-icon="layerGroup.icon"
+          outlined
+        >
+        </v-select>
+
         <v-dialog v-model="dialog" max-width="600px">
           <template #activator="{ on, attrs }">
             <v-btn v-bind="attrs" color="accent" depressed v-on="on">
@@ -35,17 +51,35 @@
 </template>
 <script>
 import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
+import { Component, Prop } from "nuxt-property-decorator";
 import Metadata from "@/components/action/Metadata.vue";
 
 @Component({
   components: { Metadata },
 })
 class DatasetTitle extends Vue {
+  @Prop({ default: false })
+  selectVariable;
+
   dialog = false;
+  layerGroup = {
+    icon: "fas fa-layer-group",
+  };
 
   get metadata() {
     return this.$api().dataset.metadata;
+  }
+
+  get variable() {
+    return this.$api().dataset.variable;
+  }
+
+  set variable(id) {
+    this.$api().dataset.setVariable(id);
+  }
+
+  get variables() {
+    return this.metadata.variables;
   }
 }
 export default DatasetTitle;

@@ -1,6 +1,6 @@
 <template>
   <v-responsive height="100%" width="100%">
-    <DatasetTitle />
+    <DatasetTitle :select-variable="true" />
     <v-row class="mt-0">
       <!-- instructions -->
       <v-col class="ma-0 px-10 pb-0">
