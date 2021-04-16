@@ -40,22 +40,6 @@
           <h1 class="font-weight-light">
             {{ metadata.title }}
           </h1>
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-btn
-                icon
-                color="secondary"
-                class="mx-3"
-                v-bind="attrs"
-                v-on="on"
-              >
-                <v-icon large @click="instructions = !instructions">
-                  info
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Instructions</span>
-          </v-tooltip>
           <v-dialog v-model="dialog" max-width="600px">
             <template #activator="{ on, attrs }">
               <v-btn depressed color="accent" v-bind="attrs" v-on="on">

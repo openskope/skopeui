@@ -5,21 +5,7 @@
       <v-col class="ml-4 mt-2 mb-0">
         <h1 class="font-weight-light">
           {{ metadata.title }}
-          <v-tooltip bottom>
-            <!-- FIXME: replace instructions alert popup with a tooltip popup -->
-            <template #activator="{ on, attrs }">
-              <v-btn icon color="secondary" class="mx-3">
-                <v-icon
-                  v-bind="attrs"
-                  large
-                  @click="instructions = !instructions"
-                  v-on="on"
-                  >info
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Instructions</span>
-          </v-tooltip>
+          <!-- FIXME: replace instructions alert popup with a tooltip popup -->
           <v-dialog v-model="dialog" max-width="600px">
             <template #activator="{ on, attrs }">
               <v-btn depressed color="accent" v-bind="attrs" v-on="on">

@@ -101,12 +101,12 @@
         <v-col cols="2">
           <v-toolbar-title>Opacity</v-toolbar-title>
           <v-toolbar-items class="my-auto">
-            <v-btn icon color="secondary">
-              <v-icon small @click="decreaseOpacity">fas fa-minus</v-icon>
+            <v-btn icon large color="secondary" @click="decreaseOpacity">
+              <span style="font-size: 2.5rem">-</span>
             </v-btn>
-            <span class="mx-3"> {{ opacity }}</span>
-            <v-btn icon small color="secondary">
-              <v-icon @click="increaseOpacity">fas fa-plus</v-icon>
+            <span class="mx-3 my-auto"> {{ opacity }}</span>
+            <v-btn icon large color="secondary" @click="increaseOpacity">
+              <span style="font-size: 2.5rem">+</span>
             </v-btn>
           </v-toolbar-items>
         </v-col>
