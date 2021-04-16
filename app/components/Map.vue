@@ -34,6 +34,7 @@
         </template>
         <span>Upload a GeoJSON file</span>
       </v-tooltip>
+      <h4>{{ selectedArea }} km<sup>2</sup></h4>
       <v-spacer></v-spacer>
       <v-text-field
         v-if="isVisualize"
@@ -42,6 +43,7 @@
         max="100"
         type="number"
         label="Opacity"
+        hint="0-100"
         append-outer-icon="add"
         prepend-icon="remove"
         class="shrink"
@@ -49,9 +51,6 @@
         @click:append-outer="increaseOpacity"
         @click:prepend="decreaseOpacity"
       ></v-text-field>
-
-      <v-spacer></v-spacer>
-      <h5>{{ selectedArea }} km<sup>2</sup></h5>
     </v-card-title>
     <v-card-text :style="isVisualize ? 'height: 80%' : 'height: 90%'">
       <client-only placeholder="Loading map, please wait...">
@@ -251,10 +250,6 @@ class Map extends Vue {
       return this.$L.CRS.EPSG4326;
     }
     return "";
-  }
-
-  set variable(id) {
-    this.$api().dataset.setVariable(id);
   }
 
   destroyed() {

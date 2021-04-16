@@ -1,35 +1,6 @@
 <template>
   <v-responsive height="100%" width="100%">
-    <v-row>
-      <!-- title -->
-      <v-col class="ml-4 mt-2 mb-0">
-        <h1 class="font-weight-light">
-          {{ metadata.title }}
-          <!-- FIXME: replace instructions alert popup with a tooltip popup -->
-          <v-dialog v-model="dialog" max-width="600px">
-            <template #activator="{ on, attrs }">
-              <v-btn depressed color="accent" v-bind="attrs" v-on="on">
-                View Metadata
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="accent text--white">
-                Metadata
-                <v-spacer></v-spacer>
-                <v-btn icon @click="dialog = false">
-                  <v-icon color="white">fas fa-window-close</v-icon>
-                </v-btn>
-              </v-card-title>
-              <v-card-text><Metadata /></v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text @click="dialog = false">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </h1>
-      </v-col>
-    </v-row>
+    <DatasetTitle />
     <v-row class="mt-0">
       <!-- instructions -->
       <v-col class="ma-0 px-10 pb-0">
@@ -304,7 +275,7 @@
 import KernelRegression from "@/components/chart-form/KernelRegression.vue";
 import RunningAverage from "@/components/chart-form/RunningAverage.vue";
 import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
-import Metadata from "@/components/action/Metadata.vue";
+import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import {
@@ -320,7 +291,7 @@ import _ from "lodash";
     KernelRegression,
     RunningAverage,
     TimeSeriesPlot,
-    Metadata,
+    DatasetTitle,
   },
 })
 class Analyze extends Vue {

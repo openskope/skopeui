@@ -1,47 +1,16 @@
 <template>
   <v-responsive height="100%" width="100%">
-    <v-row>
-      <!-- title -->
-      <v-col class="ml-4 mt-2 mb-0">
-        <h1 class="font-weight-light">
-          {{ metadata.title }}
-          <v-dialog v-model="dialog" max-width="600px">
-            <template #activator="{ on, attrs }">
-              <v-btn v-bind="attrs" color="accent" depressed v-on="on">
-                View Metadata
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="accent text--white">
-                {{ metadata.title }}
-                <v-spacer></v-spacer>
-                <v-btn icon @click="dialog = false">
-                  <v-icon color="white">fas fa-window-close</v-icon>
-                </v-btn>
-              </v-card-title>
-              <v-card-text>
-                <Metadata />
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text @click="dialog = false">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-btn
-            :disabled="!hasValidStudyArea"
-            :to="analyzeLocation"
-            class="float-right mr-3"
-            nuxt
-          >
-            Go to Analyze
-            <v-icon class="ml-2" color="white" small>
-              fas fa-chevron-right
-            </v-icon>
-          </v-btn>
-        </h1>
-      </v-col>
-    </v-row>
+    <DatasetTitle>
+      <v-btn
+        :disabled="!hasValidStudyArea"
+        :to="analyzeLocation"
+        class="float-right mr-3"
+        nuxt
+      >
+        Go to Analyze
+        <v-icon class="ml-2" color="white" small> fas fa-chevron-right </v-icon>
+      </v-btn>
+    </DatasetTitle>
     <v-row class="mt-0">
       <!-- instructions -->
       <v-col class="ma-0 px-10 pb-0">
@@ -76,8 +45,8 @@
 <script>
 import { Component } from "nuxt-property-decorator";
 import Map from "@/components/Map.vue";
-import Metadata from "@/components/action/Metadata.vue";
 import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
+import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import _ from "lodash";
 import { initializeDataset } from "@/store/actions";
@@ -92,9 +61,9 @@ const setYearSelected = _.debounce(function (vue) {
     return route.fullPath;
   },
   components: {
+    DatasetTitle,
     Map,
     TimeSeriesPlot,
-    Metadata,
   },
 })
 class Visualize extends Vue {
@@ -102,7 +71,6 @@ class Visualize extends Vue {
   // it generates a @yearSelected event that calls setYear here and we decide whether or not
   // to propagate it after validation etc
   yearSelected = 1500;
-  dialog = false;
   instructions = false;
   layerGroup = {
     icon: "fas fa-layer-group",

@@ -37,37 +37,14 @@
               </template>
             </v-dialog>
           </client-only>
-          <h1 class="font-weight-light">
-            {{ metadata.title }}
-          </h1>
-          <v-dialog v-model="dialog" max-width="600px">
-            <template #activator="{ on, attrs }">
-              <v-btn depressed color="accent" v-bind="attrs" v-on="on">
-                View Metadata
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="accent text--white">
-                Metadata
-                <v-spacer></v-spacer>
-                <v-btn icon @click="dialog = false">
-                  <v-icon color="white">fas fa-window-close</v-icon>
-                </v-btn>
-              </v-card-title>
-              <v-card-text><Metadata /></v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text @click="dialog = false">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-spacer></v-spacer>
-          <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
-            Go to Visualize
-            <v-icon small class="ml-2" color="white">
-              fas fa-chevron-right
-            </v-icon>
-          </v-btn>
+          <DatasetTitle>
+            <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
+              Go to Visualize
+              <v-icon small class="ml-2" color="white">
+                fas fa-chevron-right
+              </v-icon>
+            </v-btn>
+          </DatasetTitle>
         </v-col>
         <!-- instructions -->
         <v-col class="flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0">
@@ -99,7 +76,7 @@ import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
 
 import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
-import Metadata from "@/components/action/Metadata.vue";
+import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Map from "@/components/Map.vue";
 
 import { initializeDataset, clearGeoJson } from "@/store/actions";
@@ -112,7 +89,7 @@ const fillTemplate = require("es6-dynamic-template");
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
     LoadingSpinner,
-    Metadata,
+    DatasetTitle,
     Map,
   },
 })
