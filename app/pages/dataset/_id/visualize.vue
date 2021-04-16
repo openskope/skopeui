@@ -13,7 +13,7 @@
             </template>
             <v-card>
               <v-card-title class="accent text--white">
-                Metadata
+                {{ metadata.title }}
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog = false">
                   <v-icon color="white">fas fa-window-close</v-icon>

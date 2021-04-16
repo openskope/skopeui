@@ -13,7 +13,7 @@
           <v-btn v-bind="attrs" text v-on="on" @click="exportSelectedGeometry">
             <a id="exportSelectedGeometry">
               <v-icon>fas fa-download</v-icon>
-              Download study area
+              Download
             </a>
           </v-btn>
         </template>
@@ -29,13 +29,29 @@
         <template #activator="{ on, attrs }">
           <v-btn v-bind="attrs" text v-on="on" @click="selectGeoJsonFile">
             <v-icon>fas fa-upload</v-icon>
-            Upload GeoJSON
+            Upload
           </v-btn>
         </template>
         <span>Upload a GeoJSON file</span>
       </v-tooltip>
       <v-spacer></v-spacer>
-      <h3 class="headline">Selected area: {{ selectedArea }} km<sup>2</sup></h3>
+      <v-text-field
+        v-if="isVisualize"
+        v-model="opacity"
+        min="0"
+        max="100"
+        type="number"
+        label="Opacity"
+        append-outer-icon="add"
+        prepend-icon="remove"
+        class="shrink"
+        :rules="opacityRules"
+        @click:append-outer="increaseOpacity"
+        @click:prepend="decreaseOpacity"
+      ></v-text-field>
+
+      <v-spacer></v-spacer>
+      <h5>{{ selectedArea }} km<sup>2</sup></h5>
     </v-card-title>
     <v-card-text :style="isVisualize ? 'height: 80%' : 'height: 90%'">
       <client-only placeholder="Loading map, please wait...">
@@ -46,7 +62,6 @@
           :center="metadata.region.center"
           @ready="mapReady"
         >
-          <l-control-attribution v-if="showMapControls" position="topright" />
           <l-tile-layer
             v-for="provider of leafletProviders"
             :key="provider.name"
@@ -80,7 +95,6 @@
               :transparent="true"
               :opacity="layerOpacity"
               layer-type="overlay"
-              :attribution="v.name"
               :visible="v.visible"
               version="1.3.0"
               format="image/png"
@@ -98,18 +112,6 @@
       class="pt-8"
     >
       <v-row>
-        <v-col cols="2">
-          <v-toolbar-title>Opacity</v-toolbar-title>
-          <v-toolbar-items class="my-auto">
-            <v-btn icon large color="secondary" @click="decreaseOpacity">
-              <span style="font-size: 2.5rem">-</span>
-            </v-btn>
-            <span class="mx-3 my-auto"> {{ opacity }}</span>
-            <v-btn icon large color="secondary" @click="increaseOpacity">
-              <span style="font-size: 2.5rem">+</span>
-            </v-btn>
-          </v-toolbar-items>
-        </v-col>
         <v-col offset="4">
           <v-toolbar-title>Variable</v-toolbar-title>
           <v-toolbar-items
@@ -166,6 +168,10 @@ class Map extends Vue {
   displayRaster;
 
   opacity = 50;
+  opacityRules = [
+    (v) =>
+      (v && v >= 0 && v <= 100) || "Please enter an opacity between 0 and 100.",
+  ];
   maxTemporalRange = new Date().getFullYear();
   defaultRegionOpacity = 0.05;
   defaultCircleToPolygonEdges = 32;
@@ -543,7 +549,7 @@ export default Map;
 </script>
 <style>
 .leaflet-top.leaflet-right
-  .leaflet-control-layers:nth-child(2)
+  .leaflet-control-layers:nth-child(1)
   .leaflet-control-layers-toggle {
   background-image: url(/earth.svg);
 }

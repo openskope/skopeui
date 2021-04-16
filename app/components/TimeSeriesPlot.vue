@@ -1,6 +1,5 @@
 <template>
   <v-card class="flex-grow-1" elevation="2" outlined>
-    <v-card-title>Time Series</v-card-title>
     <LoadingSpinner v-if="isLoading"></LoadingSpinner>
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <client-only placeholder="Loading...">
