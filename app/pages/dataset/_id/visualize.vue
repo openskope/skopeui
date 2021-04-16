@@ -113,7 +113,6 @@ const setYearSelected = _.debounce(function (vue) {
   },
 })
 class Visualize extends Vue {
-  isLoadingData = true;
   opacityIndex = 3;
   opacityLevels = _.range(0, 10).map((x) => x * 10);
   // selected year is managed by this component, when a year is selected in the time series plot
@@ -186,7 +185,6 @@ class Visualize extends Vue {
 
   async mounted() {
     this.yearSelected = this.minYear;
-    this.isLoadingData = false;
   }
 
   decreaseOpacity() {

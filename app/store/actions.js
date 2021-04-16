@@ -7,7 +7,6 @@ import { TIMESERIES_ENDPOINT } from "@/store/modules/constants";
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
-  const messages = api.messages;
   console.log({ timeseriesRequestData: data });
   const { datasetId, variableId, geometry, minYear, maxYear } = data;
   console.log({
@@ -17,9 +16,10 @@ async function updateTimeSeries(api, data) {
   });
   if (!dataset.canHandleTimeSeriesRequest) {
     console.log("Cannot handle timeseries request. Aborting.");
+    dataset.setTimeSeriesNoArea();
     return;
   }
-  dataset.setIsLoading(true);
+  dataset.setTimeSeriesLoading();
   const start = minYear.toString().padStart(4, "0");
   const end = maxYear.toString().padStart(4, "0");
   if (start > end) {
@@ -45,29 +45,37 @@ async function updateTimeSeries(api, data) {
       y: response.values,
     };
     console.log({ timeseries });
-    messages.clearMessages();
     dataset.setTimeSeries(timeseries);
+    dataset.setTimeSeriesLoaded();
   } catch (e) {
-    console.error(e);
-    messages.clearMessages();
     dataset.clearTimeSeries();
-    let errorMessage =
-      "Unable to load data from the timeseries service, please try selecting a smaller area or contact us if the error persists.";
     if (e.response) {
-      console.error("received error response from server: ", e);
+      // https://github.com/axios/axios#handling-errors
+      const statusCode = e.response.status;
       const responseData = e.response.data;
-      if (responseData.status === 400) {
-        // bad request
-        errorMessage = responseData.message;
+      console.error("failed timeseries request: ", {
+        statusCode,
+        responseData,
+      });
+      if (statusCode === 504) {
+        dataset.setTimeSeriesTimeout();
+      } else if (statusCode >= 500) {
+        console.error("server error: ", e);
+        dataset.setTimeSeriesServerError(responseData.detail);
+      } else if (statusCode >= 400) {
+        // 422 = validation error
+        dataset.setTimeSeriesBadRequest(responseData.detail);
+      } else if (statusCode === 200) {
+        dataset.setTimeSeriesSuccess();
+      } else {
+        console.error("Unhandled status code: ", statusCode);
       }
     } else if (e.request) {
       // browser made a request but didn't see a response, likely a timeout / client network error
-      console.log("did not receive a server response: ", { e });
-      errorMessage += ` Cause: ${e.message}`;
+      // FIXME: distinguish between this and a server side timeout eventually
+      dataset.setTimeSeriesTimeout();
     }
-    messages.error(errorMessage);
   }
-  dataset.setIsLoading(false);
 }
 
 export const retrieveTimeSeries = _.debounce(updateTimeSeries, 300);

@@ -3,6 +3,37 @@ import { ALL_DATA } from "@/store/data";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import area from "@turf/area";
 
+const LOADING = "loading";
+const SUCCESS = "success";
+
+const LOADING_STATUS = {
+  status: LOADING,
+  type: "info",
+  messages: [{ type: "info", value: "Loading time series data." }],
+};
+const SUCCESS_STATUS = {
+  status: SUCCESS,
+  type: "info",
+  messages: [{ type: "info", value: "Success" }],
+};
+const TIMEOUT_STATUS = {
+  status: "timeout",
+  messages: [
+    {
+      type: "warning",
+      value: "Timeout exceeded, please try again with a smaller study area.",
+    },
+  ],
+};
+const NO_STUDY_AREA_STATUS = {
+  status: "no-area",
+  messages: [
+    {
+      type: "warning",
+      value: "Please enter a study area.",
+    },
+  ],
+};
 @Module({ stateFactory: true, name: "dataset", namespaced: true })
 class Dataset extends VuexModule {
   timeseries = {
@@ -10,11 +41,13 @@ class Dataset extends VuexModule {
     y: [],
   };
   metadata = null;
-  isLoadingData = false;
   hasData = false;
   geoJson = null;
   selectedAreaInSquareMeters = 0;
   variable = null;
+
+  // status types: loading | timeout | badrequest | servererror | success
+  timeSeriesRequestStatus = LOADING_STATUS;
 
   @Action
   async loadDefaultVariable(metadataId) {
@@ -75,6 +108,58 @@ class Dataset extends VuexModule {
     return [1, new Date().getFullYear()];
   }
 
+  get isTimeSeriesLoading() {
+    return this.timeSeriesRequestStatus.status === LOADING;
+  }
+
+  get isTimeSeriesLoaded() {
+    return this.timeSeriesRequestStatus.status === SUCCESS;
+  }
+
+  @Mutation
+  setTimeSeriesLoading() {
+    this.timeSeriesRequestStatus = LOADING_STATUS;
+  }
+
+  @Mutation
+  setTimeSeriesLoaded() {
+    this.timeSeriesRequestStatus = SUCCESS_STATUS;
+  }
+
+  @Mutation
+  setTimeSeriesTimeout() {
+    this.timeSeriesRequestStatus = TIMEOUT_STATUS;
+  }
+
+  @Mutation
+  setTimeSeriesBadRequest(errorDetails) {
+    this.timeSeriesRequestStatus = {
+      status: "badrequest",
+      type: "error",
+      messages: errorDetails.map((detail) => ({
+        type: "error",
+        value: detail.msg,
+      })),
+    };
+  }
+
+  @Mutation
+  setTimeSeriesServerError(errorDetails) {
+    this.timeSeriesRequestStatus = {
+      status: "servererror",
+      type: "error",
+      messages: errorDetails.map((detail) => ({
+        type: "error",
+        value: detail.msg,
+      })),
+    };
+  }
+
+  @Mutation
+  setTimeSeriesNoArea() {
+    this.timeSeriesRequestStatus = NO_STUDY_AREA_STATUS;
+  }
+
   @Mutation
   setMetadata(metadata) {
     this.metadata = metadata;
@@ -88,11 +173,6 @@ class Dataset extends VuexModule {
         this.variable = variable;
       }
     }
-  }
-
-  @Mutation
-  setIsLoading(value) {
-    this.isLoadingData = value;
   }
 
   @Mutation

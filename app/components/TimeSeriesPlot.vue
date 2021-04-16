@@ -1,8 +1,8 @@
 <template>
   <v-card class="flex-grow-1" elevation="2" outlined>
     <v-card-title>Time Series</v-card-title>
-    <LoadingSpinner v-if="!hasTimeSeries"></LoadingSpinner>
-    <v-card-text v-else-if="hasTimeSeries" style="height: 90%">
+    <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+    <v-card-text v-else-if="isLoaded" style="height: 90%">
       <client-only placeholder="Loading...">
         <Plotly
           ref="plot"
@@ -68,6 +68,14 @@
         </v-row>
       </v-toolbar>
     </v-card-text>
+    <v-alert v-else class="m-1 p-3" :type="timeSeriesRequestStatus.type">
+      <p
+        v-for="message in timeSeriesRequestStatus.messages"
+        :key="message.value"
+      >
+        {{ message.value }}
+      </p>
+    </v-alert>
   </v-card>
 </template>
 
@@ -98,6 +106,18 @@ class TimeSeriesPlot extends Vue {
   selectedTemporalRange = [1, 2017];
 
   timeSeriesUnwatcher = null;
+
+  get timeSeriesRequestStatus() {
+    return this.$api().dataset.timeSeriesRequestStatus;
+  }
+
+  get isLoading() {
+    return this.$api().dataset.isTimeSeriesLoading;
+  }
+
+  get isLoaded() {
+    return this.$api().dataset.isTimeSeriesLoaded;
+  }
 
   get timeSeries() {
     const api = this.$api();
@@ -207,6 +227,8 @@ class TimeSeriesPlot extends Vue {
   }
 
   async mounted() {
+    this.selectedTemporalRange = [this.minYear, this.maxYear];
+    this.formTemporalRange = [this.minYear, this.maxYear];
     await loadTimeSeries(this.$api());
     this.timeSeriesUnwatcher = this.$watch(
       function () {
@@ -235,16 +257,28 @@ class TimeSeriesPlot extends Vue {
       }
     );
   }
+
   destroyed() {
-    this.timeSeriesUnwatcher();
+    if (this.timeSeriesUnwatcher) {
+      this.timeSeriesUnwatcher();
+    }
   }
 
-  setYear(data) {
-    this.$emit("yearSelected", data.points[0].x);
+  setYear(year) {
+    // data.points[0].x
+    this.$emit("yearSelected", year);
   }
 
   setTemporalRange() {
     this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange);
+    if (this.yearSelected == null) {
+      return;
+    }
+    if (this.yearSelected < this.selectedTemporalRange[0]) {
+      this.setYear(this.selectedTemporalRange[0]);
+    } else if (this.yearSelected > this.selectedTemporalRange[1]) {
+      this.setYear(this.selectedTemporalRange[1]);
+    }
   }
 
   gotoFirstYear() {

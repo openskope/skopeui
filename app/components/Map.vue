@@ -68,22 +68,24 @@
             :sort-layers="false"
             position="topright"
           />
-          <l-wms-tile-layer
-            v-for="v of metadata.variables"
-            ref="wmsLayers"
-            :key="v.id"
-            :base-url="skopeWmsUrl"
-            :layers="fillTemplateYear(v.wmsLayer)"
-            :name="v.name"
-            :crs="defaultCrs"
-            :transparent="true"
-            :opacity="layerOpacity"
-            layer-type="overlay"
-            :attribution="v.name"
-            :visible="v.visible"
-            version="1.3.0"
-            format="image/png"
-          />
+          <template v-if="displayRaster">
+            <l-wms-tile-layer
+              v-for="v of metadata.variables"
+              ref="wmsLayers"
+              :key="v.id"
+              :base-url="skopeWmsUrl"
+              :layers="fillTemplateYear(v.wmsLayer)"
+              :name="v.name"
+              :crs="defaultCrs"
+              :transparent="true"
+              :opacity="layerOpacity"
+              layer-type="overlay"
+              :attribution="v.name"
+              :visible="v.visible"
+              version="1.3.0"
+              format="image/png"
+            />
+          </template>
           <l-control-scale position="bottomright" />
         </l-map>
       </client-only>
@@ -160,11 +162,11 @@ class Map extends Vue {
   @Prop({ default: 2000 })
   year;
 
-  @Prop({ default: 0.5 })
-  opacity;
+  @Prop({ default: true })
+  displayRaster;
 
+  opacity = 50;
   maxTemporalRange = new Date().getFullYear();
-
   defaultRegionOpacity = 0.05;
   defaultCircleToPolygonEdges = 32;
   legendImage = null;
@@ -172,8 +174,6 @@ class Map extends Vue {
   legendPosition = "bottomleft";
   wMinTemporalRangeKey = "skope:temporal-range-min";
   wMaxTemporalRangeKey = "skope:temporal-range-max";
-  opacityIndex = 3;
-  opacityLevels = _.range(0, 10).map((x) => x * 10);
   layerGroup = {
     icon: "fas fa-layer-group",
   };
@@ -278,10 +278,10 @@ class Map extends Vue {
   }
 
   decreaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10);
+    this.opacity = _.clamp(this.opacity - 10, 0, 100);
   }
   increaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10);
+    this.opacity = _.clamp(this.opacity + 10, 0, 100);
   }
 
   mapReady(map) {
