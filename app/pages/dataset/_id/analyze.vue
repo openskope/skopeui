@@ -41,17 +41,6 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-btn
-            class="float-right mr-3"
-            :disabled="!hasValidStudyArea"
-            :to="analyzeLocation"
-            nuxt
-          >
-            Go to Analyze
-            <v-icon small class="ml-2" color="white">
-              fas fa-chevron-right
-            </v-icon>
-          </v-btn>
         </h1>
       </v-col>
     </v-row>
