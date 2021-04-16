@@ -461,7 +461,7 @@ class Map extends Vue {
     // 1. pull out the currently selected layer's layer template string
     // 2. update it with the current year
     // 3. reset the params on the currently selected layer to request the new layer from GeoServer
-    if (this.variable !== null) {
+    if (this.variable !== null && this.$refs.wmsLayers) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         if (wmsLayerRef.name === this.variable.name) {
           const layerName = this.fillTemplateYear(this.variable.wmsLayer);

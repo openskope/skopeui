@@ -10,7 +10,7 @@
           :data="timeSeriesData"
           :layout="layoutMetadata"
           :options="options"
-          @click="setYear"
+          @click="updatePlotlyYear"
         ></Plotly>
       </client-only>
       <v-toolbar flat extended extension-height="25" class="pt-8">
@@ -262,6 +262,10 @@ class TimeSeriesPlot extends Vue {
     if (this.timeSeriesUnwatcher) {
       this.timeSeriesUnwatcher();
     }
+  }
+
+  updatePlotlyYear(data) {
+    this.setYear(data.points[0].x);
   }
 
   setYear(year) {

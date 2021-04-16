@@ -63,7 +63,7 @@
       <!-- map + time series plot -->
       <!-- map and toolbar controls-->
       <v-col class="d-flex map-flex" lg="6" md="12" no-gutters>
-        <Map />
+        <Map :year="yearSelected" />
       </v-col>
       <!-- time series plot -->
       <v-col class="d-flex map-flex" lg="6" md="12">
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { Component, Watch } from "nuxt-property-decorator";
+import { Component } from "nuxt-property-decorator";
 import Map from "@/components/Map.vue";
 import Metadata from "@/components/action/Metadata.vue";
 import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
@@ -98,8 +98,6 @@ const setYearSelected = _.debounce(function (vue) {
   },
 })
 class Visualize extends Vue {
-  opacityIndex = 3;
-  opacityLevels = _.range(0, 10).map((x) => x * 10);
   // selected year is managed by this component, when a year is selected in the time series plot
   // it generates a @yearSelected event that calls setYear here and we decide whether or not
   // to propagate it after validation etc
@@ -140,10 +138,6 @@ class Visualize extends Vue {
     return parseInt(this.metadata.timespan.period.lte);
   }
 
-  get opacity() {
-    return this.opacityLevels[this.opacityIndex];
-  }
-
   get variable() {
     return this.$api().dataset.variable;
   }
@@ -170,14 +164,6 @@ class Visualize extends Vue {
 
   async mounted() {
     this.yearSelected = this.minYear;
-  }
-
-  decreaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex - 1, 0, 10);
-  }
-
-  increaseOpacity() {
-    this.opacityIndex = _.clamp(this.opacityIndex + 1, 0, 10);
   }
 
   setYear(year) {
