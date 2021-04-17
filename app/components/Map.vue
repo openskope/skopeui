@@ -7,7 +7,7 @@
     style="z-index: 1"
     outlined
   >
-    <v-card-title>
+    <v-card-title class="my-0 py-0">
       <v-tooltip top>
         <template #activator="{ on, attrs }">
           <v-btn v-bind="attrs" text v-on="on" @click="exportSelectedGeometry">
@@ -35,7 +35,7 @@
         <span>Upload a GeoJSON file</span>
       </v-tooltip>
       <h4>{{ selectedArea }} km<sup>2</sup></h4>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-text-field
         v-if="isVisualize"
         v-model="opacity"
@@ -50,9 +50,9 @@
         :rules="opacityRules"
         @click:append-outer="increaseOpacity"
         @click:prepend="decreaseOpacity"
-      ></v-text-field>
+      />
     </v-card-title>
-    <v-card-text :style="isVisualize ? 'height: 80%' : 'height: 90%'">
+    <v-card-text class="mt-0 mb-1" style="height: 90%">
       <client-only placeholder="Loading map, please wait...">
         <l-map
           ref="layerMap"
@@ -187,20 +187,8 @@ class Map extends Vue {
     return this.currentStep >= 2;
   }
 
-  get selectedLayerName() {
-    return this.isLayerSelected ? this.variable.name : "";
-  }
-
-  get opacityLabel() {
-    return `${this.selectedLayerName} Opacity`;
-  }
-
   get layerOpacity() {
     return this.opacity / 100.0;
-  }
-
-  get isLayerSelected() {
-    return this.variable !== null;
   }
 
   get skopeWmsUrl() {

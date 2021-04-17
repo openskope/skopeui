@@ -1,7 +1,45 @@
 <template>
   <v-card class="flex-grow-1" elevation="2" outlined>
-    <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+    <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
+      <v-toolbar flat class="py-0 my-0">
+        <v-text-field
+          v-model="formTemporalRange[0]"
+          class="mx-2 shrink"
+          label="Min Year"
+          hide-details
+          type="number"
+          :min="minYear"
+          :max="maxYear"
+        />
+        <v-text-field
+          v-model="formTemporalRange[1]"
+          class="mx-2 shrink"
+          label="Max Year"
+          :min="minYear"
+          :max="maxYear"
+          hide-details
+          type="number"
+          append-outer-icon="update"
+          @click:append-outer="setTemporalRange"
+        />
+        <v-spacer />
+        <v-btn icon color="secondary" @click="gotoFirstYear">
+          <v-icon>skip_previous</v-icon>
+        </v-btn>
+        <v-btn icon color="secondary" @click="previousYear">
+          <v-icon>arrow_left</v-icon>
+        </v-btn>
+        <v-btn icon @click="togglePlay">
+          <v-icon color="secondary">{{ playIcon }}</v-icon>
+        </v-btn>
+        <v-btn icon color="secondary" @click="nextYear">
+          <v-icon>arrow_right</v-icon>
+        </v-btn>
+        <v-btn icon color="secondary" @click="gotoLastYear">
+          <v-icon>skip_next</v-icon>
+        </v-btn>
+      </v-toolbar>
       <client-only placeholder="Loading...">
         <Plotly
           ref="plot"
@@ -10,62 +48,8 @@
           :layout="layoutMetadata"
           :options="options"
           @click="updatePlotlyYear"
-        ></Plotly>
+        />
       </client-only>
-      <v-toolbar flat extended extension-height="25" class="pt-8">
-        <v-row>
-          <v-col cols="6">
-            <v-toolbar-items class="my-auto">
-              <v-text-field
-                v-model="formTemporalRange[0]"
-                class="mt-0 pt-3"
-                label="Min Year"
-                hide-details
-                type="number"
-                style="width: 60px"
-              ></v-text-field>
-              <v-spacer />
-              <v-text-field
-                v-model="formTemporalRange[1]"
-                class="mt-0 pt-3"
-                label="Max Year"
-                hide-details
-                type="number"
-                style="width: 60px"
-              ></v-text-field>
-              <v-spacer />
-              <v-btn
-                class="mt-1 py-3"
-                color="secondary"
-                @click="setTemporalRange"
-              >
-                Update
-              </v-btn>
-            </v-toolbar-items>
-          </v-col>
-          <v-col cols="6">
-            <v-toolbar-items>
-              <v-btn icon class="mt-2" color="secondary" @click="gotoFirstYear">
-                <v-icon>skip_previous</v-icon>
-              </v-btn>
-              <v-btn icon class="mt-2" color="secondary" @click="previousYear">
-                <v-icon>arrow_left</v-icon>
-              </v-btn>
-              <v-btn-toggle icon class="my-auto">
-                <v-btn icon @click="togglePlay">
-                  <v-icon color="secondary">{{ playIcon }}</v-icon>
-                </v-btn>
-              </v-btn-toggle>
-              <v-btn icon class="mt-2" color="secondary" @click="nextYear">
-                <v-icon>arrow_right</v-icon>
-              </v-btn>
-              <v-btn icon class="mt-2" color="secondary" @click="gotoLastYear">
-                <v-icon>skip_next</v-icon>
-              </v-btn>
-            </v-toolbar-items>
-          </v-col>
-        </v-row>
-      </v-toolbar>
     </v-card-text>
     <v-alert v-else class="m-1 p-3" :type="timeSeriesRequestStatus.type">
       <p
@@ -101,7 +85,6 @@ class TimeSeriesPlot extends Vue {
   isAnimationPlaying = false;
 
   formTemporalRange = [1, 2017];
-  formYearSelected = 1500;
   selectedTemporalRange = [1, 2017];
 
   timeSeriesUnwatcher = null;
@@ -159,9 +142,8 @@ class TimeSeriesPlot extends Vue {
   }
 
   get layoutMetadata() {
-    const xaxisTitle = !_.isNil(this.yearSelected)
-      ? `Year (currently ${this.yearSelected})`
-      : "Year";
+    const xaxisTitle =
+      this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
         l: 60,
@@ -340,6 +322,6 @@ export default TimeSeriesPlot;
 </script>
 <style>
 .timeseries {
-  height: calc(100% - 48px);
+  height: 100%;
 }
 </style>

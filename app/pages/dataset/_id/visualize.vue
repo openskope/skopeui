@@ -30,7 +30,6 @@
     </v-row>
     <v-row class="mx-1 mt-0" style="height: 100%">
       <!-- map + time series plot -->
-      <!-- map and toolbar controls-->
       <v-col class="d-flex map-flex" lg="6" md="12" no-gutters>
         <Map :year="yearSelected" />
       </v-col>

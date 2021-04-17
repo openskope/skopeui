@@ -16,9 +16,7 @@
           item-value="id"
           :prepend-icon="layerGroup.icon"
           outlined
-        >
-        </v-select>
-
+        />
         <v-dialog v-model="dialog" max-width="600px">
           <template #activator="{ on, attrs }">
             <v-btn v-bind="attrs" color="accent" depressed v-on="on">
@@ -28,7 +26,7 @@
           <v-card>
             <v-card-title class="accent text--white">
               {{ metadata.title }}
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-btn icon @click="dialog = false">
                 <v-icon color="white">fas fa-window-close</v-icon>
               </v-btn>
@@ -37,7 +35,7 @@
               <Metadata />
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-btn text @click="dialog = false">Close</v-btn>
             </v-card-actions>
           </v-card>
