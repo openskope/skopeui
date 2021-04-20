@@ -2,11 +2,9 @@
   <v-responsive height="100%" width="100%">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <v-row class="d-flex flex-column" style="height: 100%">
+      <v-row class="d-flex">
         <!-- title -->
-        <v-col
-          class="d-flex flex-row flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0 pt-10"
-        >
+        <v-col>
           <client-only>
             <v-dialog
               v-model="confirmGeometry"
@@ -40,29 +38,14 @@
           <DatasetTitle>
             <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
               Go to Visualize
-              <v-icon small class="ml-2" color="white">
-                fas fa-chevron-right
-              </v-icon>
+              <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
             </v-btn>
           </DatasetTitle>
         </v-col>
-        <!-- instructions -->
-        <v-col class="flex-grow-0 flex-shrink-1 ma-0 px-10 pb-0">
-          <v-alert
-            v-model="instructions"
-            color="secondary"
-            type="info"
-            text
-            outlined
-            dismissible
-          >
-            Select the geometry for the dataset by using the drawing tools on
-            the map. A geometry must be defined in order to visualize and
-            analyze the dataset.
-          </v-alert>
-        </v-col>
+      </v-row>
+      <v-row class="mb-1 ml-1" style="height: 90%">
         <!-- map -->
-        <v-col id="map-flex" class="flex-grow-1 flex-shrink-0 ma-0 px-10">
+        <v-col id="map-flex">
           <Map :display-raster="false" class="mx-auto" />
         </v-col>
       </v-row>
@@ -181,16 +164,6 @@ export default DatasetDetail;
   #map-flex {
     height: 350px;
   }
-}
-
-.map {
-  height: 100%;
-  position: relative;
-  z-index: 1;
-}
-
-.header {
-  color: white;
 }
 
 ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title="Save changes"] {

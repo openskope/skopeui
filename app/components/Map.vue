@@ -52,7 +52,7 @@
         @click:prepend="decreaseOpacity"
       />
     </v-card-title>
-    <v-card-text class="mt-0 mb-1" style="height: 90%">
+    <v-card-text class="mt-0 mb-0" style="height: 95%">
       <client-only placeholder="Loading map, please wait...">
         <l-map
           ref="layerMap"
