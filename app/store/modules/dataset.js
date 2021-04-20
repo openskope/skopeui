@@ -34,6 +34,7 @@ const NO_STUDY_AREA_STATUS = {
     },
   ],
 };
+
 @Module({ stateFactory: true, name: "dataset", namespaced: true })
 class Dataset extends VuexModule {
   timeseries = {
@@ -44,6 +45,7 @@ class Dataset extends VuexModule {
   hasData = false;
   geoJson = null;
   selectedAreaInSquareMeters = 0;
+  areaPerPixel = 45.8;
   variable = null;
 
   // status types: loading | timeout | badrequest | servererror | success
@@ -90,6 +92,18 @@ class Dataset extends VuexModule {
     );
   }
 
+  get selectedAreaInSquareKm() {
+    return (this.selectedAreaInSquareMeters / 1000000.0).toFixed(2);
+  }
+
+  get pixelArea() {
+    return this.areaPerPixel * this.numberOfPixels;
+  }
+
+  get numberOfPixels() {
+    return 42;
+  }
+
   get timeZero() {
     if (this.metadata) {
       return this.metadata.timespan.period.timeZero || 0;
@@ -114,6 +128,12 @@ class Dataset extends VuexModule {
 
   get isTimeSeriesLoaded() {
     return this.timeSeriesRequestStatus.status === SUCCESS;
+  }
+
+  @Mutation
+  setAreaPerPixel(areaPerPixel) {
+    // FIXME: retrieve pixelArea from server
+    this.areaPerPixel = areaPerPixel;
   }
 
   @Mutation

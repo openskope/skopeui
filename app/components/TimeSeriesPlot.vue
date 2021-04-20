@@ -23,22 +23,32 @@
           append-outer-icon="update"
           @click:append-outer="setTemporalRange"
         />
-        <v-spacer />
-        <v-btn icon color="secondary" @click="gotoFirstYear">
-          <v-icon>skip_previous</v-icon>
-        </v-btn>
-        <v-btn icon color="secondary" @click="previousYear">
-          <v-icon>arrow_left</v-icon>
-        </v-btn>
-        <v-btn icon @click="togglePlay">
-          <v-icon color="secondary">{{ playIcon }}</v-icon>
-        </v-btn>
-        <v-btn icon color="secondary" @click="nextYear">
-          <v-icon>arrow_right</v-icon>
-        </v-btn>
-        <v-btn icon color="secondary" @click="gotoLastYear">
-          <v-icon>skip_next</v-icon>
-        </v-btn>
+        <template v-if="showStepControls">
+          <v-spacer />
+          <v-btn icon color="secondary" @click="gotoFirstYear">
+            <v-icon>skip_previous</v-icon>
+          </v-btn>
+          <v-btn icon color="secondary" @click="previousYear">
+            <v-icon>arrow_left</v-icon>
+          </v-btn>
+          <v-btn icon @click="togglePlay">
+            <v-icon color="secondary">{{ playIcon }}</v-icon>
+          </v-btn>
+          <v-btn icon color="secondary" @click="nextYear">
+            <v-icon>arrow_right</v-icon>
+          </v-btn>
+          <v-btn icon color="secondary" @click="gotoLastYear">
+            <v-icon>skip_next</v-icon>
+          </v-btn>
+        </template>
+        <template v-if="showArea">
+          <v-spacer />
+          <span
+            >Selected area: {{ selectedAreaInSquareKm }} km<sup>2</sup>
+          </span>
+          <v-spacer />
+          <span> Pixel area: {{ pixelArea }} km<sup>2</sup> (88 pixels) </span>
+        </template>
       </v-toolbar>
       <client-only placeholder="Loading...">
         <Plotly
@@ -80,6 +90,12 @@ class TimeSeriesPlot extends Vue {
   @Prop({ default: null })
   yearSelected;
 
+  @Prop({ default: true })
+  showStepControls;
+
+  @Prop({ default: false })
+  showArea;
+
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
@@ -99,6 +115,10 @@ class TimeSeriesPlot extends Vue {
 
   get isLoaded() {
     return this.$api().dataset.isTimeSeriesLoaded;
+  }
+
+  get selectedAreaInSquareKm() {
+    return this.$api().dataset.selectedAreaInSquareKm;
   }
 
   get timeSeries() {
@@ -205,6 +225,10 @@ class TimeSeriesPlot extends Vue {
     return this.yearSelectedSeries.x.length === 0
       ? [this.timeSeries]
       : [this.timeSeries, this.yearSelectedSeries];
+  }
+
+  get pixelArea() {
+    return this.$api().dataset.pixelArea;
   }
 
   async mounted() {
