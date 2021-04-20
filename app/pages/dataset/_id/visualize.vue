@@ -8,7 +8,7 @@
         nuxt
       >
         Go to Analyze
-        <v-icon class="ml-2" color="white" small> fas fa-chevron-right </v-icon>
+        <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
       </v-btn>
     </DatasetTitle>
     <v-row class="mt-0">

@@ -52,7 +52,7 @@
         @click:prepend="decreaseOpacity"
       />
     </v-card-title>
-    <v-card-text class="mt-0 mb-0" style="height: 95%">
+    <v-card-text class="mt-0 mb-0 map">
       <client-only placeholder="Loading map, please wait...">
         <l-map
           ref="layerMap"
@@ -174,9 +174,7 @@ class Map extends Vue {
   }
 
   get selectedArea() {
-    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
-      2
-    );
+    return this.$api().dataset.selectedAreaInSquareKm;
   }
 
   get currentStep() {
@@ -509,7 +507,7 @@ export default Map;
 }
 
 .map {
-  height: calc(100% - 48px);
+  height: calc(95% - 48px);
   position: relative;
   z-index: 1;
 }
