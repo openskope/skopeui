@@ -63,14 +63,17 @@
             ></v-col>
             <v-col cols="12" sm="3"
               ><p class="subtitle" style="font-size: 1.25rem">
-                of its pixels.
+                of its pixels. <v-icon small>fas fa-question-circle</v-icon>
               </p></v-col
             >
           </v-row>
           <!-- /////////// SMOOTHING OPTIONS /////////// -->
           <v-row align="baseline" class="mt-6" justify="start" no-gutters>
             <v-col cols="12" sm="6">
-              <p class="subtitle">Select a smoothing option</p>
+              <p class="subtitle">
+                Select a smoothing option
+                <v-icon small>fas fa-question-circle</v-icon>
+              </p>
             </v-col>
             <v-col cols="12" sm="6">
               <v-select
@@ -92,6 +95,7 @@
             <v-col cols="12" sm="6">
               <p class="subtitle" style="font-size: 1.25rem">
                 Enter time step window
+                <v-icon small>fas fa-question-circle</v-icon>
               </p>
             </v-col>
             <v-col cols="12" sm="6">
@@ -101,7 +105,10 @@
           <!-- /////////// DISPLAY OPTIONS /////////// -->
           <v-row align="baseline" justify="start" no-gutters>
             <v-col cols="12" sm="6">
-              <p class="subtitle">Select a transform option</p>
+              <p class="subtitle">
+                Select a transform option
+                <v-icon small>fas fa-question-circle</v-icon>
+              </p>
             </v-col>
             <v-col cols="12" sm="6">
               <v-select
@@ -149,6 +156,7 @@
               <v-col cols="12" sm="6">
                 <p class="subtitle" style="font-size: 1.25rem">
                   Enter time step window
+                  <v-icon small>fas fa-question-circle</v-icon>
                 </p>
               </v-col>
               <v-col cols="12" sm="6">

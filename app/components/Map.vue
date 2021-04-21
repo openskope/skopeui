@@ -7,7 +7,14 @@
     outlined
   >
     <v-card-title class="py-0 my-1">
-      <h4>{{ selectedArea }} km<sup>2</sup></h4>
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <h4 class="subtitle" v-bind="attrs" v-on="on">
+            {{ selectedArea }} km<sup>2</sup>
+          </h4>
+        </template>
+        <span>Selected Area</span>
+      </v-tooltip>
       <v-spacer></v-spacer>
       <v-tooltip top>
         <template #activator="{ on, attrs }">

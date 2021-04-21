@@ -43,11 +43,23 @@
         </template>
         <template v-if="showArea">
           <v-spacer />
-          <span
-            >Selected area: {{ selectedAreaInSquareKm }} km<sup>2</sup>
-          </span>
-          <v-spacer />
-          <span> Pixel area: {{ pixelArea }} km<sup>2</sup> (88 pixels) </span>
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <p class="title" v-bind="attrs" v-on="on">
+                {{ selectedAreaInSquareKm }} km<sup>2</sup>
+              </p>
+            </template>
+            <span>Selected area in square kilometers</span>
+          </v-tooltip>
+          <v-divider vertical class="mx-4"></v-divider>
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <p class="title" v-bind="attrs" v-on="on">
+                {{ pixelArea }} km<sup>2</sup> (88 pixels)
+              </p>
+            </template>
+            <span>Pixel area</span>
+          </v-tooltip>
         </template>
       </v-toolbar>
       <client-only placeholder="Loading...">
