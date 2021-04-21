@@ -1,56 +1,53 @@
 <template>
-  <v-responsive height="100%" width="100%">
+  <v-container fluid class="fill-height">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <v-row class="d-flex">
-        <!-- title -->
-        <v-col>
-          <client-only>
-            <v-dialog
-              v-model="confirmGeometry"
-              transition="dialog-bottom-transition"
-              max-width="600"
-            >
-              <template #default="confirmGeometry">
-                <v-card class="pa-6">
-                  <v-card-text>
-                    <h3>
-                      Welcome back! Would you like to clear the currently
-                      selected area?
-                    </h3>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn
-                      depressed
-                      color="info"
-                      @click="confirmGeometry.value = false"
-                    >
-                      Keep selected area
-                    </v-btn>
-                    <v-btn depressed color="warning" @click="clearGeoJson">
-                      Clear selected area
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
-            </v-dialog>
-          </client-only>
-          <DatasetTitle>
-            <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
-              Go to Visualize
-              <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
-            </v-btn>
-          </DatasetTitle>
-        </v-col>
-      </v-row>
-      <v-row class="mb-1 ml-1" style="height: 90%">
+      <DatasetTitle>
+        <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
+          Go to Visualize
+          <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
+        </v-btn>
+      </DatasetTitle>
+      <v-row no-gutters style="height: 90%">
         <!-- map -->
         <v-col id="map-flex">
           <Map :display-raster="false" class="mx-auto" />
         </v-col>
       </v-row>
+      <v-row>
+        <client-only>
+          <v-dialog
+            v-model="confirmGeometry"
+            transition="dialog-bottom-transition"
+            max-width="600"
+          >
+            <template #default="confirmGeometry">
+              <v-card class="pa-6">
+                <v-card-text>
+                  <h3>
+                    Welcome back! Would you like to clear the currently selected
+                    area?
+                  </h3>
+                </v-card-text>
+                <v-card-actions class="justify-end">
+                  <v-btn outlined color="info" @click="clearGeoJson">
+                    Clear selected area
+                  </v-btn>
+                  <v-btn
+                    depressed
+                    color="info"
+                    @click="confirmGeometry.value = false"
+                  >
+                    Keep selected area
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog>
+        </client-only>
+      </v-row>
     </template>
-  </v-responsive>
+  </v-container>
 </template>
 
 <script>

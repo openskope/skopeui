@@ -1,53 +1,68 @@
 <template>
-  <v-row class="d-flex d-inline mt-5 ml-4">
-    <!--    <v-col class=" ml-5 mr-1 mt-4 mb-0 pb-0">-->
+  <v-row class="d-flex d-inline mt-2 mb-0 mx-4" no-gutters>
     <h1 class="font-weight-light">
       {{ metadata.title }}
     </h1>
+    <v-dialog v-model="dialog" max-width="600px">
+      <template #activator="{ on, attrs }">
+        <v-btn
+          icon
+          depressed
+          rounded
+          class="ml-2 mr-0"
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on">fas fa-info-circle</v-icon>
+            </template>
+            <span>Metadata</span>
+          </v-tooltip>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          {{ metadata.title }}
+          <v-spacer></v-spacer>
+          <v-btn icon @click="dialog = false">
+            <v-icon>fas fa-times</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <Metadata />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-divider vertical class="mx-4"></v-divider>
+    <v-btn outlined @click="show = !show">
+      <!-- FIXME: refactor tooltip to wrap components on the page -->
+      <v-tooltip v-model="show" bottom>
+        <template #activator="{ on, attrs }">
+          <span v-bind="attrs" v-on="on">Instructions</span>
+        </template>
+        <span>The less I know the better...</span>
+      </v-tooltip>
+    </v-btn>
     <v-select
       v-if="selectVariable"
       v-model="variable"
       label="Select a variable"
       item-color="secondary"
       color="secondary"
-      style="max-width: 19%"
+      style="max-width: 19%; height: 0"
       success
       dense
       :items="variables"
       item-text="name"
       item-value="id"
-      :prepend-icon="layerGroup.icon"
       outlined
-      class="ml-5"
+      class="no-gutters mx-3"
     />
-    <v-dialog v-model="dialog" max-width="600px">
-      <template #activator="{ on, attrs }">
-        <v-btn v-bind="attrs" color="accent" depressed v-on="on">
-          View Metadata
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title class="accent text--white">
-          {{ metadata.title }}
-          <v-spacer />
-          <v-btn icon @click="dialog = false">
-            <v-icon color="white">fas fa-window-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <Metadata />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="dialog = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-spacer></v-spacer>
-    <span class="float-right">
+    <span>
       <slot />
     </span>
-    <!--    </v-col>-->
   </v-row>
 </template>
 <script>

@@ -1,13 +1,14 @@
 <template>
   <v-card
-    class="flex-grow-1"
+    class="flex-grow-1 no-gutters"
     height="100%"
     width="100%"
-    elevation="2"
     style="z-index: 1"
     outlined
   >
-    <v-card-title class="my-0 py-0">
+    <v-card-title class="py-0 my-1">
+      <h4>{{ selectedArea }} km<sup>2</sup></h4>
+      <v-spacer></v-spacer>
       <v-tooltip top>
         <template #activator="{ on, attrs }">
           <v-btn v-bind="attrs" text v-on="on" @click="exportSelectedGeometry">
@@ -34,8 +35,6 @@
         </template>
         <span>Upload a GeoJSON file</span>
       </v-tooltip>
-      <h4>{{ selectedArea }} km<sup>2</sup></h4>
-      <v-spacer />
       <v-text-field
         v-if="isVisualize"
         v-model="opacity"
@@ -52,7 +51,7 @@
         @click:prepend="decreaseOpacity"
       />
     </v-card-title>
-    <v-card-text class="mt-0 mb-0 map">
+    <v-card-text class="map">
       <client-only placeholder="Loading map, please wait...">
         <l-map
           ref="layerMap"

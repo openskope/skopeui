@@ -1,33 +1,16 @@
 <template>
-  <v-responsive height="100%" width="100%">
+  <v-container fluid class="fill-height">
     <DatasetTitle :select-variable="true">
       <v-btn
         :disabled="!hasValidStudyArea"
         :to="analyzeLocation"
-        class="float-right mr-3"
+        class="float-right"
         nuxt
       >
         Go to Analyze
         <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
       </v-btn>
     </DatasetTitle>
-    <v-row class="mt-0">
-      <!-- instructions -->
-      <v-col class="ma-0 px-10 pb-0">
-        <v-alert
-          v-model="instructions"
-          color="secondary"
-          dismissible
-          outlined
-          text
-          type="info"
-        >
-          Select the study area for the dataset by using the drawing tools on
-          the map. A study area must be defined in order to visualize and
-          analyze the dataset.
-        </v-alert>
-      </v-col>
-    </v-row>
     <v-row class="mx-1 mt-0" style="height: 100%">
       <!-- map + time series plot -->
       <v-col class="d-flex map-flex" lg="6" md="12" no-gutters>
@@ -38,7 +21,7 @@
         <TimeSeriesPlot :year-selected="yearSelected" @yearSelected="setYear" />
       </v-col>
     </v-row>
-  </v-responsive>
+  </v-container>
 </template>
 
 <script>

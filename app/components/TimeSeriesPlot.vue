@@ -1,5 +1,5 @@
 <template>
-  <v-card class="flex-grow-1" elevation="2" outlined>
+  <v-card class="flex-grow-1 no-gutters" outlined>
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">

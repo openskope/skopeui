@@ -1,20 +1,8 @@
 <template>
-  <v-responsive height="100%" width="100%">
+  <v-container fluid class="fill-height">
     <v-row no-gutters>
       <v-col class="mx-auto">
-        <v-alert color="secondary" type="info" text outlined>
-          Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
-          application! To examine data, click on a dataset name, pan &amp; zoom
-          the map, define your area of interest, then select a variable layer.
-        </v-alert>
-      </v-col>
-    </v-row>
-    <v-row no-gutters>
-      <v-col class="mx-auto">
-        <h1 class="font-weight-light">
-          <v-icon class="mx-2">fas fa-database</v-icon>
-          Datasets
-        </h1>
+        <h1 class="font-weight-light">Datasets</h1>
         <template v-for="dataset in datasets" router exact>
           <v-card
             :key="dataset.absoluteUrl"
@@ -34,7 +22,7 @@
         </v-alert>
       </v-col>
     </v-row>
-  </v-responsive>
+  </v-container>
 </template>
 
 <script>
