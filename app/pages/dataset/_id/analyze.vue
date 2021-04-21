@@ -20,53 +20,29 @@
       >
         <v-form style="height: 100%; width: 100%">
           <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
-          <h3 class="mx-3 my-2 title text-capitalize">
-            Statistics for the Temporal Interval
-          </h3>
-          <v-row no-gutters justify="center" align="center" style="height: 15%">
-            <template v-for="(statistic, id) in statistics">
-              <v-col :key="id" class="px-3" cols="4" align-self="stretch"
-                ><v-card height="100%">
-                  <v-card-text>
-                    <v-tooltip bottom>
-                      <template #activator="{ on, attrs }">
-                        <v-icon small v-bind="on" v-on="attrs"
-                          >fas fa-question-circle</v-icon
-                        >
-                      </template>
-                      <span>This is a mean</span>
-                    </v-tooltip>
-                    <p class="text-center no-gutters headline font-weight-bold">
-                      {{ statistic.data }}
-                    </p>
-                    <p class="text-center subtitle">{{ statistic.label }}</p>
-                  </v-card-text>
-                </v-card></v-col
-              >
-            </template>
-          </v-row>
+          <h3 class="mx-3 my-2 title">Statistics for the Temporal Interval</h3>
+          <v-data-table
+            :disable-pagination="true"
+            :disable-filtering="true"
+            :disable-sort="true"
+            :hide-default-footer="true"
+            :headers="statisticsHeaders"
+            :items="summaryStatistics"
+            class="mb-3"
+          ></v-data-table>
           <!-- /////////// YEAR STEP SELECTION /////////// -->
-          <v-row no-gutters class="mt-6" align="baseline" justify="start">
-            <v-col cols="12" sm="6"
-              ><p class="subtitle" style="font-size: 1.25rem">
-                For each year step, summarize area as
-              </p></v-col
-            >
-            <v-col cols="12" sm="3"
-              ><v-select
-                :items="transformOptions"
-                item-text="label"
-                item-value="id"
-                color="primary"
-                class="mx-3"
-              ></v-select
-            ></v-col>
-            <v-col cols="12" sm="3"
-              ><p class="subtitle" style="font-size: 1.25rem">
-                of its pixels. <v-icon small>fas fa-question-circle</v-icon>
-              </p></v-col
-            >
-          </v-row>
+          <v-select
+            v-if="isStudyAreaPolygon"
+            v-model="zonalStatistic"
+            :items="zonalStatisticOptions"
+            label="For each time step, summarize selected area as"
+            item-text="label"
+            item-value="id"
+            color="primary"
+          ></v-select>
+          <v-alert v-else type="info">
+            Summary statistics are not available for a point geometry.
+          </v-alert>
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
@@ -181,15 +157,15 @@ class Analyze extends Vue {
     icon: "fas fa-draw-polygon",
   };
 
-  transformOption = "mean";
+  zonalStatistic = "mean";
 
-  transformOptions = [
+  zonalStatisticOptions = [
     {
-      label: "Mean",
+      label: "Mean of its pixels",
       id: "mean",
     },
     {
-      label: "Median",
+      label: "Median of its pixels",
       id: "median",
     },
   ];
@@ -242,21 +218,42 @@ class Analyze extends Vue {
     },
   ];
 
-  statistics = [
+  summaryStatistics = [
     {
-      id: "mean",
-      label: "Mean",
-      data: this.mean,
+      series: "Base",
+      mean: this.mean,
+      median: this.median,
+      stdDev: this.stdDev,
     },
     {
-      id: "median",
-      label: "Median",
-      data: this.median,
+      series: "Transform",
+      mean: "transformed mean",
+      median: "transformed median",
+      stdDev: "transformed stddev",
+    },
+  ];
+
+  statisticsHeaders = [
+    {
+      text: "Series",
+      align: "start",
+      value: "series",
+      class: "title",
     },
     {
-      id: "stdDev",
-      label: "Standard Deviation",
-      data: this.stdDev,
+      text: "Mean",
+      value: "mean",
+      class: "title",
+    },
+    {
+      text: "Median",
+      value: "median",
+      class: "title",
+    },
+    {
+      text: "Standard Deviation",
+      value: "stdDev",
+      class: "title",
     },
   ];
 
@@ -284,8 +281,12 @@ class Analyze extends Vue {
     return this.$api().dataset.mean;
   }
 
-  get studyArea() {
-    return this.$api().dataset.geoJson;
+  get studyAreaGeometry() {
+    return this.$api().dataset.geoJson.geometry;
+  }
+
+  get isStudyAreaPolygon() {
+    return this.studyAreaGeometry.type !== "Point";
   }
 
   get canHandleTimeSeriesRequest() {
@@ -344,17 +345,19 @@ class Analyze extends Vue {
 
   async updateTimeSeries() {
     console.log("submitting to web service");
-    await this.$api().analyze.retrieveAnalysis({
-      dataset_id: "lbda-v2",
-      variable_id: "palmer_modified_drought_index",
-      selected_area: this.studyArea,
-      zonal_statistic: "mean",
+    const datasetApi = this.$api().dataset;
+    const query = {
+      dataset_id: datasetApi.metadata.id,
+      variable_id: datasetApi.variable.id,
+      selected_area: this.studyAreaGeometry,
+      zonal_statistic: this.zonalStatistic,
       transforms: [],
       time_range: {
         gte: 1500,
         lte: 1800,
       },
-    });
+    };
+    await this.$api().analyze.retrieveAnalysis(query);
   }
 
   created() {
@@ -377,7 +380,7 @@ class Analyze extends Vue {
           return {
             datasetId: this.metadata.id,
             variableId: this.variable.id,
-            geometry: this.studyArea.geometry,
+            geometry: this.studyAreaGeometry,
             minYear: this.minYear,
             maxYear: this.maxYear,
           };
