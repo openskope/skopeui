@@ -104,6 +104,18 @@ class Dataset extends VuexModule {
     return 42;
   }
 
+  get mean() {
+    return 24.5;
+  }
+
+  get median() {
+    return 13;
+  }
+
+  get stdDev() {
+    return 36.2;
+  }
+
   get timeZero() {
     if (this.metadata) {
       return this.metadata.timespan.period.timeZero || 0;

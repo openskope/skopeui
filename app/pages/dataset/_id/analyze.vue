@@ -18,17 +18,32 @@
         md="12"
         style="background-color: #f4f7ff"
       >
-        <v-form style="height: 100%">
-          <h3 class="mx-3 my-2 title">Statistics for the Temporal Interval</h3>
-          <v-row no-gutters justify="center">
+        <v-form style="height: 100%; width: 100%">
+          <h3 class="mx-3 my-2 title text-capitalize">
+            Statistics for the Temporal Interval
+          </h3>
+          <v-row no-gutters justify="center" align="center" style="height: 15%">
             <!-- display stats for temporal interval -->
-            <v-col class="mx-2" align-self="stretch"
-              ><v-card>Mean</v-card></v-col
-            >
-            <v-col class="mx-2"><v-card>Median</v-card></v-col>
-            <v-col class="mx-2"
-              ><v-card>Std. Dev.: 36.4<sup>3</sup></v-card></v-col
-            >
+            <template v-for="(statistic, id) in statistics">
+              <v-col :key="id" class="mx-2" align-self="stretch"
+                ><v-card height="100%">
+                  <v-card-text>
+                    <v-tooltip bottom>
+                      <template #activator="{ on, attrs }">
+                        <v-icon small v-bind="on" v-on="attrs"
+                          >fas fa-question-circle</v-icon
+                        >
+                      </template>
+                      <span>This is a mean</span>
+                    </v-tooltip>
+                    <p class="text-center no-gutters headline font-weight-bold">
+                      {{ statistic.data }}
+                    </p>
+                    <p class="text-center subtitle">{{ statistic.label }}</p>
+                  </v-card-text>
+                </v-card></v-col
+              >
+            </template>
           </v-row>
           <h3 class="mx-3 my-2 title">
             For each Year step, selected area is summarized as the:
@@ -213,12 +228,42 @@ class Analyze extends Vue {
     },
   ];
 
+  statistics = [
+    {
+      id: "mean",
+      label: "Mean",
+      data: this.mean,
+    },
+    {
+      id: "median",
+      label: "Median",
+      data: this.median,
+    },
+    {
+      id: "stdDev",
+      label: "Standard Deviation",
+      data: this.stdDev,
+    },
+  ];
+
   get response() {
     return this.$api().analyze.response;
   }
 
   get metadata() {
     return this.$api().dataset.metadata;
+  }
+
+  get mean() {
+    return this.$api().dataset.mean;
+  }
+
+  get median() {
+    return this.$api().dataset.median;
+  }
+
+  get stdDev() {
+    return this.$api().dataset.mean;
   }
 
   get studyArea() {
