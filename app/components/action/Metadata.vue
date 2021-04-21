@@ -1,13 +1,4 @@
 <template>
-  <!--  <v-card>-->
-  <!--    <v-card-title class="accent text&#45;&#45;white">-->
-  <!--      Metadata-->
-  <!--      <v-spacer></v-spacer>-->
-  <!--      <v-btn icon @click="dialog = false">-->
-  <!--        <v-icon color="white">fas fa-window-close</v-icon>-->
-  <!--      </v-btn>-->
-  <!--    </v-card-title>-->
-  <!--    <v-card-text class="my-3">-->
   <v-card-text>
     <v-row class="mb-4">
       <v-list dense flat>
@@ -35,12 +26,6 @@
       </div>
     </v-row>
   </v-card-text>
-  <!--    </v-card-text>-->
-  <!--    <v-card-actions>-->
-  <!--      <v-spacer></v-spacer>-->
-  <!--      <v-btn text @click="dialog = false">Close</v-btn>-->
-  <!--    </v-card-actions>-->
-  <!--  </v-card>-->
 </template>
 
 <script>
