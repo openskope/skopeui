@@ -67,61 +67,35 @@
               </p></v-col
             >
           </v-row>
-          <!-- /////////// SMOOTHING OPTIONS /////////// -->
-          <v-row align="baseline" class="mt-6" justify="start" no-gutters>
-            <v-col cols="12" sm="6">
-              <p class="subtitle">
-                Select a smoothing option
-                <v-icon small>fas fa-question-circle</v-icon>
-              </p>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="smoothingOption"
-                item-color="secondary"
-                color="secondary"
-                :items="smoothingOptions"
-                item-text="label"
-                item-value="id"
-              ></v-select>
-            </v-col>
-          </v-row>
-          <v-row
-            v-if="smoothingOption !== 'none'"
-            align="baseline"
-            justify="end"
-            no-gutters
+          <v-select
+            v-model="smoothingOption"
+            label="Smoothing options"
+            item-color="secondary"
+            color="secondary"
+            :items="smoothingOptions"
+            item-text="label"
+            item-value="id"
           >
-            <v-col cols="12" sm="6">
-              <p class="subtitle" style="font-size: 1.25rem">
-                Enter time step window
-                <v-icon small>fas fa-question-circle</v-icon>
-              </p>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field v-model="smoothingTimeStep" />
-            </v-col>
-          </v-row>
+          </v-select>
+          <v-text-field
+            v-if="hasSmoothingOption"
+            v-model="smoothingTimeStep"
+            outlined
+            dense
+            label="Smoothing window"
+            type="number"
+          />
           <!-- /////////// DISPLAY OPTIONS /////////// -->
-          <v-row align="baseline" justify="start" no-gutters>
-            <v-col cols="12" sm="6">
-              <p class="subtitle">
-                Select a transform option
-                <v-icon small>fas fa-question-circle</v-icon>
-              </p>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="displayOption"
-                item-color="secondary"
-                color="secondary"
-                dense
-                :items="displayOptions"
-                item-text="label"
-                item-value="id"
-              />
-            </v-col>
-          </v-row>
+          <v-select
+            v-model="displayOption"
+            label="Display options"
+            item-color="secondary"
+            color="secondary"
+            dense
+            :items="displayOptions"
+            item-text="label"
+            item-value="id"
+          />
           <template v-if="displayOption !== 'none'">
             <v-row
               v-if="displayOption === 'zscoreFixed'"
@@ -133,7 +107,7 @@
               <v-col class="mr-5">
                 <v-text-field
                   v-model="timeRange.lb.year"
-                  label="Enter Year (Lower Bound)"
+                  label="Year (Lower Bound)"
                   dense
                   type="number"
                 ></v-text-field>
@@ -141,35 +115,26 @@
               <v-col>
                 <v-text-field
                   v-model="timeRange.ub.year"
-                  label="Enter Year (Upper Bound)"
+                  label="Year (Upper Bound)"
                   dense
                   type="number"
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-row
+            <v-text-field
               v-if="displayOption === 'zscoreMoving'"
-              no-gutters
-              align="baseline"
-              justify="end"
-            >
-              <v-col cols="12" sm="6">
-                <p class="subtitle" style="font-size: 1.25rem">
-                  Enter time step window
-                  <v-icon small>fas fa-question-circle</v-icon>
-                </p>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="zScoreMovingIntervalTimeSteps"
-                  outlined
-                  dense
-                  type="number"
-                ></v-text-field>
-              </v-col>
-            </v-row>
+              v-model="zScoreMovingIntervalTimeSteps"
+              label="Transform window"
+              outlined
+              dense
+              type="number"
+            ></v-text-field>
           </template>
-          <v-row justify="end"><v-btn type="submit">Update</v-btn></v-row>
+          <v-row no-gutters class="mt-2">
+            <v-col>
+              <v-btn @click="updateTimeSeries">Update</v-btn>
+            </v-col>
+          </v-row>
         </v-form>
       </v-col>
     </v-row>
@@ -244,16 +209,16 @@ class Analyze extends Vue {
 
   smoothingOptions = [
     {
-      label: "Modeled Values",
+      label: "None (time steps individually plotted)",
       id: "none",
     },
     {
-      label: "Moving Average (Trailing)",
-      id: "trailingAverage",
+      label: "Centered Running Average (+/- window width)",
+      id: "centeredAverage",
     },
     {
-      label: "Moving Average (Centered)",
-      id: "centeredAverage",
+      label: "Trailing Running Average (- window width)",
+      id: "trailingAverage",
     },
   ];
 
@@ -263,15 +228,16 @@ class Analyze extends Vue {
 
   displayOptions = [
     {
-      label: "None",
+      label: "Modeled values",
       id: "none",
     },
     {
-      label: "Z-Score wrt Fixed Interval",
+      label:
+        "Z-Score wrt Fixed Interval (Z calculated using Mean and S.D. above)",
       id: "zscoreFixed",
     },
     {
-      label: "Z-Score wrt Moving Interval",
+      label: "Z-Score wrt Moving Interval (Z recalculated on moving basis)",
       id: "zscoreMoving",
     },
   ];
@@ -293,6 +259,10 @@ class Analyze extends Vue {
       data: this.stdDev,
     },
   ];
+
+  get hasSmoothingOption() {
+    return this.smoothingOption !== "none";
+  }
 
   get response() {
     return this.$api().analyze.response;
@@ -372,7 +342,7 @@ class Analyze extends Vue {
     this.yearSelected = year;
   }
 
-  async submit() {
+  async updateTimeSeries() {
     console.log("submitting to web service");
     await this.$api().analyze.retrieveAnalysis({
       dataset_id: "lbda-v2",
@@ -454,11 +424,6 @@ export default Analyze;
 }
 
 .title {
-  color: #596d7b;
-  text-transform: uppercase;
-}
-
-.title-2 {
   color: #596d7b;
   text-transform: uppercase;
 }
