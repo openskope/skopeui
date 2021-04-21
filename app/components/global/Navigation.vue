@@ -158,6 +158,7 @@ export default Navigation;
     position: absolute
     height: 3px
     background: #fb7a2c
+    width: 0
 
   &::after
     width: 100%
