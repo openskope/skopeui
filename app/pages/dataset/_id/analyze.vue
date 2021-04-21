@@ -19,13 +19,13 @@
         style="background-color: #f4f7ff"
       >
         <v-form style="height: 100%; width: 100%">
+          <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
           <h3 class="mx-3 my-2 title text-capitalize">
             Statistics for the Temporal Interval
           </h3>
           <v-row no-gutters justify="center" align="center" style="height: 15%">
-            <!-- display stats for temporal interval -->
             <template v-for="(statistic, id) in statistics">
-              <v-col :key="id" class="mx-2" align-self="stretch"
+              <v-col :key="id" class="px-3" cols="4" align-self="stretch"
                 ><v-card height="100%">
                   <v-card-text>
                     <v-tooltip bottom>
@@ -45,83 +45,123 @@
               >
             </template>
           </v-row>
-          <h3 class="mx-3 my-2 title">
-            For each Year step, selected area is summarized as the:
-          </h3>
-          <v-row no-gutters>
-            <!-- select mean | median -->
-            <v-radio-group row mandatory class="mx-3">
-              <v-radio color="accent" label="Mean" value="mean"></v-radio>
-              <v-radio color="accent" label="Median" value="median"></v-radio>
-              <p class="my-auto">of its pixels</p>
-            </v-radio-group>
+          <!-- /////////// YEAR STEP SELECTION /////////// -->
+          <v-row no-gutters class="mt-6" align="baseline" justify="start">
+            <v-col cols="12" sm="6"
+              ><p class="subtitle" style="font-size: 1.25rem">
+                For each year step, summarize area as
+              </p></v-col
+            >
+            <v-col cols="12" sm="3"
+              ><v-select
+                :items="transformOptions"
+                item-text="label"
+                item-value="id"
+                color="primary"
+                class="mx-3"
+              ></v-select
+            ></v-col>
+            <v-col cols="12" sm="3"
+              ><p class="subtitle" style="font-size: 1.25rem">
+                of its pixels.
+              </p></v-col
+            >
           </v-row>
-          <!-- smoothing options -->
-          <h3 class="mx-3 my-2 title">Smoothing</h3>
-          <v-row no-gutters class="outlined grow">
-            <v-select
-              v-model="smoothingOption"
-              label="Select a smoothing option"
-              item-color="secondary"
-              color="secondary"
-              dense
-              :items="smoothingOptions"
-              item-text="label"
-              item-value="id"
-              outlined
-            />
-          </v-row>
-          <v-row v-if="smoothingOption !== 'none'">
-            <v-text-field
-              v-model="smoothingTimeStep"
-              label="Time Step Window"
-            />
-          </v-row>
-          <!-- display options -->
-          <h3 class="mx-3 my-2 title">Display</h3>
-          <v-row>
-            <v-select
-              v-model="displayOption"
-              label="Select a transform option"
-              item-color="secondary"
-              color="secondary"
-              dense
-              :items="displayOptions"
-              item-text="label"
-              item-value="id"
-              outlined
-            />
-          </v-row>
-          <v-row v-if="displayOption === 'zscoreFixed'">
-            <v-col>
-              <v-text-field
-                v-model="timeRange.lb.year"
-                label="Year (Lower Bound)"
-                outlined
-                dense
-                type="number"
-              ></v-text-field>
+          <!-- /////////// SMOOTHING OPTIONS /////////// -->
+          <v-row align="baseline" class="mt-6" justify="start" no-gutters>
+            <v-col cols="12" sm="6">
+              <p class="subtitle">Select a smoothing option</p>
             </v-col>
-            <v-col>
-              <v-text-field
-                v-model="timeRange.ub.year"
-                label="Year (Upper Bound)"
-                outlined
-                dense
-                type="number"
-              ></v-text-field>
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="smoothingOption"
+                item-color="secondary"
+                color="secondary"
+                :items="smoothingOptions"
+                item-text="label"
+                item-value="id"
+              ></v-select>
             </v-col>
           </v-row>
-          <v-row v-if="displayOption === 'zscoreMoving'">
-            <v-text-field
-              v-model="zScoreMovingIntervalTimeSteps"
-              label="Time Steps"
-              outlined
-              dense
-              type="number"
-            ></v-text-field>
+          <v-row
+            v-if="smoothingOption !== 'none'"
+            align="baseline"
+            justify="end"
+            no-gutters
+          >
+            <v-col cols="12" sm="6">
+              <p class="subtitle" style="font-size: 1.25rem">
+                Enter time step window
+              </p>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field v-model="smoothingTimeStep" />
+            </v-col>
           </v-row>
-          <v-row><v-btn type="submit">Update</v-btn></v-row>
+          <!-- /////////// DISPLAY OPTIONS /////////// -->
+          <v-row align="baseline" justify="start" no-gutters>
+            <v-col cols="12" sm="6">
+              <p class="subtitle">Select a transform option</p>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="displayOption"
+                item-color="secondary"
+                color="secondary"
+                dense
+                :items="displayOptions"
+                item-text="label"
+                item-value="id"
+              />
+            </v-col>
+          </v-row>
+          <template v-if="displayOption !== 'none'">
+            <v-row
+              v-if="displayOption === 'zscoreFixed'"
+              align="baseline"
+              justify="start"
+              no-gutters
+              class="mt-5"
+            >
+              <v-col class="mr-5">
+                <v-text-field
+                  v-model="timeRange.lb.year"
+                  label="Enter Year (Lower Bound)"
+                  dense
+                  type="number"
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="timeRange.ub.year"
+                  label="Enter Year (Upper Bound)"
+                  dense
+                  type="number"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row
+              v-if="displayOption === 'zscoreMoving'"
+              no-gutters
+              align="baseline"
+              justify="end"
+            >
+              <v-col cols="12" sm="6">
+                <p class="subtitle" style="font-size: 1.25rem">
+                  Enter time step window
+                </p>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="zScoreMovingIntervalTimeSteps"
+                  outlined
+                  dense
+                  type="number"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </template>
+          <v-row justify="end"><v-btn type="submit">Update</v-btn></v-row>
         </v-form>
       </v-col>
     </v-row>
