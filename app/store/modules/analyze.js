@@ -17,7 +17,12 @@ const updateAnalysis = _.debounce(async function (vuex, data) {
 class Analyze extends VuexModule {
   request = {};
   waitingForResponse = false;
-  response = { time_range: { gte: 0, lte: 0 }, values: [] };
+  response = {
+    time_range: { gte: 0, lte: 0 },
+    values: [],
+    n_cells: 1,
+    area: 0,
+  };
   responseError = {};
 
   @Mutation

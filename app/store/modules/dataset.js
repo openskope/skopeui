@@ -35,6 +35,13 @@ const NO_STUDY_AREA_STATUS = {
   ],
 };
 
+function toTemporalRange(metadata) {
+  return [
+    parseInt(metadata.timespan.period.gte),
+    parseInt(metadata.timespan.period.lte),
+  ];
+}
+
 @Module({ stateFactory: true, name: "dataset", namespaced: true })
 class Dataset extends VuexModule {
   timeseries = {
@@ -45,6 +52,7 @@ class Dataset extends VuexModule {
   hasData = false;
   geoJson = null;
   selectedAreaInSquareMeters = 0;
+  temporalRange = [1, 2000];
   areaPerPixel = 45.8;
   variable = null;
 
@@ -125,10 +133,7 @@ class Dataset extends VuexModule {
 
   get timespan() {
     if (this.metadata) {
-      return [
-        this.metadata.timespan.period.gte,
-        this.metadata.timespan.period.lte,
-      ];
+      return toTemporalRange(this.metadata);
     }
     console.log("No selected dataset, returning default year range");
     return [1, new Date().getFullYear()];
@@ -195,6 +200,18 @@ class Dataset extends VuexModule {
   @Mutation
   setMetadata(metadata) {
     this.metadata = metadata;
+    if (metadata) {
+      this.temporalRange.splice(
+        0,
+        this.temporalRange.length,
+        ...toTemporalRange(metadata)
+      );
+    }
+  }
+
+  @Mutation
+  setTemporalRange(temporalRange) {
+    this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
   }
 
   @Mutation

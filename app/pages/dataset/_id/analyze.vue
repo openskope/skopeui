@@ -278,7 +278,11 @@ class Analyze extends Vue {
   }
 
   get stdDev() {
-    return this.$api().dataset.mean;
+    return this.$api().dataset.stdDev;
+  }
+
+  get temporalRange() {
+    return this.$api().dataset.temporalRange;
   }
 
   get studyAreaGeometry() {
@@ -353,8 +357,8 @@ class Analyze extends Vue {
       zonal_statistic: this.zonalStatistic,
       transforms: [],
       time_range: {
-        gte: 1500,
-        lte: 1800,
+        gte: this.temporalRange[0],
+        lte: this.temporalRange[1],
       },
     };
     await this.$api().analyze.retrieveAnalysis(query);

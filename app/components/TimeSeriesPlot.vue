@@ -113,9 +113,16 @@ class TimeSeriesPlot extends Vue {
   isAnimationPlaying = false;
 
   formTemporalRange = [1, 2017];
-  selectedTemporalRange = [1, 2017];
 
   timeSeriesUnwatcher = null;
+
+  get selectedTemporalRange() {
+    return this.$api().dataset.temporalRange;
+  }
+
+  set selectedTemporalRange(temporalRange) {
+    this.$api().dataset.setTemporalRange(temporalRange);
+  }
 
   get timeSeriesRequestStatus() {
     return this.$api().dataset.timeSeriesRequestStatus;
@@ -244,9 +251,8 @@ class TimeSeriesPlot extends Vue {
   }
 
   async mounted() {
-    this.selectedTemporalRange = [this.minYear, this.maxYear];
-    this.formTemporalRange = [this.minYear, this.maxYear];
     await loadTimeSeries(this.$api());
+    this.formTemporalRange = _.cloneDeep(this.selectedTemporalRange);
     this.timeSeriesUnwatcher = this.$watch(
       function () {
         if (this.canHandleTimeSeriesRequest) {
