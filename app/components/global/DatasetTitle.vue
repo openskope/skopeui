@@ -36,10 +36,9 @@
     </v-dialog>
     <v-divider vertical class="mx-4"></v-divider>
     <v-btn outlined @click="showInstructions = !showInstructions">
-      <!-- FIXME: refactor tooltip to wrap components on the page -->
       <v-tooltip v-model="showInstructions" bottom>
-        <template #activator="{ on, attrs }">
-          <span v-bind="attrs" v-on="on">Instructions</span>
+        <template #activator="{ attrs }">
+          <span v-bind="attrs">Instructions</span>
         </template>
         <span>The less I know the better...</span>
       </v-tooltip>
