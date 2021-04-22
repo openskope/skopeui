@@ -166,9 +166,9 @@
             </v-text-field>
           </template>
           <v-btn
+            block
             class="font-weight-bold"
             color="accent"
-            block
             @click="updateTimeSeries"
             >Update <v-icon small class="mx-2">update</v-icon></v-btn
           >

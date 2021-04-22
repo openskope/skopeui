@@ -58,7 +58,21 @@
                 {{ pixelArea }} km<sup>2</sup> (88 pixels)
               </p>
             </template>
-            <span>Pixel area</span>
+            <span>Pixel area </span>
+          </v-tooltip>
+          <v-tooltip v-if="showArea" bottom>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                v-bind="attrs"
+                icon
+                class="mb-5"
+                nuxt
+                :to="selectAreaLocation"
+                v-on="on"
+                ><v-icon>edit</v-icon></v-btn
+              >
+            </template>
+            <span>Edit selected area</span>
           </v-tooltip>
         </template>
       </v-toolbar>
@@ -115,6 +129,13 @@ class TimeSeriesPlot extends Vue {
   formTemporalRange = [1, 2017];
 
   timeSeriesUnwatcher = null;
+
+  get selectAreaLocation() {
+    return {
+      name: "dataset-id",
+      params: { id: this.$route.params.id },
+    };
+  }
 
   get selectedTemporalRange() {
     return this.$api().dataset.temporalRange;
