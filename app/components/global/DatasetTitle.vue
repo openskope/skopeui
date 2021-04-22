@@ -15,7 +15,7 @@
         >
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on">fas fa-info-circle</v-icon>
+              <v-icon v-bind="attrs" v-on="on">update</v-icon>
             </template>
             <span>Metadata</span>
           </v-tooltip>

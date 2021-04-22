@@ -20,7 +20,9 @@
       >
         <v-form style="height: 100%; width: 100%">
           <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
-          <h3 class="mx-3 my-2 title">Statistics for the Temporal Interval</h3>
+          <h1 class="font-weight-light">
+            Statistics for the Temporal Interval
+          </h1>
           <v-data-table
             :disable-pagination="true"
             :disable-filtering="true"
@@ -28,8 +30,17 @@
             :hide-default-footer="true"
             :headers="statisticsHeaders"
             :items="summaryStatistics"
-            class="mb-3"
-          ></v-data-table>
+            class="my-5"
+          >
+            <template #append-outer>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                </template>
+                I'm a tooltip
+              </v-tooltip>
+            </template>
+          </v-data-table>
           <!-- /////////// YEAR STEP SELECTION /////////// -->
           <v-select
             v-if="isStudyAreaPolygon"
@@ -39,28 +50,54 @@
             item-text="label"
             item-value="id"
             color="primary"
-          ></v-select>
+          >
+            <template #append-outer>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                </template>
+                I'm a tooltip
+              </v-tooltip>
+            </template>
+          </v-select>
           <v-alert v-else type="info">
             Summary statistics are not available for a point geometry.
           </v-alert>
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
-            item-color="secondary"
-            color="secondary"
+            item-color="info"
+            color="primary"
             :items="smoothingOptions"
             item-text="label"
             item-value="id"
           >
+            <template #append-outer>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                </template>
+                I'm a tooltip
+              </v-tooltip>
+            </template>
           </v-select>
           <v-text-field
             v-if="hasSmoothingOption"
             v-model="smoothingTimeStep"
-            outlined
-            dense
             label="Smoothing window"
+            suffix="time steps"
             type="number"
-          />
+            clearable
+          >
+            <template #append-outer>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                </template>
+                I'm a tooltip
+              </v-tooltip>
+            </template>
+          </v-text-field>
           <!-- /////////// DISPLAY OPTIONS /////////// -->
           <v-select
             v-model="displayOption"
@@ -71,7 +108,16 @@
             :items="displayOptions"
             item-text="label"
             item-value="id"
-          />
+          >
+            <template #append-outer>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                </template>
+                I'm a tooltip
+              </v-tooltip>
+            </template>
+          </v-select>
           <template v-if="displayOption !== 'none'">
             <v-row
               v-if="displayOption === 'zscoreFixed'"
@@ -104,11 +150,23 @@
               outlined
               dense
               type="number"
-            ></v-text-field>
+              suffix="years"
+            >
+              <template #append-outer>
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-icon v-on="on"> fas fa-question-circle </v-icon>
+                  </template>
+                  I'm a tooltip
+                </v-tooltip>
+              </template>
+            </v-text-field>
           </template>
-          <v-row no-gutters class="mt-2">
+          <v-row no-gutters class="my-5">
             <v-col>
-              <v-btn @click="updateTimeSeries">Update</v-btn>
+              <v-btn color="accent" block @click="updateTimeSeries"
+                >Update <v-icon small class="mx-2">update</v-icon></v-btn
+              >
             </v-col>
           </v-row>
         </v-form>
@@ -432,7 +490,7 @@ export default Analyze;
 
 .title {
   color: #596d7b;
-  text-transform: uppercase;
+  font-weight: light;
 }
 
 .subtitle {
