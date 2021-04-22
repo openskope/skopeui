@@ -30,7 +30,7 @@
             :hide-default-footer="true"
             :headers="statisticsHeaders"
             :items="summaryStatistics"
-            class="my-7"
+            class="my-3"
           >
             <template #append-outer>
               <v-tooltip bottom>
@@ -60,7 +60,7 @@
               </v-tooltip>
             </template>
           </v-select>
-          <v-alert v-else class="my-4" type="info">
+          <v-alert v-else type="info">
             Summary statistics are not available for a point geometry.
           </v-alert>
           <h2 class="subtitle">Smoothing</h2>
@@ -165,13 +165,13 @@
               </template>
             </v-text-field>
           </template>
-          <v-row no-gutters class="my-5">
-            <v-col>
-              <v-btn color="accent" block @click="updateTimeSeries"
-                >Update <v-icon small class="mx-2">update</v-icon></v-btn
-              >
-            </v-col>
-          </v-row>
+          <v-btn
+            class="font-weight-bold"
+            color="accent"
+            block
+            @click="updateTimeSeries"
+            >Update <v-icon small class="mx-2">update</v-icon></v-btn
+          >
         </v-form>
       </v-col>
     </v-row>
