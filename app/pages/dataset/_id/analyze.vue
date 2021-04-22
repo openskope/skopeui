@@ -30,7 +30,7 @@
             :hide-default-footer="true"
             :headers="statisticsHeaders"
             :items="summaryStatistics"
-            class="my-5"
+            class="my-7"
           >
             <template #append-outer>
               <v-tooltip bottom>
@@ -60,9 +60,10 @@
               </v-tooltip>
             </template>
           </v-select>
-          <v-alert v-else type="info">
+          <v-alert v-else class="my-4" type="info">
             Summary statistics are not available for a point geometry.
           </v-alert>
+          <h2 class="subtitle">Smoothing</h2>
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
@@ -99,6 +100,7 @@
             </template>
           </v-text-field>
           <!-- /////////// DISPLAY OPTIONS /////////// -->
+          <h2 class="subtitle">Display</h2>
           <v-select
             v-model="displayOption"
             label="Display options"
@@ -108,6 +110,7 @@
             :items="displayOptions"
             item-text="label"
             item-value="id"
+            class="my-4"
           >
             <template #append-outer>
               <v-tooltip bottom>
