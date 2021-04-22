@@ -3,7 +3,7 @@
     <h1 class="font-weight-light">
       {{ metadata.title }}
     </h1>
-    <v-dialog v-model="dialog" max-width="600px">
+    <v-dialog v-model="showMetadata" max-width="600px">
       <template #activator="{ on, attrs }">
         <v-btn
           icon
@@ -25,7 +25,7 @@
         <v-card-title>
           {{ metadata.title }}
           <v-spacer></v-spacer>
-          <v-btn icon @click="dialog = false">
+          <v-btn icon @click="showMetadata = false">
             <v-icon>fas fa-times</v-icon>
           </v-btn>
         </v-card-title>
@@ -35,9 +35,9 @@
       </v-card>
     </v-dialog>
     <v-divider vertical class="mx-4"></v-divider>
-    <v-btn outlined @click="show = !show">
+    <v-btn outlined @click="showInstructions = !showInstructions">
       <!-- FIXME: refactor tooltip to wrap components on the page -->
-      <v-tooltip v-model="show" bottom>
+      <v-tooltip v-model="showInstructions" bottom>
         <template #activator="{ on, attrs }">
           <span v-bind="attrs" v-on="on">Instructions</span>
         </template>
@@ -77,7 +77,8 @@ class DatasetTitle extends Vue {
   @Prop({ default: false })
   selectVariable;
 
-  dialog = false;
+  showInstructions = false;
+  showMetadata = false;
   layerGroup = {
     icon: "fas fa-layer-group",
   };
