@@ -65,7 +65,13 @@
                   @change="filterDatasets"
                 >
                   <template #label>
-                    <v-chip small label class="ma-1 width-50" color="accent">
+                    <v-chip
+                      small
+                      label
+                      class="ma-1 width-50"
+                      color="info"
+                      text-color="black"
+                    >
                       <v-icon>view_column</v-icon>
                       {{ variable.name }}
                     </v-chip>

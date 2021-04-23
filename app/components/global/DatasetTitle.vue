@@ -1,21 +1,16 @@
 <template>
-  <v-row class="d-flex d-inline mt-2 mb-0 mx-4" no-gutters>
+  <v-row class="my-0 mx-4" no-gutters align="baseline" justify="start">
     <h1 class="font-weight-light">
       {{ metadata.title }}
     </h1>
     <v-dialog v-model="showMetadata" max-width="600px">
       <template #activator="{ on, attrs }">
-        <v-btn
-          icon
-          depressed
-          rounded
-          class="ml-2 mr-0"
-          v-bind="attrs"
-          v-on="on"
-        >
+        <v-btn icon depressed fab rounded v-bind="attrs" v-on="on">
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on">update</v-icon>
+              <v-icon v-bind="attrs" color="secondary" v-on="on"
+                >fas fa-info-circle</v-icon
+              >
             </template>
             <span>Metadata</span>
           </v-tooltip>
@@ -34,11 +29,17 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-divider vertical class="mx-4"></v-divider>
-    <v-btn outlined @click="showInstructions = !showInstructions">
+    <v-divider vertical></v-divider>
+    <v-btn
+      class="mx-4 my-auto"
+      depressed
+      color="accent"
+      retain-focus-on-click
+      @click="showInstructions = !showInstructions"
+    >
       <v-tooltip v-model="showInstructions" bottom>
         <template #activator="{ attrs }">
-          <span v-bind="attrs">Instructions</span>
+          <span v-bind="attrs" class="font-weight-bold">Instructions</span>
         </template>
         <span>The less I know the better...</span>
       </v-tooltip>
@@ -50,7 +51,6 @@
       item-color="secondary"
       color="secondary"
       style="max-width: 19%; height: 0"
-      success
       dense
       :items="variables"
       item-text="name"

@@ -21,7 +21,7 @@
           :href="github.url"
           v-on="on"
         >
-          <v-icon large color="white">{{ github.icon }}</v-icon>
+          <v-icon large color="secondary">{{ github.icon }}</v-icon>
         </v-btn>
       </template>
       <span>GitHub</span>
@@ -95,13 +95,7 @@ export default Header;
 </script>
 <style scoped>
 .v-app-bar {
-  background: rgb(73, 190, 131);
-  background: linear-gradient(
-    90deg,
-    rgba(73, 190, 131, 1) 0%,
-    rgba(81, 192, 139, 1) 50%,
-    rgba(88, 193, 145, 1) 100%
-  );
+  background: #457b9d;
 }
 
 .skope-title {

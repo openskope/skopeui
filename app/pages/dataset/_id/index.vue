@@ -30,12 +30,12 @@
                   </h3>
                 </v-card-text>
                 <v-card-actions class="justify-end">
-                  <v-btn outlined color="info" @click="clearGeoJson">
+                  <v-btn outlined color="accent" @click="clearGeoJson">
                     Clear selected area
                   </v-btn>
                   <v-btn
                     depressed
-                    color="info"
+                    color="accent"
                     @click="confirmGeometry.value = false"
                   >
                     Keep selected area

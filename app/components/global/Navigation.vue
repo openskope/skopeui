@@ -137,7 +137,7 @@ export default Navigation;
   content: ''
   position: absolute
   height: 3px
-  background: #fb7a2c
+  background: #EE6C4D
   width: 0
   left: 50%
   bottom: 0
@@ -145,7 +145,7 @@ export default Navigation;
   transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) all
 
 .button:hover
-  color: #fb7a2c
+  color: #EE6C4D
 
 .button:hover::after
   width: 100%
@@ -157,7 +157,7 @@ export default Navigation;
     content: ''
     position: absolute
     height: 3px
-    background: #fb7a2c
+    background: #EE6C4D
     width: 0
 
   &::after

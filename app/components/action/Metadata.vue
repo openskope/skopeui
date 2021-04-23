@@ -9,7 +9,7 @@
         >
           <v-list-item-content>
             <v-list-item-title>
-              <v-chip small label color="secondary" text-color="black">
+              <v-chip small label color="info" text-color="black">
                 <v-icon>view_column</v-icon>
                 {{ variable.class }}
               </v-chip>

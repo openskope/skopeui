@@ -44,8 +44,8 @@
                     small
                     label
                     class="ma-2"
-                    color="accent"
-                    text-color="white"
+                    color="info"
+                    text-color="black"
                   >
                     <v-icon>view_column</v-icon>
                     {{ variable.class }}
@@ -60,7 +60,6 @@
               <em> Source: </em>
               <a target="_blank" :href="sourceUrl">
                 {{ sourceUrl }}
-                <v-icon color="teal" x-small>fas fa-external-link-alt</v-icon>
               </a>
             </div>
           </v-card-text>
@@ -149,14 +148,14 @@ export default Dataset;
 
 .dataset-title {
   text-decoration: none;
-  box-shadow: inset 0 -2px 0 #09acfe, 0 2px 0 #09acfe;
+  box-shadow: inset 0 -2px 0 #ee6c4d, 0 2px 0 #ee6c4d;
   transition: box-shadow 0.3s;
   color: inherit;
   overflow: hidden;
 }
 
 .dataset-title:hover {
-  box-shadow: inset 0 -30px 0 #09acfe, 0 2px 0 #09acfe;
+  box-shadow: inset 0 -30px 0 #ee6c4d, 0 2px 0 #ee6c4d;
   color: white;
 }
 </style>
