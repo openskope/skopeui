@@ -1,9 +1,14 @@
 <template>
   <v-container fluid class="fill-height">
     <DatasetTitle :select-variable="true" />
-    <v-row class="mx-1 mt-0" style="height: 100%">
+    <v-row class="mx-1 mt-0 grow">
       <!-- time series -->
-      <v-col no-gutters class="d-flex timeseries-flex" lg="8" md="12">
+      <v-col
+        class="d-flex timeseries-flex py-0"
+        lg="8"
+        md="12"
+        align-self="stretch"
+      >
         <TimeSeriesPlot
           :show-step-controls="false"
           :show-area="true"
@@ -13,13 +18,13 @@
       </v-col>
       <!-- analysis form -->
       <v-col
-        no-gutters
         class="d-flex timeseries-flex"
         lg="4"
         md="12"
         style="background-color: #f4f7ff"
+        align-self="stretch"
       >
-        <v-form style="height: 100%; width: 100%">
+        <v-form style="width: 100%">
           <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
           <h1 class="font-weight-light">
             Statistics for the Temporal Interval
