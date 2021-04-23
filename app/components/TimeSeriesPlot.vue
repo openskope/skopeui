@@ -11,7 +11,7 @@
           type="number"
           :min="minYear"
           :max="maxYear"
-        />
+        ></v-text-field>
         <v-text-field
           v-model="formTemporalRange[1]"
           class="mx-2 shrink"
@@ -22,7 +22,11 @@
           type="number"
           append-outer-icon="update"
           @click:append-outer="setTemporalRange"
-        />
+        >
+        </v-text-field>
+        <h2 class="mx-1 font-weight-light">
+          ({{ maxYear - minYear }} time steps)
+        </h2>
         <template v-if="showStepControls">
           <v-spacer></v-spacer>
           <v-tooltip top>
