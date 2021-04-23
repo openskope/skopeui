@@ -228,7 +228,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get transformedTimeSeries() {
-    return this.toPlotlyTraces(this.$api().analysis.transformedTimeSeries);
+    return this.toPlotlyTraces(this.$api().analysis.timeseries);
   }
 
   get variableName() {
@@ -317,9 +317,14 @@ class TimeSeriesPlot extends Vue {
   }
 
   get timeSeriesData() {
-    return this.yearSelectedSeries.x.length === 0
-      ? [this.timeSeries]
-      : [this.timeSeries, this.yearSelectedSeries];
+    const timeSeriesData = [this.timeSeries];
+    if (this.yearSelectedSeries.x.length > 0) {
+      timeSeriesData.push(this.yearSelectedSeries);
+    }
+    if (this.displayTransformedTimeSeries) {
+      timeSeriesData.push(this.transformedTimeSeries);
+    }
+    return timeSeriesData;
   }
 
   get pixelArea() {

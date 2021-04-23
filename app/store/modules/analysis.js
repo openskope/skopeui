@@ -4,13 +4,17 @@ import { API } from "@/plugins/store";
 
 const updateAnalysis = _.debounce(async function (vuex, data) {
   const api = new API(vuex.store);
-  api.analysis.setResponse(
-    await vuex.store.$axios.$post(
-      // 'http://localhost:8001/timeseries-service/api/v2/datasets/yearly',
-      "https://api.openskope.org/timeseries-service/api/v2/datasets/yearly",
-      data
-    )
-  );
+  try {
+    api.analysis.setResponse(
+      await vuex.store.$axios.$post(
+        // 'http://localhost:8001/timeseries-service/api/v2/datasets/yearly',
+        "https://api.openskope.org/timeseries-service/api/v2/datasets/yearly",
+        data
+      )
+    );
+  } catch (e) {
+    api.analysis.setResponseError(e);
+  }
 }, 300);
 
 @Module({ stateFactory: true, namespaced: true, name: "analysis" })
@@ -25,6 +29,13 @@ class Analysis extends VuexModule {
   };
   responseError = {};
 
+  get timeseries() {
+    return {
+      x: _.range(this.response.time_range.gte, this.response.time_range.lte),
+      y: this.response.values,
+    };
+  }
+
   @Mutation
   setWaitingForResponse(value) {
     this.waitingForResponse = value;
@@ -34,6 +45,12 @@ class Analysis extends VuexModule {
   setResponse(response) {
     console.log({ response });
     this.response = response;
+  }
+
+  @Mutation
+  setResponseError(e) {
+    console.log({ e });
+    this.responseError = e;
   }
 
   @Action

@@ -12,7 +12,6 @@
         <TimeSeriesPlot
           :show-step-controls="false"
           :show-area="true"
-          :time-series="timeSeries"
           :display-transformed-time-series="true"
         />
       </v-col>
@@ -259,6 +258,26 @@ class Analyze extends Vue {
     },
   ];
 
+  timeSeriesTransformConverter = {
+    none: function (analyzeVue) {
+      return null;
+    },
+    centeredAverage: function (analyzeVue) {
+      return {
+        type: "MovingAverageSmoother",
+        method: "centered",
+        width: analyzeVue.smoothingTimeStep,
+      };
+    },
+    trailingAverage: function (analyzeVue) {
+      return {
+        type: "MovingAverageSmoother",
+        method: "trailing",
+        width: analyzeVue.smoothingTimeStep,
+      };
+    },
+  };
+
   smoothingTimeStep = 7;
 
   displayOption = "none";
@@ -387,15 +406,6 @@ class Analyze extends Vue {
     return this.metadata.timespan.resolution;
   }
 
-  get timeSeries() {
-    const timeseries = this.$api().dataset.timeseries;
-    if (timeseries.x.length > 0) {
-      return { ...this.$api().dataset.timeseries, type: "scatter" };
-    } else {
-      return { x: [], y: [], type: "scatter" };
-    }
-  }
-
   get minYear() {
     return parseInt(this.metadata.timespan.period.gte);
   }
@@ -436,12 +446,19 @@ class Analyze extends Vue {
   async updateTimeSeries() {
     console.log("submitting to web service");
     const datasetApi = this.$api().dataset;
+    const smoothingTransform = this.timeSeriesTransformConverter[
+      this.smoothingOption
+    ](this);
+    const transforms = [];
+    if (smoothingTransform !== null) {
+      transforms.push(smoothingTransform);
+    }
     const query = {
       dataset_id: datasetApi.metadata.id,
       variable_id: datasetApi.variable.id,
       selected_area: this.studyAreaGeometry,
       zonal_statistic: this.zonalStatistic,
-      transforms: [],
+      transforms,
       time_range: {
         gte: this.temporalRange[0],
         lte: this.temporalRange[1],
