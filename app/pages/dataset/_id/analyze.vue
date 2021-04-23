@@ -61,14 +61,14 @@
               </v-tooltip>
             </template>
           </v-select>
-          <v-alert v-else type="info">
+          <v-alert v-else type="secondary">
             Summary statistics are not available for a point geometry.
           </v-alert>
           <h2 class="subtitle">Smoothing</h2>
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
-            item-color="info"
+            item-color="secondary"
             color="primary"
             :items="smoothingOptions"
             item-text="label"
@@ -89,7 +89,6 @@
             label="Smoothing window"
             suffix="time steps"
             type="number"
-            clearable
           >
             <template #append-outer>
               <v-tooltip bottom>
@@ -170,6 +169,7 @@
             block
             class="font-weight-bold"
             color="accent"
+            :disabled="isUpdateDisabled"
             @click="updateTimeSeries"
             >Update <v-icon small class="mx-2">update</v-icon></v-btn
           >
@@ -407,6 +407,10 @@ class Analyze extends Vue {
 
   get isLoading() {
     return this.$api().analysis.waitingForResponse;
+  }
+
+  get isUpdateDisabled() {
+    return this.displayOption === "none" && this.smoothingOption === "none";
   }
 
   setYear(year) {
