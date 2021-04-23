@@ -153,7 +153,7 @@
               outlined
               dense
               type="number"
-              suffix="years"
+              suffix="time steps"
             >
               <template #append-outer>
                 <v-tooltip bottom>
