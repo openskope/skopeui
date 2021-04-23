@@ -24,22 +24,71 @@
           @click:append-outer="setTemporalRange"
         />
         <template v-if="showStepControls">
-          <v-spacer />
-          <v-btn icon color="secondary" @click="gotoFirstYear">
-            <v-icon>skip_previous</v-icon>
-          </v-btn>
-          <v-btn icon color="secondary" @click="previousYear">
-            <v-icon>arrow_left</v-icon>
-          </v-btn>
-          <v-btn icon @click="togglePlay">
-            <v-icon color="secondary">{{ playIcon }}</v-icon>
-          </v-btn>
-          <v-btn icon color="secondary" @click="nextYear">
-            <v-icon>arrow_right</v-icon>
-          </v-btn>
-          <v-btn icon color="secondary" @click="gotoLastYear">
-            <v-icon>skip_next</v-icon>
-          </v-btn>
+          <v-spacer></v-spacer>
+          <v-tooltip top>
+            <template #activator="{ attrs, on }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                color="accent"
+                v-on="on"
+                @click="gotoFirstYear"
+              >
+                <v-icon>skip_previous</v-icon>
+              </v-btn>
+            </template>
+            <span>Go to First Year</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template #activator="{ attrs, on }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                color="accent"
+                v-on="on"
+                @click="previousYear"
+              >
+                <v-icon>arrow_left</v-icon>
+              </v-btn>
+            </template>
+            <span>Go to Previous Year</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template #activator="{ attrs, on }">
+              <v-btn icon v-bind="attrs" v-on="on" @click="togglePlay">
+                <v-icon color="accent">{{ playIcon }}</v-icon>
+              </v-btn>
+            </template>
+            <span>Play</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template #activator="{ attrs, on }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                color="accent"
+                v-on="on"
+                @click="nextYear"
+              >
+                <v-icon>arrow_right</v-icon>
+              </v-btn>
+            </template>
+            <span>Go to Next Year</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template #activator="{ attrs, on }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                color="accent"
+                v-on="on"
+                @click="gotoLastYear"
+              >
+                <v-icon>skip_next</v-icon>
+              </v-btn>
+            </template>
+            <span>Go to Last Year</span>
+          </v-tooltip>
         </template>
         <template v-if="showArea">
           <v-spacer />
@@ -122,6 +171,9 @@ class TimeSeriesPlot extends Vue {
   @Prop({ default: false })
   showArea;
 
+  @Prop({ default: false })
+  displayTransformedTimeSeries;
+
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
@@ -164,16 +216,11 @@ class TimeSeriesPlot extends Vue {
   get timeSeries() {
     const api = this.$api();
     const timeseries = api.dataset.timeseries;
-    if (timeseries.x.length > 0) {
-      const minOffset = this.selectedTemporalRange[0] - this.minYear;
-      const maxOffset = this.selectedTemporalRange[1] - this.minYear;
-      const x = timeseries.x.slice(minOffset, maxOffset);
-      const y = timeseries.y.slice(minOffset, maxOffset);
-      console.log({ x, y });
-      return { x, y, type: "scatter" };
-    } else {
-      return { x: [], y: [], type: "scatter" };
-    }
+    return this.toPlotlyTraces(timeseries);
+  }
+
+  get transformedTimeSeries() {
+    return this.toPlotlyTraces(this.$api().analysis.transformedTimeSeries);
   }
 
   get variableName() {
@@ -305,6 +352,18 @@ class TimeSeriesPlot extends Vue {
   destroyed() {
     if (this.timeSeriesUnwatcher) {
       this.timeSeriesUnwatcher();
+    }
+  }
+
+  toPlotlyTraces(timeseries) {
+    if (timeseries.x.length > 0) {
+      const minOffset = this.selectedTemporalRange[0] - this.minYear;
+      const maxOffset = this.selectedTemporalRange[1] - this.minYear;
+      const x = timeseries.x.slice(minOffset, maxOffset);
+      const y = timeseries.y.slice(minOffset, maxOffset);
+      return { x, y, type: "scatter" };
+    } else {
+      return { x: [], y: [], type: "scatter" };
     }
   }
 

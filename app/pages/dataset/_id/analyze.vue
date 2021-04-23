@@ -8,6 +8,7 @@
           :show-step-controls="false"
           :show-area="true"
           :time-series="timeSeries"
+          :display-transformed-time-series="true"
         />
       </v-col>
       <!-- analysis form -->
@@ -323,7 +324,7 @@ class Analyze extends Vue {
   }
 
   get response() {
-    return this.$api().analyze.response;
+    return this.$api().analysis.response;
   }
 
   get metadata() {
@@ -404,6 +405,10 @@ class Analyze extends Vue {
     return parseInt(this.metadata.timespan.period.lte);
   }
 
+  get isLoading() {
+    return this.$api().analysis.waitingForResponse;
+  }
+
   setYear(year) {
     this.yearSelected = year;
   }
@@ -422,7 +427,7 @@ class Analyze extends Vue {
         lte: this.temporalRange[1],
       },
     };
-    await this.$api().analyze.retrieveAnalysis(query);
+    await this.$api().analysis.retrieveAnalysis(query);
   }
 
   created() {

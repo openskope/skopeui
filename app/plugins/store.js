@@ -3,15 +3,15 @@ import { Datasets } from "@/store/modules/datasets";
 import { Messages } from "@/store/modules/messages";
 import { getModule } from "vuex-module-decorators";
 import { Dataset } from "@/store/modules/dataset";
-import { Analyze } from "@/store/modules/analyze";
+import { Analysis } from "@/store/modules/analysis";
 
 export class API {
   constructor(store) {
     this.store = store;
   }
 
-  get analyze() {
-    return getModule(Analyze, this.store);
+  get analysis() {
+    return getModule(Analysis, this.store);
   }
 
   get app() {

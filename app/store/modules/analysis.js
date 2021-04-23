@@ -4,7 +4,7 @@ import { API } from "@/plugins/store";
 
 const updateAnalysis = _.debounce(async function (vuex, data) {
   const api = new API(vuex.store);
-  api.analyze.setResponse(
+  api.analysis.setResponse(
     await vuex.store.$axios.$post(
       // 'http://localhost:8001/timeseries-service/api/v2/datasets/yearly',
       "https://api.openskope.org/timeseries-service/api/v2/datasets/yearly",
@@ -13,8 +13,8 @@ const updateAnalysis = _.debounce(async function (vuex, data) {
   );
 }, 300);
 
-@Module({ stateFactory: true, namespaced: true, name: "analyze" })
-class Analyze extends VuexModule {
+@Module({ stateFactory: true, namespaced: true, name: "analysis" })
+class Analysis extends VuexModule {
   request = {};
   waitingForResponse = false;
   response = {
@@ -47,4 +47,4 @@ class Analyze extends VuexModule {
   }
 }
 
-export { Analyze };
+export { Analysis };
