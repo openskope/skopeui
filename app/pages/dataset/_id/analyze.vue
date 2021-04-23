@@ -191,12 +191,7 @@ import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
 import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import {
-  loadTimeSeries,
-  retrieveTimeSeries,
-  initializeDataset,
-} from "@/store/actions";
-import _ from "lodash";
+import { initializeDataset } from "@/store/actions";
 
 @Component({
   layout: "BaseDataset",
@@ -212,7 +207,6 @@ class Analyze extends Vue {
   instructions = false;
   smoothing = null;
   display = null;
-  timeSeriesUnWatcher = null;
   yearSelected = 1500;
   zScoreMovingIntervalTimeSteps = 25;
 
@@ -353,11 +347,11 @@ class Analyze extends Vue {
   }
 
   get studyAreaGeometry() {
-    return this.$api().dataset.geoJson.geometry;
+    return this.$api().dataset.geoJson?.geometry;
   }
 
   get isStudyAreaPolygon() {
-    return this.studyAreaGeometry.type !== "Point";
+    return this.studyAreaGeometry?.type !== "Point";
   }
 
   get canHandleTimeSeriesRequest() {
@@ -418,6 +412,23 @@ class Analyze extends Vue {
     return this.displayOption === "none" && this.smoothingOption === "none";
   }
 
+  created() {
+    const datasetId = this.$route.params.id;
+    const api = this.$api();
+    initializeDataset(this.$warehouse, api, datasetId);
+    api.dataset.loadDefaultVariable(this.$route.params.id);
+    console.log("analyze initialized dataset and default variable");
+  }
+
+  async updated() {
+    console.log("updated - variable: ", this.variable);
+  }
+
+  async mounted() {
+    // load default variable
+    this.yearSelected = this.timeRange.lb.year;
+  }
+
   setYear(year) {
     this.yearSelected = year;
   }
@@ -437,54 +448,6 @@ class Analyze extends Vue {
       },
     };
     await this.$api().analysis.retrieveAnalysis(query);
-  }
-
-  created() {
-    initializeDataset(this.$warehouse, this.$api(), this.$route.params.id);
-    console.log("analyze initializing dataset: ", this.id);
-  }
-
-  async updated() {
-    console.log("updated - variable: ", this.variable);
-  }
-
-  async mounted() {
-    const api = this.$api();
-    // load default variable
-    api.dataset.loadDefaultVariable(this.$route.params.id);
-    await loadTimeSeries(this.$api());
-    this.timeSeriesUnWatcher = this.$watch(
-      function () {
-        if (this.canHandleTimeSeriesRequest) {
-          return {
-            datasetId: this.metadata.id,
-            variableId: this.variable.id,
-            geometry: this.studyAreaGeometry,
-            minYear: this.minYear,
-            maxYear: this.maxYear,
-          };
-        } else {
-          return {
-            datasetId: null,
-            variableId: null,
-            geometry: null,
-            minYear: null,
-            maxYear: null,
-          };
-        }
-      },
-      async function (data) {
-        console.log({ data });
-        await retrieveTimeSeries(api, data);
-      }
-    );
-    this.yearSelected = this.timeRange.lb.year;
-  }
-
-  destroyed() {
-    if (this.timeSeriesUnWatcher !== null) {
-      this.timeSeriesUnWatcher();
-    }
   }
 }
 export default Analyze;

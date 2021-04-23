@@ -140,15 +140,4 @@ export default Visualize;
     height: 350px;
   }
 }
-
-.v-toolbar__title {
-  color: #fb7a2c;
-  text-transform: uppercase;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.v-toolbar__items {
-  margin-top: 0.5rem;
-}
 </style>

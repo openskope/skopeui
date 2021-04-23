@@ -5,22 +5,25 @@
       <v-toolbar flat class="py-0 my-0">
         <v-text-field
           v-model="formTemporalRange[0]"
-          class="mx-2 shrink"
           label="Min Year"
           hide-details
           type="number"
           :min="minYear"
           :max="maxYear"
-        ></v-text-field>
+          style="max-width: 10%"
+        >
+          <template #append-outer>to</template>
+        </v-text-field>
         <v-text-field
           v-model="formTemporalRange[1]"
-          class="mx-2 shrink"
+          class="mx-3"
           label="Max Year"
           :min="minYear"
           :max="maxYear"
           hide-details
           type="number"
           append-outer-icon="update"
+          style="max-width: 12%"
           @click:append-outer="setTemporalRange"
         >
         </v-text-field>
@@ -95,7 +98,7 @@
           </v-tooltip>
         </template>
         <template v-if="showArea">
-          <v-spacer />
+          <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <p class="title" v-bind="attrs" v-on="on">
@@ -118,6 +121,7 @@
               <v-btn
                 v-bind="attrs"
                 icon
+                fab
                 class="mb-5"
                 nuxt
                 :to="selectAreaLocation"

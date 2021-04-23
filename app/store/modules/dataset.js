@@ -61,17 +61,17 @@ class Dataset extends VuexModule {
 
   @Action
   async loadDefaultVariable(metadataId) {
-    if (_.isNull(this.metadata)) {
+    if (this.metadata == null) {
       await this.context.dispatch("loadMetadata", metadataId);
     }
-    if (_.isNull(this.variable)) {
+    if (this.variable == null) {
       this.context.commit("setVariable", this.metadata.variables[0].id);
     }
   }
 
   @Action
   loadMetadata(id) {
-    if (_.isNull(this.metadata) || this.metadata.id !== id) {
+    if (this.metadata == null || this.metadata.id !== id) {
       const metadata = ALL_DATA.find((m) => m.id === id);
       if (metadata) {
         this.context.commit("setMetadata", metadata);
@@ -84,7 +84,7 @@ class Dataset extends VuexModule {
   }
 
   get hasGeoJson() {
-    return this.geoJson !== null;
+    return this.geoJson != null;
   }
 
   get geoJsonKey() {
@@ -95,9 +95,7 @@ class Dataset extends VuexModule {
   }
 
   get canHandleTimeSeriesRequest() {
-    return (
-      !_.isNull(this.metadata) && this.hasGeoJson && !_.isNull(this.variable)
-    );
+    return this.metadata != null && this.hasGeoJson && this.variable != null;
   }
 
   get selectedAreaInSquareKm() {
