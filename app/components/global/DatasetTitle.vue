@@ -18,10 +18,10 @@
       </template>
       <v-card>
         <v-card-title>
-          {{ metadata.title }}
+          <h3 class="font-weight-light">{{ metadata.title }}</h3>
           <v-spacer></v-spacer>
           <v-btn icon @click="showMetadata = false">
-            <v-icon>fas fa-times</v-icon>
+            <v-icon color="error">fas fa-times</v-icon>
           </v-btn>
         </v-card-title>
         <v-card-text>
@@ -41,7 +41,7 @@
         <template #activator="{ attrs }">
           <span v-bind="attrs" class="font-weight-bold">Instructions</span>
         </template>
-        <span>The less I know the better...</span>
+        <span>{{ instructions[currentStep] }}</span>
       </v-tooltip>
     </v-btn>
     <v-select
@@ -76,6 +76,7 @@ class DatasetTitle extends Vue {
   @Prop({ default: false })
   selectVariable;
 
+  stepNames = _.clone(this.$api().app.stepNames);
   showInstructions = false;
   showMetadata = false;
   layerGroup = {
@@ -97,6 +98,17 @@ class DatasetTitle extends Vue {
   get variables() {
     return this.metadata.variables;
   }
+
+  get currentStep() {
+    return this.stepNames.findIndex((x) => x === this.$route.name);
+  }
+
+  instructions = [
+    "Welcome to the Synthesizing Knowledge of Past Environments (SKOPE) application! To examine data, click on a dataset name, pan & zoom the map, define your area of interest, then select a variable layer. ",
+    "To define a selected area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisfied with your selection, click next.",
+    "Instructions here",
+    "Instructions here",
+  ];
 }
 export default DatasetTitle;
 </script>

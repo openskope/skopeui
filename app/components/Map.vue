@@ -18,10 +18,9 @@
       <v-spacer></v-spacer>
       <v-tooltip top>
         <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" text v-on="on" @click="exportSelectedGeometry">
+          <v-btn v-bind="attrs" icon v-on="on" @click="exportSelectedGeometry">
             <a id="exportSelectedGeometry">
               <v-icon>fas fa-download</v-icon>
-              Download
             </a>
           </v-btn>
         </template>
@@ -35,9 +34,8 @@
       />
       <v-tooltip top>
         <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" text v-on="on" @click="selectGeoJsonFile">
+          <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
             <v-icon>fas fa-upload</v-icon>
-            Upload
           </v-btn>
         </template>
         <span>Upload a GeoJSON file</span>

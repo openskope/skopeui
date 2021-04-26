@@ -61,7 +61,6 @@ import _ from "lodash";
 
 @Component()
 class Navigation extends Vue {
-  steps = _.cloneDeep(this.$api().app.steps);
   stepNames = _.clone(this.$api().app.stepNames);
 
   // --------- GETTERS ---------
