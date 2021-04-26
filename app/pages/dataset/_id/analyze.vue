@@ -487,7 +487,7 @@ export default Analyze;
 
 .title {
   color: #596d7b;
-  font-weight: light;
+  font-weight: lighter;
 }
 
 .subtitle {
