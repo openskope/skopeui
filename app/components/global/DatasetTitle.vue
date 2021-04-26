@@ -68,6 +68,7 @@
 import Vue from "vue";
 import { Component, Prop } from "nuxt-property-decorator";
 import Metadata from "@/components/action/Metadata.vue";
+import _ from "lodash";
 
 @Component({
   components: { Metadata },
