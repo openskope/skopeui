@@ -84,10 +84,12 @@ class DatasetTitle extends Vue {
     icon: "fas fa-layer-group",
   };
 
-  mounted() {
-    this.$router.push({
-      query: { variable: this.variable.id },
-    });
+  created() {
+    if (this.currentStep > 1) {
+      this.$router.push({
+        query: { variable: this.variable.id },
+      });
+    }
   }
 
   get metadata() {

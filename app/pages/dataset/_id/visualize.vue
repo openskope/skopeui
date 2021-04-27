@@ -53,7 +53,6 @@ class Visualize extends Vue {
   // it generates a @yearSelected event that calls setYear here and we decide whether or not
   // to propagate it after validation etc
   yearSelected = 1500;
-  instructions = false;
   layerGroup = {
     icon: "fas fa-layer-group",
   };
