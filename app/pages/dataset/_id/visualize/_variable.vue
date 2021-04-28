@@ -100,15 +100,19 @@ class Visualize extends Vue {
   }
 
   get analyzeLocation() {
+    const id = this.$route.params.id;
+    const variable = this.$api().dataset.variable.id;
     return {
-      name: "dataset-id-analyze",
-      params: { id: this.$route.params.id },
+      name: "dataset-id-analyze-variable",
+      params: { id, variable },
     };
   }
 
-  async fetch() {
+  created() {
     const datasetId = this.$route.params.id;
-    initializeDataset(this.$warehouse, this.$api(), datasetId);
+    const variableId = this.$route.params.variable;
+    console.log(`created with dataset ${datasetId} and variable ${variableId}`);
+    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
   }
 
   async mounted() {

@@ -424,9 +424,9 @@ class Analyze extends Vue {
 
   created() {
     const datasetId = this.$route.params.id;
+    const variableId = this.$route.params.variable;
     const api = this.$api();
-    initializeDataset(this.$warehouse, api, datasetId);
-    api.dataset.loadDefaultVariable(this.$route.params.id);
+    initializeDataset(this.$warehouse, api, datasetId, variableId);
     console.log("analyze initialized dataset and default variable");
   }
 

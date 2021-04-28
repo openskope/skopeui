@@ -50,16 +50,33 @@
       label="Select a variable"
       item-color="secondary"
       color="secondary"
-      style="max-width: 19%; height: 0"
+      style="max-width: 25%; height: 0"
       dense
       :items="variables"
       item-text="name"
       item-value="id"
       outlined
-      class="no-gutters mx-3"
+      class="mx-3"
     />
+    <v-menu v-if="selectVariable">
+      <template #activator="{ on, attrs }">
+        <v-btn color="primary" dark v-bind="attrs" v-on="on">
+          {{ variable.name }}
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="(v, index) in variables"
+          :key="index"
+          :to="location(v.id)"
+        >
+          <v-list-item-title>{{ v.name }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
     <v-spacer></v-spacer>
     <span>
+      <!-- slot for next nav button -->
       <slot />
     </span>
   </v-row>
@@ -84,14 +101,6 @@ class DatasetTitle extends Vue {
     icon: "fas fa-layer-group",
   };
 
-  created() {
-    if (this.currentStep > 1) {
-      this.$router.push({
-        query: { variable: this.variable.id },
-      });
-    }
-  }
-
   get metadata() {
     return this.$api().dataset.metadata;
   }
@@ -100,10 +109,16 @@ class DatasetTitle extends Vue {
     return this.$api().dataset.variable;
   }
 
-  set variable(id) {
-    this.$api().dataset.setVariable(id);
+  set variable(variableId) {
+    const id = this.$route.params.id;
+    const name = this.$route.name;
+    this.$api().dataset.setVariable(variableId);
     this.$router.push({
-      query: { variable: id },
+      name,
+      params: {
+        id,
+        variable: variableId,
+      },
     });
   }
 
@@ -113,6 +128,15 @@ class DatasetTitle extends Vue {
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
+  }
+
+  location(variable) {
+    const id = this.$route.params.id;
+    const name = this.$route.name;
+    return {
+      name,
+      params: { id, variable },
+    };
   }
 
   instructions = [

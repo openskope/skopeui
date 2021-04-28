@@ -80,7 +80,11 @@ class Navigation extends Vue {
   get visualizeLocation() {
     if (this.hasValidStudyArea) {
       const id = this.$route.params.id;
-      return { name: "dataset-id-visualize", params: { id } };
+      const variable = this.variableId;
+      return {
+        name: "dataset-id-visualize-variable",
+        params: { id, variable },
+      };
     }
     return {};
   }
@@ -88,7 +92,11 @@ class Navigation extends Vue {
   get analyzeLocation() {
     if (this.canAnalyze) {
       const id = this.$route.params.id;
-      return { name: "dataset-id-analyze", params: { id } };
+      const variable = this.variableId;
+      return {
+        name: "dataset-id-analyze-variable",
+        params: { id, variable },
+      };
     }
     return {};
   }
@@ -118,6 +126,10 @@ class Navigation extends Vue {
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
+  }
+
+  get variableId() {
+    return this.$api().dataset.variable.id;
   }
 }
 

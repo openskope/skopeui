@@ -60,13 +60,15 @@ class Dataset extends VuexModule {
   timeSeriesRequestStatus = LOADING_STATUS;
 
   @Action
-  async loadDefaultVariable(metadataId) {
+  async loadVariable({ metadataId, variableId }) {
     if (this.metadata == null) {
-      await this.context.dispatch("loadMetadata", metadataId);
+      this.context.dispatch("loadMetadata", metadataId);
     }
-    if (this.variable == null) {
-      this.context.commit("setVariable", this.metadata.variables[0].id);
+    if (variableId == null) {
+      // set a default variable if no variable id was passed in
+      variableId = this.metadata.variables[0].id;
     }
+    this.context.commit("setVariable", variableId);
   }
 
   @Action
@@ -75,10 +77,6 @@ class Dataset extends VuexModule {
       const metadata = ALL_DATA.find((m) => m.id === id);
       if (metadata) {
         this.context.commit("setMetadata", metadata);
-        console.log({ variables: metadata.variables });
-        if (metadata.variables.length > 0) {
-          this.context.commit("setVariable", metadata.variables[0].id);
-        }
       }
     }
   }
@@ -214,6 +212,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setVariable(id) {
+    console.log("Setting variable to ", id);
     for (const variable of this.metadata.variables) {
       variable.visible = variable.id === id;
       if (variable.visible) {

@@ -113,7 +113,8 @@ class DatasetDetail extends Vue {
 
   async fetch() {
     const datasetId = this.$route.params.id;
-    initializeDataset(this.$warehouse, this.$api(), datasetId);
+    const variableId = this.$route.params.variable;
+    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
     this.confirmGeometry = this.hasValidStudyArea;
   }
 
@@ -129,7 +130,8 @@ class DatasetDetail extends Vue {
 
   get visualizeLocation() {
     const id = this.$route.params.id;
-    return { name: "dataset-id-visualize", params: { id } };
+    const variable = this.$api().dataset.variable.id;
+    return { name: "dataset-id-visualize-variable", params: { id, variable } };
   }
 
   clearGeoJson() {

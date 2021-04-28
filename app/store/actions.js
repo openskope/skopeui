@@ -101,9 +101,9 @@ export function saveGeoJson(warehouse, api, geoJson) {
   api.dataset.setGeoJson(geoJson);
 }
 
-export function initializeDataset(warehouse, api, datasetId) {
-  console.log("initializing dataset ", datasetId);
-  api.dataset.loadMetadata(datasetId);
+export function initializeDataset(warehouse, api, metadataId, variableId) {
+  api.dataset.loadMetadata(metadataId);
+  api.dataset.loadVariable({ metadataId, variableId });
   if (process.client) {
     initializeDatasetGeoJson(warehouse, api);
   }

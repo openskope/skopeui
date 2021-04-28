@@ -22,13 +22,13 @@ class App extends VuexModule {
     },
     {
       step: 3,
-      name: "dataset-id-visualize",
+      name: "dataset-id-visualize-variable",
       label: "Visualize Data",
       instructions: "Instructions here",
     },
     {
       step: 4,
-      name: "dataset-id-analyze",
+      name: "dataset-id-analyze-variable",
       label: "Analyze Data",
       instructions: "Instructions here",
     },
@@ -37,8 +37,8 @@ class App extends VuexModule {
   stepNames = [
     "index",
     "dataset-id",
-    "dataset-id-visualize",
-    "dataset-id-analyze",
+    "dataset-id-visualize-variable",
+    "dataset-id-analyze-variable",
   ];
 
   /**
