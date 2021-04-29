@@ -32,7 +32,8 @@ export class API {
 }
 
 export default ({ store }, inject) => {
+  const api = new API(store);
   inject("api", function () {
-    return new API(store);
+    return api;
   });
 };

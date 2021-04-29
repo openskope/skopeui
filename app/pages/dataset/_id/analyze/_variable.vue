@@ -341,21 +341,6 @@ class Analyze extends Vue {
     },
   ];
 
-  summaryStatistics = [
-    {
-      series: "Base",
-      mean: this.mean,
-      median: this.median,
-      stdDev: this.stdDev,
-    },
-    {
-      series: "Transform",
-      mean: "transformed mean",
-      median: "transformed median",
-      stdDev: "transformed stddev",
-    },
-  ];
-
   statisticsHeaders = [
     {
       text: "Series",
@@ -380,6 +365,13 @@ class Analyze extends Vue {
     },
   ];
 
+  get summaryStatistics() {
+    return [
+      this.$api().dataset.summaryStatistics,
+      this.$api().analysis.summaryStatistics,
+    ];
+  }
+
   get hasSmoothingOption() {
     return this.smoothingOption !== "none";
   }
@@ -390,18 +382,6 @@ class Analyze extends Vue {
 
   get metadata() {
     return this.$api().dataset.metadata;
-  }
-
-  get mean() {
-    return this.$api().dataset.mean;
-  }
-
-  get median() {
-    return this.$api().dataset.median;
-  }
-
-  get stdDev() {
-    return this.$api().dataset.stdDev;
   }
 
   get temporalRange() {

@@ -2,6 +2,7 @@ import _ from "lodash";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import { API } from "@/plugins/store";
 import { TIMESERIES_V2_ENDPOINT } from "@/store/modules/constants";
+import { filterTimeSeries, summarize } from "@/store/stats";
 
 const updateAnalysis = _.debounce(async function (vuex, data) {
   const api = new API(vuex.store);
@@ -21,7 +22,7 @@ const EMPTY_RESPONSE = {
   area: 0,
 };
 
-@Module({ stateFactory: true, namespaced: true, name: "analysis" })
+@Module({ stateFactory: true, name: "analysis", namespaced: true })
 class Analysis extends VuexModule {
   request = {};
   waitingForResponse = false;
@@ -33,6 +34,28 @@ class Analysis extends VuexModule {
       x: _.range(this.response.time_range.gte, this.response.time_range.lte),
       y: this.response.values,
     };
+  }
+
+  get summaryStatistics() {
+    return { ...summarize(this.filteredTimeSeries), series: "Transformed" };
+  }
+
+  /*
+  get temporalRange() {
+    return this.context.rootState["dataset/temporalRange"];
+  }
+
+  get minYear() {
+    return this.context.rootGetters["dataset/minYear"];
+  }
+  */
+
+  get filteredTimeSeries() {
+    return filterTimeSeries({
+      timeseries: this.timeseries,
+      temporalRange: [1000, 1500],
+      minYear: 1,
+    });
   }
 
   @Mutation

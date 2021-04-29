@@ -2,6 +2,7 @@ import _ from "lodash";
 import { ALL_DATA } from "@/store/data";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import area from "@turf/area";
+import { filterTimeSeries, summarize } from "@/store/stats";
 
 const LOADING = "loading";
 const SUCCESS = "success";
@@ -82,6 +83,14 @@ class Dataset extends VuexModule {
     }
   }
 
+  get filteredTimeSeries() {
+    return filterTimeSeries({
+      timeseries: this.timeseries,
+      temporalRange: this.temporalRange,
+      minYear: this.minYear,
+    });
+  }
+
   get hasGeoJson() {
     return this.geoJson != null;
   }
@@ -105,16 +114,8 @@ class Dataset extends VuexModule {
     return (this.totalCellArea / 1e6).toFixed(2);
   }
 
-  get mean() {
-    return 24.5;
-  }
-
-  get median() {
-    return 13;
-  }
-
-  get stdDev() {
-    return 36.2;
+  get summaryStatistics() {
+    return { ...summarize(this.filteredTimeSeries), series: "Original" };
   }
 
   get timeZero() {

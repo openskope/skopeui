@@ -114,22 +114,22 @@
                 {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }} cells)
               </p>
             </template>
-            <span>Cell area </span>
+            <span>Total cell area used in this timeseries calculation</span>
           </v-tooltip>
           <v-tooltip v-if="showArea" bottom>
             <template #activator="{ on, attrs }">
               <v-btn
                 v-bind="attrs"
-                icon
-                fab
-                class="mb-5"
-                nuxt
                 :to="selectAreaLocation"
+                class="mb-4"
+                small
                 v-on="on"
-                ><v-icon>edit</v-icon></v-btn
               >
+                <v-icon>edit_location</v-icon>
+                Edit selected area
+              </v-btn>
             </template>
-            <span>Edit selected area</span>
+            <span>Return to Select Area</span>
           </v-tooltip>
         </template>
       </v-toolbar>
@@ -222,13 +222,11 @@ class TimeSeriesPlot extends Vue {
   }
 
   get timeSeries() {
-    const api = this.$api();
-    const timeseries = api.dataset.timeseries;
-    return this.toPlotlyTraces(timeseries);
+    return { ...this.$api().dataset.filteredTimeSeries, type: "scatter" };
   }
 
   get transformedTimeSeries() {
-    return this.toPlotlyTraces(this.$api().analysis.timeseries);
+    return { ...this.$api().analysis.filteredTimeSeries, type: "scatter" };
   }
 
   get variableName() {
@@ -245,11 +243,11 @@ class TimeSeriesPlot extends Vue {
   }
 
   get minYear() {
-    return parseInt(this.metadata.timespan.period.gte);
+    return this.$api().dataset.minYear;
   }
 
   get maxYear() {
-    return parseInt(this.metadata.timespan.period.lte);
+    return this.$api().dataset.maxYear;
   }
 
   get variable() {
@@ -355,18 +353,6 @@ class TimeSeriesPlot extends Vue {
   destroyed() {
     if (this.timeSeriesUnwatcher) {
       this.timeSeriesUnwatcher();
-    }
-  }
-
-  toPlotlyTraces(timeseries) {
-    if (timeseries.x.length > 0) {
-      const minOffset = this.selectedTemporalRange[0] - this.minYear;
-      const maxOffset = this.selectedTemporalRange[1] - this.minYear;
-      const x = timeseries.x.slice(minOffset, maxOffset);
-      const y = timeseries.y.slice(minOffset, maxOffset);
-      return { x, y, type: "scatter" };
-    } else {
-      return { x: [], y: [], type: "scatter" };
     }
   }
 

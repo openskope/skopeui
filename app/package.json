@@ -36,6 +36,7 @@
     "markdown-it": "^12.0.4",
     "markdown-it-attrs": "^4.0.0",
     "markdown-it-div": "^1.1.0",
+    "mathjs": "^9.3.2",
     "nuxt": "^2.15.2",
     "nuxt-property-decorator": "^2.9.1",
     "plotly.js": "^1.58.4",
