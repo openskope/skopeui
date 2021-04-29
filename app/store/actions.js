@@ -9,20 +9,6 @@
 import _ from "lodash";
 import { TIMESERIES_V2_ENDPOINT } from "@/store/modules/constants";
 
-function convertV1ShapeToV2(data) {
-  return {
-    dataset_id: data.datasetId,
-    variable_id: data.variableId,
-    selected_area: data.geometry,
-    zonal_statistic: "mean",
-    time_range: {
-      gte: data.minYear,
-      lte: data.maxYear,
-    },
-    transforms: [],
-  };
-}
-
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
   console.log({ timeseriesRequestData: data });
@@ -55,7 +41,9 @@ async function updateTimeSeries(api, data) {
       y: response.values,
     };
     console.log({ timeseries });
-    dataset.setTimeSeries(timeseries);
+    const numberOfCells = response.n_cells;
+    const totalCellArea = response.area;
+    dataset.setTimeSeries({ timeseries, numberOfCells, totalCellArea });
     dataset.setTimeSeriesLoaded();
   } catch (e) {
     dataset.clearTimeSeries();

@@ -1,12 +1,7 @@
 <template>
   <v-container fluid class="fill-height">
     <DatasetTitle :select-variable="true">
-      <v-btn
-        :disabled="!hasValidStudyArea"
-        :to="analyzeLocation"
-        class="float-right"
-        nuxt
-      >
+      <v-btn :disabled="!hasValidStudyArea" :to="analyzeLocation" nuxt>
         Go to Analyze
         <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
       </v-btn>

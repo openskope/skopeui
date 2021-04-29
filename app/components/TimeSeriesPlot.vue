@@ -111,10 +111,10 @@
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <p class="title" v-bind="attrs" v-on="on">
-                {{ pixelArea }} km<sup>2</sup> (88 pixels)
+                {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }} cells)
               </p>
             </template>
-            <span>Pixel area </span>
+            <span>Cell area </span>
           </v-tooltip>
           <v-tooltip v-if="showArea" bottom>
             <template #activator="{ on, attrs }">
@@ -327,8 +327,12 @@ class TimeSeriesPlot extends Vue {
     return timeSeriesData;
   }
 
-  get pixelArea() {
-    return this.$api().dataset.pixelArea;
+  get totalCellArea() {
+    return this.$api().dataset.totalCellAreaInSquareKm;
+  }
+
+  get numberOfCells() {
+    return this.$api().dataset.numberOfCells;
   }
 
   get timeseriesRequestData() {

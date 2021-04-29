@@ -53,7 +53,8 @@ class Dataset extends VuexModule {
   geoJson = null;
   selectedAreaInSquareMeters = 0;
   temporalRange = [1, 2000];
-  areaPerPixel = 45.8;
+  totalCellArea = 0;
+  numberOfCells = 0;
   variable = null;
 
   // status types: loading | timeout | badrequest | servererror | success
@@ -97,15 +98,11 @@ class Dataset extends VuexModule {
   }
 
   get selectedAreaInSquareKm() {
-    return (this.selectedAreaInSquareMeters / 1000000.0).toFixed(2);
+    return (this.selectedAreaInSquareMeters / 1e6).toFixed(2);
   }
 
-  get pixelArea() {
-    return this.areaPerPixel * this.numberOfPixels;
-  }
-
-  get numberOfPixels() {
-    return 42;
+  get totalCellAreaInSquareKm() {
+    return (this.totalCellArea / 1e6).toFixed(2);
   }
 
   get mean() {
@@ -178,12 +175,6 @@ class Dataset extends VuexModule {
         transforms: null,
       };
     }
-  }
-
-  @Mutation
-  setAreaPerPixel(areaPerPixel) {
-    // FIXME: retrieve pixelArea from server
-    this.areaPerPixel = areaPerPixel;
   }
 
   @Mutation
@@ -271,9 +262,11 @@ class Dataset extends VuexModule {
   }
 
   @Mutation
-  setTimeSeries(timeseries) {
+  setTimeSeries({ timeseries, numberOfCells, totalCellArea }) {
     this.hasData = true;
     this.timeseries = timeseries;
+    this.numberOfCells = numberOfCells;
+    this.totalCellArea = totalCellArea;
   }
 
   @Mutation
@@ -283,6 +276,8 @@ class Dataset extends VuexModule {
       x: [],
       y: [],
     };
+    this.numberOfCells = 0;
+    this.totalCellArea = 0;
   }
 }
 

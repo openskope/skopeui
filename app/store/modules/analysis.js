@@ -14,16 +14,18 @@ const updateAnalysis = _.debounce(async function (vuex, data) {
   }
 }, 300);
 
+const EMPTY_RESPONSE = {
+  time_range: { gte: 0, lte: 0 },
+  values: [],
+  n_cells: 1,
+  area: 0,
+};
+
 @Module({ stateFactory: true, namespaced: true, name: "analysis" })
 class Analysis extends VuexModule {
   request = {};
   waitingForResponse = false;
-  response = {
-    time_range: { gte: 0, lte: 0 },
-    values: [],
-    n_cells: 1,
-    area: 0,
-  };
+  response = EMPTY_RESPONSE;
   responseError = {};
 
   get timeseries() {
@@ -42,6 +44,11 @@ class Analysis extends VuexModule {
   setResponse(response) {
     console.log({ response });
     this.response = response;
+  }
+
+  @Mutation
+  clearResponse() {
+    this.response = EMPTY_RESPONSE;
   }
 
   @Mutation
