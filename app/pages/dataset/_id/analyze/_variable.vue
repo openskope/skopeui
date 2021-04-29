@@ -37,16 +37,22 @@
             :items="summaryStatistics"
             class="my-3"
           >
-            <template #append-outer>
-              <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                </template>
-                I'm a tooltip
-              </v-tooltip>
-            </template>
           </v-data-table>
           <!-- /////////// YEAR STEP SELECTION /////////// -->
+          <h2 class="subtitle">Zonal Statistic</h2>
+          <v-alert
+            v-if="isStudyAreaPolygon"
+            v-model="showZonalStatisticHint"
+            border="top"
+            colored-border
+            icon="fas fa-question-circle"
+            color="secondary"
+            elevation="2"
+            dismissible
+          >
+            At each time step, the value used for the selected area is the
+            summary value (mean by default) of all selected pixels.
+          </v-alert>
           <v-select
             v-if="isStudyAreaPolygon"
             v-model="zonalStatistic"
@@ -57,18 +63,41 @@
             color="primary"
           >
             <template #append-outer>
-              <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                </template>
-                I'm a tooltip
-              </v-tooltip>
+              <v-btn
+                icon
+                @click="showZonalStatisticHint = !showZonalStatisticHint"
+              >
+                <v-icon color="secondary"> fas fa-question-circle </v-icon>
+              </v-btn>
             </template>
           </v-select>
           <v-alert v-else type="secondary">
             Summary statistics are not available for a point geometry.
           </v-alert>
           <h2 class="subtitle">Smoothing</h2>
+          <v-alert
+            v-model="showSmoothingHint"
+            border="top"
+            colored-border
+            icon="fas fa-question-circle"
+            color="secondary"
+            elevation="2"
+            dismissible
+          >
+            <span v-if="smoothingOption == 'centeredAverage'">
+              If window width is n, the graphed value for a given year is the
+              {{ zonalStatistic }} the 2n+1 time step summary values for the
+              selected area centered on that year.
+            </span>
+            <span v-else-if="smoothingOption === 'trailingAverage'">
+              If the window width entered is n, the graphed value for a year is
+              the {{ zonalStatistic }} of the n time step summary values for the
+              current year and the n-1 preceding years
+            </span>
+            <span v-else>
+              No smoothing the summary values for a given year are graphed.
+            </span>
+          </v-alert>
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
@@ -79,12 +108,9 @@
             item-value="id"
           >
             <template #append-outer>
-              <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                </template>
-                I'm a tooltip
-              </v-tooltip>
+              <v-btn icon @click="showSmoothingHint = !showSmoothingHint">
+                <v-icon color="secondary"> fas fa-question-circle </v-icon>
+              </v-btn>
             </template>
           </v-select>
           <v-text-field
@@ -94,20 +120,33 @@
             suffix="time steps"
             type="number"
           >
-            <template #append-outer>
-              <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                </template>
-                I'm a tooltip
-              </v-tooltip>
-            </template>
           </v-text-field>
-          <!-- /////////// DISPLAY OPTIONS /////////// -->
-          <h2 class="subtitle">Display</h2>
+          <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
+          <h2 class="subtitle">Transformation</h2>
+          <v-alert
+            v-model="showTransformHint"
+            border="top"
+            colored-border
+            icon="fas fa-question-circle"
+            color="secondary"
+            elevation="2"
+            dismissible
+          >
+            <span v-if="displayOption === 'zscoreFixed'">
+              Displays Z-score transformed values relative to a fixed interval
+              selected by the user.
+            </span>
+            <span v-else-if="displayOption === 'zscoreMoving'">
+              Displays Z-score transformed values relative to a moving window of
+              a size (n time steps) selected by the user.
+            </span>
+            <span v-else
+              >Modeled values are graphed without any transformation.</span
+            >
+          </v-alert>
           <v-select
             v-model="displayOption"
-            label="Display options"
+            label="Transformation options"
             item-color="secondary"
             color="secondary"
             dense
@@ -117,12 +156,9 @@
             class="my-4"
           >
             <template #append-outer>
-              <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                </template>
-                I'm a tooltip
-              </v-tooltip>
+              <v-btn icon @click="showTransformHint = !showTransformHint">
+                <v-icon color="secondary"> fas fa-question-circle </v-icon>
+              </v-btn>
             </template>
           </v-select>
           <template v-if="displayOption !== 'none'">
@@ -159,14 +195,6 @@
               type="number"
               suffix="time steps"
             >
-              <template #append-outer>
-                <v-tooltip bottom>
-                  <template #activator="{ on }">
-                    <v-icon v-on="on"> fas fa-question-circle </v-icon>
-                  </template>
-                  I'm a tooltip
-                </v-tooltip>
-              </template>
             </v-text-field>
           </template>
           <v-btn
@@ -203,11 +231,13 @@ import { initializeDataset } from "@/store/actions";
 })
 class Analyze extends Vue {
   dialog = false;
-  instructions = false;
   smoothing = null;
   display = null;
   yearSelected = 1500;
   zScoreMovingIntervalTimeSteps = 25;
+  showSmoothingHint = false;
+  showTransformHint = false;
+  showZonalStatisticHint = false;
 
   layerGroup = {
     icon: "fas fa-layer-group",
@@ -274,6 +304,19 @@ class Analyze extends Vue {
         type: "MovingAverageSmoother",
         method: "trailing",
         width: analyzeVue.smoothingTimeStep,
+      };
+    },
+    zscoreFixed: function (analyzeVue) {
+      return {
+        type: "ZScoreFixedInterval",
+        start: analyzeVue.timeRange.lb.year,
+        end: analyzeVue.timeRange.ub.year,
+      };
+    },
+    zscoreMoving: function (analyzeVue) {
+      return {
+        type: "ZScoreMovingInterval",
+        width: analyzeVue.zScoreMovingIntervalTimeSteps,
       };
     },
   };
@@ -443,16 +486,28 @@ class Analyze extends Vue {
     this.yearSelected = year;
   }
 
-  async updateTimeSeries() {
-    console.log("submitting to web service");
-    const datasetApi = this.$api().dataset;
+  get transformFunctions() {
+    // FIXME: refactor this more
     const smoothingTransform = this.timeSeriesTransformConverter[
       this.smoothingOption
+    ](this);
+    const displayTransform = this.timeSeriesTransformConverter[
+      this.displayOption
     ](this);
     const transforms = [];
     if (smoothingTransform !== null) {
       transforms.push(smoothingTransform);
     }
+    if (displayTransform) {
+      transforms.push(displayTransform);
+    }
+    return transforms;
+  }
+
+  async updateTimeSeries() {
+    console.log("submitting to web service");
+    const datasetApi = this.$api().dataset;
+    const transforms = this.transformFunctions;
     const query = {
       dataset_id: datasetApi.metadata.id,
       variable_id: datasetApi.variable.id,
