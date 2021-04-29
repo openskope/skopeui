@@ -540,11 +540,6 @@ export default Analyze;
   }
 }
 
-.title {
-  color: #596d7b;
-  font-weight: lighter;
-}
-
 .subtitle {
   color: #596d7b;
   font-size: 1.5rem;

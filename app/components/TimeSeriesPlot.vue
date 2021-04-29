@@ -331,29 +331,15 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.pixelArea;
   }
 
+  get timeseriesRequestData() {
+    return this.$api().dataset.timeseriesRequestData;
+  }
+
   async mounted() {
     await loadTimeSeries(this.$api());
     this.formTemporalRange = _.cloneDeep(this.selectedTemporalRange);
     this.timeSeriesUnwatcher = this.$watch(
-      function () {
-        if (this.canHandleTimeSeriesRequest) {
-          return {
-            datasetId: this.metadata.id,
-            variableId: this.variable.id,
-            geometry: this.geometry,
-            minYear: this.minYear,
-            maxYear: this.maxYear,
-          };
-        } else {
-          return {
-            datasetId: null,
-            variableId: null,
-            geometry: null,
-            minYear: null,
-            maxYear: null,
-          };
-        }
-      },
+      "timeseriesRequestData",
       async function (data) {
         console.log("retrieving time series");
         console.log({ data });

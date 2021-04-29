@@ -1,14 +1,32 @@
+/**
+ * Actions used by the visualize page only
+ */
+
 // Would need to make a custom debounce decorator so
 // that debounced methods can exist in a vue-class-component
 //
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 import _ from "lodash";
-import { TIMESERIES_ENDPOINT } from "@/store/modules/constants";
+import { TIMESERIES_V2_ENDPOINT } from "@/store/modules/constants";
+
+function convertV1ShapeToV2(data) {
+  return {
+    dataset_id: data.datasetId,
+    variable_id: data.variableId,
+    selected_area: data.geometry,
+    zonal_statistic: "mean",
+    time_range: {
+      gte: data.minYear,
+      lte: data.maxYear,
+    },
+    transforms: [],
+  };
+}
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
   console.log({ timeseriesRequestData: data });
-  const { datasetId, variableId, geometry, minYear, maxYear } = data;
+  const { time_range } = data;
   console.log({
     metadata: dataset.metadata,
     geoJson: dataset.geoJson,
@@ -20,27 +38,19 @@ async function updateTimeSeries(api, data) {
     return;
   }
   dataset.setTimeSeriesLoading();
-  const start = minYear.toString().padStart(4, "0");
-  const end = maxYear.toString().padStart(4, "0");
+  const start = time_range.gte;
+  const end = time_range.lte;
   if (start > end) {
     api.messages.info("Please select a start year before the end year");
     return;
   }
-  const body = {
-    datasetId,
-    variableName: variableId,
-    boundaryGeometry: geometry,
-    start: start,
-    end: end,
-  };
-  const url = TIMESERIES_ENDPOINT;
   try {
-    const response = await api.store.$axios.$post(url, body);
+    const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
     const timeZeroOffset = dataset.metadata.timespan.period.timeZero;
     const timeseries = {
       x: _.range(
-        parseInt(response.start) + timeZeroOffset,
-        parseInt(response.end) + timeZeroOffset + 1
+        parseInt(response.time_range.gte) + timeZeroOffset,
+        parseInt(response.time_range.lte) + timeZeroOffset + 1
       ),
       y: response.values,
     };
@@ -84,15 +94,7 @@ export const loadTimeSeries = _.debounce(async function (api) {
   const dataset = api.dataset;
   console.log("loading time series...", dataset.canHandleTimeSeriesRequest);
   if (dataset.canHandleTimeSeriesRequest) {
-    const timeseriesReqData = {
-      datasetId: dataset.metadata.id,
-      variableId: dataset.variable.id,
-      geometry: dataset.geoJson.geometry,
-      minYear: dataset.timespan[0],
-      maxYear: dataset.timespan[1],
-      zeroYearOffset: dataset.metadata.timespan.period.timeZero,
-    };
-    updateTimeSeries(api, timeseriesReqData);
+    updateTimeSeries(api, dataset.timeseriesRequestData);
   }
 }, 300);
 

@@ -4,6 +4,8 @@ export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
 export const TIMESERIES_SERVICE_URI = "timeseries-service/api/v1/timeseries/";
 export const SKOPE_WMS_ENDPOINT = `https://app.openskope.org/${WMS_SERVER_URI}`;
 export const TIMESERIES_ENDPOINT = `${API_HOST_URL}${TIMESERIES_SERVICE_URI}`;
+export const TIMESERIES_V2_ENDPOINT =
+  "https://api.openskope.org/timeseries-service/api/v2/datasets/yearly";
 export const LEAFLET_PROVIDERS = [
   {
     name: "CartoDB.Positron",

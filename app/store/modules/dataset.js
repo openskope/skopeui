@@ -127,6 +127,20 @@ class Dataset extends VuexModule {
     return 0;
   }
 
+  get minYear() {
+    if (this.metadata) {
+      return parseInt(this.metadata.timespan.period.gte);
+    }
+    return 0;
+  }
+
+  get maxYear() {
+    if (this.metadata) {
+      return parseInt(this.metadata.timespan.period.lte);
+    }
+    return 2000;
+  }
+
   get timespan() {
     if (this.metadata) {
       return toTemporalRange(this.metadata);
@@ -141,6 +155,29 @@ class Dataset extends VuexModule {
 
   get isTimeSeriesLoaded() {
     return this.timeSeriesRequestStatus.status === SUCCESS;
+  }
+
+  get timeseriesRequestData() {
+    // returns timeseries v2 request data
+    if (this.canHandleTimeSeriesRequest) {
+      return {
+        dataset_id: this.metadata.id,
+        variable_id: this.variable.id,
+        selected_area: this.geoJson.geometry,
+        time_range: { gte: this.minYear, lte: this.maxYear },
+        zonal_statistic: "mean",
+        transforms: [],
+      };
+    } else {
+      return {
+        dataset_id: null,
+        variable_id: null,
+        selected_area: null,
+        time_range: null,
+        zonal_statistic: null,
+        transforms: null,
+      };
+    }
   }
 
   @Mutation
