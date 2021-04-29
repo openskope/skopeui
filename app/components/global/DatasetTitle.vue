@@ -29,21 +29,6 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-divider vertical></v-divider>
-    <!--    <v-btn-->
-    <!--      class="mx-4 my-auto"-->
-    <!--      depressed-->
-    <!--      color="accent"-->
-    <!--      retain-focus-on-click-->
-    <!--      @click="showInstructions = !showInstructions"-->
-    <!--    >-->
-    <!--      <v-tooltip v-model="showInstructions" bottom>-->
-    <!--        <template #activator="{ attrs }">-->
-    <!--          <span v-bind="attrs" class="font-weight-bold">Instructions</span>-->
-    <!--        </template>-->
-    <!--        <span>{{ instructions[currentStep] }}</span>-->
-    <!--      </v-tooltip>-->
-    <!--    </v-btn>-->
     <v-select
       v-if="selectVariable"
       v-model="variable"
