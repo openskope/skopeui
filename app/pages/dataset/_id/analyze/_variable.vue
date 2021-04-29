@@ -132,11 +132,11 @@
             elevation="2"
             dismissible
           >
-            <span v-if="displayOption === 'zscoreFixed'">
+            <span v-if="transformOption === 'zscoreFixed'">
               Displays Z-score transformed values relative to a fixed interval
               selected by the user.
             </span>
-            <span v-else-if="displayOption === 'zscoreMoving'">
+            <span v-else-if="transformOption === 'zscoreMoving'">
               Displays Z-score transformed values relative to a moving window of
               a size (n time steps) selected by the user.
             </span>
@@ -145,12 +145,12 @@
             >
           </v-alert>
           <v-select
-            v-model="displayOption"
+            v-model="transformOption"
             label="Transformation options"
             item-color="secondary"
             color="secondary"
             dense
-            :items="displayOptions"
+            :items="transformOptions"
             item-text="label"
             item-value="id"
             class="my-4"
@@ -161,9 +161,9 @@
               </v-btn>
             </template>
           </v-select>
-          <template v-if="displayOption !== 'none'">
+          <template v-if="transformOption !== 'none'">
             <v-row
-              v-if="displayOption === 'zscoreFixed'"
+              v-if="transformOption === 'zscoreFixed'"
               align="baseline"
               justify="start"
               no-gutters
@@ -187,7 +187,7 @@
               </v-col>
             </v-row>
             <v-text-field
-              v-if="displayOption === 'zscoreMoving'"
+              v-if="transformOption === 'zscoreMoving'"
               v-model="zScoreMovingIntervalTimeSteps"
               label="Transform window"
               outlined
@@ -323,9 +323,9 @@ class Analyze extends Vue {
 
   smoothingTimeStep = 7;
 
-  displayOption = "none";
+  transformOption = "none";
 
-  displayOptions = [
+  transformOptions = [
     {
       label: "Modeled values",
       id: "none",
@@ -462,7 +462,7 @@ class Analyze extends Vue {
   }
 
   get isUpdateDisabled() {
-    return this.displayOption === "none" && this.smoothingOption === "none";
+    return this.transformOption === "none" && this.smoothingOption === "none";
   }
 
   created() {
@@ -492,7 +492,7 @@ class Analyze extends Vue {
       this.smoothingOption
     ](this);
     const displayTransform = this.timeSeriesTransformConverter[
-      this.displayOption
+      this.transformOption
     ](this);
     const transforms = [];
     if (smoothingTransform !== null) {
