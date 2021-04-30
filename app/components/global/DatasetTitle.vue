@@ -43,22 +43,6 @@
       outlined
       class="mx-3"
     />
-    <v-menu v-if="selectVariable">
-      <template #activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on">
-          {{ variable.name }}
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item
-          v-for="(v, index) in variables"
-          :key="index"
-          :to="location(v.id)"
-        >
-          <v-list-item-title>{{ v.name }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
     <v-spacer></v-spacer>
     <span>
       <!-- slot for next nav button -->
