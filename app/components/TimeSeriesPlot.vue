@@ -122,8 +122,8 @@
                 v-bind="attrs"
                 :to="selectAreaLocation"
                 class="mb-4 mx-3"
-                v-on="on"
                 color="accent"
+                v-on="on"
               >
                 <v-icon class="mr-2">edit_location</v-icon>
                 Edit selected area

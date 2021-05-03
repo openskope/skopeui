@@ -86,6 +86,25 @@ export const loadTimeSeries = _.debounce(async function (api) {
   }
 }, 300);
 
+const updateAnalysis = _.debounce(async function (api, data) {
+  try {
+    api.analysis.setResponse(
+      await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data)
+    );
+  } catch (e) {
+    api.analysis.setResponseError(e);
+  }
+}, 300);
+
+export async function retrieveAnalysis(api, data) {
+  api.analysis.setWaitingForResponse(true);
+  try {
+    await updateAnalysis(api, data);
+  } finally {
+    api.analysis.setWaitingForResponse(false);
+  }
+}
+
 export function saveGeoJson(warehouse, api, geoJson) {
   warehouse.set(api.dataset.geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);

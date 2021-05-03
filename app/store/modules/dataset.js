@@ -1,7 +1,7 @@
 import _ from "lodash";
-import { ALL_DATA } from "@/store/data";
-import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import area from "@turf/area";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { ALL_DATA } from "@/store/data";
 import { filterTimeSeries, summarize } from "@/store/stats";
 
 const LOADING = "loading";

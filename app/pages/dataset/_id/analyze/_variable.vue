@@ -218,7 +218,7 @@ import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
 import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import { initializeDataset } from "@/store/actions";
+import { initializeDataset, retrieveAnalysis } from "@/store/actions";
 
 @Component({
   layout: "BaseDataset",
@@ -499,7 +499,7 @@ class Analyze extends Vue {
         lte: this.temporalRange[1],
       },
     };
-    await this.$api().analysis.retrieveAnalysis(query);
+    await retrieveAnalysis(this.$api(), query);
   }
 }
 export default Analyze;
