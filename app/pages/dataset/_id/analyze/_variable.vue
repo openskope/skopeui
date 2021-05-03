@@ -39,7 +39,7 @@
           >
           </v-data-table>
           <!-- /////////// YEAR STEP SELECTION /////////// -->
-          <h2 class="subtitle">Zonal Statistic</h2>
+          <h2 class="subtitle">Selected Area Summary Statistic</h2>
           <v-alert
             v-if="isStudyAreaPolygon"
             v-model="showZonalStatisticHint"
