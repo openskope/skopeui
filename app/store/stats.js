@@ -6,16 +6,19 @@ const EMPTY_SUMMARY_STATISTICS = {
   median: "N/A",
 };
 
+const DEFAULT_PRECISION = 2;
+
 export function summarize(timeseries) {
   // returns { stdDev, mean, median }
   const values = timeseries.y;
   if (values.length === 0) {
     return EMPTY_SUMMARY_STATISTICS;
   }
+  const precision = timeseries.precision ?? DEFAULT_PRECISION;
   return {
-    stdDev: std(values).toFixed(6),
-    mean: mean(values).toFixed(6),
-    median: median(values).toFixed(6),
+    stdDev: std(values).toPrecision(precision),
+    mean: mean(values).toPrecision(precision),
+    median: median(values).toPrecision(precision),
   };
 }
 

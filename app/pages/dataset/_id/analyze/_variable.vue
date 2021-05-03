@@ -453,10 +453,6 @@ class Analyze extends Vue {
     console.log("analyze initialized dataset and default variable");
   }
 
-  async updated() {
-    console.log("updated - variable: ", this.variable);
-  }
-
   async mounted() {
     // load default variable
     this.yearSelected = this.timeRange.lb.year;
