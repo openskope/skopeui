@@ -3,33 +3,39 @@
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
+        <!-- FIXME: change to v-row and v-cols instead, does not handle shrinkage across breakpoints well-->
         <v-text-field
           v-model="formTemporalRange[0]"
           label="Min Year"
-          hide-details
-          type="number"
           :min="minYear"
-          :max="maxYear"
-          style="max-width: 10%"
+          :max="maxYear - 1"
+          type="number"
+          class="shrink"
+          :rules="[validateMinYear]"
+          @keydown.enter="setTemporalRange"
         >
           <template #append-outer>to</template>
         </v-text-field>
         <v-text-field
           v-model="formTemporalRange[1]"
-          class="mx-3"
+          class="mx-2 shrink"
           label="Max Year"
-          :min="minYear"
+          :min="minYear + 1"
           :max="maxYear"
-          hide-details
+          :rules="[validateMaxYear]"
           type="number"
-          append-outer-icon="update"
-          style="max-width: 12%"
-          @click:append-outer="setTemporalRange"
+          @keydown.enter="setTemporalRange"
         >
+          <template #append-outer>
+            <v-btn small text @click="setTemporalRange">
+              <v-icon>update</v-icon>
+              Update
+            </v-btn>
+          </template>
         </v-text-field>
-        <h2 class="mx-1 font-weight-light">
-          ({{ maxYear - minYear }} time steps)
-        </h2>
+        <span class="mx-0 mb-4 font-weight-light">
+          ({{ selectedTemporalRange[1] - selectedTemporalRange[0] }} time steps)
+        </span>
         <template v-if="showStepControls">
           <v-spacer></v-spacer>
           <v-tooltip top>
@@ -354,6 +360,26 @@ class TimeSeriesPlot extends Vue {
     if (this.timeSeriesUnwatcher) {
       this.timeSeriesUnwatcher();
     }
+  }
+
+  validateMinYear(value) {
+    if (value < this.minYear) {
+      return `Please enter a min year >= ${this.minYear}`;
+    }
+    if (value >= this.maxYear) {
+      return `Please enter a min year < ${this.maxYear}`;
+    }
+    return true;
+  }
+
+  validateMaxYear(value) {
+    if (value <= this.minYear) {
+      return `Please enter a max year > ${this.minYear}`;
+    }
+    if (value > this.maxYear) {
+      return `Please enter a max year <= ${this.maxYear}`;
+    }
+    return true;
   }
 
   updatePlotlyYear(data) {
