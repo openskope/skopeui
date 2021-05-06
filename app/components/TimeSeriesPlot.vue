@@ -186,7 +186,7 @@ class TimeSeriesPlot extends Vue {
   showArea;
 
   @Prop({ default: false })
-  displayTransformedTimeSeries;
+  displayTransformedTimeseries;
 
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
@@ -227,12 +227,15 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.selectedAreaInSquareKm;
   }
 
-  get timeSeries() {
+  get timeseries() {
     return { ...this.$api().dataset.filteredTimeSeries, type: "scatter" };
   }
 
-  get transformedTimeSeries() {
-    return { ...this.$api().analysis.filteredTimeSeries, type: "scatter" };
+  get transformedTimeseries() {
+    return this.$api().analysis.filteredTimeSeries.map((fts) => ({
+      ...fts,
+      type: "scatter",
+    }));
   }
 
   get variableName() {
@@ -300,7 +303,7 @@ class TimeSeriesPlot extends Vue {
     if (!_.isNull(this.yearSelected)) {
       return {
         x: [this.yearSelected, this.yearSelected],
-        y: [_.min(this.timeSeries.y), _.max(this.timeSeries.y)],
+        y: [_.min(this.timeseries.y), _.max(this.timeseries.y)],
         type: "scatter",
       };
     } else {
@@ -317,16 +320,16 @@ class TimeSeriesPlot extends Vue {
   }
 
   get hasTimeSeries() {
-    return this.timeSeries.x.length > 0;
+    return this.timeseries.x.length > 0;
   }
 
   get timeSeriesData() {
-    const timeSeriesData = [this.timeSeries];
+    if (this.displayTransformedTimeseries) {
+      return this.transformedTimeseries;
+    }
+    const timeSeriesData = [this.timeseries];
     if (this.yearSelectedSeries.x.length > 0) {
       timeSeriesData.push(this.yearSelectedSeries);
-    }
-    if (this.displayTransformedTimeSeries) {
-      timeSeriesData.push(this.transformedTimeSeries);
     }
     return timeSeriesData;
   }

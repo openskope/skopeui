@@ -4,10 +4,11 @@ import { filterTimeSeries, summarize } from "@/store/stats";
 
 // expected response structure from the time series endpoint
 const EMPTY_RESPONSE = {
-  time_range: { gte: 0, lte: 0 },
-  values: [],
-  n_cells: 1,
   area: 0,
+  n_cells: 1,
+  series: [],
+  zonal_statistic: "mean",
+  values: [],
 };
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
@@ -18,10 +19,12 @@ class Analysis extends VuexModule {
   responseError = {};
 
   get timeseries() {
-    return {
-      x: _.range(this.response.time_range.gte, this.response.time_range.lte),
-      y: this.response.values,
-    };
+    this.response.series.map((s) => {
+      return {
+        x: _.range(s.time_range.gte, s.time_range.lte),
+        y: s.values,
+      };
+    });
   }
 
   get summaryStatistics() {
@@ -29,15 +32,17 @@ class Analysis extends VuexModule {
   }
 
   get filteredTimeSeries() {
-    return filterTimeSeries({
-      timeseries: this.timeseries,
-      // NOTE: accessing the dataset store's temporalRange
-      // property uses dot syntax instead of "dataset/temporalRange"
-      temporalRange: this.context.rootState.dataset.temporalRange,
-      // getters must be accessed by string key to avoid
-      // eager evaluation errors "Cannot read property 'minYear' of undefined"
-      minYear: this.context.rootGetters["dataset/minYear"],
-    });
+    return this.timeseries.map((ts) =>
+      filterTimeSeries({
+        timeseries: ts,
+        // NOTE: accessing the dataset store's temporalRange
+        // property uses dot syntax instead of "dataset/temporalRange"
+        temporalRange: this.context.rootState.dataset.temporalRange,
+        // getters must be accessed by string key to avoid
+        // eager evaluation errors "Cannot read property 'minYear' of undefined"
+        minYear: this.context.rootGetters["dataset/minYear"],
+      })
+    );
   }
 
   @Mutation

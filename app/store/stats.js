@@ -33,3 +33,7 @@ export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
     return { x: [], y: [] };
   }
 }
+
+export function toISODate(year) {
+  return `${year.toString().padStart(4, "0")}-01-01`;
+}

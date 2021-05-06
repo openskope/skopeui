@@ -288,9 +288,11 @@ class Analyze extends Vue {
     },
   ];
 
-  timeSeriesTransformConverter = {
+  smoothingConverter = {
     none: function (analyzeVue) {
-      return null;
+      return {
+        type: "NoSmoother",
+      };
     },
     centeredAverage: function (analyzeVue) {
       return {
@@ -304,6 +306,14 @@ class Analyze extends Vue {
         type: "MovingAverageSmoother",
         method: "trailing",
         width: analyzeVue.smoothingTimeStep,
+      };
+    },
+  };
+
+  transformConverter = {
+    none: function (analyzeVue) {
+      return {
+        type: "NoTransform",
       };
     },
     zscoreFixed: function (analyzeVue) {
@@ -374,6 +384,10 @@ class Analyze extends Vue {
 
   get hasSmoothingOption() {
     return this.smoothingOption !== "none";
+  }
+
+  get hasTransformFunction() {
+    return this.transformOption !== "none";
   }
 
   get response() {
@@ -462,22 +476,23 @@ class Analyze extends Vue {
     this.yearSelected = year;
   }
 
-  get transformFunctions() {
-    // FIXME: refactor this more
-    const smoothingTransform = this.timeSeriesTransformConverter[
-      this.smoothingOption
-    ](this);
-    const displayTransform = this.timeSeriesTransformConverter[
-      this.transformOption
-    ](this);
-    const transforms = [];
-    if (smoothingTransform !== null) {
-      transforms.push(smoothingTransform);
+  get transformFunction() {
+    return this.transformConverter[this.transformOption](this);
+  }
+
+  get smoothingFunction() {
+    return this.smoothingConverter[this.smoothingOption](this);
+  }
+
+  get requestedSeries() {
+    const series = [{ name: "original", smoother: { type: "NoSmoother" } }];
+    if (this.hasTransformFunction) {
+      series.push({
+        name: "transformed",
+        smoother: this.smoothingFunction,
+      });
     }
-    if (displayTransform) {
-      transforms.push(displayTransform);
-    }
-    return transforms;
+    return series;
   }
 
   async updateTimeSeries() {
@@ -489,11 +504,12 @@ class Analyze extends Vue {
       variable_id: datasetApi.variable.id,
       selected_area: this.studyAreaGeometry,
       zonal_statistic: this.zonalStatistic,
-      transforms,
+      transform: this.transformFunction,
       time_range: {
         gte: this.temporalRange[0],
         lte: this.temporalRange[1],
       },
+      requested_series: this.requestedSeries,
     };
     await retrieveAnalysis(this.$api(), query);
   }

@@ -2,7 +2,7 @@ import _ from "lodash";
 import area from "@turf/area";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { ALL_DATA } from "@/store/data";
-import { filterTimeSeries, summarize } from "@/store/stats";
+import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
 
 const LOADING = "loading";
 const SUCCESS = "success";
@@ -162,9 +162,18 @@ class Dataset extends VuexModule {
         dataset_id: this.metadata.id,
         variable_id: this.variable.id,
         selected_area: this.geoJson.geometry,
-        time_range: { gte: this.minYear, lte: this.maxYear },
+        time_range: {
+          gte: toISODate(this.minYear),
+          lte: toISODate(this.maxYear),
+        },
         zonal_statistic: "mean",
-        transforms: [],
+        transform: { type: "NoTransform" },
+        requested_series: [
+          {
+            name: "original",
+            smoother: { type: "NoSmoother" },
+          },
+        ],
       };
     } else {
       return {
@@ -173,7 +182,8 @@ class Dataset extends VuexModule {
         selected_area: null,
         time_range: null,
         zonal_statistic: null,
-        transforms: null,
+        transform: null,
+        requested_series: null,
       };
     }
   }

@@ -33,12 +33,13 @@ async function updateTimeSeries(api, data) {
   try {
     const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
     const timeZeroOffset = dataset.metadata.timespan.period.timeZero;
+    const originalSeries = response.series[0];
     const timeseries = {
       x: _.range(
-        parseInt(response.time_range.gte) + timeZeroOffset,
-        parseInt(response.time_range.lte) + timeZeroOffset + 1
+        parseInt(originalSeries.time_range.gte) + timeZeroOffset,
+        parseInt(originalSeries.time_range.lte) + timeZeroOffset + 1
       ),
-      y: response.values,
+      y: originalSeries.values,
     };
     console.log({ timeseries });
     const numberOfCells = response.n_cells;
