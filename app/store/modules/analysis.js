@@ -1,6 +1,6 @@
 import _ from "lodash";
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { filterTimeSeries, summarize } from "@/store/stats";
+import { Module, VuexModule, Mutation } from "vuex-module-decorators";
+import { filterTimeSeries, summarize, extractYear } from "@/store/stats";
 
 // expected response structure from the time series endpoint
 const EMPTY_RESPONSE = {
@@ -8,7 +8,6 @@ const EMPTY_RESPONSE = {
   n_cells: 1,
   series: [],
   zonal_statistic: "mean",
-  values: [],
 };
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
@@ -19,16 +18,21 @@ class Analysis extends VuexModule {
   responseError = {};
 
   get timeseries() {
-    this.response.series.map((s) => {
-      return {
-        x: _.range(s.time_range.gte, s.time_range.lte),
-        y: s.values,
-      };
-    });
+    return this.response.series.map((s) => ({
+      x: _.range(extractYear(s.time_range.gte), extractYear(s.time_range.lte)),
+      y: s.values,
+      options: s.options,
+    }));
   }
 
   get summaryStatistics() {
-    return { ...summarize(this.filteredTimeSeries), series: "Transformed" };
+    // returns an array of summary statistics over all the filtered time series
+    const statistics = this.filteredTimeSeries.map((timeseries) => ({
+      ...summarize(timeseries),
+      series: timeseries.name,
+    }));
+    console.log({ statistics });
+    return statistics;
   }
 
   get filteredTimeSeries() {

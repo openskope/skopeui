@@ -219,6 +219,7 @@ import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
+import { toISODate } from "@/store/stats";
 
 @Component({
   layout: "BaseDataset",
@@ -378,7 +379,7 @@ class Analyze extends Vue {
   get summaryStatistics() {
     return [
       this.$api().dataset.summaryStatistics,
-      this.$api().analysis.summaryStatistics,
+      ...this.$api().analysis.summaryStatistics,
     ];
   }
 
@@ -498,7 +499,6 @@ class Analyze extends Vue {
   async updateTimeSeries() {
     console.log("submitting to web service");
     const datasetApi = this.$api().dataset;
-    const transforms = this.transformFunctions;
     const query = {
       dataset_id: datasetApi.metadata.id,
       variable_id: datasetApi.variable.id,
@@ -506,8 +506,8 @@ class Analyze extends Vue {
       zonal_statistic: this.zonalStatistic,
       transform: this.transformFunction,
       time_range: {
-        gte: this.temporalRange[0],
-        lte: this.temporalRange[1],
+        gte: toISODate(this.temporalRange[0]),
+        lte: toISODate(this.temporalRange[1]),
       },
       requested_series: this.requestedSeries,
     };

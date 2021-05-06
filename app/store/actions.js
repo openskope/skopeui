@@ -8,6 +8,7 @@
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 import _ from "lodash";
 import { TIMESERIES_V2_ENDPOINT } from "@/store/modules/constants";
+import { extractYear } from "@/store/stats";
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
@@ -36,10 +37,11 @@ async function updateTimeSeries(api, data) {
     const originalSeries = response.series[0];
     const timeseries = {
       x: _.range(
-        parseInt(originalSeries.time_range.gte) + timeZeroOffset,
-        parseInt(originalSeries.time_range.lte) + timeZeroOffset + 1
+        extractYear(originalSeries.time_range.gte) + timeZeroOffset,
+        extractYear(originalSeries.time_range.lte) + timeZeroOffset + 1
       ),
       y: originalSeries.values,
+      options: originalSeries.options,
     };
     console.log({ timeseries });
     const numberOfCells = response.n_cells;

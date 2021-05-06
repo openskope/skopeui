@@ -23,12 +23,13 @@ export function summarize(timeseries) {
 }
 
 export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
+  console.log("filtering timeseries: ", timeseries);
   if (timeseries.x.length > 0) {
     const minOffset = temporalRange[0] - minYear;
     const maxOffset = temporalRange[1] - minYear;
     const x = timeseries.x.slice(minOffset, maxOffset);
     const y = timeseries.y.slice(minOffset, maxOffset);
-    return { x, y };
+    return { x, y, name: timeseries.options.name };
   } else {
     return { x: [], y: [] };
   }
@@ -36,4 +37,9 @@ export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
 
 export function toISODate(year) {
   return `${year.toString().padStart(4, "0")}-01-01`;
+}
+
+export function extractYear(isoDateString) {
+  // FIXME: brittle, do some error handling / checking
+  return parseInt(isoDateString.split("-")[0]);
 }
