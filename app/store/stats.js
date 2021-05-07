@@ -8,9 +8,16 @@ const EMPTY_SUMMARY_STATISTICS = {
 
 const DEFAULT_PRECISION = 2;
 
+/**
+ * Returns an object structure with { stdDev, mean, median } statistics for
+ * the given timeseries.
+ * @param {*} timeseries
+ * @returns  {stdDev, mean, median} over the given timeseries
+ */
 export function summarize(timeseries) {
-  // returns { stdDev, mean, median }
-  const values = timeseries.y;
+  // FIXME: replacing null values with 0 may work for some data but not all
+  // need to clarify how to handle NODATA
+  const values = timeseries.y.map((v) => (v == null ? 0 : v));
   if (values.length === 0) {
     return EMPTY_SUMMARY_STATISTICS;
   }
