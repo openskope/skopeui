@@ -1,5 +1,5 @@
 /**
- * Actions used by the visualize page only
+ * Actions used by the visualize and analysis vue components
  */
 
 // Would need to make a custom debounce decorator so

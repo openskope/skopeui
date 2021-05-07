@@ -50,7 +50,7 @@
                 <v-icon>skip_previous</v-icon>
               </v-btn>
             </template>
-            <span>Go to First Year</span>
+            <span>Go to the first year of the defined temporal range</span>
           </v-tooltip>
           <v-tooltip top>
             <template #activator="{ attrs, on }">
@@ -64,7 +64,7 @@
                 <v-icon>arrow_left</v-icon>
               </v-btn>
             </template>
-            <span>Go to Previous Year</span>
+            <span>Previous year</span>
           </v-tooltip>
           <v-tooltip top>
             <template #activator="{ attrs, on }">
@@ -86,7 +86,7 @@
                 <v-icon>arrow_right</v-icon>
               </v-btn>
             </template>
-            <span>Go to Next Year</span>
+            <span>Next year</span>
           </v-tooltip>
           <v-tooltip top>
             <template #activator="{ attrs, on }">
@@ -100,7 +100,7 @@
                 <v-icon>skip_next</v-icon>
               </v-btn>
             </template>
-            <span>Go to Last Year</span>
+            <span>Go to the last year of the defined temporal range</span>
           </v-tooltip>
         </template>
         <template v-if="showArea">
@@ -205,6 +205,14 @@ class TimeSeriesPlot extends Vue {
 
   get selectedTemporalRange() {
     return this.$api().dataset.temporalRange;
+  }
+
+  get temporalRangeMin() {
+    return this.selectedTemporalRange[0];
+  }
+
+  get temporalRangeMax() {
+    return this.selectedTemporalRange[1] - 1;
   }
 
   set selectedTemporalRange(temporalRange) {
@@ -392,7 +400,6 @@ class TimeSeriesPlot extends Vue {
   }
 
   setYear(year) {
-    // data.points[0].x
     this.$emit("yearSelected", year);
   }
 
@@ -412,36 +419,57 @@ class TimeSeriesPlot extends Vue {
     if (this.variable === null) {
       return;
     }
-    this.setYear(this.minYear);
+    this.setYear(this.selectedTemporalRange[0]);
   }
+
   gotoLastYear() {
     if (this.variable === null) {
       return;
     }
-    this.setYear(this.maxYear);
+    this.setYear(this.selectedTemporalRange[1] - 1);
   }
+
   nextYear() {
     if (this.variable === null) {
       return;
     }
-    this.setYear(_.clamp(this.yearSelected + 1, this.minYear, this.maxYear));
+    this.setYear(
+      _.clamp(
+        parseInt(this.yearSelected) + 1,
+        this.temporalRangeMin,
+        this.temporalRangeMax
+      )
+    );
   }
+
   previousYear() {
     if (this.variable === null) {
       return;
     }
-    this.setYear(_.clamp(this.yearSelected - 1, this.minYear, this.maxYear));
+    this.setYear(
+      _.clamp(
+        this.yearSelected - 1,
+        this.temporalRangeMin,
+        this.temporalRangeMax
+      )
+    );
   }
+
   togglePlay(event) {
     this.isAnimationPlaying = !this.isAnimationPlaying;
     if (this.isAnimationPlaying) {
       // start an interval
       const animationInterval = setInterval(() => {
-        if (!this.isAnimationPlaying) {
+        if (
+          this.isAnimationPlaying &&
+          this.yearSelected < this.temporalRangeMax
+        ) {
+          this.nextYear();
+        } else {
+          this.isAnimationPlaying = false;
           clearInterval(animationInterval);
           return;
         }
-        this.nextYear();
       }, this.animationSpeed);
     }
   }
