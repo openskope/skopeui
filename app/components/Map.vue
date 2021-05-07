@@ -297,7 +297,7 @@ class Map extends Vue {
       edit: {
         featureGroup: this.drawnItems,
       },
-      draw: true,
+      draw: false,
     });
     // set custom tooltips on the draw and edit toolbars
     const drawControlButtons = L.drawLocal.draw.toolbar.buttons;

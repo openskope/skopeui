@@ -143,7 +143,6 @@ class Dataset extends VuexModule {
     if (this.metadata) {
       return toTemporalRange(this.metadata);
     }
-    console.log("No selected dataset, returning default year range");
     return [1, new Date().getFullYear()];
   }
 
@@ -251,7 +250,6 @@ class Dataset extends VuexModule {
 
   @Mutation
   setVariable(id) {
-    console.log("Setting variable to ", id);
     for (const variable of this.metadata.variables) {
       variable.visible = variable.id === id;
       if (variable.visible) {

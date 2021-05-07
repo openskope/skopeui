@@ -220,6 +220,7 @@ import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
 import { toISODate } from "@/store/stats";
+import _ from "lodash";
 
 @Component({
   layout: "BaseDataset",
@@ -231,22 +232,10 @@ import { toISODate } from "@/store/stats";
   },
 })
 class Analyze extends Vue {
-  dialog = false;
-  smoothing = null;
-  display = null;
-  yearSelected = 1500;
   zScoreMovingIntervalTimeSteps = 25;
   showSmoothingHint = false;
   showTransformHint = false;
   showZonalStatisticHint = false;
-
-  layerGroup = {
-    icon: "fas fa-layer-group",
-  };
-
-  polygon = {
-    icon: "fas fa-draw-polygon",
-  };
 
   zonalStatistic = "mean";
 
@@ -411,47 +400,6 @@ class Analyze extends Vue {
     return this.studyAreaGeometry?.type !== "Point";
   }
 
-  get canHandleTimeSeriesRequest() {
-    return this.$api().dataset.canHandleTimeSeriesRequest;
-  }
-
-  get variable() {
-    return this.$api().dataset.variable;
-  }
-
-  set variable(id) {
-    this.$api().dataset.setVariable(id);
-  }
-
-  get variables() {
-    return this.metadata.variables;
-  }
-
-  get smootherWidthLabel() {
-    let widthUnit = "Unknowns";
-    switch (this.temporalResolution) {
-      case "month":
-        widthUnit = "Months";
-        break;
-      case "year":
-        widthUnit = "Years";
-        break;
-    }
-    return `Smoother Width (# of ${widthUnit})`;
-  }
-
-  get temporalResolution() {
-    return this.metadata.timespan.resolution;
-  }
-
-  get minYear() {
-    return parseInt(this.metadata.timespan.period.gte);
-  }
-
-  get maxYear() {
-    return parseInt(this.metadata.timespan.period.lte);
-  }
-
   get isLoading() {
     return this.$api().analysis.waitingForResponse;
   }
@@ -465,16 +413,9 @@ class Analyze extends Vue {
     const variableId = this.$route.params.variable;
     const api = this.$api();
     initializeDataset(this.$warehouse, api, datasetId, variableId);
-    console.log("analyze initialized dataset and default variable");
-  }
-
-  async mounted() {
-    // load default variable
-    this.yearSelected = this.timeRange.lb.year;
-  }
-
-  setYear(year) {
-    this.yearSelected = year;
+    if (!_.isEqual(api.analysis.cachedAnalysisId, { datasetId, variableId })) {
+      api.analysis.clearResponse();
+    }
   }
 
   get transformFunction() {

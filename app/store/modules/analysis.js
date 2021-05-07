@@ -8,6 +8,8 @@ const EMPTY_RESPONSE = {
   n_cells: 1,
   series: [],
   zonal_statistic: "mean",
+  dataset_id: "",
+  variable_id: "",
 };
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
@@ -16,6 +18,17 @@ class Analysis extends VuexModule {
   waitingForResponse = false;
   response = EMPTY_RESPONSE;
   responseError = {};
+
+  get cachedAnalysisId() {
+    if (this.response.dataset_id && this.response.variable_id) {
+      return {
+        datasetId: this.response.dataset_id,
+        variableId: this.response.variable_id,
+      };
+    } else {
+      return null;
+    }
+  }
 
   get timeseries() {
     return this.response.series.map((s) => ({
