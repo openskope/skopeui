@@ -12,13 +12,7 @@ import { extractYear } from "@/store/stats";
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
-  console.log({ timeseriesRequestData: data });
   const { time_range } = data;
-  console.log({
-    metadata: dataset.metadata,
-    geoJson: dataset.geoJson,
-    variable: dataset.variable,
-  });
   if (!dataset.canHandleTimeSeriesRequest) {
     console.log("Cannot handle timeseries request. Aborting.");
     dataset.setTimeSeriesNoArea();
@@ -33,17 +27,15 @@ async function updateTimeSeries(api, data) {
   }
   try {
     const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
-    const timeZeroOffset = dataset.metadata.timespan.period.timeZero;
     const originalSeries = response.series[0];
     const timeseries = {
       x: _.range(
-        extractYear(originalSeries.time_range.gte) + timeZeroOffset,
-        extractYear(originalSeries.time_range.lte) + timeZeroOffset + 1
+        extractYear(originalSeries.time_range.gte),
+        extractYear(originalSeries.time_range.lte) + 1
       ),
       y: originalSeries.values,
       options: originalSeries.options,
     };
-    console.log({ timeseries });
     const numberOfCells = response.n_cells;
     const totalCellArea = response.area;
     dataset.setTimeSeries({ timeseries, numberOfCells, totalCellArea });
@@ -83,7 +75,7 @@ export const retrieveTimeSeries = _.debounce(updateTimeSeries, 300);
 
 export const loadTimeSeries = _.debounce(async function (api) {
   const dataset = api.dataset;
-  console.log("loading time series...", dataset.canHandleTimeSeriesRequest);
+  console.log("loading time series? ", dataset.canHandleTimeSeriesRequest);
   if (dataset.canHandleTimeSeriesRequest) {
     updateTimeSeries(api, dataset.timeseriesRequestData);
   }

@@ -19,7 +19,10 @@ class Analysis extends VuexModule {
 
   get timeseries() {
     return this.response.series.map((s) => ({
-      x: _.range(extractYear(s.time_range.gte), extractYear(s.time_range.lte)),
+      x: _.range(
+        extractYear(s.time_range.gte),
+        extractYear(s.time_range.lte) + 1
+      ),
       y: s.values,
       options: s.options,
     }));
@@ -27,12 +30,10 @@ class Analysis extends VuexModule {
 
   get summaryStatistics() {
     // returns an array of summary statistics over all the filtered time series
-    const statistics = this.filteredTimeSeries.map((timeseries) => ({
+    return this.filteredTimeSeries.map((timeseries) => ({
       ...summarize(timeseries),
       series: timeseries.name,
     }));
-    console.log({ statistics });
-    return statistics;
   }
 
   get filteredTimeSeries() {
@@ -56,7 +57,6 @@ class Analysis extends VuexModule {
 
   @Mutation
   setResponse(response) {
-    console.log({ response });
     this.response = response;
   }
 

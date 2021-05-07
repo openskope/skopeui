@@ -23,7 +23,6 @@ export function summarize(timeseries) {
 }
 
 export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
-  console.log("filtering timeseries: ", timeseries);
   if (timeseries.x.length > 0) {
     const minOffset = temporalRange[0] - minYear;
     const maxOffset = temporalRange[1] - minYear;

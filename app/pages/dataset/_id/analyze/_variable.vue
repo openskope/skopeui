@@ -377,17 +377,17 @@ class Analyze extends Vue {
   ];
 
   get summaryStatistics() {
-    return [
-      this.$api().dataset.summaryStatistics,
-      ...this.$api().analysis.summaryStatistics,
-    ];
+    if (this.$api().analysis.summaryStatistics.length === 0) {
+      return [this.$api().dataset.summaryStatistics];
+    }
+    return this.$api().analysis.summaryStatistics;
   }
 
   get hasSmoothingOption() {
     return this.smoothingOption !== "none";
   }
 
-  get hasTransformFunction() {
+  get hasTransformOption() {
     return this.transformOption !== "none";
   }
 
@@ -486,10 +486,10 @@ class Analyze extends Vue {
   }
 
   get requestedSeries() {
-    const series = [{ name: "original", smoother: { type: "NoSmoother" } }];
-    if (this.hasTransformFunction) {
+    const series = [{ name: "Original", smoother: { type: "NoSmoother" } }];
+    if (this.hasSmoothingOption) {
       series.push({
-        name: "transformed",
+        name: "Transformed",
         smoother: this.smoothingFunction,
       });
     }

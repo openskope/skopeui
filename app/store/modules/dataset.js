@@ -170,7 +170,7 @@ class Dataset extends VuexModule {
         transform: { type: "NoTransform" },
         requested_series: [
           {
-            name: "original",
+            name: "Original",
             smoother: { type: "NoSmoother" },
           },
         ],

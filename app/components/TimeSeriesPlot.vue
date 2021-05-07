@@ -186,7 +186,7 @@ class TimeSeriesPlot extends Vue {
   showArea;
 
   @Prop({ default: false })
-  displayTransformedTimeseries;
+  displayTransformedTimeSeries;
 
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
@@ -231,11 +231,12 @@ class TimeSeriesPlot extends Vue {
     return { ...this.$api().dataset.filteredTimeSeries, type: "scatter" };
   }
 
-  get transformedTimeseries() {
-    return this.$api().analysis.filteredTimeSeries.map((fts) => ({
+  get transformedTimeSeries() {
+    const tts = this.$api().analysis.filteredTimeSeries.map((fts) => ({
       ...fts,
       type: "scatter",
     }));
+    return tts;
   }
 
   get variableName() {
@@ -324,8 +325,11 @@ class TimeSeriesPlot extends Vue {
   }
 
   get timeSeriesData() {
-    if (this.displayTransformedTimeseries) {
-      return this.transformedTimeseries;
+    if (
+      this.displayTransformedTimeSeries &&
+      this.transformedTimeSeries.length > 0
+    ) {
+      return this.transformedTimeSeries;
     }
     const timeSeriesData = [this.timeseries];
     if (this.yearSelectedSeries.x.length > 0) {
@@ -352,8 +356,6 @@ class TimeSeriesPlot extends Vue {
     this.timeSeriesUnwatcher = this.$watch(
       "timeseriesRequestData",
       async function (data) {
-        console.log("retrieving time series");
-        console.log({ data });
         await retrieveTimeSeries(this.$api(), data);
       }
     );
