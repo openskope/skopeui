@@ -88,7 +88,7 @@
           />
           <template v-if="displayRaster">
             <l-wms-tile-layer
-              v-for="v of metadata.variables"
+              v-for="v of variables"
               ref="wmsLayers"
               :key="v.id"
               :base-url="skopeWmsUrl"
@@ -144,14 +144,12 @@ class Map extends Vue {
     (v) =>
       (v && v >= 0 && v <= 100) || "Please enter an opacity between 0 and 100.",
   ];
-  maxTemporalRange = new Date().getFullYear();
   defaultRegionOpacity = 0.05;
   defaultCircleToPolygonEdges = 32;
   legendImage = null;
   legendControl = null;
   legendPosition = "bottomleft";
-  wMinTemporalRangeKey = "skope:temporal-range-min";
-  wMaxTemporalRangeKey = "skope:temporal-range-max";
+  geoJsonUnwatcher = null;
 
   get stepNames() {
     return this.$api().app.stepNames;
@@ -159,18 +157,6 @@ class Map extends Vue {
 
   get metadata() {
     return this.$api().dataset.metadata;
-  }
-
-  get timespan() {
-    return this.$api().dataset.timespan;
-  }
-
-  get timeZero() {
-    return this.$api().dataset.timeZero;
-  }
-
-  get variable() {
-    return this.$api().dataset.variable;
   }
 
   get geoJson() {
@@ -208,30 +194,22 @@ class Map extends Vue {
     return "";
   }
 
-  destroyed() {
-    if (this.geoJsonUnwatcher) {
-      this.geoJsonUnwatcher();
-    }
-  }
-
   get isVisualize() {
     return this.stepNames.findIndex((x) => x === this.$route.name) === 2;
-  }
-
-  get selectedDataset() {
-    return this.$api().datasets.selectedDataset;
   }
 
   get variable() {
     return this.$api().dataset.variable;
   }
 
-  set variable(id) {
-    this.$api().dataset.setVariable(id);
-  }
-
   get variables() {
     return this.metadata.variables;
+  }
+
+  destroyed() {
+    if (this.geoJsonUnwatcher) {
+      this.geoJsonUnwatcher();
+    }
   }
 
   decreaseOpacity() {
@@ -246,10 +224,7 @@ class Map extends Vue {
       console.log("handling layer change event ", { event });
       const leafletLayer = event.layer;
       if (this.isSkopeLayer(leafletLayer)) {
-        const variable = _.find(
-          this.metadata.variables,
-          (v) => v.name === event.name
-        );
+        const variable = _.find(this.variables, (v) => v.name === event.name);
         this.$api().dataset.setVariable(variable.id);
         this.updateWmsLegend(map, leafletLayer.wmsParams.layers);
         leafletLayer.bringToFront();
@@ -452,7 +427,7 @@ class Map extends Vue {
   }
 
   fillTemplateYear(templateString) {
-    const year = (this.year || this.maxTemporalRange).toString();
+    const year = (this.year || this.$api().dataset.temporalRangeMax).toString();
     const layer = fillTemplate(templateString, {
       year: year.padStart(4, "0"),
     });
@@ -483,7 +458,7 @@ class Map extends Vue {
   }
 
   exportSelectedGeometry(event) {
-    const geoJson = this.$api().dataset.geoJson;
+    const geoJson = this.geoJson;
     if (geoJson) {
       console.log("exporting selected geoJson: ", { geoJson });
       const convertedArea =

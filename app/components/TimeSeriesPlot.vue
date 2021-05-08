@@ -207,16 +207,16 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.temporalRange;
   }
 
+  set selectedTemporalRange(temporalRange) {
+    this.$api().dataset.setTemporalRange(temporalRange);
+  }
+
   get temporalRangeMin() {
-    return this.selectedTemporalRange[0];
+    return this.$api().dataset.temporalRangeMin;
   }
 
   get temporalRangeMax() {
-    return this.selectedTemporalRange[1] - 1;
-  }
-
-  set selectedTemporalRange(temporalRange) {
-    this.$api().dataset.setTemporalRange(temporalRange);
+    return this.$api().dataset.temporalRangeMax;
   }
 
   get timeSeriesRequestStatus() {
@@ -308,20 +308,18 @@ class TimeSeriesPlot extends Vue {
     }
   }
 
+  /**
+   * returns a single point timeseries to mark the selected year ranging from ymin to ymax
+   */
   get yearSelectedSeries() {
+    let x = [];
+    let y = [];
     if (!_.isNull(this.yearSelected)) {
-      return {
-        x: [this.yearSelected, this.yearSelected],
-        y: [_.min(this.timeseries.y), _.max(this.timeseries.y)],
-        type: "scatter",
-      };
-    } else {
-      return {
-        x: [],
-        y: [],
-        type: "scatter",
-      };
+      x = [this.yearSelected, this.yearSelected];
+      // a bounds single pass function would be more efficient
+      y = [_.min(this.timeseries.y), _.max(this.timeseries.y)];
     }
+    return { x, y, type: "scatter" };
   }
 
   get canHandleTimeSeriesRequest() {
@@ -408,10 +406,10 @@ class TimeSeriesPlot extends Vue {
     if (this.yearSelected == null) {
       return;
     }
-    if (this.yearSelected < this.selectedTemporalRange[0]) {
-      this.setYear(this.selectedTemporalRange[0]);
-    } else if (this.yearSelected > this.selectedTemporalRange[1]) {
-      this.setYear(this.selectedTemporalRange[1]);
+    if (this.yearSelected < this.temporalRangeMin) {
+      this.setYear(this.temporalRangeMin);
+    } else if (this.yearSelected > this.temporalRangeMax) {
+      this.setYear(this.temporalRangeMax);
     }
   }
 
@@ -419,14 +417,14 @@ class TimeSeriesPlot extends Vue {
     if (this.variable === null) {
       return;
     }
-    this.setYear(this.selectedTemporalRange[0]);
+    this.setYear(this.temporalRangeMin);
   }
 
   gotoLastYear() {
     if (this.variable === null) {
       return;
     }
-    this.setYear(this.selectedTemporalRange[1] - 1);
+    this.setYear(this.temporalRangeMax);
   }
 
   nextYear() {

@@ -53,6 +53,7 @@ class Dataset extends VuexModule {
   hasData = false;
   geoJson = null;
   selectedAreaInSquareMeters = 0;
+  // defined temporal range for the given dataset [min, max)
   temporalRange = [1, 2000];
   totalCellArea = 0;
   numberOfCells = 0;
@@ -96,7 +97,7 @@ class Dataset extends VuexModule {
   }
 
   get geoJsonKey() {
-    if (this.metadata === null) {
+    if (this.metadata == null) {
       return "skope:geometry";
     }
     return `geojson:${this.metadata.id}`;
@@ -118,6 +119,7 @@ class Dataset extends VuexModule {
     return { ...summarize(this.filteredTimeSeries), series: "Original" };
   }
 
+  // FIXME: this may not be needed anymore
   get timeZero() {
     if (this.metadata) {
       return this.metadata.timespan.period.timeZero || 0;
@@ -126,17 +128,11 @@ class Dataset extends VuexModule {
   }
 
   get minYear() {
-    if (this.metadata) {
-      return parseInt(this.metadata.timespan.period.gte);
-    }
-    return 0;
+    return this.timespan[0];
   }
 
   get maxYear() {
-    if (this.metadata) {
-      return parseInt(this.metadata.timespan.period.lte);
-    }
-    return 2000;
+    return this.timespan[1];
   }
 
   get timespan() {
@@ -144,6 +140,20 @@ class Dataset extends VuexModule {
       return toTemporalRange(this.metadata);
     }
     return [1, new Date().getFullYear()];
+  }
+
+  /**
+   * Returns the first value with data in the defined temporal range
+   */
+  get temporalRangeMin() {
+    return this.temporalRange[0];
+  }
+
+  /**
+   * Returns the last value with data in the defined temporal range
+   */
+  get temporalRangeMax() {
+    return this.temporalRangeMax[1] - 1;
   }
 
   get isTimeSeriesLoading() {

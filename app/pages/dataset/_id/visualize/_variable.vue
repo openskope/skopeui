@@ -7,8 +7,8 @@
       </v-btn>
     </DatasetTitle>
     <v-row class="mx-1 mt-0" style="height: 100%">
-      <!-- map + time series plot -->
-      <v-col class="d-flex map-flex" lg="6" md="12" no-gutters>
+      <!-- 2 column layout with map and time series-->
+      <v-col class="d-flex map-flex" lg="6" md="12">
         <Map :year="yearSelected" />
       </v-col>
       <!-- time series plot -->
@@ -44,26 +44,15 @@ const setYearSelected = _.debounce(function (vue) {
   },
 })
 class Visualize extends Vue {
-  // selected year is managed by this component, when a year is selected in the time series plot
-  // it generates a @yearSelected event that calls setYear here and we decide whether or not
-  // to propagate it after validation etc
+  // yearSelected state is managed by this component.
+  // when a year is selected in the time series plot
+  // it generates a @yearSelected event that calls setYear here which
+  // propagates back down to the map and time series plot components
   yearSelected = 1500;
   layerGroup = {
     icon: "fas fa-layer-group",
   };
   stepNames = _.clone(this.$api().app.stepNames);
-
-  get geometry() {
-    return this.$api().dataset.geoJson?.geometry ?? null;
-  }
-
-  get metadata() {
-    return this.$api().dataset.metadata;
-  }
-
-  get timespan() {
-    return this.$api().dataset.timespan;
-  }
 
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
@@ -74,29 +63,9 @@ class Visualize extends Vue {
     return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
   }
 
-  get minYear() {
-    return parseInt(this.metadata.timespan.period.gte);
-  }
-
-  get maxYear() {
-    return parseInt(this.metadata.timespan.period.lte);
-  }
-
-  get variable() {
-    return this.$api().dataset.variable;
-  }
-
-  set variable(id) {
-    this.$api().dataset.setVariable(id);
-  }
-
-  get variables() {
-    return this.metadata.variables;
-  }
-
   get analyzeLocation() {
     const id = this.$route.params.id;
-    const variable = this.$api().dataset.variable.id;
+    const variable = this.$route.params.variable;
     return {
       name: "dataset-id-analyze-variable",
       params: { id, variable },
@@ -106,12 +75,11 @@ class Visualize extends Vue {
   created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
-    console.log(`created with dataset ${datasetId} and variable ${variableId}`);
     initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
   }
 
   async mounted() {
-    this.yearSelected = this.minYear;
+    this.setYear(this.$api().dataset.temporalRangeMin);
   }
 
   setYear(year) {
