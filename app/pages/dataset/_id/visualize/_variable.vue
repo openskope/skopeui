@@ -1,18 +1,26 @@
 <template>
-  <v-container fluid class="fill-height">
-    <DatasetTitle :select-variable="true">
-      <v-btn :disabled="!hasValidStudyArea" :to="analyzeLocation" nuxt>
-        Go to Analyze
-        <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
-      </v-btn>
-    </DatasetTitle>
-    <v-row class="mx-1 mt-0" style="height: 100%">
+  <v-container fluid class="fill-height align-start">
+    <v-row no-gutters>
+      <v-col lg="12" md="12" class="mb-3">
+        <DatasetTitle :select-variable="true">
+          <v-spacer></v-spacer>
+          <v-btn :disabled="!hasValidStudyArea" :to="analyzeLocation" nuxt>
+            Go to Analyze
+            <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
+          </v-btn>
+        </DatasetTitle>
+      </v-col>
       <!-- 2 column layout with map and time series-->
-      <v-col class="d-flex map-flex" lg="6" md="12">
+      <v-col
+        class="d-flex map-flex mb-3 px-2"
+        lg="6"
+        md="12"
+        align-self="stretch"
+      >
         <Map :year="yearSelected" />
       </v-col>
       <!-- time series plot -->
-      <v-col class="d-flex map-flex" lg="6" md="12">
+      <v-col class="d-flex map-flex px-2" lg="6" md="12" align-self="stretch">
         <TimeSeriesPlot :year-selected="yearSelected" @yearSelected="setYear" />
       </v-col>
     </v-row>

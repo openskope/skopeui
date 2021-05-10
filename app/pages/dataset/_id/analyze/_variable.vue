@@ -7,7 +7,7 @@
       </v-col>
       <!-- time series -->
       <v-col
-        class="d-flex timeseries-flex px-2"
+        class="d-flex timeseries-flex px-2 mb-3"
         lg="8"
         md="12"
         align-self="stretch"
