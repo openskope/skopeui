@@ -1,10 +1,13 @@
 <template>
-  <v-container fluid class="fill-height">
-    <DatasetTitle :select-variable="true" />
-    <v-row class="mx-1 mt-0 grow">
+  <v-container fluid class="fill-height align-start">
+    <v-row no-gutters>
+      <!-- dataset title -->
+      <v-col lg="8" md="12" class="mb-3">
+        <DatasetTitle :select-variable="true" />
+      </v-col>
       <!-- time series -->
       <v-col
-        class="d-flex timeseries-flex py-0"
+        class="d-flex timeseries-flex px-2"
         lg="8"
         md="12"
         align-self="stretch"
@@ -17,7 +20,7 @@
       </v-col>
       <!-- analysis form -->
       <v-col
-        class="d-flex timeseries-flex"
+        class="d-flex timeseries-flex px-2"
         lg="4"
         md="12"
         style="background-color: #f4f7ff"
@@ -62,42 +65,52 @@
             item-value="id"
             color="primary"
           >
-            <template #append-outer>
-              <v-btn
-                icon
-                @click="showZonalStatisticHint = !showZonalStatisticHint"
-              >
-                <v-icon color="secondary"> fas fa-question-circle </v-icon>
-              </v-btn>
+            <template #prepend>
+              <v-tooltip v-model="showZonalStatisticHint" left>
+                <template #activator="{ attrs }">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="showZonalStatisticHint = !showZonalStatisticHint"
+                  >
+                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                  </v-btn>
+                </template>
+                <span
+                  >At each time step, the value used for the selected area is
+                  the summary value (mean by default) of all selected
+                  pixels.</span
+                >
+              </v-tooltip>
             </template>
           </v-select>
           <v-alert v-else type="secondary">
             Summary statistics are not available for a point geometry.
           </v-alert>
           <h2 class="subtitle">Smoothing</h2>
-          <v-alert
-            v-model="showSmoothingHint"
-            border="top"
-            colored-border
-            icon="fas fa-question-circle"
-            color="secondary"
-            elevation="2"
-            dismissible
-          >
-            <span v-if="smoothingOption == 'centeredAverage'">
-              If window width is n, the graphed value for a given year is the
-              {{ zonalStatistic }} the 2n+1 time step summary values for the
-              selected area centered on that year.
-            </span>
-            <span v-else-if="smoothingOption === 'trailingAverage'">
-              If the window width entered is n, the graphed value for a year is
-              the {{ zonalStatistic }} of the n time step summary values for the
-              current year and the n-1 preceding years
-            </span>
-            <span v-else>
-              No smoothing the summary values for a given year are graphed.
-            </span>
-          </v-alert>
+          <!--          <v-alert-->
+          <!--            v-model="showSmoothingHint"-->
+          <!--            border="top"-->
+          <!--            colored-border-->
+          <!--            icon="fas fa-question-circle"-->
+          <!--            color="secondary"-->
+          <!--            elevation="2"-->
+          <!--            dismissible-->
+          <!--          >-->
+          <!--            <span v-if="smoothingOption == 'centeredAverage'">-->
+          <!--              If window width is n, the graphed value for a given year is the-->
+          <!--              {{ zonalStatistic }} the 2n+1 time step summary values for the-->
+          <!--              selected area centered on that year.-->
+          <!--            </span>-->
+          <!--            <span v-else-if="smoothingOption === 'trailingAverage'">-->
+          <!--              If the window width entered is n, the graphed value for a year is-->
+          <!--              the {{ zonalStatistic }} of the n time step summary values for the-->
+          <!--              current year and the n-1 preceding years-->
+          <!--            </span>-->
+          <!--            <span v-else>-->
+          <!--              No smoothing the summary values for a given year are graphed.-->
+          <!--            </span>-->
+          <!--          </v-alert>-->
           <v-select
             v-model="smoothingOption"
             label="Smoothing options"
@@ -107,10 +120,32 @@
             item-text="label"
             item-value="id"
           >
-            <template #append-outer>
-              <v-btn icon @click="showSmoothingHint = !showSmoothingHint">
-                <v-icon color="secondary"> fas fa-question-circle </v-icon>
-              </v-btn>
+            <template #prepend>
+              <v-tooltip v-model="showSmoothingHint" left>
+                <template #activator="{ attrs }">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="showSmoothingHint = !showSmoothingHint"
+                  >
+                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                  </v-btn>
+                </template>
+                <span v-if="smoothingOption == 'centeredAverage'">
+                  If window width is n, the graphed value for a given year is
+                  the
+                  {{ zonalStatistic }} the 2n+1 time step summary values for the
+                  selected area centered on that year.
+                </span>
+                <span v-else-if="smoothingOption === 'trailingAverage'">
+                  If the window width entered is n, the graphed value for a year
+                  is the {{ zonalStatistic }} of the n time step summary values
+                  for the current year and the n-1 preceding years
+                </span>
+                <span v-else>
+                  No smoothing the summary values for a given year are graphed.
+                </span>
+              </v-tooltip>
             </template>
           </v-select>
           <v-text-field
@@ -123,27 +158,27 @@
           </v-text-field>
           <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
           <h2 class="subtitle">Transformation</h2>
-          <v-alert
-            v-model="showTransformHint"
-            border="top"
-            colored-border
-            icon="fas fa-question-circle"
-            color="secondary"
-            elevation="2"
-            dismissible
-          >
-            <span v-if="transformOption === 'zscoreFixed'">
-              Displays Z-score transformed values relative to a fixed interval
-              selected by the user.
-            </span>
-            <span v-else-if="transformOption === 'zscoreMoving'">
-              Displays Z-score transformed values relative to a moving window of
-              a size (n time steps) selected by the user.
-            </span>
-            <span v-else
-              >Modeled values are graphed without any transformation.</span
-            >
-          </v-alert>
+          <!--          <v-alert-->
+          <!--            v-model="showTransformHint"-->
+          <!--            border="top"-->
+          <!--            colored-border-->
+          <!--            icon="fas fa-question-circle"-->
+          <!--            color="secondary"-->
+          <!--            elevation="2"-->
+          <!--            dismissible-->
+          <!--          >-->
+          <!--            <span v-if="transformOption === 'zscoreFixed'">-->
+          <!--              Displays Z-score transformed values relative to a fixed interval-->
+          <!--              selected by the user.-->
+          <!--            </span>-->
+          <!--            <span v-else-if="transformOption === 'zscoreMoving'">-->
+          <!--              Displays Z-score transformed values relative to a moving window of-->
+          <!--              a size (n time steps) selected by the user.-->
+          <!--            </span>-->
+          <!--            <span v-else-->
+          <!--              >Modeled values are graphed without any transformation.</span-->
+          <!--            >-->
+          <!--          </v-alert>-->
           <v-select
             v-model="transformOption"
             label="Transformation options"
@@ -155,10 +190,29 @@
             item-value="id"
             class="my-4"
           >
-            <template #append-outer>
-              <v-btn icon @click="showTransformHint = !showTransformHint">
-                <v-icon color="secondary"> fas fa-question-circle </v-icon>
-              </v-btn>
+            <template #prepend>
+              <v-tooltip v-model="showTransformHint" left>
+                <template #activator="{ attrs }">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="showTransformHint = !showTransformHint"
+                  >
+                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                  </v-btn>
+                </template>
+                <span v-if="transformOption === 'zscoreFixed'">
+                  Displays Z-score transformed values relative to a fixed
+                  interval selected by the user.
+                </span>
+                <span v-else-if="transformOption === 'zscoreMoving'">
+                  Displays Z-score transformed values relative to a moving
+                  window of a size (n time steps) selected by the user.
+                </span>
+                <span v-else
+                  >Modeled values are graphed without any transformation.</span
+                >
+              </v-tooltip>
             </template>
           </v-select>
           <template v-if="transformOption !== 'none'">
