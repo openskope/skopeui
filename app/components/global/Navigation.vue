@@ -1,56 +1,85 @@
 <template>
   <v-row align="center" justify="center" align-content="space-around">
-    <v-btn
-      nuxt
-      text
-      large
-      color="white"
-      :class="isActiveStep(0) ? 'active' : 'button'"
-      :to="selectDatasetLocation"
-    >
-      <v-icon v-if="!complete(0)">fas fa-database</v-icon>
-      <v-icon v-else>fas fa-check</v-icon>
-      <span class="step">Select Dataset</span>
-    </v-btn>
-    <v-btn
-      nuxt
-      text
-      large
-      color="white"
-      :class="isActiveStep(1) ? 'active' : 'button'"
-      :disabled="!hasMetadata"
-      :to="selectAreaLocation"
-    >
-      <v-icon v-if="!complete(1)">fas fa-map</v-icon>
-      <v-icon v-else>fas fa-check</v-icon>
-      <span class="step">Select Area</span>
-    </v-btn>
-    <v-btn
-      nuxt
-      text
-      large
-      color="white"
-      :class="isActiveStep(2) ? 'active' : 'button'"
-      :disabled="!hasValidStudyArea"
-      :to="visualizeLocation"
-    >
-      <v-icon v-if="!complete(2)">fas fa-chart-bar</v-icon>
-      <v-icon v-else>fas fa-check</v-icon>
-      <span class="step">Visualize Data</span>
-    </v-btn>
-    <v-btn
-      nuxt
-      text
-      large
-      color="white"
-      :class="isActiveStep(3) ? 'active' : 'button'"
-      :disabled="!canAnalyze"
-      :to="analyzeLocation"
-    >
-      <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
-      <v-icon v-else>fas fa-check</v-icon>
-      <span class="step">Analyze Data</span>
-    </v-btn>
+    <v-col>
+      <v-menu v-if="this.$vuetify.breakpoint.mdAndDown" offset-y>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            nuxt
+            text
+            large
+            color="white"
+            :class="isActiveStep(0) ? 'active' : 'button'"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon class="mx-3">{{ steps[currentStepIndex].icon }}</v-icon>
+            <span class="step mx-3">{{ currentStepName }}</span>
+            <v-icon class="ml-3">fas fa-caret-down</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item v-for="(step, index) in steps" :key="index" link nuxt>
+            <router-link :to="links[index]" class="text-decoration-none">
+              <v-icon class="mx-3">{{ steps[index].icon }}</v-icon>
+              <span class="step mx-3">{{ step.label }}</span>
+            </router-link>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+      <template v-else>
+        <v-btn
+          nuxt
+          text
+          large
+          color="white"
+          :class="isActiveStep(0) ? 'active' : 'button'"
+          :to="selectDatasetLocation"
+        >
+          <v-icon v-if="!complete(0)">fas fa-database</v-icon>
+          <v-icon v-else>fas fa-check</v-icon>
+          <span class="step mx-3">Select Dataset</span>
+        </v-btn>
+        <v-btn
+          nuxt
+          text
+          large
+          color="white"
+          :class="isActiveStep(1) ? 'active' : 'button'"
+          :disabled="!hasMetadata"
+          :to="selectAreaLocation"
+        >
+          <v-icon v-if="!complete(1)">fas fa-map</v-icon>
+          <v-icon v-else>fas fa-check</v-icon>
+          <span class="step mx-3">Select Area</span>
+        </v-btn>
+        <v-btn
+          nuxt
+          text
+          large
+          color="white"
+          :class="isActiveStep(2) ? 'active' : 'button'"
+          :disabled="!hasValidStudyArea"
+          :to="visualizeLocation"
+        >
+          <v-icon class="mx-3" v-if="!complete(2)">fas fa-chart-bar</v-icon>
+          <v-icon v-else>fas fa-check</v-icon>
+          <span class="step mx-3">Visualize Data</span>
+        </v-btn>
+        <v-btn
+          nuxt
+          text
+          large
+          color="white"
+          :class="isActiveStep(3) ? 'active' : 'button'"
+          :disabled="!canAnalyze"
+          :to="analyzeLocation"
+        >
+          <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
+          <v-icon v-else>fas fa-check</v-icon>
+          <span class="step mx-3">Analyze Data</span>
+        </v-btn>
+      </template>
+    </v-col>
   </v-row>
 </template>
 
@@ -62,6 +91,13 @@ import _ from "lodash";
 @Component()
 class Navigation extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
+  steps = _.clone(this.$api().app.steps);
+  links = [
+    this.selectDatasetLocation,
+    this.selectAreaLocation,
+    this.visualizeLocation,
+    this.analyzeLocation,
+  ];
 
   // --------- GETTERS ---------
 
@@ -114,22 +150,30 @@ class Navigation extends Vue {
     return this.hasValidStudyArea && this.$api().dataset.hasData;
   }
 
-  // --------- METHODS ---------
-
-  complete(index) {
-    return this.currentStep > index;
+  get currentStepName() {
+    return this.steps[this.currentStepIndex].label;
   }
 
-  isActiveStep(index) {
-    return this.currentStep === index;
-  }
-
-  get currentStep() {
+  get currentStepIndex() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
   }
 
   get variableId() {
     return this.$api().dataset.variable.id;
+  }
+
+  get mdBreakpoint() {
+    return this.$vuetify.breakpoint.md;
+  }
+
+  // --------- METHODS ---------
+
+  complete(index) {
+    return this.currentStepIndex > index;
+  }
+
+  isActiveStep(index) {
+    return this.currentStepIndex === index;
   }
 }
 
@@ -142,7 +186,6 @@ export default Navigation;
   letter-spacing: .05em
   font: 1.5em 'Roboto', serif
   text-transform: capitalize
-  margin-left: 1rem
 
 .button::after
   content: ''
