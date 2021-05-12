@@ -1,4 +1,6 @@
 import colors from "vuetify/es5/util/colors";
+import Vue from "vue";
+import Vuetify from "vuetify/lib";
 
 export default {
   primary: "#3D5A80",
@@ -31,6 +33,11 @@ export default {
         error: "#AD1F1F",
         success: "#B5B682",
       },
+    },
+  },
+  breakpoint: {
+    thresholds: {
+      md: 1636, // 1620px (window width) + 16px (desktop scrollbar width)
     },
   },
 };

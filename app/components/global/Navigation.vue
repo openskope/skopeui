@@ -1,6 +1,6 @@
 <template>
   <v-row align="center" justify="center" align-content="space-around">
-    <v-col>
+    <v-col class="text-center">
       <v-menu v-if="this.$vuetify.breakpoint.mdAndDown" offset-y>
         <template #activator="{ on, attrs }">
           <v-btn
@@ -61,7 +61,7 @@
           :disabled="!hasValidStudyArea"
           :to="visualizeLocation"
         >
-          <v-icon class="mx-3" v-if="!complete(2)">fas fa-chart-bar</v-icon>
+          <v-icon v-if="!complete(2)" class="mx-3">fas fa-chart-bar</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
           <span class="step mx-3">Visualize Data</span>
         </v-btn>
@@ -162,10 +162,6 @@ class Navigation extends Vue {
     return this.$api().dataset.variable.id;
   }
 
-  get mdBreakpoint() {
-    return this.$vuetify.breakpoint.md;
-  }
-
   // --------- METHODS ---------
 
   complete(index) {
@@ -174,6 +170,10 @@ class Navigation extends Vue {
 
   isActiveStep(index) {
     return this.currentStepIndex === index;
+  }
+
+  created() {
+    console.log("breakpoint: ", this.$vuetify.breakpoint.thresholds.md);
   }
 }
 
