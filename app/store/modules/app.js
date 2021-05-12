@@ -9,14 +9,16 @@ class App extends VuexModule {
     {
       step: 1,
       name: "index",
-      label: "Select Data Set",
+      label: "Select Dataset",
+      icon: "fas fa-database",
       instructions:
         "Welcome to the Synthesizing Knowledge of Past Environments (SKOPE) application! To examine data, click on a dataset name, pan & zoom the map, define your area of interest, then select a variable layer. ",
     },
     {
       step: 2,
       name: "dataset-id-studyarea",
-      label: "Define Study Area",
+      label: "Select Area",
+      icon: "fas fa-map",
       instructions:
         "To define a selected area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisified with your selection, click next.",
     },
@@ -24,12 +26,14 @@ class App extends VuexModule {
       step: 3,
       name: "dataset-id-visualize-variable",
       label: "Visualize Data",
+      icon: "fas fa-chart-bar",
       instructions: "Instructions here",
     },
     {
       step: 4,
       name: "dataset-id-analyze-variable",
       label: "Analyze Data",
+      icon: "fas fa-chart-line",
       instructions: "Instructions here",
     },
   ];
