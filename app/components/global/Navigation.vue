@@ -19,10 +19,16 @@
         </template>
         <v-list>
           <v-list-item v-for="(step, index) in steps" :key="index" link nuxt>
-            <router-link :to="links[index]" class="text-decoration-none">
+            <component
+              :is="isDisabled(step.id) ? 'span' : 'router-link'"
+              :to="links[index]"
+              :disabled="isDisabled(step.id)"
+              :class="isDisabled(step.id) ? 'disabled' : ''"
+              class="text-decoration-none"
+            >
               <v-icon class="mx-3">{{ steps[index].icon }}</v-icon>
               <span class="step mx-3">{{ step.label }}</span>
-            </router-link>
+            </component>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -33,7 +39,7 @@
           large
           color="white"
           :class="isActiveStep(0) ? 'active' : 'button'"
-          :to="selectDatasetLocation"
+          :to="links[0]"
         >
           <v-icon v-if="!complete(0)">fas fa-database</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
@@ -45,8 +51,8 @@
           large
           color="white"
           :class="isActiveStep(1) ? 'active' : 'button'"
-          :disabled="!hasMetadata"
-          :to="selectAreaLocation"
+          :disabled="isDisabled(2)"
+          :to="links[1]"
         >
           <v-icon v-if="!complete(1)">fas fa-map</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
@@ -58,8 +64,8 @@
           large
           color="white"
           :class="isActiveStep(2) ? 'active' : 'button'"
-          :disabled="!hasValidStudyArea"
-          :to="visualizeLocation"
+          :disabled="isDisabled(3)"
+          :to="links[2]"
         >
           <v-icon v-if="!complete(2)" class="mx-3">fas fa-chart-bar</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
@@ -71,8 +77,8 @@
           large
           color="white"
           :class="isActiveStep(3) ? 'active' : 'button'"
-          :disabled="!canAnalyze"
-          :to="analyzeLocation"
+          :disabled="isDisabled(4)"
+          :to="links[3]"
         >
           <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
@@ -164,6 +170,21 @@ class Navigation extends Vue {
 
   // --------- METHODS ---------
 
+  isDisabled(stepId) {
+    console.log("stepId: ", stepId);
+    if (stepId === 1) {
+      return false;
+    } else if (stepId === 2) {
+      return !this.hasMetadata;
+    } else if (stepId === 3) {
+      return !this.hasValidStudyArea;
+    } else if (stepId === 4) {
+      return !this.canAnalyze;
+    } else {
+      return true;
+    }
+  }
+
   complete(index) {
     return this.currentStepIndex > index;
   }
@@ -219,4 +240,7 @@ export default Navigation;
     left: 0
     bottom: 0
     transition: all ease 0.6s
+
+.disabled
+  opacity: 50%
 </style>
