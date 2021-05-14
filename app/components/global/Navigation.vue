@@ -18,12 +18,17 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item v-for="(step, index) in steps" :key="index" link nuxt>
+          <v-list-item
+            v-for="(step, index) in steps"
+            :key="index"
+            link
+            nuxt
+            :disabled="isDisabled(step.id)"
+            :class="isDisabled(step.id) ? 'disabled' : ''"
+          >
             <component
               :is="isDisabled(step.id) ? 'span' : 'router-link'"
               :to="links[index]"
-              :disabled="isDisabled(step.id)"
-              :class="isDisabled(step.id) ? 'disabled' : ''"
               class="text-decoration-none"
             >
               <v-icon class="mx-3">{{ steps[index].icon }}</v-icon>
