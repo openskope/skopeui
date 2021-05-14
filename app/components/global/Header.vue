@@ -8,77 +8,26 @@
     <v-toolbar-title class="mr-10">
       <nuxt-link class="skope-title" to="/">skope</nuxt-link>
     </v-toolbar-title>
+    <v-spacer></v-spacer>
     <Navigation class="mt-2 flex-grow-1" />
-    <v-tooltip bottom>
-      <template #activator="{ on, attrs }">
-        <v-btn
-          plain
-          color="white"
-          large
-          icon
-          v-bind="attrs"
-          class="mt-3 mx-3 button"
-          :href="github.url"
-          v-on="on"
-        >
-          <v-icon large color="secondary">{{ github.icon }}</v-icon>
-        </v-btn>
-      </template>
-      <span>GitHub</span>
-    </v-tooltip>
-    <v-tooltip bottom>
-      <template #activator="{ on, attrs }">
-        <v-btn
-          plain
-          color="white"
-          large
-          icon
-          class="mt-3 mx-3 button"
-          v-bind="attrs"
-          v-on="on"
-          ><v-icon large color="white">help</v-icon></v-btn
-        >
-      </template>
-      <span>Help</span>
-    </v-tooltip>
-
-    <v-tooltip bottom>
-      <template #activator="{ on, attrs }">
-        <v-btn
-          plain
-          color="white"
-          icon
-          large
-          href="https://www.comses.net/about/contact/"
-          target="_blank"
-          v-bind="attrs"
-          class="mt-3 mx-3 button"
-          v-on="on"
-        >
-          <v-icon large color="white">email</v-icon>
-        </v-btn>
-      </template>
-      <span>Email us</span>
-    </v-tooltip>
+    <v-spacer></v-spacer>
+    <Links></Links>
   </v-app-bar>
 </template>
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import Navigation from "@/components/global/Navigation.vue";
+import Links from "@/components/global/Links.vue";
 import { Prop, Watch } from "vue-property-decorator";
 
 @Component({
   components: {
     Navigation,
+    Links,
   },
 })
 class Header extends Vue {
-  github = {
-    icon: "fab fa-github",
-    url: "https://github.com/openskope/skopeui",
-  };
-
   // --------- GETTERS ---------
 
   get drawer() {
