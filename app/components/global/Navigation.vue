@@ -31,7 +31,7 @@
               :to="links[index]"
               class="text-decoration-none"
             >
-              <v-icon class="mx-3">{{ steps[index].icon }}</v-icon>
+              <v-icon class="mx-3">{{ step.icon }}</v-icon>
               <span class="step mx-3">{{ step.label }}</span>
             </component>
           </v-list-item>
@@ -39,55 +39,22 @@
       </v-menu>
       <template v-else>
         <v-btn
+          v-for="(step, index) in steps"
+          :key="index"
           nuxt
           text
-          large
           color="white"
-          :class="isActiveStep(0) ? 'active' : 'button'"
-          :to="links[0]"
+          :disabled="isDisabled(step.id)"
+          :class="{
+            active: isActiveStep(index),
+            button: !isActiveStep(index),
+            disabled: isDisabled(step.id),
+          }"
+          :to="links[index]"
         >
-          <v-icon v-if="!complete(0)">fas fa-database</v-icon>
+          <v-icon v-if="!complete(index)">{{ step.icon }}</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
-          <span class="step mx-3">Select Dataset</span>
-        </v-btn>
-        <v-btn
-          nuxt
-          text
-          large
-          color="white"
-          :class="isActiveStep(1) ? 'active' : 'button'"
-          :disabled="isDisabled(2)"
-          :to="links[1]"
-        >
-          <v-icon v-if="!complete(1)">fas fa-map</v-icon>
-          <v-icon v-else>fas fa-check</v-icon>
-          <span class="step mx-3">Select Area</span>
-        </v-btn>
-        <v-btn
-          nuxt
-          text
-          large
-          color="white"
-          :class="isActiveStep(2) ? 'active' : 'button'"
-          :disabled="isDisabled(3)"
-          :to="links[2]"
-        >
-          <v-icon v-if="!complete(2)" class="mx-3">fas fa-chart-bar</v-icon>
-          <v-icon v-else>fas fa-check</v-icon>
-          <span class="step mx-3">Visualize Data</span>
-        </v-btn>
-        <v-btn
-          nuxt
-          text
-          large
-          color="white"
-          :class="isActiveStep(3) ? 'active' : 'button'"
-          :disabled="isDisabled(4)"
-          :to="links[3]"
-        >
-          <v-icon v-if="!complete(3)">fas fa-chart-line</v-icon>
-          <v-icon v-else>fas fa-check</v-icon>
-          <span class="step mx-3">Analyze Data</span>
+          <span class="step mx-3">{{ step.label }}</span>
         </v-btn>
       </template>
     </v-col>
@@ -144,8 +111,9 @@ class Navigation extends Vue {
         name: "dataset-id-analyze-variable",
         params: { id, variable },
       };
+    } else {
+      return {};
     }
-    return {};
   }
 
   get hasMetadata() {
