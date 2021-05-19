@@ -1,4 +1,4 @@
-import { std, mean, median } from "mathjs";
+import { format, std, mean, median } from "mathjs";
 
 const EMPTY_SUMMARY_STATISTICS = {
   stdDev: "N/A",
@@ -22,10 +22,12 @@ export function summarize(timeseries) {
     return EMPTY_SUMMARY_STATISTICS;
   }
   const precision = timeseries.precision ?? DEFAULT_PRECISION;
+  // may need to make lowerExp and upperExp explicit, check with science team
+  // https://mathjs.org/docs/reference/functions/format.html
   return {
-    stdDev: std(values).toPrecision(precision),
-    mean: mean(values).toPrecision(precision),
-    median: median(values).toPrecision(precision),
+    stdDev: format(std(values), { precision }),
+    mean: format(mean(values), { precision }),
+    median: format(median(values), { precision }),
   };
 }
 
