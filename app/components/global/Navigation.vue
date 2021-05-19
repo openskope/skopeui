@@ -1,7 +1,9 @@
 <template>
   <v-row align="center" justify="center" align-content="space-around">
     <v-col class="text-center">
-      <v-menu v-if="this.$vuetify.breakpoint.mdAndDown" offset-y>
+      <!-- FIXME: steps are tightly coupled to this nav component; consider moving steps from store/app into this component -->
+      <!-- minimized nav menu -->
+      <v-menu v-if="isMdAndDown" offset-y>
         <template #activator="{ on, attrs }">
           <v-btn
             nuxt
@@ -28,7 +30,7 @@
           >
             <component
               :is="isDisabled(step.id) ? 'span' : 'router-link'"
-              :to="links[index]"
+              :to="locations[index]"
               class="text-decoration-none"
             >
               <v-icon class="mx-3">{{ step.icon }}</v-icon>
@@ -37,6 +39,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
+      <!-- full size nav -->
       <template v-else>
         <v-btn
           v-for="(step, index) in steps"
@@ -50,7 +53,7 @@
             button: !isActiveStep(index),
             disabled: isDisabled(step.id),
           }"
-          :to="links[index]"
+          :to="locations[index]"
         >
           <v-icon v-if="!complete(index)">{{ step.icon }}</v-icon>
           <v-icon v-else>fas fa-check</v-icon>
@@ -70,14 +73,17 @@ import _ from "lodash";
 class Navigation extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   steps = _.clone(this.$api().app.steps);
-  links = [
-    this.selectDatasetLocation,
-    this.selectAreaLocation,
-    this.visualizeLocation,
-    this.analyzeLocation,
-  ];
 
   // --------- GETTERS ---------
+
+  get locations() {
+    return [
+      this.selectDatasetLocation,
+      this.selectAreaLocation,
+      this.visualizeLocation,
+      this.analyzeLocation,
+    ];
+  }
 
   get selectDatasetLocation() {
     return { name: "index" };
@@ -141,20 +147,22 @@ class Navigation extends Vue {
     return this.$api().dataset.variable.id;
   }
 
+  get isMdAndDown() {
+    return this.$vuetify.breakpoint.mdAndDown;
+  }
+
   // --------- METHODS ---------
 
   isDisabled(stepId) {
-    console.log("stepId: ", stepId);
-    if (stepId === 1) {
-      return false;
-    } else if (stepId === 2) {
-      return !this.hasMetadata;
-    } else if (stepId === 3) {
-      return !this.hasValidStudyArea;
-    } else if (stepId === 4) {
-      return !this.canAnalyze;
-    } else {
-      return true;
+    switch (stepId) {
+      case 2:
+        return !this.hasMetadata;
+      case 3:
+        return !this.hasValidStudyArea;
+      case 4:
+        return !this.canAnalyze;
+      default:
+        return false;
     }
   }
 
@@ -164,10 +172,6 @@ class Navigation extends Vue {
 
   isActiveStep(index) {
     return this.currentStepIndex === index;
-  }
-
-  created() {
-    console.log("breakpoint: ", this.$vuetify.breakpoint.thresholds.md);
   }
 }
 

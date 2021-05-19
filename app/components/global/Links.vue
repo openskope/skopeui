@@ -1,7 +1,7 @@
 <template>
   <v-row align="end" justify="end">
     <v-col class="text-center">
-      <v-menu v-if="this.$vuetify.breakpoint.mdAndDown" offset-y>
+      <v-menu v-if="isMdAndDown" offset-y>
         <template #activator="{ on, attrs }">
           <v-btn
             plain
@@ -42,7 +42,7 @@
               :href="links[0].url"
               v-on="on"
             >
-              <v-icon large color="secondary">{{ links[0].icon }}</v-icon>
+              <v-icon large color="white">{{ links[0].icon }}</v-icon>
             </v-btn>
           </template>
           <span>{{ links[0].label }}</span>
@@ -92,8 +92,8 @@ class Links extends Vue {
     },
   ];
 
-  created() {
-    console.log("breakpoint: ", this.$vuetify.breakpoint.thresholds.md);
+  get isMdAndDown() {
+    return this.$vuetify.breakpoint.mdAndDown;
   }
 }
 
