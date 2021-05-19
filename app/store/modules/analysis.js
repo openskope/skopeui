@@ -30,6 +30,13 @@ class Analysis extends VuexModule {
     }
   }
 
+  /**
+   * Returns the time series that the skope api generated in a form
+   * that can be sent to plotly.
+   * This will include up to 2 time series: an original time series and an
+   * optional transformed time series if smoothing and/or z-score transformations
+   * were applied
+   */
   get timeseries() {
     return this.response.series.map((s) => ({
       x: _.range(
@@ -42,13 +49,13 @@ class Analysis extends VuexModule {
   }
 
   get summaryStatistics() {
-    // returns an array of summary statistics over all the filtered time series
-    return this.filteredTimeSeries.map((timeseries) => ({
-      ...summarize(timeseries),
-      series: timeseries.name,
+    return this.timeseries.map((ts) => ({
+      ...summarize(ts),
+      series: ts.options.name,
     }));
   }
 
+  /*
   get filteredTimeSeries() {
     return this.timeseries.map((ts) =>
       filterTimeSeries({
@@ -62,6 +69,7 @@ class Analysis extends VuexModule {
       })
     );
   }
+  */
 
   @Mutation
   setWaitingForResponse(value) {

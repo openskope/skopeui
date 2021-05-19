@@ -209,6 +209,7 @@ class TimeSeriesPlot extends Vue {
 
   set selectedTemporalRange(temporalRange) {
     this.$api().dataset.setTemporalRange(temporalRange);
+    this.$emit("selectedTemporalRange", temporalRange);
   }
 
   get temporalRangeMin() {
@@ -240,11 +241,11 @@ class TimeSeriesPlot extends Vue {
   }
 
   get transformedTimeSeries() {
-    const tts = this.$api().analysis.filteredTimeSeries.map((fts) => ({
-      ...fts,
+    const transformedTimeSeries = this.$api().analysis.timeseries.map((ts) => ({
+      ...ts,
       type: "scatter",
     }));
-    return tts;
+    return transformedTimeSeries;
   }
 
   get variableName() {
@@ -330,6 +331,11 @@ class TimeSeriesPlot extends Vue {
     return this.timeseries.x.length > 0;
   }
 
+  /**
+   * FIXME: should refactor
+   * Returns analysis store's time series if displayTransformedTimeSeries = true
+   * otherwise returns the dataset store's time series
+   */
   get timeSeriesData() {
     if (
       this.displayTransformedTimeSeries &&
@@ -337,6 +343,8 @@ class TimeSeriesPlot extends Vue {
     ) {
       return this.transformedTimeSeries;
     }
+    // if we are in the analysis page but there's no analysis time series data,
+    // display time series from the dataset store
     const timeSeriesData = [this.timeseries];
     if (this.yearSelectedSeries.x.length > 0) {
       timeSeriesData.push(this.yearSelectedSeries);

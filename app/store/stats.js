@@ -31,6 +31,12 @@ export function summarize(timeseries) {
   };
 }
 
+/**
+ * Returns a new time series object for plotly adjusted based on the selected temporal range
+ * and minYear of the time series' dataset
+ * @param {timeseries, temporalRange, minYear}
+ * @returns a new time series object for plotly adjusted based on the selected temporal range
+ */
 export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
   if (timeseries.x.length > 0) {
     const minOffset = temporalRange[0] - minYear;
@@ -49,5 +55,7 @@ export function toISODate(year) {
 
 export function extractYear(isoDateString) {
   // FIXME: brittle, do some error handling / checking
-  return parseInt(isoDateString.split("-")[0]);
+  const year = parseInt(isoDateString.split("-")[0]);
+  // console.log("extracting year from ", isoDateString, " resulted in ", year);
+  return year;
 }

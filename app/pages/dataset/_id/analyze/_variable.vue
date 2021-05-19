@@ -16,6 +16,7 @@
           :show-step-controls="false"
           :show-area="true"
           :display-transformed-time-series="true"
+          @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>
       <!-- analysis form -->
