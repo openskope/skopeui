@@ -2,7 +2,7 @@
   <v-container fluid class="fill-height align-start">
     <v-row no-gutters>
       <!-- dataset title -->
-      <v-col lg="8" md="12" class="mb-3">
+      <v-col lg="12" md="12" sm="12" class="mb-3">
         <DatasetTitle :select-variable="true" />
       </v-col>
       <!-- time series -->

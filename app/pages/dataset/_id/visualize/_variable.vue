@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-row no-gutters>
-      <v-col lg="12" md="12" class="mb-3">
+      <v-col lg="12" md="12" sm="12" class="mb-3">
         <DatasetTitle :select-variable="true">
           <v-spacer></v-spacer>
           <v-btn :disabled="!hasValidStudyArea" :to="analyzeLocation" nuxt>

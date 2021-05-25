@@ -3,7 +3,7 @@
     <Header />
     <DiscoverSideBar />
     <v-main>
-      <v-container class="mt-5" fluid>
+      <v-container fluid>
         <Messages />
         <nuxt />
       </v-container>

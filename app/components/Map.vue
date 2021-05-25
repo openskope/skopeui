@@ -6,56 +6,68 @@
     style="z-index: 1"
     outlined
   >
-    <v-card-title class="py-0 my-1">
-      <v-tooltip bottom>
-        <template #activator="{ on, attrs }">
-          <h4 class="subtitle" v-bind="attrs" v-on="on">
-            {{ selectedArea }} km<sup>2</sup>
-          </h4>
-        </template>
-        <span>Selected Area</span>
-      </v-tooltip>
-      <v-spacer></v-spacer>
-      <v-tooltip top>
-        <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" icon v-on="on" @click="exportSelectedGeometry">
-            <a id="exportSelectedGeometry">
-              <v-icon>fas fa-download</v-icon>
-            </a>
-          </v-btn>
-        </template>
-        <span>Download study area as a GeoJSON file</span>
-      </v-tooltip>
-      <input
-        id="loadGeoJsonFile"
-        type="file"
-        style="display: none"
-        @change="loadGeoJson"
-      />
-      <v-tooltip top>
-        <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
-            <v-icon>fas fa-upload</v-icon>
-          </v-btn>
-        </template>
-        <span>Upload a GeoJSON file</span>
-      </v-tooltip>
-      <v-text-field
-        v-if="isVisualize"
-        v-model="opacity"
-        min="0"
-        max="100"
-        type="number"
-        label="Opacity"
-        hint="0-100"
-        append-outer-icon="add"
-        prepend-icon="remove"
-        class="shrink"
-        :rules="opacityRules"
-        @click:append-outer="increaseOpacity"
-        @click:prepend="decreaseOpacity"
-      />
-    </v-card-title>
+    <v-toolbar flat class="ma-0 pa-0">
+      <v-row class="mx-0" align="center">
+        <!-- selected area -->
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <h3 class="title" v-bind="attrs" v-on="on">
+              {{ selectedArea }} km<sup>2</sup>
+            </h3>
+          </template>
+          <span>Selected Area</span>
+        </v-tooltip>
+        <v-spacer></v-spacer>
+        <!-- export geojson -->
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              icon
+              v-on="on"
+              @click="exportSelectedGeometry"
+            >
+              <a id="exportSelectedGeometry">
+                <v-icon color="secondary">fas fa-download</v-icon>
+              </a>
+            </v-btn>
+          </template>
+          <span>Download study area as a GeoJSON file</span>
+        </v-tooltip>
+        <!-- upload geojson -->
+        <input
+          id="loadGeoJsonFile"
+          type="file"
+          style="display: none"
+          @change="loadGeoJson"
+        />
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
+              <v-icon color="secondary">fas fa-upload</v-icon>
+            </v-btn>
+          </template>
+          <span>Upload a GeoJSON file</span>
+        </v-tooltip>
+        <!-- set opacity -->
+        <v-text-field
+          v-if="isVisualize"
+          v-model="opacity"
+          min="0"
+          max="100"
+          type="number"
+          label="Opacity"
+          hint="0-100"
+          append-outer-icon="add"
+          prepend-icon="remove"
+          class="shrink mt-8"
+          :rules="opacityRules"
+          @click:append-outer="increaseOpacity"
+          @click:prepend="decreaseOpacity"
+        />
+      </v-row>
+    </v-toolbar>
+    <!-- map -->
     <v-card-text class="map">
       <client-only placeholder="Loading map, please wait...">
         <l-map
