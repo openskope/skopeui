@@ -34,7 +34,13 @@
             >
               <!-- FIXME restyle so it looks like a button -->
               <template #append-outer>
-                <v-btn small text @click="setTemporalRange">
+                <v-btn
+                  small
+                  text
+                  color="accent"
+                  depressed
+                  @click="setTemporalRange"
+                >
                   <v-icon>update</v-icon>
                   Update
                 </v-btn>
@@ -119,7 +125,7 @@
           <v-col v-if="showArea" md="1">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
-                <h3 v-bind="attrs" v-on="on" class="font-weight-light">
+                <h3 v-bind="attrs" class="font-weight-light" v-on="on">
                   {{ selectedAreaInSquareKm }} km<sup>2</sup>
                 </h3>
               </template>
@@ -130,7 +136,7 @@
           <v-col v-if="showArea" md="2">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
-                <h3 v-bind="attrs" v-on="on" class="font-weight-light">
+                <h3 v-bind="attrs" class="font-weight-light" v-on="on">
                   {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }}
                   cells)
                 </h3>
