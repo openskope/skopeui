@@ -33,7 +33,8 @@ export function summarize(timeseries) {
 
 /**
  * Returns a new time series object for plotly adjusted based on the selected temporal range
- * and minYear of the time series' dataset
+ * and minYear of the time series' dataset. Should only be called with a full data time series
+ * that needs to be further refined.
  * @param {timeseries, temporalRange, minYear}
  * @returns a new time series object for plotly adjusted based on the selected temporal range
  */
