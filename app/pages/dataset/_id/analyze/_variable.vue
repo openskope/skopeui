@@ -389,12 +389,12 @@ class Analyze extends Vue {
 
   transformOptions = [
     {
-      label: "Modeled values",
+      label: "None. Modeled values displayed",
       id: "none",
     },
     {
       label:
-        "Z-Score wrt Fixed Interval (Z calculated using Mean and S.D. above)",
+        "Z-Score wrt Fixed Interval   (Z calculated using Mean and S.D. above)",
       id: "zscoreFixed",
     },
     {

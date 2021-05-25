@@ -3,7 +3,6 @@
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
-        <!-- FIXME: change to v-row and v-cols instead, does not handle shrinkage across breakpoints well-->
         <v-row align="baseline" justify="space-between">
           <!-- lower temporal range input -->
           <v-col md="2">
@@ -55,7 +54,7 @@
             </h3>
           </v-col>
           <!-- step controls -->
-          <v-col v-if="showStepControls" md="4">
+          <v-col v-if="showStepControls" md="5">
             <v-tooltip bottom>
               <template #activator="{ attrs, on }">
                 <v-btn
@@ -132,7 +131,7 @@
               <span>Selected area in square kilometers</span>
             </v-tooltip>
           </v-col>
-          <v-divider vertical class="py-5"></v-divider>
+          <v-divider v-if="showArea" vertical class="py-5"></v-divider>
           <v-col v-if="showArea" md="2">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">

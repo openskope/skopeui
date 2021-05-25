@@ -15,12 +15,19 @@
         class="d-flex map-flex mb-3 px-2"
         lg="6"
         md="12"
+        sm="12"
         align-self="stretch"
       >
         <Map :year="yearSelected" />
       </v-col>
       <!-- time series plot -->
-      <v-col class="d-flex map-flex px-2" lg="6" md="12" align-self="stretch">
+      <v-col
+        class="d-flex map-flex px-2"
+        lg="6"
+        md="12"
+        sm="12"
+        align-self="stretch"
+      >
         <TimeSeriesPlot :year-selected="yearSelected" @yearSelected="setYear" />
       </v-col>
     </v-row>
