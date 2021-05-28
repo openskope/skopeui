@@ -210,9 +210,9 @@
                   Displays Z-score transformed values relative to a moving
                   window of a size (n time steps) selected by the user.
                 </span>
-                <span v-else
-                  >Modeled values are graphed without any transformation.</span
-                >
+                <span v-else>
+                  Modeled values are graphed without any transformation.
+                </span>
               </v-tooltip>
             </template>
           </v-select>
@@ -383,22 +383,21 @@ class Analyze extends Vue {
     },
   };
 
-  smoothingTimeStep = 7;
+  smoothingTimeStep = 9;
 
   transformOption = "none";
 
   transformOptions = [
     {
-      label: "None. Modeled values displayed",
+      label: "None: Modeled values displayed",
       id: "none",
     },
     {
-      label:
-        "Z-Score wrt Fixed Interval   (Z calculated using Mean and S.D. above)",
+      label: "Z-Score wrt selected temporal interval",
       id: "zscoreFixed",
     },
     {
-      label: "Z-Score wrt Moving Interval (Z recalculated on moving basis)",
+      label: "Z-Score wrt moving interval (Z recalculated on moving basis)",
       id: "zscoreMoving",
     },
   ];
