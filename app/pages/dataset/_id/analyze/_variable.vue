@@ -252,7 +252,10 @@
             >
             </v-text-field>
           </template>
-          <v-row justify="center" align="space-between">
+          <v-row align="space-between">
+            <v-col>
+              <v-btn block @click="clearTransformedTimeSeries"> Clear </v-btn>
+            </v-col>
             <v-col>
               <v-btn
                 block
@@ -262,9 +265,6 @@
                 @click="updateTimeSeries"
                 >Update <v-icon small class="mx-2">update</v-icon></v-btn
               >
-            </v-col>
-            <v-col>
-              <v-btn block @click="clearTransformedTimeSeries"> Clear </v-btn>
             </v-col>
           </v-row>
         </v-form>
