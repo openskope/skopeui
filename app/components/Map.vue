@@ -38,6 +38,7 @@
         <input
           id="loadGeoJsonFile"
           type="file"
+          accept=".geojson"
           style="display: none"
           @change="loadGeoJson"
         />
