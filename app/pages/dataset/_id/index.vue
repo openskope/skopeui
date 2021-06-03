@@ -116,6 +116,7 @@ class DatasetDetail extends Vue {
     const variableId = this.$route.params.variable;
     initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
     this.confirmGeometry = this.hasValidStudyArea;
+    this.$api().dataset.clearTimeSeries();
   }
 
   head() {
