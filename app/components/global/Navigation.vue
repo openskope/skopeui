@@ -132,7 +132,7 @@ class Navigation extends Vue {
   }
 
   get canAnalyze() {
-    return this.hasValidStudyArea && this.$api().dataset.hasData;
+    return this.hasValidStudyArea;
   }
 
   get currentStepName() {
