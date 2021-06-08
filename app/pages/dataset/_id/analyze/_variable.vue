@@ -3,7 +3,12 @@
     <v-row no-gutters>
       <!-- dataset title -->
       <v-col lg="12" md="12" sm="12" class="mb-3">
-        <DatasetTitle :select-variable="true" />
+        <DatasetTitle :select-variable="true">
+          <v-btn color="success" depressed>
+            Download
+            <v-icon class="ml-2" small>download</v-icon>
+          </v-btn>
+        </DatasetTitle>
       </v-col>
       <!-- time series -->
       <v-col
