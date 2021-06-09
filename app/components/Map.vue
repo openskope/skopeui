@@ -185,6 +185,10 @@ class Map extends Vue {
     return this.$api().dataset.geoJson;
   }
 
+  get hasGeoJson() {
+    return this.$api().dataset.hasGeoJson;
+  }
+
   get selectedArea() {
     return this.$api().dataset.selectedAreaInSquareKm;
   }
@@ -263,6 +267,7 @@ class Map extends Vue {
         console.log("watcher updating geojson", geoJson);
         if (geoJson === null) {
           this.drawnItems.clearLayers();
+          this.disableEditOnly(map);
         } else {
           this.renderSelectedArea(geoJson, map);
         }
