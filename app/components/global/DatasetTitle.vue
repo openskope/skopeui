@@ -1,5 +1,5 @@
 <template>
-  <v-row class="my-0 mx-4" no-gutters align="baseline" justify="start">
+  <v-row class="my-0" no-gutters align="baseline" justify="start">
     <h1 class="font-weight-light">
       {{ metadata.title }}
     </h1>

@@ -11,8 +11,6 @@ export default {
   // secondary: '#98C1D9',
   info: "#E0FBFC",
   warning: "#F9C80E",
-  error: "#AD1F1F",
-  success: "#B5B682",
   theme: {
     themes: {
       light: {
@@ -21,8 +19,6 @@ export default {
         secondary: "#98C1D9",
         info: "#E0FBFC",
         warning: "#F9C80E",
-        error: "#AD1F1F",
-        success: "#B5B682",
       },
       dark: {
         primary: "#3D5A80",
@@ -30,8 +26,6 @@ export default {
         secondary: "#98C1D9",
         info: "#E0FBFC",
         warning: "#F9C80E",
-        error: "#AD1F1F",
-        success: "#B5B682",
       },
     },
   },

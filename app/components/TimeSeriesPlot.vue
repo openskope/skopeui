@@ -31,19 +31,6 @@
               type="number"
               @keydown.enter="setTemporalRange"
             >
-              <!-- FIXME restyle so it looks like a button -->
-              <template #append-outer>
-                <v-btn
-                  small
-                  text
-                  color="accent"
-                  depressed
-                  @click="setTemporalRange"
-                >
-                  <v-icon>update</v-icon>
-                  Update
-                </v-btn>
-              </template>
             </v-text-field>
           </v-col>
           <!-- time steps -->
@@ -160,146 +147,6 @@
             </v-tooltip>
           </v-col>
         </v-row>
-        <!--        &lt;!&ndash; temporal range &ndash;&gt;-->
-        <!--        <v-text-field-->
-        <!--          v-model="formTemporalRange[0]"-->
-        <!--          label="Min Year"-->
-        <!--          :min="minYear"-->
-        <!--          :max="maxYear - 1"-->
-        <!--          type="number"-->
-        <!--          class="shrink"-->
-        <!--          :rules="[validateMinYear]"-->
-        <!--          @keydown.enter="setTemporalRange"-->
-        <!--        >-->
-        <!--          <template #append-outer>to</template>-->
-        <!--        </v-text-field>-->
-        <!--        <v-text-field-->
-        <!--          v-model="formTemporalRange[1]"-->
-        <!--          class="mx-2 shrink"-->
-        <!--          label="Max Year"-->
-        <!--          :min="minYear + 1"-->
-        <!--          :max="maxYear"-->
-        <!--          :rules="[validateMaxYear]"-->
-        <!--          type="number"-->
-        <!--          @keydown.enter="setTemporalRange"-->
-        <!--        >-->
-        <!--          <template #append-outer>-->
-        <!--            <v-btn small text @click="setTemporalRange">-->
-        <!--              <v-icon>update</v-icon>-->
-        <!--              Update-->
-        <!--            </v-btn>-->
-        <!--          </template>-->
-        <!--        </v-text-field>-->
-        <!--        &lt;!&ndash; time steps &ndash;&gt;-->
-        <!--        <h2 class="mx-1 font-weight-light">-->
-        <!--          ({{ selectedTemporalRange[1] - selectedTemporalRange[0] }} time steps)-->
-        <!--        </h2>-->
-        <!--        <v-spacer></v-spacer>-->
-        <!--        &lt;!&ndash; step controls &ndash;&gt;-->
-        <!--        &lt;!&ndash; show stepControls if in viz step &ndash;&gt;-->
-        <!--        <template v-if="showStepControls">-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ attrs, on }">-->
-        <!--              <v-btn-->
-        <!--                icon-->
-        <!--                v-bind="attrs"-->
-        <!--                color="accent"-->
-        <!--                v-on="on"-->
-        <!--                @click="gotoFirstYear"-->
-        <!--              >-->
-        <!--                <v-icon>skip_previous</v-icon>-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Go to the first year of the defined temporal range</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ attrs, on }">-->
-        <!--              <v-btn-->
-        <!--                icon-->
-        <!--                v-bind="attrs"-->
-        <!--                color="accent"-->
-        <!--                v-on="on"-->
-        <!--                @click="previousYear"-->
-        <!--              >-->
-        <!--                <v-icon>arrow_left</v-icon>-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Previous year</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ attrs, on }">-->
-        <!--              <v-btn icon v-bind="attrs" v-on="on" @click="togglePlay">-->
-        <!--                <v-icon color="accent">{{ playIcon }}</v-icon>-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Play</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ attrs, on }">-->
-        <!--              <v-btn-->
-        <!--                icon-->
-        <!--                v-bind="attrs"-->
-        <!--                color="accent"-->
-        <!--                v-on="on"-->
-        <!--                @click="nextYear"-->
-        <!--              >-->
-        <!--                <v-icon>arrow_right</v-icon>-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Next year</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ attrs, on }">-->
-        <!--              <v-btn-->
-        <!--                icon-->
-        <!--                v-bind="attrs"-->
-        <!--                color="accent"-->
-        <!--                v-on="on"-->
-        <!--                @click="gotoLastYear"-->
-        <!--              >-->
-        <!--                <v-icon>skip_next</v-icon>-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Go to the last year of the defined temporal range</span>-->
-        <!--          </v-tooltip>-->
-        <!--        </template>-->
-        <!--        &lt;!&ndash; selected area in km2 &ndash;&gt;-->
-        <!--        &lt;!&ndash; show area if in analyze step &ndash;&gt;-->
-        <!--        <template v-if="showArea">-->
-        <!--          <v-spacer></v-spacer>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ on, attrs }">-->
-        <!--              <p class="title" v-bind="attrs" v-on="on">-->
-        <!--                {{ selectedAreaInSquareKm }} km<sup>2</sup>-->
-        <!--              </p>-->
-        <!--            </template>-->
-        <!--            <span>Selected area in square kilometers</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-divider vertical class="mx-4"></v-divider>-->
-        <!--          <v-tooltip bottom>-->
-        <!--            <template #activator="{ on, attrs }">-->
-        <!--              <p class="title" v-bind="attrs" v-on="on">-->
-        <!--                {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }} cells)-->
-        <!--              </p>-->
-        <!--            </template>-->
-        <!--            <span>Total cell area used in this timeseries calculation</span>-->
-        <!--          </v-tooltip>-->
-        <!--          <v-tooltip v-if="showArea" bottom>-->
-        <!--            <template #activator="{ on, attrs }">-->
-        <!--              <v-btn-->
-        <!--                v-bind="attrs"-->
-        <!--                :to="selectAreaLocation"-->
-        <!--                class="mb-4 mx-3"-->
-        <!--                color="accent"-->
-        <!--                v-on="on"-->
-        <!--              >-->
-        <!--                <v-icon class="mr-2">edit_location</v-icon>-->
-        <!--                Edit selected area-->
-        <!--              </v-btn>-->
-        <!--            </template>-->
-        <!--            <span>Return to Select Area</span>-->
-        <!--          </v-tooltip>-->
-        <!--        </template>-->
       </v-toolbar>
       <!-- time series plot -->
       <client-only placeholder="Loading...">
@@ -328,7 +175,7 @@
 import Vue from "vue";
 import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
-import { Prop, Watch } from "vue-property-decorator";
+import { Emit, Prop, Watch } from "vue-property-decorator";
 import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
 import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 

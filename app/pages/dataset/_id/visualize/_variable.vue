@@ -4,8 +4,14 @@
       <v-col lg="12" md="12" sm="12" class="mb-3">
         <DatasetTitle :select-variable="true">
           <v-spacer></v-spacer>
-          <v-btn :disabled="!hasValidStudyArea" :to="analyzeLocation" nuxt>
-            Go to Analyze
+          <v-btn
+            :disabled="!hasValidStudyArea"
+            :to="analyzeLocation"
+            nuxt
+            color="success"
+            depressed
+          >
+            Analyze Data
             <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
           </v-btn>
         </DatasetTitle>

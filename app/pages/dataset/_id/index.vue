@@ -3,8 +3,14 @@
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
       <DatasetTitle>
-        <v-btn :disabled="!hasValidStudyArea" :to="visualizeLocation" nuxt>
-          Go to Visualize
+        <v-btn
+          :disabled="!hasValidStudyArea"
+          :to="visualizeLocation"
+          nuxt
+          color="success"
+          depressed
+        >
+          Visualize Data
           <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
         </v-btn>
       </DatasetTitle>
@@ -75,9 +81,7 @@ const fillTemplate = require("es6-dynamic-template");
 })
 class DatasetDetail extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
-
   dialog = false;
-  instructions = false;
   confirmGeometry = false;
 
   get isLoading() {
@@ -116,7 +120,6 @@ class DatasetDetail extends Vue {
     const variableId = this.$route.params.variable;
     initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
     this.confirmGeometry = this.hasValidStudyArea;
-    this.$api().dataset.clearTimeSeries();
   }
 
   head() {
