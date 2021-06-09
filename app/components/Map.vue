@@ -18,38 +18,6 @@
           <span>Selected Area</span>
         </v-tooltip>
         <v-spacer></v-spacer>
-        <!-- export geojson -->
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              icon
-              v-on="on"
-              @click="exportSelectedGeometry"
-            >
-              <a id="exportSelectedGeometry">
-                <v-icon color="secondary">fas fa-download</v-icon>
-              </a>
-            </v-btn>
-          </template>
-          <span>Download study area as a GeoJSON file</span>
-        </v-tooltip>
-        <!-- upload geojson -->
-        <input
-          id="loadGeoJsonFile"
-          type="file"
-          accept=".geojson"
-          style="display: none"
-          @change="loadGeoJson"
-        />
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn v-bind="attrs" icon v-on="on" @click="selectGeoJsonFile">
-              <v-icon color="secondary">fas fa-upload</v-icon>
-            </v-btn>
-          </template>
-          <span>Upload a GeoJSON file</span>
-        </v-tooltip>
         <!-- set opacity -->
         <v-text-field
           v-if="isVisualize"
@@ -66,6 +34,47 @@
           @click:append-outer="increaseOpacity"
           @click:prepend="decreaseOpacity"
         />
+        <v-spacer></v-spacer>
+        <!-- upload geojson -->
+        <input
+          id="loadGeoJsonFile"
+          type="file"
+          accept=".geojson"
+          style="display: none"
+          @change="loadGeoJson"
+        />
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              small
+              color="success"
+              v-bind="attrs"
+              v-on="on"
+              @click="selectGeoJsonFile"
+            >
+              <v-icon>upload</v-icon>
+            </v-btn>
+          </template>
+          <span>Upload a GeoJSON file</span>
+        </v-tooltip>
+        <!-- export geojson -->
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              small
+              color="error"
+              v-bind="attrs"
+              class="mx-2"
+              v-on="on"
+              @click="exportSelectedGeometry"
+            >
+              <a id="exportSelectedGeometry">
+                <v-icon>download</v-icon>
+              </a>
+            </v-btn>
+          </template>
+          <span>Download study area as a GeoJSON file</span>
+        </v-tooltip>
       </v-row>
     </v-toolbar>
     <!-- map -->
