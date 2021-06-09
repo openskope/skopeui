@@ -34,7 +34,11 @@
         sm="12"
         align-self="stretch"
       >
-        <TimeSeriesPlot :year-selected="yearSelected" @yearSelected="setYear" />
+        <TimeSeriesPlot
+          :traces="traces"
+          :year-selected="yearSelected"
+          @yearSelected="setYear"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -91,6 +95,10 @@ class Visualize extends Vue {
       name: "dataset-id-analyze-variable",
       params: { id, variable },
     };
+  }
+
+  get traces() {
+    return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
   }
 
   created() {

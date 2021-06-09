@@ -4,7 +4,7 @@
       <!-- dataset title -->
       <v-col lg="12" md="12" sm="12" class="mb-3">
         <DatasetTitle :select-variable="true">
-          <v-btn color="success" depressed>
+          <v-btn color="success" depressed @click="exportData">
             Download
             <v-icon class="ml-2" small>download</v-icon>
           </v-btn>
@@ -18,9 +18,10 @@
         align-self="stretch"
       >
         <TimeSeriesPlot
+          ref="plot"
           :show-step-controls="false"
           :show-area="true"
-          :display-transformed-time-series="true"
+          :traces="traces"
           @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>
@@ -288,6 +289,10 @@ import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
 import { toISODate } from "@/store/stats";
 import _ from "lodash";
+import JSZip from "jszip";
+import streamSaver from "streamsaver";
+import { WritableStream } from "web-streams-polyfill/ponyfill";
+streamSaver.WritableStream = WritableStream;
 
 @Component({
   layout: "BaseDataset",
@@ -474,6 +479,18 @@ class Analyze extends Vue {
     return this.transformOption === "none" && this.smoothingOption === "none";
   }
 
+  get traces() {
+    const transformedTimeSeries = this.$api().analysis.timeseries.map((ts) => ({
+      ...ts,
+      type: "scatter",
+    }));
+    if (transformedTimeSeries.length > 0) {
+      return transformedTimeSeries;
+    } else {
+      return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
+    }
+  }
+
   created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
@@ -508,6 +525,54 @@ class Analyze extends Vue {
     this.smoothingOption = "none";
     this.transformOption = "none";
     this.$api().analysis.clearResponse();
+  }
+
+  // plotly plot, data, summary stats
+  async exportData() {
+    const summaryStatistics = this.summaryStatistics.map((summary) =>
+      _.mapValues(summary, (s) => {
+        const f = parseFloat(s);
+        return _.isNaN(f) ? s : f;
+      })
+    );
+    const timeseries = this.traces;
+    const plot = await fetch(await this.$refs.plot.getTimeSeriesPlotImage());
+    const geoJson = this.studyAreaGeometry;
+
+    const zip = new JSZip();
+    zip.file("summaryStatistics.json", JSON.stringify(summaryStatistics));
+    zip.file("timeseries.json", JSON.stringify(timeseries));
+    zip.file("plot.svg", await plot.blob());
+    zip.file("studyarea.geojson", JSON.stringify(geoJson));
+
+    const content = await zip.generateAsync({ type: "blob" });
+    const fileStream = streamSaver.createWriteStream(
+      `${this.metadata.id}.zip`,
+      {
+        size: content.size, // Makes the percentage visible in the download
+      }
+    );
+
+    const readableStream = content.stream();
+
+    // more optimized pipe version
+    // (Safari may have pipeTo but it's useless without the WritableStream)
+    if (window.WritableStream && readableStream.pipeTo) {
+      return readableStream
+        .pipeTo(fileStream)
+        .then(() => console.log("done writing"));
+    }
+    // Write (pipe) manually
+    window.writer = fileStream.getWriter();
+
+    const reader = readableStream.getReader();
+    const pump = () =>
+      reader
+        .read()
+        .then((res) =>
+          res.done ? writer.close() : writer.write(res.value).then(pump)
+        );
+    pump();
   }
 
   async updateTimeSeries() {

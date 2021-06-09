@@ -29,7 +29,7 @@
     "file-saver": "^2.0.5",
     "global": "^4.4.0",
     "json2csv": "^5.0.5",
-    "jszip": "^3.2.2",
+    "jszip": "^3.6.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
     "lodash": "^4.17.20",
@@ -42,6 +42,7 @@
     "plotly.js": "^1.58.4",
     "query-string": "^7.0.0",
     "store": "^2.0.12",
+    "streamsaver": "^2.0.5",
     "vue": "^2.6.12",
     "vue-class-component": "^7.2.6",
     "vue-plotly": "^1.1.0",
@@ -52,7 +53,8 @@
     "vue2-leaflet": "^2.6.0",
     "vuex": "^3.6.2",
     "vuex-class": "^0.3.2",
-    "vuex-module-decorators": "^1.0.1"
+    "vuex-module-decorators": "^1.0.1",
+    "web-streams-polyfill": "^3.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

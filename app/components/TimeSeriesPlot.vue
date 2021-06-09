@@ -195,8 +195,11 @@ class TimeSeriesPlot extends Vue {
   @Prop({ default: false })
   showArea;
 
-  @Prop({ default: false })
-  displayTransformedTimeSeries;
+  @Prop({})
+  traces;
+
+  @Prop({})
+  transformedTimeSeries;
 
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
@@ -244,18 +247,6 @@ class TimeSeriesPlot extends Vue {
 
   get selectedAreaInSquareKm() {
     return this.$api().dataset.selectedAreaInSquareKm;
-  }
-
-  get timeseries() {
-    return { ...this.$api().dataset.filteredTimeSeries, type: "scatter" };
-  }
-
-  get transformedTimeSeries() {
-    const transformedTimeSeries = this.$api().analysis.timeseries.map((ts) => ({
-      ...ts,
-      type: "scatter",
-    }));
-    return transformedTimeSeries;
   }
 
   get variableName() {
@@ -328,7 +319,7 @@ class TimeSeriesPlot extends Vue {
     if (!_.isNull(this.yearSelected)) {
       x = [this.yearSelected, this.yearSelected];
       // a bounds single pass function would be more efficient
-      y = [_.min(this.timeseries.y), _.max(this.timeseries.y)];
+      y = [_.min(this.traces[0].y), _.max(this.traces[0].y)];
     }
     return { x, y, type: "scatter" };
   }
@@ -338,7 +329,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get hasTimeSeries() {
-    return this.timeseries.x.length > 0;
+    return this.traces[0].x.length > 0;
   }
 
   /**
@@ -347,19 +338,9 @@ class TimeSeriesPlot extends Vue {
    * otherwise returns the dataset store's time series
    */
   get timeSeriesData() {
-    if (
-      this.displayTransformedTimeSeries &&
-      this.transformedTimeSeries.length > 0
-    ) {
-      return this.transformedTimeSeries;
-    }
-    // if we are in the analysis page but there's no analysis time series data,
-    // display time series from the dataset store
-    const timeSeriesData = [this.timeseries];
-    if (this.yearSelectedSeries.x.length > 0) {
-      timeSeriesData.push(this.yearSelectedSeries);
-    }
-    return timeSeriesData;
+    return this.yearSelected
+      ? this.traces.concat([this.yearSelectedSeries])
+      : this.traces;
   }
 
   get totalCellArea() {
@@ -371,7 +352,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get timeseriesRequestData() {
-    return this.$api().dataset.timeseriesRequestData;
+    return this.$api().dataset.timeSeriesRequestData;
   }
 
   async mounted() {
@@ -488,6 +469,10 @@ class TimeSeriesPlot extends Vue {
         }
       }, this.animationSpeed);
     }
+  }
+
+  getTimeSeriesPlotImage() {
+    return this.$refs.plot.toImage({ format: "svg", height: 600, width: 1200 });
   }
 
   @Watch("timeSeriesData")
