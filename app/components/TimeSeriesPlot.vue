@@ -3,7 +3,41 @@
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
-        <v-row align="baseline" justify="space-between">
+        <v-row align="baseline" align-content="space-between">
+          <!-- area -->
+          <v-col v-if="showArea" cols="auto">
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <h3
+                  v-bind="attrs"
+                  class="font-weight-light text-center pa-2"
+                  style="background-color: #e4e7ef"
+                  v-on="on"
+                >
+                  {{ selectedAreaInSquareKm }} km<sup>2</sup>
+                </h3>
+              </template>
+              <span>Selected area in square kilometers</span>
+            </v-tooltip>
+          </v-col>
+          <v-col v-if="showArea" cols="auto">
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <h3
+                  v-bind="attrs"
+                  class="font-weight-light text-center pa-2"
+                  style="background-color: #e4e7ef"
+                  v-on="on"
+                >
+                  {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }}
+                  cells)
+                </h3>
+              </template>
+              <span>Total cell area used in this timeseries calculation</span>
+            </v-tooltip>
+          </v-col>
+          <v-spacer v-if="showArea"></v-spacer>
+          <!-- temporal range input -->
           <!-- lower temporal range input -->
           <v-col md="2">
             <!-- temporal range -->
@@ -20,7 +54,7 @@
             </v-text-field>
           </v-col>
           <!-- upper temporal range input -->
-          <v-col md="3">
+          <v-col md="2">
             <v-text-field
               v-model="formTemporalRange[1]"
               class="mx-2"
@@ -31,6 +65,7 @@
               type="number"
               @keydown.enter="setTemporalRange"
             >
+              <template #append-outer></template>
             </v-text-field>
           </v-col>
           <!-- time steps -->
@@ -41,7 +76,8 @@
             </h3>
           </v-col>
           <!-- step controls -->
-          <v-col v-if="showStepControls" md="5">
+          <v-spacer v-if="showStepControls"></v-spacer>
+          <v-col v-if="showStepControls" cols="auto">
             <v-tooltip bottom>
               <template #activator="{ attrs, on }">
                 <v-btn
@@ -107,29 +143,7 @@
               <span>Go to the last year of the defined temporal range</span>
             </v-tooltip>
           </v-col>
-          <!-- area -->
-          <v-col v-if="showArea" md="1">
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <h3 v-bind="attrs" class="font-weight-light" v-on="on">
-                  {{ selectedAreaInSquareKm }} km<sup>2</sup>
-                </h3>
-              </template>
-              <span>Selected area in square kilometers</span>
-            </v-tooltip>
-          </v-col>
-          <v-divider v-if="showArea" vertical class="py-5"></v-divider>
-          <v-col v-if="showArea" md="2">
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <h3 v-bind="attrs" class="font-weight-light" v-on="on">
-                  {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }}
-                  cells)
-                </h3>
-              </template>
-              <span>Total cell area used in this timeseries calculation</span>
-            </v-tooltip>
-          </v-col>
+          <v-spacer v-if="showArea"></v-spacer>
           <v-col v-if="showArea" md="1">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">

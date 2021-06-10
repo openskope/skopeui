@@ -11,7 +11,12 @@
         <!-- selected area -->
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
-            <h3 class="title" v-bind="attrs" v-on="on">
+            <h3
+              class="font-weight-light text-center pa-2"
+              style="background-color: #e4e7ef"
+              v-bind="attrs"
+              v-on="on"
+            >
               {{ selectedArea }} km<sup>2</sup>
             </h3>
           </template>
