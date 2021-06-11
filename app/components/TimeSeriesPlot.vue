@@ -3,9 +3,9 @@
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
-        <v-row align="baseline" align-content="space-between">
+        <v-row align="baseline" justify="space-between">
           <!-- area -->
-          <v-col v-if="showArea" cols="auto">
+          <v-col v-if="showArea" cols="auto" class="d-flex">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <h3
@@ -19,8 +19,7 @@
               </template>
               <span>Selected area in square kilometers</span>
             </v-tooltip>
-          </v-col>
-          <v-col v-if="showArea" cols="auto">
+            <v-divider vertical class="mx-2"></v-divider>
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <h3
@@ -36,10 +35,9 @@
               <span>Total cell area used in this timeseries calculation</span>
             </v-tooltip>
           </v-col>
-          <v-spacer v-if="showArea"></v-spacer>
           <!-- temporal range input -->
           <!-- lower temporal range input -->
-          <v-col md="2">
+          <v-col md="8" class="d-flex flex-row">
             <!-- temporal range -->
             <v-text-field
               v-model="formTemporalRange[0]"
@@ -48,14 +46,11 @@
               :max="maxYear - 1"
               type="number"
               :rules="[validateMinYear]"
-              @keydown.enter="setTemporalRange"
               hint="Press enter to update time series plot"
+              @keydown.enter="setTemporalRange"
             >
               <template #append-outer>to</template>
             </v-text-field>
-          </v-col>
-          <!-- upper temporal range input -->
-          <v-col md="2">
             <v-text-field
               v-model="formTemporalRange[1]"
               class="mx-2"
@@ -64,21 +59,16 @@
               :max="maxYear"
               :rules="[validateMaxYear]"
               type="number"
-              @keydown.enter="setTemporalRange"
               hint="Press enter to update time series plot"
+              @keydown.enter="setTemporalRange"
             >
-              <template #append-outer></template>
             </v-text-field>
-          </v-col>
-          <!-- time steps -->
-          <v-col md="2">
-            <h3 class="mx-1 font-weight-light">
+            <h3 class="mx-2 font-weight-light">
               ({{ selectedTemporalRange[1] - selectedTemporalRange[0] }} time
               steps)
             </h3>
           </v-col>
           <!-- step controls -->
-          <v-spacer v-if="showStepControls"></v-spacer>
           <v-col v-if="showStepControls" cols="auto">
             <v-tooltip bottom>
               <template #activator="{ attrs, on }">
@@ -145,8 +135,7 @@
               <span>Go to the last year of the defined temporal range</span>
             </v-tooltip>
           </v-col>
-          <v-spacer v-if="showArea"></v-spacer>
-          <v-col v-if="showArea" md="1">
+          <v-col v-if="showArea" cols="auto">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <v-btn
