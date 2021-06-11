@@ -502,7 +502,13 @@ class Analyze extends Vue {
     if (transformedTimeSeries.length > 0) {
       return transformedTimeSeries;
     } else {
-      return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
+      return [
+        {
+          ...this.$api().dataset.filteredTimeSeries,
+          type: "scatter",
+          name: "Original",
+        },
+      ];
     }
   }
 

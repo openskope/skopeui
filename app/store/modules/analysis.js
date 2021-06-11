@@ -44,14 +44,14 @@ class Analysis extends VuexModule {
         extractYear(s.time_range.lte) + 1
       ),
       y: s.values,
-      options: s.options,
+      name: s.options.name,
     }));
   }
 
   get summaryStatistics() {
     return this.timeseries.map((ts) => ({
       ...summarize(ts),
-      series: ts.options.name,
+      series: ts.name,
     }));
   }
 
