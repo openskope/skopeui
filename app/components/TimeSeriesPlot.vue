@@ -37,7 +37,7 @@
           </v-col>
           <!-- temporal range input -->
           <!-- lower temporal range input -->
-          <v-col md="5" class="d-flex flex-row">
+          <v-col md="6" class="d-flex flex-row">
             <!-- temporal range -->
             <v-text-field
               v-model="formTemporalRange[0]"
@@ -46,7 +46,7 @@
               :max="maxYear - 1"
               type="number"
               :rules="[validateMinYear]"
-              hint="Press enter to update time series plot"
+              hint="Press enter to update"
               @keydown.enter="setTemporalRange"
             >
               <template #append-outer>to</template>
@@ -59,7 +59,7 @@
               :max="maxYear"
               :rules="[validateMaxYear]"
               type="number"
-              hint="Press enter to update time series plot"
+              hint="Press enter to update"
               @keydown.enter="setTemporalRange"
             >
             </v-text-field>
@@ -135,7 +135,7 @@
               <span>Go to the last year of the defined temporal range</span>
             </v-tooltip>
           </v-col>
-          <v-col v-if="showArea" cols="auto">
+          <v-col v-if="showArea" cols="auto" class="text-right">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <v-btn
@@ -144,8 +144,9 @@
                   class="mb-4 mx-3"
                   color="accent"
                   v-on="on"
+                  small
                 >
-                  <v-icon class="mr-2">edit_location</v-icon>
+                  <v-icon small>edit</v-icon>
                 </v-btn>
               </template>
               <span>Return to Select Area</span>

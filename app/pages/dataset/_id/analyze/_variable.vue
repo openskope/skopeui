@@ -4,7 +4,7 @@
       <!-- dataset title -->
       <v-col lg="12" md="12" sm="12" class="mb-3">
         <DatasetTitle :select-variable="true">
-          <v-btn color="success" depressed @click="exportData">
+          <v-btn color="secondary" depressed @click="exportData">
             Download
             <v-icon class="ml-2" small>download</v-icon>
           </v-btn>

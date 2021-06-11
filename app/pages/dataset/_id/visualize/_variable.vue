@@ -8,7 +8,7 @@
             :disabled="!hasValidStudyArea"
             :to="analyzeLocation"
             nuxt
-            color="success"
+            color="accent"
             depressed
           >
             Analyze Data

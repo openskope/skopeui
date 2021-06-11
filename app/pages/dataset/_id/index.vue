@@ -7,7 +7,7 @@
           :disabled="!hasValidStudyArea"
           :to="visualizeLocation"
           nuxt
-          color="success"
+          color="accent"
           depressed
         >
           Visualize Data

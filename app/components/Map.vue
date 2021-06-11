@@ -52,7 +52,9 @@
           <template #activator="{ on, attrs }">
             <v-btn
               small
-              color="success"
+              color="secondary"
+              outlined
+              depressed
               v-bind="attrs"
               v-on="on"
               @click="selectGeoJsonFile"
@@ -67,7 +69,8 @@
           <template #activator="{ on, attrs }">
             <v-btn
               small
-              color="error"
+              color="secondary"
+              depressed
               v-bind="attrs"
               class="mx-2"
               v-on="on"
