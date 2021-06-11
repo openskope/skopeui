@@ -55,6 +55,7 @@ module.exports = {
     { src: "~/plugins/nuxt-leaflet.js", ssr: false },
     { src: "~/plugins/axios.js", ssr: false },
     { src: "~/plugins/store.js", ssr: true },
+    { src: "~/plugins/stream.js", mode: "client" },
   ],
 
   /*

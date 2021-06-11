@@ -294,9 +294,6 @@ import { initializeDataset, retrieveAnalysis } from "@/store/actions";
 import { toISODate } from "@/store/stats";
 import _ from "lodash";
 import JSZip from "jszip";
-import streamSaver from "streamsaver";
-import { WritableStream } from "web-streams-polyfill/ponyfill";
-streamSaver.WritableStream = WritableStream;
 
 @Component({
   layout: "BaseDataset",
@@ -517,9 +514,7 @@ class Analyze extends Vue {
     const variableId = this.$route.params.variable;
     const api = this.$api();
     initializeDataset(this.$warehouse, api, datasetId, variableId);
-    if (!_.isEqual(api.analysis.cachedAnalysisId, { datasetId, variableId })) {
-      api.analysis.clearResponse();
-    }
+    api.analysis.clearResponse();
   }
 
   get transformFunction() {
@@ -567,7 +562,7 @@ class Analyze extends Vue {
     zip.file("studyarea.geojson", JSON.stringify(geoJson));
 
     const content = await zip.generateAsync({ type: "blob" });
-    const fileStream = streamSaver.createWriteStream(
+    const fileStream = this.$stream.createWriteStream(
       `${this.metadata.id}.zip`,
       {
         size: content.size, // Makes the percentage visible in the download
@@ -575,7 +570,6 @@ class Analyze extends Vue {
     );
 
     const readableStream = content.stream();
-
     // more optimized pipe version
     // (Safari may have pipeTo but it's useless without the WritableStream)
     if (window.WritableStream && readableStream.pipeTo) {
