@@ -37,7 +37,7 @@
           </v-col>
           <!-- temporal range input -->
           <!-- lower temporal range input -->
-          <v-col md="8" class="d-flex flex-row">
+          <v-col md="5" class="d-flex flex-row">
             <!-- temporal range -->
             <v-text-field
               v-model="formTemporalRange[0]"
