@@ -262,7 +262,7 @@
             >
             </v-text-field>
           </template>
-          <v-row align="space-between">
+          <v-row align-content="space-between">
             <v-col>
               <v-btn block @click="clearTransformedTimeSeries"> Clear </v-btn>
             </v-col>
