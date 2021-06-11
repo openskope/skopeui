@@ -49,6 +49,7 @@
               type="number"
               :rules="[validateMinYear]"
               @keydown.enter="setTemporalRange"
+              hint="Press enter to update time series plot"
             >
               <template #append-outer>to</template>
             </v-text-field>
@@ -64,6 +65,7 @@
               :rules="[validateMaxYear]"
               type="number"
               @keydown.enter="setTemporalRange"
+              hint="Press enter to update time series plot"
             >
               <template #append-outer></template>
             </v-text-field>
