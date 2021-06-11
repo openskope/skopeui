@@ -212,6 +212,10 @@
                   Displays Z-score transformed values relative to a fixed
                   interval selected by the user.
                 </span>
+                <span v-if="transformOption === 'zscoreSelected'">
+                  Displays Z-score transformed values using the selected
+                  interval
+                </span>
                 <span v-else-if="transformOption === 'zscoreMoving'">
                   Displays Z-score transformed values relative to a moving
                   window of a size (n time steps) selected by the user.
@@ -381,8 +385,15 @@ class Analyze extends Vue {
     zscoreFixed: function (analyzeVue) {
       return {
         type: "ZScoreFixedInterval",
-        start: analyzeVue.timeRange.lb.year,
-        end: analyzeVue.timeRange.ub.year,
+        time_range: {
+          gte: toISODate(analyzeVue.timeRange.lb.year),
+          lte: toISODate(analyzeVue.timeRange.ub.year),
+        },
+      };
+    },
+    zscoreSelected: function (analyzeVue) {
+      return {
+        type: "ZScoreFixedInterval",
       };
     },
     zscoreMoving: function (analyzeVue) {
@@ -403,8 +414,12 @@ class Analyze extends Vue {
       id: "none",
     },
     {
-      label: "Z-Score wrt selected temporal interval",
+      label: "Z-Score wrt fixed interval",
       id: "zscoreFixed",
+    },
+    {
+      label: "Z-Score wrt selected interval",
+      id: "zscoreSelected",
     },
     {
       label: "Z-Score wrt moving interval (Z recalculated on moving basis)",
