@@ -1,17 +1,23 @@
 <template>
   <v-app-bar extended extension-height="25" color="primary" app>
-    <v-app-bar-nav-icon
-      plain
-      color="white"
-      @click="toggleDrawer(!drawer)"
-    ></v-app-bar-nav-icon>
-    <v-toolbar-title class="mr-10">
-      <nuxt-link class="skope-title" to="/">skope</nuxt-link>
-    </v-toolbar-title>
-    <v-spacer></v-spacer>
-    <Navigation class="mt-2 flex-grow-1" />
-    <v-spacer></v-spacer>
-    <Links></Links>
+    <v-row align="end" align-content="space-between">
+      <v-col class="d-flex ma-0 pa-0">
+        <v-app-bar-nav-icon
+          plain
+          color="white"
+          @click="toggleDrawer(!drawer)"
+        ></v-app-bar-nav-icon>
+        <v-toolbar-title class="mx-2">
+          <nuxt-link class="skope-title" to="/">skope</nuxt-link>
+        </v-toolbar-title>
+      </v-col>
+      <v-col md="8">
+        <Navigation />
+      </v-col>
+      <v-col md="2">
+        <Links></Links>
+      </v-col>
+    </v-row>
   </v-app-bar>
 </template>
 <script>

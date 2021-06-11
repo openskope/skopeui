@@ -1,6 +1,6 @@
 <template>
-  <v-row align="end" justify="end">
-    <v-col class="text-center">
+  <v-row>
+    <v-col class="text-right">
       <v-menu v-if="isMdAndDown" offset-y>
         <template #activator="{ on, attrs }">
           <v-btn

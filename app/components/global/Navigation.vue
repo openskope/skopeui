@@ -1,6 +1,6 @@
 <template>
-  <v-row align="center" justify="center" align-content="space-around">
-    <v-col class="text-center">
+  <v-row class="text-center">
+    <v-col>
       <!-- FIXME: steps are tightly coupled to this nav component; consider moving steps from store/app into this component -->
       <!-- minimized nav menu -->
       <v-menu v-if="isMdAndDown" offset-y>
