@@ -570,24 +570,18 @@ class Analyze extends Vue {
     );
 
     const readableStream = content.stream();
-    // more optimized pipe version
-    // (Safari may have pipeTo but it's useless without the WritableStream)
-    if (window.WritableStream && readableStream.pipeTo) {
-      return readableStream
-        .pipeTo(fileStream)
-        .then(() => console.log("done writing"));
-    }
-    // Write (pipe) manually
-    window.writer = fileStream.getWriter();
+    const writer = fileStream.getWriter();
 
     const reader = readableStream.getReader();
-    const pump = () =>
-      reader
-        .read()
-        .then((res) =>
-          res.done ? writer.close() : writer.write(res.value).then(pump)
-        );
-    pump();
+    while (true) {
+      const res = await reader.read();
+      if (res.done) {
+        await writer.close();
+        break;
+      } else {
+        await writer.write(res.value);
+      }
+    }
   }
 
   async updateTimeSeries() {
