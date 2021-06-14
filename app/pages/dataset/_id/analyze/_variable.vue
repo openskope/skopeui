@@ -552,13 +552,16 @@ class Analyze extends Vue {
       })
     );
     const timeseries = this.traces;
-    const plot = await fetch(await this.$refs.plot.getTimeSeriesPlotImage());
+    const plots = await this.$refs.plot.getTimeSeriesPlotImage();
+    const png = await fetch(plots.png);
+    const svg = await fetch(plots.svg);
     const geoJson = this.studyAreaGeometry;
 
     const zip = new JSZip();
     zip.file("summaryStatistics.json", JSON.stringify(summaryStatistics));
     zip.file("timeseries.json", JSON.stringify(timeseries));
-    zip.file("plot.svg", await plot.blob());
+    zip.file("plot.png", await png.blob());
+    zip.file("plot.svg", await svg.blob());
     zip.file("studyarea.geojson", JSON.stringify(geoJson));
 
     const content = await zip.generateAsync({ type: "blob" });

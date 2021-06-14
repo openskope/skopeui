@@ -476,8 +476,21 @@ class TimeSeriesPlot extends Vue {
     }
   }
 
-  getTimeSeriesPlotImage() {
-    return this.$refs.plot.toImage({ format: "svg", height: 600, width: 1200 });
+  async getTimeSeriesPlotImage() {
+    const svg = await this.$refs.plot.toImage({
+      format: "svg",
+      height: 600,
+      width: 1200,
+    });
+    const png = await this.$refs.plot.toImage({
+      format: "png",
+      height: 600,
+      width: 1200,
+    });
+    return {
+      png,
+      svg,
+    };
   }
 
   @Watch("timeSeriesData")
