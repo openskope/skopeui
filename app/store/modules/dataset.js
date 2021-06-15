@@ -153,7 +153,7 @@ class Dataset extends VuexModule {
    * Returns the last value with data in the defined temporal range
    */
   get temporalRangeMax() {
-    return this.temporalRangeMax[1] - 1;
+    return this.temporalRange[1] - 1;
   }
 
   get isTimeSeriesLoading() {
