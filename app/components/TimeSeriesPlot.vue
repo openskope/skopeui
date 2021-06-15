@@ -289,9 +289,13 @@ class TimeSeriesPlot extends Vue {
       showlegend: false,
       xaxis: {
         title: xaxisTitle,
+        linewidth: 3,
+        gridwidth: 3,
       },
       yaxis: {
         title: this.variable.name,
+        linewidth: 3,
+        gridwidth: 3,
       },
       font: {
         size: 16,
@@ -325,7 +329,7 @@ class TimeSeriesPlot extends Vue {
       // a bounds single pass function would be more efficient
       y = [_.min(this.traces[0].y), _.max(this.traces[0].y)];
     }
-    return { x, y, type: "scatter" };
+    return { x, y, type: "scatter", mode: "lines+markers" };
   }
 
   get canHandleTimeSeriesRequest() {
