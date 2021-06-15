@@ -66,6 +66,24 @@
           <span>{{ links[1].label }}</span>
         </v-tooltip>
       </template>
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            plain
+            color="white"
+            large
+            icon
+            v-bind="attrs"
+            class="mt-3 mx-3 button"
+            target="_blank"
+            :href="links[2].url"
+            v-on="on"
+          >
+            <v-icon large color="white">{{ links[2].icon }}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ links[2].label }}</span>
+      </v-tooltip>
     </v-col>
   </v-row>
 </template>
@@ -89,6 +107,12 @@ class Links extends Vue {
       label: "Email us",
       icon: "email",
       url: "https://www.comses.net/about/contact/",
+    },
+    {
+      id: "docs",
+      label: "Documentation",
+      icon: "fas fa-question-circle",
+      url: "https://www.openskope.org/skope-users-guide ",
     },
   ];
 
