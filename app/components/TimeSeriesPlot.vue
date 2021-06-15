@@ -298,6 +298,9 @@ class TimeSeriesPlot extends Vue {
       yaxis: {
         title: this.variableName,
       },
+      font: {
+        size: 16,
+      },
     };
   }
 
