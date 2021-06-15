@@ -66,8 +66,8 @@
             >
             </v-text-field>
             <h3 class="mx-2 font-weight-light">
-              ({{ selectedTemporalRange[1] - selectedTemporalRange[0] }} time
-              steps)
+              ({{ selectedTemporalRange[1] - selectedTemporalRange[0] + 1 }}
+              time steps)
             </h3>
           </v-col>
           <!-- step controls -->
