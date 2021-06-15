@@ -91,7 +91,7 @@
         <l-map
           ref="layerMap"
           :min-zoom="3"
-          :zoom="4"
+          :zoom="metadata.region.zoom"
           :center="metadata.region.center"
           @ready="mapReady"
         >
@@ -109,7 +109,7 @@
           <l-rectangle
             :bounds="metadata.region.extents"
             :style="metadata.region.style"
-            :fill-opacity="defaultRegionOpacity"
+            :fill-opacity="defaultDatasetOpacity"
           />
           <l-control-layers
             v-if="showMapControls"
@@ -174,7 +174,10 @@ class Map extends Vue {
     (v) =>
       (v && v >= 0 && v <= 100) || "Please enter an opacity between 0 and 100.",
   ];
-  defaultRegionOpacity = 0.05;
+  // default opacity for the dataset bounding box
+  defaultDatasetOpacity = 0.05;
+  // default padding for fitBounds
+  defaultBoundsPadding = [3, 3];
   defaultCircleToPolygonEdges = 32;
   legendImage = null;
   legendControl = null;
@@ -269,6 +272,9 @@ class Map extends Vue {
     this.addDrawToolbar(map);
     initializeDatasetGeoJson(this.$warehouse, this.$api());
     this.registerToolbarHandlers(map);
+    map.fitBounds(this.metadata.region.extents, {
+      padding: this.defaultBoundsPadding,
+    });
     this.geoJsonUnwatcher = this.$watch(
       "geoJson",
       function (geoJson) {
@@ -355,9 +361,9 @@ class Map extends Vue {
       this.drawnItems.addLayer(l);
     });
     this.enableEditOnly(map);
-    let padding = [5, 5];
+    let padding = this.defaultBoundsPadding;
     if (geoJsonLayer instanceof L.Marker) {
-      padding = [30, 30];
+      padding = padding.map((x) => x * 15);
     }
     map.fitBounds(this.drawnItems.getBounds(), { padding });
   }

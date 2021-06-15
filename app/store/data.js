@@ -9,7 +9,7 @@ export const ALL_DATA = [
     status: "Published",
     revised: "2017-08-03",
     region: {
-      zoom: 2,
+      zoom: 3,
       center: [36.5, -95.75],
       resolution: ".5 degree (~55.5km)",
       name: "Continental USA",
@@ -72,7 +72,7 @@ export const ALL_DATA = [
     status: "Published",
     revised: "2009-06-14",
     region: {
-      zoom: 2,
+      zoom: 3,
       center: [37.5, -95],
       resolution: "250m",
       name: "Continental USA",
@@ -127,7 +127,7 @@ export const ALL_DATA = [
     revised: "2016-04-01",
 
     region: {
-      zoom: 4,
+      zoom: 5,
       center: [37, -108.5],
       resolution: "800m",
       name: "Southwestern USA",
