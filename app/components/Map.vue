@@ -62,7 +62,7 @@
               <v-icon>upload</v-icon>
             </v-btn>
           </template>
-          <span>Upload a GeoJSON file</span>
+          <span>Upload study area from GeoJSON</span>
         </v-tooltip>
         <!-- export geojson -->
         <v-tooltip bottom>
@@ -81,7 +81,7 @@
               </a>
             </v-btn>
           </template>
-          <span>Download study area as a GeoJSON file</span>
+          <span>Download selected area as GeoJSON</span>
         </v-tooltip>
       </v-row>
     </v-toolbar>
