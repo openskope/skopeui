@@ -37,7 +37,7 @@
           </v-col>
           <!-- temporal range input -->
           <!-- lower temporal range input -->
-          <v-col md="6" class="d-flex flex-row">
+          <v-col class="d-flex flex-row">
             <!-- temporal range -->
             <v-text-field
               v-model="formTemporalRange[0]"
@@ -48,6 +48,7 @@
               :rules="[validateMinYear]"
               hint="Press enter to update"
               @keydown.enter="setTemporalRange"
+              @blur="setTemporalRange"
             >
               <template #append-outer>to</template>
             </v-text-field>
@@ -61,6 +62,7 @@
               type="number"
               hint="Press enter to update"
               @keydown.enter="setTemporalRange"
+              @blur="setTemporalRange"
             >
             </v-text-field>
             <h3 class="mx-2 font-weight-light">
@@ -69,7 +71,7 @@
             </h3>
           </v-col>
           <!-- step controls -->
-          <v-col v-if="showStepControls" cols="auto">
+          <v-col v-if="showStepControls" class="text-right">
             <v-tooltip bottom>
               <template #activator="{ attrs, on }">
                 <v-btn
@@ -143,8 +145,8 @@
                   :to="selectAreaLocation"
                   class="mb-4 mx-3"
                   color="accent"
-                  v-on="on"
                   small
+                  v-on="on"
                 >
                   <v-icon small>edit</v-icon>
                 </v-btn>
@@ -210,9 +212,7 @@ class TimeSeriesPlot extends Vue {
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
-
   formTemporalRange = [1, 2017];
-
   timeSeriesUnwatcher = null;
 
   get selectAreaLocation() {
