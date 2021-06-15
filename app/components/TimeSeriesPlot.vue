@@ -255,11 +255,6 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.selectedAreaInSquareKm;
   }
 
-  get variableName() {
-    const api = this.$api();
-    return _.isEmpty(api.dataset.layer) ? "" : api.dataset.layer.name;
-  }
-
   get geometry() {
     return this.$api().dataset.geoJson?.geometry ?? null;
   }
@@ -285,7 +280,7 @@ class TimeSeriesPlot extends Vue {
       this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
-        l: 60,
+        l: 80,
         r: 10,
         b: 60,
         t: 10,
@@ -296,7 +291,7 @@ class TimeSeriesPlot extends Vue {
         title: xaxisTitle,
       },
       yaxis: {
-        title: this.variableName,
+        title: this.variable.name,
       },
       font: {
         size: 16,
