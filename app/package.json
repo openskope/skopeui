@@ -15,7 +15,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@hapi/bell": "^12.1.1",
     "@hapi/hapi": "^20.0.3",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/hapi": "^3.0.0",
@@ -24,6 +23,7 @@
     "@nuxtjs/vuetify": "^1.11.3",
     "@turf/turf": "^6.3.0",
     "circle-to-polygon": "^2.0.2",
+    "consola": "^2.15.3",
     "cross-env": "^7.0.3",
     "es6-dynamic-template": "2.0.0",
     "file-saver": "^2.0.5",
@@ -63,7 +63,6 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/vue-fontawesome": "^2.0.2",
-    "@nuxt/babel-preset-app": "^2.15.4",
     "@nuxtjs/eslint-config": "^6.0.0",
     "@nuxtjs/google-analytics": "^2.4.0",
     "@types/file-saver": "^2.0.1",
@@ -88,7 +87,7 @@
     "jest": "^26.6.3",
     "nodemon": "^2.0.6",
     "prettier": "2.2.1",
-    "vue-jest": "^3.0.7",
+    "vue-jest": "^4.0.1",
     "webpack": "^4.46.0",
     "webpack-cli": "^4.6.0"
   }
