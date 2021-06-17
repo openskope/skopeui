@@ -51,3 +51,19 @@ export class BaseMapProvider {
     return find(LEAFLET_PROVIDERS, { name });
   }
 }
+
+export function buildReadme(requestData) {
+  return `
+# SKOPE data for ${requestData.dataset_id} / ${requestData.variable_id}
+
+Time range: ${requestData.time_range.gte} - ${requestData.time_range.lte} CE
+Location: ${JSON.stringify(requestData.selected_area, null, 2)}
+
+## Files
+- \`request.json\` - a shareable file that contains all of the input parameters needed to recreate the analysis. You should be able to re-upload this file to SKOPE to generate the same analysis if the version is compatible
+- \`summaryStatistics.json\` - the mean, median, and standard deviation of the time series data
+- \`plot.png\` and \`plog.svg\` - plotly generated graph
+- \`timeseries.json\` and \`timeseries.csv\` - the timeseries data in JSON and long form CSV formats
+- \`studyarea.geojson\` - a GeoJSON file for the defined study area
+`;
+}

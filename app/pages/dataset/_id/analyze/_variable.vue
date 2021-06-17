@@ -293,6 +293,7 @@ import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
 import { toISODate } from "@/store/stats";
+import { buildReadme } from "@/store/modules/constants";
 import _ from "lodash";
 import JSZip from "jszip";
 
@@ -626,6 +627,14 @@ class Analyze extends Vue {
     );
   }
 
+  tracesPivotLonger() {
+    const tr = stthis.traces.map((t) => ({
+      name: _.repeat(t.name, t.x.length),
+      x: t.x,
+      y: t.y,
+    }));
+  }
+
   // plotly plot, data, summary stats
   async exportData() {
     const summaryStatistics = this.summaryStatistics.map((summary) =>
@@ -639,40 +648,24 @@ class Analyze extends Vue {
     const png = await fetch(plots.png);
     const svg = await fetch(plots.svg);
     const geoJson = this.studyAreaGeometry;
+    const request = this.$api().analysis.request;
 
     const zip = new JSZip();
+    zip.file("request.json", JSON.stringify(request));
     zip.file("summaryStatistics.json", JSON.stringify(summaryStatistics));
     zip.file("timeseries.json", JSON.stringify(timeseries));
     zip.file("plot.png", await png.blob());
     zip.file("plot.svg", await svg.blob());
     zip.file("studyarea.geojson", JSON.stringify(geoJson));
+    zip.file("README.md", buildReadme(request));
 
     const content = await zip.generateAsync({ type: "blob" });
-    const fileStream = this.$stream.createWriteStream(
-      `${this.metadata.id}.zip`,
-      {
-        size: content.size, // Makes the percentage visible in the download
-      }
-    );
-
-    const readableStream = content.stream();
-    const writer = fileStream.getWriter();
-
-    const reader = readableStream.getReader();
-    while (true) {
-      const res = await reader.read();
-      if (res.done) {
-        await writer.close();
-        break;
-      } else {
-        await writer.write(res.value);
-      }
-    }
+    this.$download.saveAs(content, `${request.dataset_id}.zip`);
   }
 
   async updateTimeSeries() {
     const datasetApi = this.$api().dataset;
-    console.log("submitting to web service", datasetApi.defaultApiRequestData);
+    console.log("submitting to web service");
     const query = {
       ...datasetApi.defaultApiRequestData,
       // override zonal statistic, transform, time range, and requested series
