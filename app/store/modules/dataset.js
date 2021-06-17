@@ -1,4 +1,3 @@
-import _ from "lodash";
 import area from "@turf/area";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { ALL_DATA } from "@/store/data";
@@ -164,26 +163,30 @@ class Dataset extends VuexModule {
     return this.timeSeriesRequestStatus.status === SUCCESS;
   }
 
+  get defaultApiRequestData() {
+    return {
+      dataset_id: this.metadata.id,
+      variable_id: this.variable.id,
+      selected_area: this.geoJson?.geometry,
+      time_range: {
+        gte: toISODate(this.minYear),
+        lte: toISODate(this.maxYear),
+      },
+      zonal_statistic: "mean",
+      transform: { type: "NoTransform" },
+      requested_series: [
+        {
+          name: "Original",
+          smoother: { type: "NoSmoother" },
+        },
+      ],
+    };
+  }
+
   get timeseriesRequestData() {
     // returns timeseries v2 request data
     if (this.canHandleTimeSeriesRequest) {
-      return {
-        dataset_id: this.metadata.id,
-        variable_id: this.variable.id,
-        selected_area: this.geoJson.geometry,
-        time_range: {
-          gte: toISODate(this.minYear),
-          lte: toISODate(this.maxYear),
-        },
-        zonal_statistic: "mean",
-        transform: { type: "NoTransform" },
-        requested_series: [
-          {
-            name: "Original",
-            smoother: { type: "NoSmoother" },
-          },
-        ],
-      };
+      return this.defaultApiRequestData;
     } else {
       return {
         dataset_id: null,

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Module, VuexModule, Mutation } from "vuex-module-decorators";
-import { filterTimeSeries, summarize, extractYear } from "@/store/stats";
+import { summarize, extractYear } from "@/store/stats";
 
 // expected response structure from the time series endpoint
 const EMPTY_RESPONSE = {
@@ -55,22 +55,6 @@ class Analysis extends VuexModule {
     }));
   }
 
-  /*
-  get filteredTimeSeries() {
-    return this.timeseries.map((ts) =>
-      filterTimeSeries({
-        timeseries: ts,
-        // NOTE: accessing the dataset store's temporalRange
-        // property uses dot syntax instead of "dataset/temporalRange"
-        temporalRange: this.context.rootState.dataset.temporalRange,
-        // getters must be accessed by string key to avoid
-        // eager evaluation errors "Cannot read property 'minYear' of undefined"
-        minYear: this.context.rootGetters["dataset/minYear"],
-      })
-    );
-  }
-  */
-
   @Mutation
   setWaitingForResponse(value) {
     this.waitingForResponse = value;
@@ -82,7 +66,14 @@ class Analysis extends VuexModule {
   }
 
   @Mutation
-  clearResponse() {
+  setRequestData(requestData) {
+    this.request = requestData;
+  }
+
+  @Mutation
+  setDefaultRequestData(defaultRequestData) {
+    // clears the response as well
+    this.request = defaultRequestData;
     this.response = EMPTY_RESPONSE;
   }
 

@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid class="fill-height align-start">
+  <v-container class="fill-height align-start" fluid>
     <v-row no-gutters>
       <!-- dataset title -->
-      <v-col lg="12" md="12" sm="12" class="mb-3">
+      <v-col class="mb-3" lg="12" md="12" sm="12">
         <DatasetTitle :select-variable="true">
           <v-btn color="secondary" depressed @click="exportData">
             Download
@@ -12,26 +12,26 @@
       </v-col>
       <!-- time series -->
       <v-col
+        align-self="stretch"
         class="d-flex timeseries-flex px-2 mb-3"
         lg="8"
         md="12"
-        align-self="stretch"
       >
         <TimeSeriesPlot
           ref="plot"
-          :show-step-controls="false"
           :show-area="true"
+          :show-step-controls="false"
           :traces="traces"
           @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>
       <!-- analysis form -->
       <v-col
+        align-self="stretch"
         class="d-flex timeseries-flex px-2"
         lg="4"
         md="12"
         style="background-color: #f4f7ff"
-        align-self="stretch"
       >
         <v-form style="width: 100%">
           <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
@@ -39,11 +39,11 @@
             Statistics for the Temporal Interval
           </h1>
           <v-data-table
-            :disable-pagination="true"
             :disable-filtering="true"
+            :disable-pagination="true"
             :disable-sort="true"
-            :hide-default-footer="true"
             :headers="statisticsHeaders"
+            :hide-default-footer="true"
             :items="summaryStatistics"
             class="my-3"
           >
@@ -54,11 +54,11 @@
             v-if="isStudyAreaPolygon"
             v-model="showZonalStatisticHint"
             border="top"
-            colored-border
-            icon="fas fa-question-circle"
             color="secondary"
-            elevation="2"
+            colored-border
             dismissible
+            elevation="2"
+            icon="fas fa-question-circle"
           >
             At each time step, the value used for the selected area is the
             summary value (mean by default) of all selected pixels.
@@ -67,20 +67,20 @@
             v-if="isStudyAreaPolygon"
             v-model="zonalStatistic"
             :items="zonalStatisticOptions"
-            label="For each time step, summarize selected area as"
+            color="primary"
             item-text="label"
             item-value="id"
-            color="primary"
+            label="For each time step, summarize selected area as"
           >
             <template #prepend>
               <v-tooltip v-model="showZonalStatisticHint" left>
                 <template #activator="{ attrs }">
                   <v-btn
-                    icon
                     v-bind="attrs"
+                    icon
                     @click="showZonalStatisticHint = !showZonalStatisticHint"
                   >
-                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                    <v-icon color="secondary"> fas fa-question-circle</v-icon>
                   </v-btn>
                 </template>
                 <span
@@ -120,22 +120,22 @@
           <!--          </v-alert>-->
           <v-select
             v-model="smoothingOption"
-            label="Smoothing options"
-            item-color="secondary"
-            color="primary"
             :items="smoothingOptions"
+            color="primary"
+            item-color="secondary"
             item-text="label"
             item-value="id"
+            label="Smoothing options"
           >
             <template #prepend>
               <v-tooltip v-model="showSmoothingHint" left>
                 <template #activator="{ attrs }">
                   <v-btn
-                    icon
                     v-bind="attrs"
+                    icon
                     @click="showSmoothingHint = !showSmoothingHint"
                   >
-                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                    <v-icon color="secondary"> fas fa-question-circle</v-icon>
                   </v-btn>
                 </template>
                 <span v-if="smoothingOption == 'centeredAverage'">
@@ -188,24 +188,24 @@
           <!--          </v-alert>-->
           <v-select
             v-model="transformOption"
-            label="Transformation options"
-            item-color="secondary"
+            :items="transformOptions"
+            class="my-4"
             color="secondary"
             dense
-            :items="transformOptions"
+            item-color="secondary"
             item-text="label"
             item-value="id"
-            class="my-4"
+            label="Transformation options"
           >
             <template #prepend>
               <v-tooltip v-model="showTransformHint" left>
                 <template #activator="{ attrs }">
                   <v-btn
-                    icon
                     v-bind="attrs"
+                    icon
                     @click="showTransformHint = !showTransformHint"
                   >
-                    <v-icon color="secondary"> fas fa-question-circle </v-icon>
+                    <v-icon color="secondary"> fas fa-question-circle</v-icon>
                   </v-btn>
                 </template>
                 <span v-if="transformOption === 'zscoreFixed'">
@@ -230,23 +230,23 @@
             <v-row
               v-if="transformOption === 'zscoreFixed'"
               align="baseline"
+              class="mt-5"
               justify="start"
               no-gutters
-              class="mt-5"
             >
               <v-col class="mr-5">
                 <v-text-field
                   v-model="timeRange.lb.year"
-                  label="Year (Lower Bound)"
                   dense
+                  label="Year (Lower Bound)"
                   type="number"
                 ></v-text-field>
               </v-col>
               <v-col>
                 <v-text-field
                   v-model="timeRange.ub.year"
-                  label="Year (Upper Bound)"
                   dense
+                  label="Year (Upper Bound)"
                   type="number"
                 ></v-text-field>
               </v-col>
@@ -254,27 +254,28 @@
             <v-text-field
               v-if="transformOption === 'zscoreMoving'"
               v-model="zScoreMovingIntervalTimeSteps"
+              dense
               label="Transform window"
               outlined
-              dense
-              type="number"
               suffix="time steps"
+              type="number"
             >
             </v-text-field>
           </template>
           <v-row align-content="space-between">
             <v-col>
-              <v-btn block @click="clearTransformedTimeSeries"> Clear </v-btn>
+              <v-btn block @click="clearTransformedTimeSeries"> Clear</v-btn>
             </v-col>
             <v-col>
               <v-btn
+                :disabled="isUpdateDisabled"
                 block
                 class="font-weight-bold"
                 color="accent"
-                :disabled="isUpdateDisabled"
                 @click="updateTimeSeries"
-                >Update <v-icon small class="mx-2">update</v-icon></v-btn
-              >
+                >Update
+                <v-icon class="mx-2" small>update</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -340,66 +341,49 @@ class Analyze extends Vue {
     {
       label: "None (time steps individually plotted)",
       id: "none",
+      type: "NoSmoother",
+      toRequestData: function (analyzeVue) {
+        return {
+          type: this.type,
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        analyzeVue.smoothingOption = this.id;
+      },
     },
     {
       label: "Centered Running Average (+/- window width)",
       id: "centeredAverage",
+      type: "MovingAverageSmoother",
+      toRequestData: function (analyzeVue) {
+        return {
+          type: this.type,
+          method: "centered",
+          width: analyzeVue.smoothingTimeStep,
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        analyzeVue.smoothingOption = this.id;
+        analyzeVue.smoothingTimeStep = requestData.width;
+      },
     },
     {
       label: "Trailing Running Average (- window width)",
       id: "trailingAverage",
+      type: "MovingAverageSmoother",
+      toRequestData: function (analyzeVue) {
+        return {
+          type: this.type,
+          method: "trailing",
+          width: analyzeVue.smoothingTimeStep,
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        analyzeVue.smoothingOption = this.id;
+        analyzeVue.smoothingTimeStep = requestData.width;
+      },
     },
   ];
-
-  smoothingConverter = {
-    none: function (analyzeVue) {
-      return {
-        type: "NoSmoother",
-      };
-    },
-    centeredAverage: function (analyzeVue) {
-      return {
-        type: "MovingAverageSmoother",
-        method: "centered",
-        width: analyzeVue.smoothingTimeStep,
-      };
-    },
-    trailingAverage: function (analyzeVue) {
-      return {
-        type: "MovingAverageSmoother",
-        method: "trailing",
-        width: analyzeVue.smoothingTimeStep,
-      };
-    },
-  };
-
-  transformConverter = {
-    none: function (analyzeVue) {
-      return {
-        type: "NoTransform",
-      };
-    },
-    zscoreFixed: function (analyzeVue) {
-      return {
-        type: "ZScoreFixedInterval",
-        time_range: {
-          gte: toISODate(analyzeVue.timeRange.lb.year),
-          lte: toISODate(analyzeVue.timeRange.ub.year),
-        },
-      };
-    },
-    zscoreSelected: function (analyzeVue) {
-      return {
-        type: "ZScoreFixedInterval",
-      };
-    },
-    zscoreMoving: function (analyzeVue) {
-      return {
-        type: "ZScoreMovingInterval",
-        width: analyzeVue.zScoreMovingIntervalTimeSteps,
-      };
-    },
-  };
 
   smoothingTimeStep = 9;
 
@@ -409,18 +393,69 @@ class Analyze extends Vue {
     {
       label: "None: Modeled values displayed",
       id: "none",
-    },
-    {
-      label: "Z-Score wrt fixed interval",
-      id: "zscoreFixed",
+      type: "NoTransform",
+      toRequestData: function () {
+        return {
+          type: this.type,
+        };
+      },
+      fromRequestData: function (analyzeVue) {
+        analyzeVue.transformOption = this.id;
+      },
     },
     {
       label: "Z-Score wrt selected interval",
       id: "zscoreSelected",
+      type: "ZScoreFixedInterval",
+      toRequestData: function () {
+        return {
+          type: this.type,
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        if (requestData.time_range) {
+          // FIXME: refactor this, we have two mappings for ZScoreFixedIntervals and
+          // the only way to disambiguate them at the moment is testing for requestData.time_range
+          analyzeVue.transformOption = "zscoreFixed";
+          analyzeVue.time_range = requestData.time_range;
+        } else {
+          analyzeVue.transformOption = this.id;
+        }
+      },
+    },
+    {
+      label: "Z-Score wrt fixed interval",
+      id: "zscoreFixed",
+      type: "ZScoreFixedInterval",
+      toRequestData: function (analyzeVue) {
+        return {
+          type: this.type,
+          time_range: {
+            gte: toISODate(analyzeVue.timeRange.lb.year),
+            lte: toISODate(analyzeVue.timeRange.ub.year),
+          },
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        // FIXME: this does not get called due to multiple mappings for ZScoreFixedIntervals
+        analyzeVue.transformOption = this.id;
+        analyzeVue.time_range = requestData.time_range;
+      },
     },
     {
       label: "Z-Score wrt moving interval (Z recalculated on moving basis)",
       id: "zscoreMoving",
+      type: "ZScoreMovingInterval",
+      toRequestData: function (analyzeVue) {
+        return {
+          type: this.type,
+          width: analyzeVue.zScoreMovingIntervalTimeSteps,
+        };
+      },
+      fromRequestData: function (analyzeVue, requestData) {
+        analyzeVue.transformOption = this.id;
+        analyzeVue.zScoreMovingIntervalTimeSteps = requestData.width;
+      },
     },
   ];
 
@@ -509,20 +544,16 @@ class Analyze extends Vue {
     }
   }
 
-  created() {
-    const datasetId = this.$route.params.id;
-    const variableId = this.$route.params.variable;
-    const api = this.$api();
-    initializeDataset(this.$warehouse, api, datasetId, variableId);
-    api.analysis.clearResponse();
-  }
-
-  get transformFunction() {
-    return this.transformConverter[this.transformOption](this);
+  get transformRequestData() {
+    return this.transformOptions
+      .find((x) => x.id === this.transformOption)
+      .toRequestData(this);
   }
 
   get smoothingFunction() {
-    return this.smoothingConverter[this.smoothingOption](this);
+    return this.smoothingOptions
+      .find((x) => x.id === this.smoothingOption)
+      .toRequestData(this);
   }
 
   get requestedSeries() {
@@ -536,11 +567,63 @@ class Analyze extends Vue {
     return series;
   }
 
+  created() {
+    const datasetId = this.$route.params.id;
+    const variableId = this.$route.params.variable;
+    const api = this.$api();
+    initializeDataset(this.$warehouse, api, datasetId, variableId);
+    // load data from api.analysis.request if any
+    // assume that it would be cleared by any actions that invalidate the request data
+    // (change in dataset, study area, or variable)
+    this.loadRequestData();
+  }
+
+  loadRequestData() {
+    const requestData = this.$api().analysis.request;
+    console.log("store request data", requestData);
+    if (_.isEmpty(requestData)) {
+      this.$api().analysis.setDefaultRequestData(
+        this.$api().dataset.defaultApiRequestData
+      );
+    } else {
+      this.zonalStatistic = requestData.zonal_statistic;
+      this.loadSmoothingOption(requestData.requested_series);
+      this.loadTransformOption(requestData.transform);
+    }
+  }
+
+  loadTransformOption(transform) {
+    const option = this.transformOptions.find((x) => x.type === transform.type);
+    if (option) {
+      option.fromRequestData(this, transform);
+    }
+  }
+
+  loadSmoothingOption(requestedSeries) {
+    // locate the transformed time series in requested_series from the request data
+    const transformedSeries = requestedSeries.find(
+      (x) => x.name === "Transformed"
+    );
+    if (transformedSeries) {
+      // if the transformed time series exists, find the smoothing option that corresponds to the
+      // transformed time series smoother option and invoke fromRequestData to set the appropriate
+      // properties on this analyze vue component (if needed, e.g., smoothing time steps)
+      const smoother = transformedSeries.smoother;
+      const option = this.smoothingOptions.find(
+        (x) => x.type === smoother.type
+      );
+      option.fromRequestData(this, smoother);
+    }
+  }
+
   clearTransformedTimeSeries() {
+    this.transformOptions[0].generator();
     // clear smoothingOption and transformOption
     this.smoothingOption = "none";
     this.transformOption = "none";
-    this.$api().analysis.clearResponse();
+    this.$api().analysis.setDefaultRequestData(
+      this.$api().dataset.defaultApiRequestData
+    );
   }
 
   // plotly plot, data, summary stats
@@ -588,14 +671,13 @@ class Analyze extends Vue {
   }
 
   async updateTimeSeries() {
-    console.log("submitting to web service");
     const datasetApi = this.$api().dataset;
+    console.log("submitting to web service", datasetApi.defaultApiRequestData);
     const query = {
-      dataset_id: datasetApi.metadata.id,
-      variable_id: datasetApi.variable.id,
-      selected_area: this.studyAreaGeometry,
+      ...datasetApi.defaultApiRequestData,
+      // override zonal statistic, transform, time range, and requested series
       zonal_statistic: this.zonalStatistic,
-      transform: this.transformFunction,
+      transform: this.transformRequestData,
       time_range: {
         gte: toISODate(this.temporalRange[0]),
         lte: toISODate(this.temporalRange[1]),
@@ -605,6 +687,7 @@ class Analyze extends Vue {
     await retrieveAnalysis(this.$api(), query);
   }
 }
+
 export default Analyze;
 </script>
 
@@ -612,11 +695,13 @@ export default Analyze;
 .timeseries-flex {
   height: calc(85vh - 96px);
 }
+
 @media all and (max-width: 960px) {
   .timeseries-flex {
     height: 400px;
   }
 }
+
 @media all and (max-width: 600px) {
   .timeseries-flex {
     height: 350px;
