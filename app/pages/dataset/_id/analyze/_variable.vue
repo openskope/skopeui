@@ -296,6 +296,7 @@ import { toISODate } from "@/store/stats";
 import { buildReadme } from "@/store/modules/constants";
 import _ from "lodash";
 import JSZip from "jszip";
+import Papa from "papaparse";
 
 @Component({
   layout: "BaseDataset",
@@ -627,12 +628,16 @@ class Analyze extends Vue {
     );
   }
 
-  tracesPivotLonger() {
-    const tr = stthis.traces.map((t) => ({
-      name: _.repeat(t.name, t.x.length),
-      x: t.x,
-      y: t.y,
-    }));
+  tracesAsArrayOfObjects() {
+    // convert timeseries data in plotly form into long form for a CSV
+    // returns an array of objects [{name: .., x: ..., y: ... }]
+    const rows = [];
+    for (const trace of this.traces) {
+      for (let row = 0; row < trace.x.length; row++) {
+        rows.push({ name: trace.name, x: trace.x[row], y: trace.y[row] });
+      }
+    }
+    return rows;
   }
 
   // plotly plot, data, summary stats
@@ -654,6 +659,8 @@ class Analyze extends Vue {
     zip.file("request.json", JSON.stringify(request));
     zip.file("summaryStatistics.json", JSON.stringify(summaryStatistics));
     zip.file("timeseries.json", JSON.stringify(timeseries));
+    console.log(Papa.unparse);
+    zip.file("timeseries.csv", Papa.unparse(this.tracesAsArrayOfObjects()));
     zip.file("plot.png", await png.blob());
     zip.file("plot.svg", await svg.blob());
     zip.file("studyarea.geojson", JSON.stringify(geoJson));
