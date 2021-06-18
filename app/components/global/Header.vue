@@ -11,10 +11,10 @@
           <nuxt-link class="skope-title" to="/">skope</nuxt-link>
         </v-toolbar-title>
       </v-col>
-      <v-col md="8">
+      <v-col md="7">
         <Navigation />
       </v-col>
-      <v-col md="2">
+      <v-col md="3">
         <Links></Links>
       </v-col>
     </v-row>
