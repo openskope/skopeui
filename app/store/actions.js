@@ -83,7 +83,6 @@ export const loadTimeSeries = _.debounce(async function (api) {
 
 const updateAnalysis = _.debounce(async function (api, data) {
   try {
-    api.analysis.setRequestData(data);
     api.analysis.setResponse(
       await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data)
     );

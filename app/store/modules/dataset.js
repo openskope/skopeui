@@ -258,6 +258,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTemporalRange(temporalRange) {
+    console.log("setting temporal range on dataset: ", temporalRange);
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
   }
 

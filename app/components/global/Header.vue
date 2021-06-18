@@ -35,7 +35,6 @@ import { Prop, Watch } from "vue-property-decorator";
 })
 class Header extends Vue {
   // --------- GETTERS ---------
-
   get drawer() {
     return this.$api().app.isVisible;
   }

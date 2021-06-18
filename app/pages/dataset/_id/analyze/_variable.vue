@@ -22,6 +22,7 @@
           :show-area="true"
           :show-step-controls="false"
           :traces="traces"
+          :key="analysisRequestData"
           @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>
@@ -292,7 +293,7 @@ import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
-import { toISODate } from "@/store/stats";
+import { toISODate, extractYear } from "@/store/stats";
 import { buildReadme } from "@/store/modules/constants";
 import _ from "lodash";
 import JSZip from "jszip";
@@ -312,6 +313,7 @@ class Analyze extends Vue {
   showSmoothingHint = false;
   showTransformHint = false;
   showZonalStatisticHint = false;
+  requestDataWatcher = null;
 
   zonalStatistic = "mean";
 
@@ -569,29 +571,58 @@ class Analyze extends Vue {
     return series;
   }
 
-  created() {
+  async created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
     const api = this.$api();
     initializeDataset(this.$warehouse, api, datasetId, variableId);
+  }
+
+  async mounted() {
+    await this.loadRequestData();
+    this.requestDataWatcher = this.$watch(
+      "analysisRequestData",
+      async function (data) {
+        console.log("analysis request data has changed: ", data);
+        await this.initializeFormData(data);
+        await retrieveAnalysis(this.$api(), data);
+      },
+      { immediate: true }
+    );
+  }
+
+  destroyed() {
+    if (this.requestDataWatcher) {
+      this.requestDataWatcher();
+    }
+  }
+
+  get analysisRequestData() {
+    return this.$api().analysis.request;
+  }
+
+  async loadRequestData() {
+    // FIXME: form state should be loaded from the store instead of initialized here, move this to an action instead
+
     // load data from api.analysis.request if any
     // assume that it would be cleared by any actions that invalidate the request data
     // (change in dataset, study area, or variable)
-    this.loadRequestData();
+    const api = this.$api();
+    const requestData = api.analysis.request;
+    console.log("request data in the store: ", requestData);
+    if (_.isEmpty(requestData)) {
+      api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
+    }
   }
 
-  loadRequestData() {
-    const requestData = this.$api().analysis.request;
-    console.log("store request data", requestData);
-    if (_.isEmpty(requestData)) {
-      this.$api().analysis.setDefaultRequestData(
-        this.$api().dataset.defaultApiRequestData
-      );
-    } else {
-      this.zonalStatistic = requestData.zonal_statistic;
-      this.loadSmoothingOption(requestData.requested_series);
-      this.loadTransformOption(requestData.transform);
-    }
+  async initializeFormData(requestData) {
+    this.zonalStatistic = requestData.zonal_statistic;
+    this.loadSmoothingOption(requestData.requested_series);
+    this.loadTransformOption(requestData.transform);
+    this.$api().dataset.setTemporalRange([
+      extractYear(requestData.time_range.gte),
+      extractYear(requestData.time_range.lte),
+    ]);
   }
 
   loadTransformOption(transform) {
@@ -659,7 +690,6 @@ class Analyze extends Vue {
     zip.file("request.json", JSON.stringify(request));
     zip.file("summaryStatistics.json", JSON.stringify(summaryStatistics));
     zip.file("timeseries.json", JSON.stringify(timeseries));
-    console.log(Papa.unparse);
     zip.file("timeseries.csv", Papa.unparse(this.tracesAsArrayOfObjects()));
     zip.file("plot.png", await png.blob());
     zip.file("plot.svg", await svg.blob());
@@ -671,10 +701,11 @@ class Analyze extends Vue {
   }
 
   async updateTimeSeries() {
-    const datasetApi = this.$api().dataset;
+    // grab form inputs and set them on the store
+    const api = this.$api();
     console.log("submitting to web service");
-    const query = {
-      ...datasetApi.defaultApiRequestData,
+    const requestData = {
+      ...api.dataset.defaultApiRequestData,
       // override zonal statistic, transform, time range, and requested series
       zonal_statistic: this.zonalStatistic,
       transform: this.transformRequestData,
@@ -684,7 +715,7 @@ class Analyze extends Vue {
       },
       requested_series: this.requestedSeries,
     };
-    await retrieveAnalysis(this.$api(), query);
+    api.analysis.setRequestData(requestData);
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <v-app light>
     <Header />
-    <v-main class="flex-grow-1">
+    <v-main>
       <Messages />
       <nuxt />
     </v-main>

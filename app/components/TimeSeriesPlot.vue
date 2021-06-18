@@ -212,6 +212,7 @@ class TimeSeriesPlot extends Vue {
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
+  // FIXME: clean up https://github.com/openskope/skopeui/issues/106
   formTemporalRange = [1, 2017];
   timeSeriesUnwatcher = null;
 
