@@ -1,6 +1,86 @@
 // FIXME: create a clear schema with types for Datasets
 export const ALL_DATA = [
   {
+    id: "paleocar",
+    title: "PaleoCAR: SW USA Paleoclimatic Reconstruction",
+    originator: "Bocinsky, R.K.; Kohler, T.A.",
+    references:
+      "Bocinsky, R. Kyle, and Timothy A. Kohler. 2014. A 2,000-year reconstruction of the rain-fed maize agricultural niche in the US Southwest. Nature Communications 5:5618. [doi: 10.1038/ncomms6618](https://doi.org/10.1038/ncomms6618).",
+    contactInformation:
+      "> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513",
+    uncertainty:
+      "The uncertainty for GDD and Precipitation that is available on the graph and in the graph data download csv represents the predicted residual error sum of squares (PRESS) statistic for each cell's reconstruction. [add uncertainty for maize farming niche]",
+    methodSummary:
+      "For each pixel, for each year, the model selects the tree ring chronologies (within a 10-degree buffer of the Four Corners states; from the National Tree Ring Database) that best predict PRISM data for that location and uses linear regression to estimate the paleoenvironmental variable for that date and location.\n\nBecause the Maize Farming Niche is based on direct precipitation, maize farming may be possible if other water sources are utilized (e.g. spring or rivers) or if precipitation is concentrated on fields through water diversion structures (e.g. ak chin fields) or geologically (e.g. sand dune fields).",
+    description:
+      "High spatial resolution (30 arc-second, ~800 m) Southwestern United States tree-ring reconstructions of " +
+      " May-Sept growing degree days (GDD), net water-year precipitation (previous Oct–Sept), and the direct precipitation maize " +
+      " farming niche (>= 1800 growing Season F GDD & >= 300 mm water-year precipitation).",
+    sourceUrl: "https://www.ncdc.noaa.gov/paleo/study/19783",
+    type: "dataset",
+    status: "Published",
+    revised: "2016-04-01",
+
+    region: {
+      zoom: 5,
+      center: [37, -108.5],
+      resolution: "800m",
+      name: "Southwestern USA",
+      style: { color: "red", weight: 1 },
+      extents: [
+        [43, -115],
+        [31, -102],
+      ],
+    },
+    atemporal: false,
+    timespan: {
+      resolution: "month",
+      resolutionLabel: "monthly",
+      period: {
+        timeZero: 1,
+        gte: "0001",
+        lte: "2000",
+        suffix: "CE",
+      },
+    },
+    variables: [
+      {
+        id: "growing_degree_days",
+        class: "Temperature",
+        name: "Growing Degree Days (F, May-Sept)",
+        wmsLayer: "SKOPE:paleocar_gdd_${year}-01-01",
+        min: 0.0,
+        max: 10.0,
+        visible: false,
+        styles: "default,raster",
+        description: "F deg.; Growing Season: May–Sept.",
+      },
+      {
+        id: "water_year_precipitation",
+        class: "Precipitation",
+        name: "Water-year (Oct-Sept) Precipitation (mm)",
+        wmsLayer: "SKOPE:paleocar_ppt_${year}-01-01",
+        min: 0.0,
+        max: 10.0,
+        visible: false,
+        styles: "default,raster",
+        description: "(prev. Oct through listed year Sept)",
+      },
+      {
+        id: "maize_farming_niche",
+        class: "Crop Niche",
+        name: "Maize Farming Niche (Direct Precip.)",
+        wmsLayer: "SKOPE:niche_${year}",
+        min: 0.0,
+        max: 1.0,
+        visible: false,
+        styles: "default",
+        description:
+          "In niche if Growing Season F GDD (as above) >= 1800 & Water Year Precip. (as above) >= 300 mm; otherwise out of niche.",
+      },
+    ],
+  },
+  {
     id: "lbda",
     title: "Living Blended Drought Atlas (LBDA) Version 2",
     description:
@@ -102,86 +182,6 @@ export const ALL_DATA = [
         min: 0.0,
         max: 4500.0,
         styles: "default",
-      },
-    ],
-  },
-  {
-    id: "paleocar",
-    title: "PaleoCAR: SW USA Paleoclimatic Reconstruction",
-    originator: "Bocinsky, R.K.; Kohler, T.A.",
-    references:
-      "Bocinsky, R. Kyle, and Timothy A. Kohler. 2014. A 2,000-year reconstruction of the rain-fed maize agricultural niche in the US Southwest. Nature Communications 5:5618. [doi: 10.1038/ncomms6618](https://doi.org/10.1038/ncomms6618).",
-    contactInformation:
-      "> DOC/NOAA/NESDIS/NCEI\n> National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce\n> 325 Broadway, E/NE31\n> Boulder, CO 80305-3328\n> USA\n> https://www.ncdc.noaa.gov/data-access/paleoclimatology-data\n> email: paleo@noaa.gov\n> phone: 303-497-6280\n> fax: 303-497-6513",
-    uncertainty:
-      "The uncertainty for GDD and Precipitation that is available on the graph and in the graph data download csv represents the predicted residual error sum of squares (PRESS) statistic for each cell's reconstruction. [add uncertainty for maize farming niche]",
-    methodSummary:
-      "For each pixel, for each year, the model selects the tree ring chronologies (within a 10-degree buffer of the Four Corners states; from the National Tree Ring Database) that best predict PRISM data for that location and uses linear regression to estimate the paleoenvironmental variable for that date and location.\n\nBecause the Maize Farming Niche is based on direct precipitation, maize farming may be possible if other water sources are utilized (e.g. spring or rivers) or if precipitation is concentrated on fields through water diversion structures (e.g. ak chin fields) or geologically (e.g. sand dune fields).",
-    description:
-      "High spatial resolution (30 arc-second, ~800 m) Southwestern United States tree-ring reconstructions of " +
-      " May-Sept growing degree days (GDD), net water-year precipitation (previous Oct–Sept), and the direct precipitation maize " +
-      " farming niche (>= 1800 growing Season F GDD & >= 300 mm water-year precipitation).",
-    sourceUrl: "https://www.ncdc.noaa.gov/paleo/study/19783",
-    type: "dataset",
-    status: "Published",
-    revised: "2016-04-01",
-
-    region: {
-      zoom: 5,
-      center: [37, -108.5],
-      resolution: "800m",
-      name: "Southwestern USA",
-      style: { color: "red", weight: 1 },
-      extents: [
-        [43, -115],
-        [31, -102],
-      ],
-    },
-    atemporal: false,
-    timespan: {
-      resolution: "month",
-      resolutionLabel: "monthly",
-      period: {
-        timeZero: 1,
-        gte: "0001",
-        lte: "2000",
-        suffix: "CE",
-      },
-    },
-    variables: [
-      {
-        id: "growing_degree_days",
-        class: "Temperature",
-        name: "Growing Degree Days (F, May-Sept)",
-        wmsLayer: "SKOPE:paleocar_gdd_${year}-01-01",
-        min: 0.0,
-        max: 10.0,
-        visible: false,
-        styles: "default,raster",
-        description: "F deg.; Growing Season: May–Sept.",
-      },
-      {
-        id: "water_year_precipitation",
-        class: "Precipitation",
-        name: "Water-year (Oct-Sept) Precipitation (mm)",
-        wmsLayer: "SKOPE:paleocar_ppt_${year}-01-01",
-        min: 0.0,
-        max: 10.0,
-        visible: false,
-        styles: "default,raster",
-        description: "(prev. Oct through listed year Sept)",
-      },
-      {
-        id: "maize_farming_niche",
-        class: "Crop Niche",
-        name: "Maize Farming Niche (Direct Precip.)",
-        wmsLayer: "SKOPE:niche_${year}",
-        min: 0.0,
-        max: 1.0,
-        visible: false,
-        styles: "default",
-        description:
-          "In niche if Growing Season F GDD (as above) >= 1800 & Water Year Precip. (as above) >= 300 mm; otherwise out of niche.",
       },
     ],
   },
