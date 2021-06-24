@@ -41,34 +41,6 @@
                   {{ variable.name }}
                 </v-chip>
               </v-chip-group>
-              <!--              <v-list-->
-              <!--                v-for="(variable, index) in variableClasses"-->
-              <!--                :key="index"-->
-              <!--                class="py-0 my-2"-->
-              <!--              >-->
-              <!--                <v-checkbox-->
-              <!--                  v-model="selectedVariableClasses"-->
-              <!--                  :value="variable.name"-->
-              <!--                  :label="variable.name"-->
-              <!--                  dense-->
-              <!--                  hide-details-->
-              <!--                  class="py-0 my-0"-->
-              <!--                  @change="filterDatasets"-->
-              <!--                >-->
-              <!--                  <template #label>-->
-              <!--                    <v-chip-->
-              <!--                      small-->
-              <!--                      label-->
-              <!--                      class="ma-1 width-50"-->
-              <!--                      color="info"-->
-              <!--                      text-color="black"-->
-              <!--                    >-->
-              <!--                      <v-icon>view_column</v-icon>-->
-              <!--                      {{ variable.name }}-->
-              <!--                    </v-chip>-->
-              <!--                  </template>-->
-              <!--                </v-checkbox>-->
-              <!--              </v-list>-->
             </v-col>
             <!-- start and end date range -->
             <v-col cols="2"><h3 class="headline">Year range</h3></v-col>

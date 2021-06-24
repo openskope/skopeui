@@ -1,7 +1,7 @@
 <template>
   <v-app-bar extended extension-height="25" color="primary" app>
     <v-row align="end" align-content="space-between">
-      <v-col class="d-flex ma-0 pa-0">
+      <v-col class="d-flex ma-0 pa-0" md="2">
         <v-app-bar-nav-icon
           v-if="isMdAndDown"
           color="white"
@@ -12,7 +12,7 @@
           <nuxt-link class="skope-title" to="/">skope</nuxt-link>
         </v-toolbar-title>
       </v-col>
-      <v-col md="7">
+      <v-col lg="7">
         <Navigation />
       </v-col>
       <v-col v-if="!isMdAndDown" md="3" class="text-right">
