@@ -19,10 +19,10 @@
       >
         <TimeSeriesPlot
           ref="plot"
+          :key="analysisRequestData"
           :show-area="true"
           :show-step-controls="false"
           :traces="traces"
-          :key="analysisRequestData"
           @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>

@@ -2,7 +2,6 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 @Module({ stateFactory: true, namespaced: true, name: "app" })
 class App extends VuexModule {
-  isDisabled = 0;
   isVisible = false;
 
   steps = [
@@ -46,30 +45,12 @@ class App extends VuexModule {
   ];
 
   /**
-   * Determine if drawer can be toggled.
-   */
-  @Mutation
-  disableDrawer(step) {
-    if (step == 1) {
-      return (this.isDisabled = 0);
-    } else {
-      return (this.isDisabled = 1);
-    }
-  }
-
-  /**
    * Toggle drawer with options click filter datasets.
-   * @param {*} openDrawer
+   * @param {*} isVisible
    */
   @Mutation
   setDrawer(isVisible) {
     this.isVisible = isVisible;
-  }
-
-  @Action({ commit: "disableDrawer" })
-  canShowDrawer(step) {
-    this.context.commit("disableDrawer", step);
-    return isDisabled;
   }
 
   /**

@@ -1,39 +1,11 @@
 <template>
   <v-row>
-    <v-col class="text-right">
-      <v-menu v-if="isMdAndDown" offset-y>
-        <template #activator="{ on, attrs }">
-          <v-btn
-            plain
-            color="white"
-            large
-            icon
-            v-bind="attrs"
-            class="mt-3 mx-3 button"
-            v-on="on"
-          >
-            <v-icon large color="secondary">fas fa-ellipsis-v</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(link, index) in links"
-            :key="index"
-            link
-            nuxt
-            :href="link.url"
-          >
-            <v-icon>{{ link.icon }}</v-icon>
-            <span class="mx-3">{{ link.label }}</span>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-      <template v-else>
+    <v-col>
+      <template>
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
             <v-btn
               plain
-              color="white"
               large
               icon
               v-bind="attrs"
@@ -48,7 +20,7 @@
                 style="display: none"
                 @change="loadRequestData"
               />
-              <v-icon large color="white">fas fa-file-upload</v-icon>
+              <v-icon large>fas fa-file-upload</v-icon>
             </v-btn>
           </template>
           <span>Load Analysis</span>
@@ -57,7 +29,6 @@
           <template #activator="{ on, attrs }">
             <v-btn
               plain
-              color="white"
               large
               icon
               v-bind="attrs"
@@ -66,7 +37,7 @@
               :href="links[0].url"
               v-on="on"
             >
-              <v-icon large color="white">{{ links[0].icon }}</v-icon>
+              <v-icon large>{{ links[0].icon }}</v-icon>
             </v-btn>
           </template>
           <span>{{ links[0].label }}</span>
@@ -75,7 +46,6 @@
           <template #activator="{ on, attrs }">
             <v-btn
               plain
-              color="white"
               large
               icon
               v-bind="attrs"
@@ -84,7 +54,7 @@
               :href="links[2].url"
               v-on="on"
             >
-              <v-icon large color="white">{{ links[2].icon }}</v-icon>
+              <v-icon large>{{ links[2].icon }}</v-icon>
             </v-btn>
           </template>
           <span>{{ links[2].label }}</span>
@@ -93,7 +63,6 @@
           <template #activator="{ on, attrs }">
             <v-btn
               plain
-              color="white"
               icon
               large
               :href="links[1].url"
@@ -102,7 +71,7 @@
               class="mt-3 mx-3 button"
               v-on="on"
             >
-              <v-icon large color="white">{{ links[1].icon }}</v-icon>
+              <v-icon large>{{ links[1].icon }}</v-icon>
             </v-btn>
           </template>
           <span>{{ links[1].label }}</span>
