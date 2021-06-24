@@ -3,14 +3,42 @@
     <v-col>
       <!-- FIXME: steps are tightly coupled to this nav component; consider moving steps from store/app into this component -->
       <!-- minimized nav menu -->
-      <h1 v-if="isMdAndDown" offset-y style="color: white">
-        <span style="border-bottom: #ee6c4d solid" class="pb-2">
-          <v-icon large color="white" class="mx-2">{{
-            steps[currentStepIndex].icon
-          }}</v-icon>
-          {{ currentStepName }}
-        </span>
-      </h1>
+      <v-menu v-if="isMdAndDown">
+        <template #activator="{ on, attrs }">
+          <v-btn
+            nuxt
+            text
+            large
+            color="black"
+            :class="isActiveStep(0) ? 'active' : 'button'"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>{{ steps[currentStepIndex].icon }}</v-icon>
+            <span class="step mx-2">{{ currentStepName }}</span>
+            <v-icon class="mx-2">fas fa-angle-down</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="(step, index) in steps"
+            :key="index"
+            link
+            nuxt
+            :disabled="isDisabled(step.id)"
+            :class="isDisabled(step.id) ? 'disabled' : ''"
+          >
+            <component
+              :is="isDisabled(step.id) ? 'span' : 'router-link'"
+              :to="locations[index]"
+              class="text-decoration-none"
+            >
+              <v-icon class="mx-3">{{ step.icon }}</v-icon>
+              <span class="step mx-3">{{ step.label }}</span>
+            </component>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <!-- full size nav -->
       <template v-else>
         <v-btn

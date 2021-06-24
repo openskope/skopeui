@@ -1,7 +1,10 @@
 <template>
   <v-navigation-drawer v-model="isVisible" temporary app>
     <v-row>
-      <v-col class="text-center">
+      <v-col cols="12">
+        <Navigation></Navigation>
+      </v-col>
+      <v-col cols="12" class="text-center">
         <Links></Links>
       </v-col>
     </v-row>
