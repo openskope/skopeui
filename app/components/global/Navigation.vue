@@ -154,7 +154,7 @@ export default Navigation;
 @import './assets/style/variables.scss'
 .step
   letter-spacing: .05em
-  font: 1.5em 'Roboto', serif
+  font: 1.75em 'Roboto', serif
   text-transform: capitalize
 
 .button::after
@@ -189,7 +189,4 @@ export default Navigation;
     left: 0
     bottom: 0
     transition: all ease 0.6s
-
-.disabled
-  opacity: 50%
 </style>
