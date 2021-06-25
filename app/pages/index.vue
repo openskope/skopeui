@@ -26,21 +26,14 @@
             </v-col>
             <!-- filter by variable -->
             <v-col cols="6">
-              <h3 class="headline">Filter by variable</h3>
-              <v-chip-group v-model="variableClasses" center-active multiple>
-                <v-chip
-                  v-for="(variable, index) in variableClasses"
-                  :key="index"
-                  :value="variable.name"
-                  multiple
-                  label
-                  @click="selectedVariableClasses.push(variable.name)"
-                  @click:close="selectedVariableClasses.splice(index, 1)"
-                  @change="filterDatasets()"
-                >
-                  {{ variable.name }}
-                </v-chip>
-              </v-chip-group>
+              <v-combobox
+                v-model="selectedVariableClasses"
+                :items="variableClasses"
+                label="Filter by variable"
+                multiple
+                chips
+                @change="filterDatasets"
+              ></v-combobox>
             </v-col>
             <!-- start and end date range -->
             <v-col cols="2"><h3 class="headline">Year range</h3></v-col>
@@ -173,9 +166,7 @@ class LandingPage extends Vue {
     }
     const variableClasses = [];
     for (const variableClass of variableClassSet) {
-      variableClasses.push({
-        name: variableClass,
-      });
+      variableClasses.push(variableClass);
     }
     return variableClasses;
   }
