@@ -80,7 +80,7 @@
             />
           </v-card>
         </template>
-        <v-alert v-if="datasets.length === 0" type="info">
+        <v-alert v-if="datasets.length === 0" type="warning">
           No datasets found, please refine your filter criteria.
         </v-alert>
       </v-col>

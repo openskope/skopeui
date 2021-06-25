@@ -1,26 +1,31 @@
 <template>
   <v-container fluid class="fill-height">
-    <LoadingSpinner v-if="isLoading" />
-    <template v-else>
-      <DatasetTitle>
-        <v-btn
-          :disabled="!hasValidStudyArea"
-          :to="visualizeLocation"
-          nuxt
-          color="accent"
-          depressed
-        >
-          Visualize Data
-          <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
-        </v-btn>
-      </DatasetTitle>
-      <v-row no-gutters style="height: 90%">
-        <!-- map -->
-        <v-col id="map-flex">
-          <Map :display-raster="false" class="mx-auto" />
-        </v-col>
-      </v-row>
-      <v-row>
+    <v-row>
+      <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+      <v-col lg="12" md="12" sm="12" class="mb-3">
+        <DatasetTitle>
+          <v-btn
+            :disabled="!hasValidStudyArea"
+            :to="visualizeLocation"
+            nuxt
+            color="accent"
+            depressed
+          >
+            Visualize Data
+            <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
+          </v-btn>
+        </DatasetTitle>
+      </v-col>
+      <v-col
+        lg="12"
+        md="12"
+        sm="12"
+        class="d-flex map-flex"
+        align-self="stretch"
+      >
+        <Map :display-raster="false" class="mx-auto"></Map>
+      </v-col>
+      <v-col>
         <client-only>
           <v-dialog
             v-model="confirmGeometry"
@@ -51,8 +56,8 @@
             </template>
           </v-dialog>
         </client-only>
-      </v-row>
-    </template>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -146,25 +151,24 @@ class DatasetDetail extends Vue {
 export default DatasetDetail;
 </script>
 <style>
-.leaflet-top.leaflet-right
-  .leaflet-control-layers:nth-child(2)
-  .leaflet-control-layers-toggle {
+.leaflet-top.leaflet-right,
+.leaflet-control-layers:nth-child(2),
+.leaflet-control-layers-toggle {
   background-image: url(/earth.svg);
 }
 
-#exportSelectedGeometry {
-  text-decoration: none;
-  color: inherit;
+.map-flex {
+  height: calc(85vh - 96px);
 }
 
 @media all and (max-width: 960px) {
-  #map-flex {
+  .map-flex {
     height: 400px;
   }
 }
 
 @media all and (max-width: 600px) {
-  #map-flex {
+  .map-flex {
     height: 350px;
   }
 }

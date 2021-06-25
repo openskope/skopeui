@@ -15,7 +15,7 @@
       <v-col v-if="!isMdAndDown" lg="7">
         <Navigation />
       </v-col>
-      <v-col class="text-center" v-else lg="7">
+      <v-col v-else class="text-center" lg="7">
         <h1 offset-y style="color: white">
           <span style="border-bottom: #ee6c4d solid" class="pb-2">
             <v-icon large color="white" class="mx-2">{{
