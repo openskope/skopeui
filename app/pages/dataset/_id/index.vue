@@ -151,12 +151,6 @@ class DatasetDetail extends Vue {
 export default DatasetDetail;
 </script>
 <style>
-.leaflet-top.leaflet-right,
-.leaflet-control-layers:nth-child(2),
-.leaflet-control-layers-toggle {
-  background-image: url(/earth.svg);
-}
-
 .map-flex {
   height: calc(85vh - 96px);
 }
@@ -171,9 +165,5 @@ export default DatasetDetail;
   .map-flex {
     height: 350px;
   }
-}
-
-ul.leaflet-draw-actions.leaflet-draw-actions-bottom li a[title="Save changes"] {
-  display: none;
 }
 </style>
