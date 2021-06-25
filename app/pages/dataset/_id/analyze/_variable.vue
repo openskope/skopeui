@@ -241,6 +241,7 @@
                   dense
                   label="Year (Lower Bound)"
                   type="number"
+                  :rules="[validateMinYear]"
                 ></v-text-field>
               </v-col>
               <v-col>
@@ -249,6 +250,7 @@
                   dense
                   label="Year (Upper Bound)"
                   type="number"
+                  :rules="[validateMaxYear]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -487,6 +489,8 @@ class Analyze extends Vue {
     },
   ];
 
+  // --------- GETTERS ---------
+
   get summaryStatistics() {
     if (this.$api().analysis.summaryStatistics.length === 0) {
       return [this.$api().dataset.summaryStatistics];
@@ -571,6 +575,12 @@ class Analyze extends Vue {
     return series;
   }
 
+  get analysisRequestData() {
+    return this.$api().analysis.request;
+  }
+
+  // --------- LIFECYCLE HOOKS ---------
+
   async created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
@@ -597,9 +607,7 @@ class Analyze extends Vue {
     }
   }
 
-  get analysisRequestData() {
-    return this.$api().analysis.request;
-  }
+  // --------- MEHODS ---------
 
   async loadRequestData() {
     // FIXME: form state should be loaded from the store instead of initialized here, move this to an action instead
@@ -716,6 +724,30 @@ class Analyze extends Vue {
       requested_series: this.requestedSeries,
     };
     api.analysis.setRequestData(requestData);
+  }
+
+  validateMinYear(year) {
+    const minYear = this.temporalRange[0];
+    const maxYear = this.temporalRange[1];
+    if (year < minYear) {
+      return `Please enter a max year > ${minYear}`;
+    }
+    if (year >= maxYear) {
+      return `Please enter a max year <= ${maxYear}`;
+    }
+    return true;
+  }
+
+  validateMaxYear(year) {
+    const minYear = this.temporalRange[0];
+    const maxYear = this.temporalRange[1];
+    if (year <= minYear) {
+      return `Please enter a max year > ${minYear}`;
+    }
+    if (year >= maxYear) {
+      return `Please enter a max year <= ${maxYear}`;
+    }
+    return true;
   }
 }
 
