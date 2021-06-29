@@ -34,14 +34,14 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import Navigation from "@/components/global/Navigation.vue";
 import Links from "@/components/global/Links.vue";
+import Navigation from "@/components/global/Navigation.vue";
 import _ from "lodash";
 
 @Component({
   components: {
-    Navigation,
     Links,
+    Navigation,
   },
 })
 class Header extends Vue {

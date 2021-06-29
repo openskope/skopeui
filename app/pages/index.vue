@@ -85,27 +85,6 @@
         </v-alert>
       </v-col>
     </v-row>
-    <v-dialog v-model="disclaimer" max-width="300">
-      <v-card>
-        <v-card-title class="headline">Terms of Use</v-card-title>
-        <v-card-text>
-          We are not responsible for any errors or their consequences or
-          anything you do with the data.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            depressed
-            outlined
-            color="accent"
-            text
-            @click="disclaimer = false"
-          >
-            Ok
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -128,7 +107,6 @@ class LandingPage extends Vue {
   selectedVariableClasses = [];
   minYear = 1;
   maxYear = this.currentYear;
-  disclaimer = false;
 
   get datasets() {
     return this.$api().datasets.filteredDatasets;
@@ -179,7 +157,6 @@ class LandingPage extends Vue {
     const api = this.$api();
     api.dataset.clearTimeSeries();
     api.dataset.setMetadata(null);
-    this.disclaimer = true;
   }
 
   filterDatasets() {

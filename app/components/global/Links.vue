@@ -1,92 +1,78 @@
 <template>
   <v-row>
     <v-col>
-      <template>
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              plain
-              large
-              icon
-              v-bind="attrs"
-              class="mt-3 mx-3 button"
-              @click="selectLoadRequestDataFile"
-              v-on="on"
-            >
-              <input
-                id="loadRequestDataFile"
-                type="file"
-                accept=".json"
-                style="display: none"
-                @change="loadRequestData"
-              />
-              <v-icon large>fas fa-file-upload</v-icon>
-            </v-btn>
-          </template>
-          <span>Load Analysis</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              plain
-              large
-              icon
-              v-bind="attrs"
-              class="mt-3 mx-3 button"
-              target="_blank"
-              :href="links[0].url"
-              v-on="on"
-            >
-              <v-icon large>{{ links[0].icon }}</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ links[0].label }}</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              plain
-              large
-              icon
-              v-bind="attrs"
-              class="mt-3 mx-3 button"
-              target="_blank"
-              :href="links[2].url"
-              v-on="on"
-            >
-              <v-icon large>{{ links[2].icon }}</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ links[2].label }}</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              plain
-              icon
-              large
-              :href="links[1].url"
-              target="_blank"
-              v-bind="attrs"
-              class="mt-3 mx-3 button"
-              v-on="on"
-            >
-              <v-icon large>{{ links[1].icon }}</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ links[1].label }}</span>
-        </v-tooltip>
-      </template>
+      <TermsOfUse :force-show-terms="showTerms" @input="setTerms" />
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            plain
+            large
+            icon
+            v-bind="attrs"
+            class="mt-3 mx-3 button"
+            @click.stop="displayTermsOfUse"
+            v-on="on"
+          >
+            <v-icon large>fas fa-file-contract</v-icon>
+          </v-btn>
+        </template>
+        <span>Terms of Use</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            plain
+            large
+            icon
+            v-bind="attrs"
+            class="mt-3 mx-3 button"
+            @click="selectLoadRequestDataFile"
+            v-on="on"
+          >
+            <input
+              id="loadRequestDataFile"
+              type="file"
+              accept=".json"
+              style="display: none"
+              @change="loadRequestData"
+            />
+            <v-icon large>fas fa-file-upload</v-icon>
+          </v-btn>
+        </template>
+        <span>Load Analysis</span>
+      </v-tooltip>
+      <v-tooltip v-for="link in links" :key="link.id" bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            plain
+            large
+            icon
+            v-bind="attrs"
+            class="mt-3 mx-3 button"
+            target="_blank"
+            :href="link.url"
+            v-on="on"
+          >
+            <v-icon large>{{ link.icon }}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ link.label }}</span>
+      </v-tooltip>
     </v-col>
   </v-row>
 </template>
-
 <script>
 import Vue from "vue";
-import { Component, Watch } from "nuxt-property-decorator";
+import { Component } from "nuxt-property-decorator";
+import TermsOfUse from "@/components/global/TermsOfUse.vue";
 
-@Component()
+@Component({
+  components: {
+    TermsOfUse,
+  },
+})
 class Links extends Vue {
+  showTerms = false;
   links = [
     {
       id: "github",
@@ -113,6 +99,14 @@ class Links extends Vue {
    */
   get isMdAndDown() {
     return this.$vuetify.breakpoint.mdAndDown;
+  }
+
+  displayTermsOfUse() {
+    this.showTerms = true;
+  }
+
+  setTerms(value) {
+    this.showTerms = value;
   }
 
   /**
