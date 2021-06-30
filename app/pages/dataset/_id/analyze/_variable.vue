@@ -590,12 +590,16 @@ class Analyze extends Vue {
 
   async mounted() {
     await this.loadRequestData();
+    // FIXME: assumes year timesteps
+    const api = this.$api();
+    this.timeRange.lb.year = api.dataset.minYear;
+    this.timeRange.ub.year = api.dataset.maxYear;
     this.requestDataWatcher = this.$watch(
       "analysisRequestData",
       async function (data) {
         console.log("analysis request data has changed: ", data);
         await this.initializeFormData(data);
-        await retrieveAnalysis(this.$api(), data);
+        await retrieveAnalysis(api, data);
       },
       { immediate: true }
     );
