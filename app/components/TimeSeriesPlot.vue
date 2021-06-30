@@ -37,11 +37,12 @@
           </v-col>
           <!-- temporal range input -->
           <!-- lower temporal range input -->
-          <v-col class="d-flex flex-row">
+          <v-col class="d-flex flex-row" @click="enableTemporalRangeEdit">
             <!-- temporal range -->
             <v-text-field
-              v-model="formTemporalRange[0]"
+              v-model="formTemporalRangeMin"
               label="Min Year"
+              :disabled="!isTemporalRangeEditable"
               :min="minYear"
               :max="maxYear - 1"
               type="number"
@@ -53,7 +54,8 @@
               <template #append-outer>to</template>
             </v-text-field>
             <v-text-field
-              v-model="formTemporalRange[1]"
+              v-model="formTemporalRangeMax"
+              :disabled="!isTemporalRangeEditable"
               class="mx-2"
               label="Max Year"
               :min="minYear + 1"
@@ -148,7 +150,7 @@
                   small
                   v-on="on"
                 >
-                  <v-icon small>edit</v-icon>
+                  <v-icon small>fas fa-map</v-icon>
                 </v-btn>
               </template>
               <span>Return to Select Area</span>
@@ -183,7 +185,7 @@
 import Vue from "vue";
 import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
-import { Emit, Prop, Watch } from "vue-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
 import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
 import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 
@@ -213,8 +215,37 @@ class TimeSeriesPlot extends Vue {
   animationSpeed = 2000;
   isAnimationPlaying = false;
   // FIXME: clean up https://github.com/openskope/skopeui/issues/106
-  formTemporalRange = [1, 2017];
+  localTemporalRangeMin = 1;
+  localTemporalRangeMax = 2020;
+  isTemporalRangeEditable = false;
   timeSeriesUnwatcher = null;
+
+  get formTemporalRangeMin() {
+    return this.isTemporalRangeEditable
+      ? this.localTemporalRangeMin
+      : this.selectedTemporalRange[0];
+  }
+
+  get formTemporalRangeMax() {
+    return this.isTemporalRangeEditable
+      ? this.localTemporalRangeMax
+      : this.selectedTemporalRange[1];
+  }
+
+  set formTemporalRangeMin(value) {
+    this.localTemporalRangeMin = value;
+  }
+
+  set formTemporalRangeMax(value) {
+    this.localTemporalRangeMax = value;
+  }
+
+  get hasTemporalRangeChanges() {
+    return (
+      this.localTemporalRangeMin !== this.selectedTemporalRange[0] ||
+      this.localTemporalRangeMax !== this.selectedTemporalRange[1]
+    );
+  }
 
   get selectAreaLocation() {
     return {
@@ -366,13 +397,23 @@ class TimeSeriesPlot extends Vue {
 
   async mounted() {
     await loadTimeSeries(this.$api());
-    this.formTemporalRange = _.cloneDeep(this.selectedTemporalRange);
+    this.localTemporalRangeMin = this.selectedTemporalRange[0];
+    this.localTemporalRangeMax = this.selectedTemporalRange[1];
     this.timeSeriesUnwatcher = this.$watch(
       "timeseriesRequestData",
       async function (data) {
         await retrieveTimeSeries(this.$api(), data);
       }
     );
+  }
+
+  enableTemporalRangeEdit() {
+    if (this.isTemporalRangeEditable) {
+      return;
+    }
+    this.localTemporalRangeMin = this.selectedTemporalRange[0];
+    this.localTemporalRangeMax = this.selectedTemporalRange[1];
+    this.isTemporalRangeEditable = true;
   }
 
   destroyed() {
@@ -410,7 +451,16 @@ class TimeSeriesPlot extends Vue {
   }
 
   setTemporalRange() {
-    this.selectedTemporalRange = _.cloneDeep(this.formTemporalRange);
+    // no-op if local temporal range min and max are equal to the selected temporal range
+    if (!this.hasTemporalRangeChanges) {
+      return;
+    }
+    this.selectedTemporalRange = [
+      this.localTemporalRangeMin,
+      this.localTemporalRangeMax,
+    ];
+    this.isTemporalRangeEditable = false;
+    // if yearSelected is set, clamp it to the new temporal range min / max if needed
     if (this.yearSelected == null) {
       return;
     }

@@ -19,7 +19,6 @@
       >
         <TimeSeriesPlot
           ref="plot"
-          :key="analysisRequestData"
           :show-area="true"
           :show-step-controls="false"
           :traces="traces"
@@ -95,75 +94,6 @@
           <v-alert v-else type="secondary">
             Summary statistics are not available for a point geometry.
           </v-alert>
-          <h2 class="subtitle">Smoothing</h2>
-          <!--          <v-alert-->
-          <!--            v-model="showSmoothingHint"-->
-          <!--            border="top"-->
-          <!--            colored-border-->
-          <!--            icon="fas fa-question-circle"-->
-          <!--            color="secondary"-->
-          <!--            elevation="2"-->
-          <!--            dismissible-->
-          <!--          >-->
-          <!--            <span v-if="smoothingOption == 'centeredAverage'">-->
-          <!--              If window width is n, the graphed value for a given year is the-->
-          <!--              {{ zonalStatistic }} the 2n+1 time step summary values for the-->
-          <!--              selected area centered on that year.-->
-          <!--            </span>-->
-          <!--            <span v-else-if="smoothingOption === 'trailingAverage'">-->
-          <!--              If the window width entered is n, the graphed value for a year is-->
-          <!--              the {{ zonalStatistic }} of the n time step summary values for the-->
-          <!--              current year and the n-1 preceding years-->
-          <!--            </span>-->
-          <!--            <span v-else>-->
-          <!--              No smoothing the summary values for a given year are graphed.-->
-          <!--            </span>-->
-          <!--          </v-alert>-->
-          <v-select
-            v-model="smoothingOption"
-            :items="smoothingOptions"
-            color="primary"
-            item-color="secondary"
-            item-text="label"
-            item-value="id"
-            label="Smoothing options"
-          >
-            <template #prepend>
-              <v-tooltip v-model="showSmoothingHint" left>
-                <template #activator="{ attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    icon
-                    @click="showSmoothingHint = !showSmoothingHint"
-                  >
-                    <v-icon color="secondary"> fas fa-question-circle</v-icon>
-                  </v-btn>
-                </template>
-                <span v-if="smoothingOption == 'centeredAverage'">
-                  If window width is n, the graphed value for a given year is
-                  the
-                  {{ zonalStatistic }} the 2n+1 time step summary values for the
-                  selected area centered on that year.
-                </span>
-                <span v-else-if="smoothingOption === 'trailingAverage'">
-                  If the window width entered is n, the graphed value for a year
-                  is the {{ zonalStatistic }} of the n time step summary values
-                  for the current year and the n-1 preceding years
-                </span>
-                <span v-else>
-                  No smoothing the summary values for a given year are graphed.
-                </span>
-              </v-tooltip>
-            </template>
-          </v-select>
-          <v-text-field
-            v-if="hasSmoothingOption"
-            v-model="smoothingTimeStep"
-            label="Smoothing window"
-            suffix="time steps"
-            type="number"
-          >
-          </v-text-field>
           <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
           <h2 class="subtitle">Transformation</h2>
           <!--          <v-alert-->
@@ -265,6 +195,76 @@
             >
             </v-text-field>
           </template>
+
+          <h2 class="subtitle">Smoothing</h2>
+          <!--          <v-alert-->
+          <!--            v-model="showSmoothingHint"-->
+          <!--            border="top"-->
+          <!--            colored-border-->
+          <!--            icon="fas fa-question-circle"-->
+          <!--            color="secondary"-->
+          <!--            elevation="2"-->
+          <!--            dismissible-->
+          <!--          >-->
+          <!--            <span v-if="smoothingOption == 'centeredAverage'">-->
+          <!--              If window width is n, the graphed value for a given year is the-->
+          <!--              {{ zonalStatistic }} the 2n+1 time step summary values for the-->
+          <!--              selected area centered on that year.-->
+          <!--            </span>-->
+          <!--            <span v-else-if="smoothingOption === 'trailingAverage'">-->
+          <!--              If the window width entered is n, the graphed value for a year is-->
+          <!--              the {{ zonalStatistic }} of the n time step summary values for the-->
+          <!--              current year and the n-1 preceding years-->
+          <!--            </span>-->
+          <!--            <span v-else>-->
+          <!--              No smoothing the summary values for a given year are graphed.-->
+          <!--            </span>-->
+          <!--          </v-alert>-->
+          <v-select
+            v-model="smoothingOption"
+            :items="smoothingOptions"
+            color="primary"
+            item-color="secondary"
+            item-text="label"
+            item-value="id"
+            label="Smoothing options"
+          >
+            <template #prepend>
+              <v-tooltip v-model="showSmoothingHint" left>
+                <template #activator="{ attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    icon
+                    @click="showSmoothingHint = !showSmoothingHint"
+                  >
+                    <v-icon color="secondary"> fas fa-question-circle</v-icon>
+                  </v-btn>
+                </template>
+                <span v-if="smoothingOption == 'centeredAverage'">
+                  If window width is n, the graphed value for a given year is
+                  the
+                  {{ zonalStatistic }} the 2n+1 time step summary values for the
+                  selected area centered on that year.
+                </span>
+                <span v-else-if="smoothingOption === 'trailingAverage'">
+                  If the window width entered is n, the graphed value for a year
+                  is the {{ zonalStatistic }} of the n time step summary values
+                  for the current year and the n-1 preceding years
+                </span>
+                <span v-else>
+                  No smoothing the summary values for a given year are graphed.
+                </span>
+              </v-tooltip>
+            </template>
+          </v-select>
+          <v-text-field
+            v-if="hasSmoothingOption"
+            v-model="smoothingTimeStep"
+            label="Smoothing window"
+            suffix="time steps"
+            type="number"
+          >
+          </v-text-field>
           <v-row align-content="space-between">
             <v-col>
               <v-btn block @click="clearTransformedTimeSeries"> Clear</v-btn>
