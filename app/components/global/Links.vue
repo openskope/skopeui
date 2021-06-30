@@ -1,23 +1,8 @@
 <template>
   <v-row>
     <v-col>
-      <TermsOfUse :force-show-terms="showTerms" @input="setTerms" />
-      <v-tooltip bottom>
-        <template #activator="{ on, attrs }">
-          <v-btn
-            plain
-            large
-            icon
-            v-bind="attrs"
-            class="mt-3 mx-3 button"
-            @click.stop="displayTermsOfUse"
-            v-on="on"
-          >
-            <v-icon large>fas fa-file-contract</v-icon>
-          </v-btn>
-        </template>
-        <span>Terms of Use</span>
-      </v-tooltip>
+      <TermsOfUse />
+      <!-- load analysis -->
       <v-tooltip bottom>
         <template #activator="{ on, attrs }">
           <v-btn
@@ -41,6 +26,7 @@
         </template>
         <span>Load Analysis</span>
       </v-tooltip>
+      <!-- links -->
       <v-tooltip v-for="link in links" :key="link.id" bottom>
         <template #activator="{ on, attrs }">
           <v-btn

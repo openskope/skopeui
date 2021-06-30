@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="showTerms" :persistent="true" max-width="600">
+  <v-dialog v-model="showTerms" persistent max-width="600">
+    <template #activator="{ on, attrs }">
+      <v-btn plain large icon v-bind="attrs" class="mt-3 mx-3 button" v-on="on">
+        <v-icon large>fas fa-file-contract</v-icon>
+      </v-btn>
+    </template>
     <v-card>
       <v-card-title class="headline">Terms of Use</v-card-title>
       <v-card-text>
@@ -21,7 +26,7 @@
         <p>(SKOPE 2021)</p>
 
         <h5>Example Citation</h5>
-        <blockquote>
+        <blockquote class="blockquote">
           SKOPE 2021 SKOPE: Synthesizing Knowledge of Past Environments.
           https://app.openskope.org/. Accessed 1 July 2021.
         </blockquote>
@@ -33,19 +38,17 @@
         </a>
       </v-card-text>
       <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn depressed color="accent" @click.stop="acceptTerms"
+          >I accept</v-btn
+        >
         <v-btn
           href="https://www.openskope.org"
-          depressed
           outlined
-          color="secondary"
-          text
-          @click.stop="declineTerms"
+          color="accent"
+          @click="declineTerms"
         >
           I decline, return to www.openskope.org
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn depressed outlined color="accent" text @click.stop="acceptTerms">
-          I accept
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -57,28 +60,14 @@ import { Component, Prop } from "nuxt-property-decorator";
 
 @Component()
 class TermsOfUse extends Vue {
-  @Prop({ default: false })
-  forceShowTerms;
-
-  warehouseTermsAccepted = false;
+  showTerms = true;
 
   created() {
     if (process.client) {
       const warehouse = this.$warehouse;
-      this.warehouseTermsAccepted =
-        warehouse.get(this.termsAcceptedWarehouseKey) || false;
-      console.log("warehouse? ", this.warehouseTermsAccepted);
+      this.showTerms = !warehouse.get(this.termsAcceptedWarehouseKey);
+      console.log("warehouse? ", this.showTerms);
     }
-  }
-
-  get showTerms() {
-    const displayTerms = this.forceShowTerms || !this.warehouseTermsAccepted;
-    console.log("display terms", displayTerms);
-    return displayTerms;
-  }
-
-  set showTerms(value) {
-    this.$emit("input", value);
   }
 
   get termsAcceptedWarehouseKey() {
@@ -86,14 +75,13 @@ class TermsOfUse extends Vue {
   }
 
   acceptTerms() {
+    this.showTerms = false;
     this.$warehouse.set(this.termsAcceptedWarehouseKey, true);
-    this.$emit("input", true);
   }
 
   declineTerms() {
     console.log("declining terms");
     this.$warehouse.remove(this.termsAcceptedWarehouseKey);
-    this.$emit("input", false);
   }
 }
 

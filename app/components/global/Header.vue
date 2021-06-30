@@ -75,27 +75,11 @@ class Header extends Vue {
 export default Header;
 </script>
 <style scoped>
-.v-app-bar {
-  background: #457b9d;
-}
-
 .skope-title {
   text-decoration: none;
   color: white;
   font-family: "Roboto", serif;
   font-weight: bold;
   font-size: 2em;
-}
-
-.button {
-  /*background: rgb(9, 172, 254);*/
-  /*background: linear-gradient(*/
-  /*  90deg,*/
-  /*  rgba(9, 172, 254, 1) 0%,*/
-  /*  rgba(67, 191, 255, 1) 50%*/
-  /*);*/
-  letter-spacing: 0.05em;
-  outline: none;
-  font: 1.25em Raleway, sans-serif;
 }
 </style>
