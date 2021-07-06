@@ -25,38 +25,15 @@
         </template>
         <span>Load Analysis</span>
       </v-tooltip>
-      <!-- links -->
-      <v-tooltip v-for="link in links" :key="link.id" bottom>
-        <template #activator="{ on, attrs }">
-          <v-btn
-            plain
-            large
-            icon
-            v-bind="attrs"
-            class="mt-3 mx-3 button"
-            target="_blank"
-            :href="link.url"
-            v-on="on"
-          >
-            <v-icon large>{{ link.icon }}</v-icon>
-          </v-btn>
-        </template>
-        <span>{{ link.label }}</span>
-      </v-tooltip>
     </v-col>
   </v-row>
 </template>
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import TermsOfUse from "@/components/global/TermsOfUse.vue";
 
-@Component({
-  components: {
-    TermsOfUse,
-  },
-})
-class Links extends Vue {
+@Component({})
+class LoadAnalysis extends Vue {
   links = [
     {
       id: "github",
@@ -132,7 +109,7 @@ class Links extends Vue {
   }
 }
 
-export default Links;
+export default LoadAnalysis;
 </script>
 
 <style scoped></style>

@@ -26,7 +26,7 @@
         </h1>
       </v-col>
       <v-col v-if="!isMdAndDown" md="3" class="text-right">
-        <Links></Links>
+        <LoadAnalysis></LoadAnalysis>
       </v-col>
     </v-row>
   </v-app-bar>
@@ -34,13 +34,13 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import Links from "@/components/global/Links.vue";
+import LoadAnalysis from "@/components/global/LoadAnalysis.vue";
 import Navigation from "@/components/global/Navigation.vue";
 import _ from "lodash";
 
 @Component({
   components: {
-    Links,
+    LoadAnalysis,
     Navigation,
   },
 })

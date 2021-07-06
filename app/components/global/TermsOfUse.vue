@@ -1,7 +1,16 @@
 <template>
   <v-dialog v-model="showTerms" persistent max-width="600">
     <template #activator="{ on, attrs }">
-      <v-btn text v-bind="attrs" v-on="on"> Terms of Use </v-btn>
+      <v-btn
+        style="font-weight: bold"
+        color="white"
+        class="subtitle-1"
+        plain
+        v-bind="attrs"
+        v-on="on"
+      >
+        Terms of Use
+      </v-btn>
     </template>
     <v-card>
       <v-card-title class="headline">Terms of Use</v-card-title>
