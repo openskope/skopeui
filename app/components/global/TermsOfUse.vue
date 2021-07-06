@@ -1,9 +1,7 @@
 <template>
   <v-dialog v-model="showTerms" persistent max-width="600">
     <template #activator="{ on, attrs }">
-      <v-btn plain large icon v-bind="attrs" class="mt-3 mx-3 button" v-on="on">
-        <v-icon large>fas fa-file-contract</v-icon>
-      </v-btn>
+      <v-btn text v-bind="attrs" v-on="on"> Terms of Use </v-btn>
     </template>
     <v-card>
       <v-card-title class="headline">Terms of Use</v-card-title>
@@ -56,7 +54,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { Component, Prop } from "nuxt-property-decorator";
+import { Component } from "nuxt-property-decorator";
 
 @Component()
 class TermsOfUse extends Vue {

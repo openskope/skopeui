@@ -1,7 +1,6 @@
 <template>
   <v-row>
     <v-col>
-      <TermsOfUse />
       <!-- load analysis -->
       <v-tooltip bottom>
         <template #activator="{ on, attrs }">
@@ -58,7 +57,6 @@ import TermsOfUse from "@/components/global/TermsOfUse.vue";
   },
 })
 class Links extends Vue {
-  showTerms = false;
   links = [
     {
       id: "github",
@@ -85,14 +83,6 @@ class Links extends Vue {
    */
   get isMdAndDown() {
     return this.$vuetify.breakpoint.mdAndDown;
-  }
-
-  displayTermsOfUse() {
-    this.showTerms = true;
-  }
-
-  setTerms(value) {
-    this.showTerms = value;
   }
 
   /**
