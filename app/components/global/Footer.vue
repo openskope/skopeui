@@ -2,31 +2,39 @@
   <!-- footer -->
   <v-footer
     app
+    absolute
     color="secondary"
-    class="align-baseline subtitle-1"
+    class="align-baseline"
     style="color: white"
   >
-    This material is based upon work supported by the National Science
-    Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
-    University, SMA 1439603 and 1637155 to the University of Illinois at
-    Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State
-    University. &copy; 2016 - {{ new Date().getFullYear() }}
-    <v-spacer></v-spacer>
-    <TermsOfUse />
-    <v-btn
-      v-for="link in links"
-      v-bind="attrs"
-      :key="link.id"
-      plain
-      style="font-weight: bold"
-      color="white"
-      class="subtitle-1"
-      target="_blank"
-      :href="link.url"
-      v-on="on"
-    >
-      {{ link.label }}
-    </v-btn>
+    <v-card tile flat width="100%" color="secondary" class="text-center">
+      <v-card-text style="color: white" class="subtitle-2">
+        This material is based upon work supported by the National Science
+        Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
+        University, SMA 1439603 and 1637155 to the University of Illinois at
+        Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State
+        University.
+      </v-card-text>
+      <v-divider></v-divider>
+      <span class="subtitle-1 font-weight-bold" style="color: white"
+        >&copy; 2016 - {{ new Date().getFullYear() }}</span
+      >
+      <TermsOfUse />
+      <v-btn
+        v-for="link in links"
+        v-bind="attrs"
+        :key="link.id"
+        plain
+        style="font-weight: bold"
+        color="white"
+        class="subtitle-1"
+        target="_blank"
+        :href="link.url"
+        v-on="on"
+      >
+        {{ link.label }}
+      </v-btn>
+    </v-card>
   </v-footer>
   <!-- end footer -->
 </template>
