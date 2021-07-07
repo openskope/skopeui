@@ -1,9 +1,9 @@
 <template>
   <v-app light>
     <Header />
-    <DiscoverSideBar />
     <v-main>
       <v-container fluid>
+        <DiscoverSideBar />
         <Messages />
         <nuxt />
       </v-container>
@@ -13,19 +13,25 @@
 </template>
 
 <script>
+import Vue from "vue";
+import { Component } from "nuxt-property-decorator";
 import DiscoverSideBar from "@/components/DiscoverSideBar";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import Messages from "@/components/Messages";
 
-export default {
-  name: "SKOPE",
-  title: "SKOPE",
+@Component({
   components: {
-    DiscoverSideBar,
-    Footer,
     Header,
+    DiscoverSideBar,
     Messages,
+    Footer,
   },
-};
+})
+class BaseDataset extends Vue {
+  get isMdAndDown() {
+    return this.$vuetify.breakpoint.mdAndDown;
+  }
+}
+export default BaseDataset;
 </script>

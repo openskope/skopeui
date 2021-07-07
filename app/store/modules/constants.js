@@ -56,6 +56,18 @@ export function buildReadme(requestData) {
   return `
 # SKOPE data for ${requestData.dataset_id} / ${requestData.variable_id}
 
+## Terms of Service
+By using the SKOPE application, you assume any risk associated with its use. You are solely responsible for any damage or loss you may incur resulting from your reliance on or use of information. provided by SKOPE.
+
+## Citation
+Use of data, graphics, or other information provided by SKOPE should be accompanied by a citation of the original data source (provided by SKOPE in the dataset metadata) and of the SKOPE application Web page. Example reference: (SKOPE 2021).
+
+Example Citation:
+> SKOPE 2021 SKOPE: Synthesizing Knowledge of Past Environments. https://app.openskope.org/. Accessed 1 July 2021.
+
+## Contact Us
+Please use the "Email Us" button on the application navigation bar or submit your message directly to https://www.comses.net/about/contact)
+
 Time range: ${requestData.time_range.gte} - ${requestData.time_range.lte} CE
 Location: ${JSON.stringify(requestData.selected_area, null, 2)}
 

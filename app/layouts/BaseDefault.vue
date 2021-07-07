@@ -1,9 +1,9 @@
 <template>
   <v-app light>
     <Header />
-    <DiscoverSideBar />
     <v-main>
       <v-container fluid>
+        <DiscoverSideBar />
         <Messages />
         <nuxt />
       </v-container>
@@ -28,6 +28,10 @@ import Footer from "@/components/global/Footer";
     Footer,
   },
 })
-class BaseDefault extends Vue {}
+class BaseDefault extends Vue {
+  get isMdAndDown() {
+    return this.$vuetify.breakpoint.mdAndDown;
+  }
+}
 export default BaseDefault;
 </script>
