@@ -10,7 +10,7 @@
             text
             large
             color="black"
-            :class="isActiveStep(0) ? 'active' : 'button'"
+            :class="isCurrentStep(0) ? 'current' : 'button'"
             v-bind="attrs"
             v-on="on"
           >
@@ -46,13 +46,11 @@
           :key="index"
           nuxt
           text
+          plain
+          tile
           color="white"
           :disabled="isDisabled(step.id)"
-          :class="{
-            active: isActiveStep(index),
-            button: !isActiveStep(index),
-            disabled: isDisabled(step.id),
-          }"
+          :class="isCurrentStep(index) ? 'current' : 'button'"
           :to="locations[index]"
         >
           <v-icon v-if="!complete(index)">{{ step.icon }}</v-icon>
@@ -170,7 +168,7 @@ class Navigation extends Vue {
     return this.currentStepIndex > index;
   }
 
-  isActiveStep(index) {
+  isCurrentStep(index) {
     return this.currentStepIndex === index;
   }
 }
@@ -202,7 +200,7 @@ export default Navigation;
 .button:hover::after
   width: 100%
 
-.active
+.current
   text-decoration: none
 
   &::before, &::after

@@ -24,7 +24,7 @@
             <v-icon v-if="!isMdAndDown" large color="white"
               >fas fa-file-upload</v-icon
             >
-            <h2 class="title" v-else>Load Analysis</h2>
+            <h2 v-else class="title">Load Analysis</h2>
           </v-btn>
         </template>
         <span>Load Analysis</span>
