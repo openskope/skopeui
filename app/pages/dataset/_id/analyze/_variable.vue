@@ -359,7 +359,7 @@ class Analyze extends Vue {
       },
     },
     {
-      label: "Centered Running Average (+/- window width)",
+      label: "Centered Running Average",
       id: "centeredAverage",
       type: "MovingAverageSmoother",
       toRequestData: function (analyzeVue) {
