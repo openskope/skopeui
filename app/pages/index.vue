@@ -3,16 +3,28 @@
     <v-row>
       <v-col md="12" lg="8" offset-lg="2">
         <v-form @submit.prevent>
-          <v-row>
+          <v-row align="center">
+            <!-- filter by variable -->
+            <v-col cols="3">
+              <v-combobox
+                v-model="selectedVariableClasses"
+                :items="variableClasses"
+                label="Filter by variable"
+                multiple
+                chips
+                dense
+                @change="filterDatasets"
+              ></v-combobox>
+            </v-col>
             <!-- search by keyword -->
-            <v-col cols="6">
+            <v-col cols="5">
               <!-- keyword search -->
               <v-text-field
                 id="search"
                 v-model="search"
                 clearable
                 outlined
-                filled
+                dense
                 data-toggle="hideseek"
                 label="Search for a keyword"
                 @change="filterDatasets"
@@ -24,20 +36,7 @@
                 </template>
               </v-text-field>
             </v-col>
-            <!-- filter by variable -->
-            <v-col cols="6">
-              <v-combobox
-                v-model="selectedVariableClasses"
-                :items="variableClasses"
-                label="Filter by variable"
-                multiple
-                chips
-                @change="filterDatasets"
-              ></v-combobox>
-            </v-col>
-            <!-- start and end date range -->
-            <v-col cols="2"><h3 class="headline">Year range</h3></v-col>
-            <v-col cols="5">
+            <v-col cols="2">
               <v-text-field
                 v-model="startYear"
                 outlined
@@ -49,7 +48,7 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="2">
               <v-text-field
                 v-model="endYear"
                 outlined
