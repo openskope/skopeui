@@ -20,7 +20,7 @@
               style="display: none"
               @change="loadRequestData"
             />
-            <v-icon large>fas fa-file-upload</v-icon>
+            <v-icon large color="white">fas fa-file-upload</v-icon>
           </v-btn>
         </template>
         <span>Load Analysis</span>
