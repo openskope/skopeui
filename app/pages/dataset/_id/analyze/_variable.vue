@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="fill-height align-start">
-    <v-row>
+  <v-container fluid class="fill-height">
+    <v-row class="fill-height">
       <!-- dataset title -->
       <v-col class="mb-3" lg="12" md="12" sm="12">
         <DatasetTitle :select-variable="true">
@@ -11,7 +11,7 @@
         </DatasetTitle>
       </v-col>
       <!-- time series -->
-      <v-col align-self="stretch" class="d-flex timeseries-flex" lg="8" md="12">
+      <v-col class="timeseries-flex" lg="8" md="12">
         <TimeSeriesPlot
           ref="plot"
           :show-area="true"
@@ -21,16 +21,17 @@
         />
       </v-col>
       <!-- analysis form -->
-      <v-col class="d-flex timeseries-flex" lg="4" md="12">
-        <v-form class="pa-3" style="background-color: #f4f7ff; width: 100%">
-          <v-row align-content="space-between">
-            <v-col>
-              <h1 class="font-weight-light">
-                Statistics for the Temporal Interval
-              </h1>
+      <v-col lg="4" md="12">
+        <v-form
+          class="pa-3 fill-height"
+          style="background-color: #f4f7ff; width: 100%"
+        >
+          <v-row class="flex-column fill-height">
+            <v-col class="shrink" align-self="start">
+              <h2>Statistics for the Temporal Interval</h2>
             </v-col>
             <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
-            <v-col cols="12">
+            <v-col class="shrink" align-self="start">
               <v-data-table
                 :disable-filtering="true"
                 :disable-pagination="true"
@@ -41,7 +42,7 @@
               >
               </v-data-table>
             </v-col>
-            <v-col cols="12">
+            <!--            <v-col cols="12">
               <v-alert
                 v-if="isStudyAreaPolygon"
                 v-model="showZonalStatisticHint"
@@ -55,6 +56,8 @@
                 At each time step, the value used for the selected area is the
                 summary value (mean by default) of all selected pixels.
               </v-alert>
+            </v-col>-->
+            <v-col class="grow">
               <v-select
                 v-if="isStudyAreaPolygon"
                 v-model="zonalStatistic"
@@ -265,18 +268,18 @@
               >
               </v-text-field>
             </v-col>
-            <v-col>
+            <v-col class="shrink text-center" align-self="end">
               <v-btn
+                width="45%"
                 :disabled="isUpdateDisabled"
-                block
                 class="font-weight-bold"
                 color="accent"
                 @click="updateTimeSeries"
                 >Update
               </v-btn>
-            </v-col>
-            <v-col>
-              <v-btn block @click="clearTransformedTimeSeries">Clear</v-btn>
+              <v-btn width="45%" @click="clearTransformedTimeSeries"
+                >Clear</v-btn
+              >
             </v-col>
           </v-row>
         </v-form>
@@ -488,7 +491,6 @@ class Analyze extends Vue {
   ];
 
   // --------- GETTERS ---------
-
   get summaryStatistics() {
     if (this.$api().analysis.summaryStatistics.length === 0) {
       return [this.$api().dataset.summaryStatistics];

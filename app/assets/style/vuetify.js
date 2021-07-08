@@ -34,7 +34,7 @@ export default {
   },
   breakpoint: {
     thresholds: {
-      md: 1546, // 1426px (window width) + 16px (desktop scrollbar width)
+      md: 1616, // 1600px (window width) + 16px (desktop scrollbar width)
     },
   },
 };
