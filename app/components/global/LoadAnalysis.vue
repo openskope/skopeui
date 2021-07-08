@@ -5,11 +5,12 @@
       <v-tooltip bottom>
         <template #activator="{ on, attrs }">
           <v-btn
-            plain
+            :icon="!isMdAndDown"
             large
-            icon
+            color="accent"
+            depressed
             v-bind="attrs"
-            class="mt-3 mx-3 button"
+            class="mt-3 mx-3"
             @click="selectLoadRequestDataFile"
             v-on="on"
           >
@@ -20,7 +21,10 @@
               style="display: none"
               @change="loadRequestData"
             />
-            <v-icon large color="white">fas fa-file-upload</v-icon>
+            <v-icon v-if="!isMdAndDown" large color="white"
+              >fas fa-file-upload</v-icon
+            >
+            <h2 class="title" v-else>Load Analysis</h2>
           </v-btn>
         </template>
         <span>Load Analysis</span>

@@ -5,7 +5,7 @@
         <Navigation></Navigation>
       </v-col>
       <v-col cols="12" class="text-center">
-        <Links></Links>
+        <LoadAnalysis></LoadAnalysis>
       </v-col>
     </v-row>
   </v-navigation-drawer>
@@ -13,12 +13,12 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import Links from "@/components/global/LoadAnalysis.vue";
+import LoadAnalysis from "@/components/global/LoadAnalysis.vue";
 import Navigation from "@/components/global/Navigation.vue";
 
 @Component({
   components: {
-    Links,
+    LoadAnalysis,
     Navigation,
   },
 })
