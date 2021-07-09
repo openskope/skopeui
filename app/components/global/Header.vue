@@ -1,9 +1,10 @@
 <template>
   <v-app-bar extended extension-height="25" color="primary" app>
     <v-row align="end" align-content="space-between">
-      <v-col class="d-flex ma-0 pa-0" md="2">
+      <v-col class="d-flex ma-0 pa-0 shrink" md="2" align-self="end">
         <v-app-bar-nav-icon
           v-if="isMdAndDown"
+          class="my-auto"
           color="white"
           @click.stop="toggleDrawer(!drawer)"
         >
@@ -12,10 +13,10 @@
           <nuxt-link class="skope-title" to="/">skope</nuxt-link>
         </v-toolbar-title>
       </v-col>
-      <v-col v-if="!isMdAndDown" lg="7">
+      <v-col v-if="!isMdAndDown" lg="7" class="grow">
         <Navigation />
       </v-col>
-      <v-col v-else class="text-center" lg="7">
+      <v-col v-else align-self="center" lg="7" class="grow text-right mx-2">
         <h1 offset-y style="color: white">
           <span style="border-bottom: #ee6c4d solid" class="pb-2">
             <v-icon large color="white" class="mx-2">{{
