@@ -21,7 +21,7 @@
         />
       </v-col>
       <!-- analysis form -->
-      <v-col lg="4" md="12">
+      <v-col lg="4" md="12" class="timeseries-flex">
         <v-form
           class="pa-3 fill-height"
           style="background-color: #f4f7ff; width: 100%"
@@ -94,27 +94,27 @@
                 Summary statistics are not available for a point geometry.
               </v-alert>
               <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
-              <!--          <v-alert-->
-              <!--            v-model="showTransformHint"-->
-              <!--            border="top"-->
-              <!--            colored-border-->
-              <!--            icon="fas fa-question-circle"-->
-              <!--            color="secondary"-->
-              <!--            elevation="2"-->
-              <!--            dismissible-->
-              <!--          >-->
-              <!--            <span v-if="transformOption === 'zscoreFixed'">-->
-              <!--              Displays Z-score transformed values relative to a fixed interval-->
-              <!--              selected by the user.-->
-              <!--            </span>-->
-              <!--            <span v-else-if="transformOption === 'zscoreMoving'">-->
-              <!--              Displays Z-score transformed values relative to a moving window of-->
-              <!--              a size (n time steps) selected by the user.-->
-              <!--            </span>-->
-              <!--            <span v-else-->
-              <!--              >Modeled values are graphed without any transformation.</span-->
-              <!--            >-->
-              <!--          </v-alert>-->
+              <!--                        <v-alert
+                          v-model="showTransformHint"
+                          border="top"
+                          colored-border
+                          icon="fas fa-question-circle"
+                          color="secondary"
+                          elevation="2"
+                          dismissible
+                        >
+                          <span v-if="transformOption === 'zscoreFixed'">
+                            Displays Z-score transformed values relative to a fixed interval
+                            selected by the user.
+                          </span>
+                          <span v-else-if="transformOption === 'zscoreMoving'">
+                            Displays Z-score transformed values relative to a moving window of
+                            a size (n time steps) selected by the user.
+                          </span>
+                          <span v-else
+                            >Modeled values are graphed without any transformation.</span
+                          >
+                        </v-alert>-->
               <v-select
                 v-model="transformOption"
                 :items="transformOptions"
@@ -195,29 +195,29 @@
                 >
                 </v-text-field>
               </template>
-              <!--          <v-alert-->
-              <!--            v-model="showSmoothingHint"-->
-              <!--            border="top"-->
-              <!--            colored-border-->
-              <!--            icon="fas fa-question-circle"-->
-              <!--            color="secondary"-->
-              <!--            elevation="2"-->
-              <!--            dismissible-->
-              <!--          >-->
-              <!--            <span v-if="smoothingOption == 'centeredAverage'">-->
-              <!--              If window width is n, the graphed value for a given year is the-->
-              <!--              {{ zonalStatistic }} the 2n+1 time step summary values for the-->
-              <!--              selected area centered on that year.-->
-              <!--            </span>-->
-              <!--            <span v-else-if="smoothingOption === 'trailingAverage'">-->
-              <!--              If the window width entered is n, the graphed value for a year is-->
-              <!--              the {{ zonalStatistic }} of the n time step summary values for the-->
-              <!--              current year and the n-1 preceding years-->
-              <!--            </span>-->
-              <!--            <span v-else>-->
-              <!--              No smoothing the summary values for a given year are graphed.-->
-              <!--            </span>-->
-              <!--          </v-alert>-->
+              <!--                        <v-alert
+                          v-model="showSmoothingHint"
+                          border="top"
+                          colored-border
+                          icon="fas fa-question-circle"
+                          color="secondary"
+                          elevation="2"
+                          dismissible
+                        >
+                          <span v-if="smoothingOption == 'centeredAverage'">
+                            If window width is n, the graphed value for a given year is the
+                            {{ zonalStatistic }} the 2n+1 time step summary values for the
+                            selected area centered on that year.
+                          </span>
+                          <span v-else-if="smoothingOption === 'trailingAverage'">
+                            If the window width entered is n, the graphed value for a year is
+                            the {{ zonalStatistic }} of the n time step summary values for the
+                            current year and the n-1 preceding years
+                          </span>
+                          <span v-else>
+                            No smoothing the summary values for a given year are graphed.
+                          </span>
+                        </v-alert>-->
               <v-select
                 v-model="smoothingOption"
                 :items="smoothingOptions"
