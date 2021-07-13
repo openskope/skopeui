@@ -65,7 +65,6 @@
 import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
-
 import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
 import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Map from "@/components/Map.vue";
