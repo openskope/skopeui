@@ -24,6 +24,7 @@
     "@turf/turf": "^6.3.0",
     "circle-to-polygon": "^2.0.2",
     "consola": "^2.15.3",
+    "cookie-universal-nuxt": "^2.1.5",
     "cross-env": "^7.0.3",
     "es6-dynamic-template": "2.0.0",
     "file-saver": "^2.0.5",

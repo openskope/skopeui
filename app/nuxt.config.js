@@ -78,6 +78,8 @@ module.exports = {
         ],
       },
     ],
+    // Simple usage
+    ["cookie-universal-nuxt", { alias: "cookie", parseJSON: false }],
   ],
   // [optional] markdownit options
   // See https://github.com/markdown-it/markdown-it

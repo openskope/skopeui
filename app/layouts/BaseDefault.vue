@@ -50,25 +50,24 @@ import Footer from "@/components/global/Footer";
 class BaseDefault extends Vue {
   firstTimeUser = true;
 
-  created() {
-    if (process.client) {
-      const warehouse = this.$warehouse;
-      this.showTerms = !warehouse.get(this.firstTimeWarehouseKey);
-      console.log("warehouse? ", this.showTerms);
-    }
-  }
-
-  get firstTimeWarehouseKey() {
-    return "skope:firstTime";
+  get firstTimeCookie() {
+    console.log("cookie: ", this.$cookie.get("firstTime"));
+    return this.$cookie.get("firstTime");
   }
 
   setFirstTime(value) {
-    this.firstTimeUser = value;
+    let now = new Date();
+    let time = now.getTime();
+    let expireTime = time + 1000 * 36000;
     if (value) {
-      this.$warehouse.set(this.firstTimeWarehouseKey, true);
+      this.$cookie.set("firstTime", value, { sameSite: true });
+      console.log("setCookie: ", this.$cookie.get("firstTime"));
     } else {
-      this.$warehouse.remove(this.firstTimeWarehouseKey);
+      console.log("setCookie: ", this.$cookie.get("firstTime"));
+      this.$cookie.set("firstTime", value, { sameSite: true });
+      console.log("setCookie: ", this.$cookie.get("firstTime"));
     }
+    this.firstTimeUser = false;
   }
 
   get isMdAndDown() {
