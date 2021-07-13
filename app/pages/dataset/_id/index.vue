@@ -75,7 +75,7 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
 const fillTemplate = require("es6-dynamic-template");
 
 @Component({
-  layout: "BaseDataset",
+  layout: "BaseDefault",
   components: {
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090

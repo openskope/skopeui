@@ -303,7 +303,7 @@ import JSZip from "jszip";
 import Papa from "papaparse";
 
 @Component({
-  layout: "BaseDataset",
+  layout: "BaseDefault",
   components: {
     KernelRegression,
     RunningAverage,

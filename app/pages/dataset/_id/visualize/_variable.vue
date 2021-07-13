@@ -58,7 +58,7 @@ const setYearSelected = _.debounce(function (vue) {
 }, 350);
 
 @Component({
-  layout: "BaseDataset",
+  layout: "BaseDefault",
   key: function (route) {
     return route.fullPath;
   },
