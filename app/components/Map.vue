@@ -184,10 +184,10 @@ class Map extends Vue {
   legendPosition = "bottomleft";
   geoJsonUnwatcher = null;
   polyStyle = {
-    fillColor: "green",
+    fillColor: "orange",
     weight: 2,
     opacity: 1,
-    color: "green",
+    color: "orange",
   };
 
   get stepNames() {
@@ -308,20 +308,20 @@ class Map extends Vue {
         circlemarker: false,
         rectangle: {
           shapeOptions: {
-            color: "green",
-            fill: "green",
+            color: "orange",
+            fill: "orange",
           },
         },
         circle: {
           shapeOptions: {
-            color: "green",
-            fill: "green",
+            color: "orange",
+            fill: "orange",
           },
         },
         polygon: {
           shapeOptions: {
-            color: "green",
-            fill: "green",
+            color: "orange",
+            fill: "orange",
           },
         },
       },
