@@ -183,6 +183,12 @@ class Map extends Vue {
   legendControl = null;
   legendPosition = "bottomleft";
   geoJsonUnwatcher = null;
+  polyStyle = {
+    fillColor: "green",
+    weight: 2,
+    opacity: 1,
+    color: "green",
+  };
 
   get stepNames() {
     return this.$api().app.stepNames;
@@ -300,9 +306,23 @@ class Map extends Vue {
         // disable polylines and circlemarkers, allow polygon, rectangle, circle, and marker
         polyline: false,
         circlemarker: false,
+        rectangle: {
+          shapeOptions: {
+            color: "green",
+            fill: "green",
+          },
+        },
+        circle: {
+          shapeOptions: {
+            color: "green",
+            fill: "green",
+          },
+        },
         polygon: {
-          allowIntersection: false,
-          showArea: true,
+          shapeOptions: {
+            color: "green",
+            fill: "green",
+          },
         },
       },
       edit: {
@@ -398,6 +418,7 @@ class Map extends Vue {
           return new L.Marker(latlng);
         }
       },
+      style: this.polyStyle,
     });
   }
 

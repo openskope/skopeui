@@ -64,7 +64,7 @@
         </v-form>
       </v-col>
       <v-col cols="12">
-        <h1 class="font-weight-light">Datasets</h1>
+        <h1 class="font-weight-light">Select a Dataset</h1>
         <template v-for="dataset in datasets" router exact>
           <v-card
             :key="dataset.absoluteUrl"

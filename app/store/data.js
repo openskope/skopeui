@@ -26,7 +26,7 @@ export const ALL_DATA = [
       center: [37, -108.5],
       resolution: "800m",
       name: "Southwestern USA",
-      style: { color: "red", weight: 1 },
+      style: { color: "blue", weight: 2 },
       extents: [
         [43, -115],
         [31, -102],
@@ -156,7 +156,7 @@ export const ALL_DATA = [
       center: [37.5, -95],
       resolution: "250m",
       name: "Continental USA",
-      style: { color: "gray", weight: 2 },
+      style: { color: "blue", weight: 2 },
       extents: [
         [50, -125],
         [25, -65],

@@ -29,14 +29,15 @@
               </nuxt-link>
             </h2>
           </v-card-title>
-          <v-subheader class="subheading">
+          <v-subheader>
             {{ spatialCoverage }} | {{ temporalCoverage }}
           </v-subheader>
           <v-card-text class="body">
             <div v-html="$md.render(description)"></div>
           </v-card-text>
+          <v-subheader><h3>Variables</h3></v-subheader>
           <!-- FIXME: extract this to a component and reuse across the detail page -->
-          <v-list dense light>
+          <v-list dense>
             <v-list-item v-for="(variable, index) in variables" :key="index">
               <v-list-item-content>
                 <v-list-item-title class="variable">
@@ -47,7 +48,6 @@
                     color="info"
                     text-color="black"
                   >
-                    <v-icon>view_column</v-icon>
                     {{ variable.class }}
                   </v-chip>
                   {{ variable.name }}
@@ -57,7 +57,7 @@
           </v-list>
           <v-card-text>
             <div class="py-3 citation font-weight-bold">
-              <em> Source: </em>
+              Source:
               <a target="_blank" :href="sourceUrl">
                 {{ sourceUrl }}
               </a>
