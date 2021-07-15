@@ -58,16 +58,16 @@ class Footer extends Vue {
       url: "https://www.openskope.org/skope-users-guide ",
     },
     {
-      id: "github",
-      label: "GitHub",
-      icon: "fab fa-github",
-      url: "https://github.com/openskope/skopeui",
-    },
-    {
       id: "contact",
       label: "Contact",
       icon: "email",
       url: "https://www.comses.net/about/contact/",
+    },
+    {
+      id: "github",
+      label: "GitHub",
+      icon: "fab fa-github",
+      url: "https://github.com/openskope/skopeui",
     },
   ];
 }
