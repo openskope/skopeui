@@ -67,9 +67,9 @@
               outlined
               depressed
               v-bind="attrs"
+              class="my-auto"
               v-on="on"
               @click="selectGeoJsonFile"
-              class="my-auto"
             >
               <v-icon>upload</v-icon>
             </v-btn>
