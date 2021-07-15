@@ -2,33 +2,23 @@
   <v-row>
     <v-col>
       <!-- load analysis -->
-      <v-tooltip bottom>
-        <template #activator="{ on, attrs }">
-          <v-btn
-            :icon="!isMdAndDown"
-            large
-            color="accent"
-            depressed
-            v-bind="attrs"
-            class="mt-3 mx-3"
-            @click="selectLoadRequestDataFile"
-            v-on="on"
-          >
-            <input
-              id="loadRequestDataFile"
-              type="file"
-              accept=".json"
-              style="display: none"
-              @change="loadRequestData"
-            />
-            <v-icon v-if="!isMdAndDown" large color="white"
-              >fas fa-file-upload</v-icon
-            >
-            <h2 v-else class="title">Load Analysis</h2>
-          </v-btn>
-        </template>
-        <span>Load Analysis</span>
-      </v-tooltip>
+      <v-btn
+        color="secondary"
+        depressed
+        v-bind="attrs"
+        class="mt-3 mx-3"
+        @click="selectLoadRequestDataFile"
+        v-on="on"
+      >
+        <input
+          id="loadRequestDataFile"
+          type="file"
+          accept=".json"
+          style="display: none"
+          @change="loadRequestData"
+        />
+        <h2 class="title">Load Analysis</h2>
+      </v-btn>
     </v-col>
   </v-row>
 </template>

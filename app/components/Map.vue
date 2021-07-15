@@ -7,12 +7,12 @@
     outlined
   >
     <v-toolbar flat class="ma-0 pa-0">
-      <v-row class="mx-0" align="center">
+      <v-row class="mx-0" align="baseline">
         <!-- selected area -->
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
             <h3
-              class="font-weight-light text-center pa-2"
+              class="font-weight-light text-center pa-2 my-auto"
               style="background-color: #e4e7ef"
               v-bind="attrs"
               v-on="on"
@@ -23,6 +23,17 @@
           <span>Selected Area</span>
         </v-tooltip>
         <v-spacer></v-spacer>
+        <v-alert
+          v-if="isSelectArea"
+          dense
+          text
+          outlined
+          icon="draw"
+          color="secondary"
+          class="my-auto"
+        >
+          Use the draw toolbar on the left to select an area of study.
+        </v-alert>
         <!-- set opacity -->
         <v-text-field
           v-if="isVisualize"
@@ -58,6 +69,7 @@
               v-bind="attrs"
               v-on="on"
               @click="selectGeoJsonFile"
+              class="my-auto"
             >
               <v-icon>upload</v-icon>
             </v-btn>
@@ -72,7 +84,7 @@
               color="secondary"
               depressed
               v-bind="attrs"
-              class="mx-2"
+              class="mx-2 my-auto"
               v-on="on"
               @click="exportSelectedGeometry"
             >
@@ -235,6 +247,10 @@ class Map extends Vue {
       return this.$L.CRS.EPSG4326;
     }
     return "";
+  }
+
+  get isSelectArea() {
+    return this.stepNames.findIndex((x) => x === this.$route.name) === 1;
   }
 
   get isVisualize() {
