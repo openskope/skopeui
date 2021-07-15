@@ -13,10 +13,10 @@
           <nuxt-link class="skope-title" to="/">skope</nuxt-link>
         </v-toolbar-title>
       </v-col>
-      <v-col v-if="!isMdAndDown" lg="7" class="grow">
+      <v-col v-if="!isMdAndDown" md="7" class="grow">
         <Navigation />
       </v-col>
-      <v-col v-else align-self="center" lg="7" class="grow text-right mx-2">
+      <v-col v-else align-self="center" class="grow text-right mx-2">
         <h1 offset-y style="color: white">
           <span style="border-bottom: #ee6c4d solid" class="pb-2">
             <v-icon large color="white" class="mx-2">{{
