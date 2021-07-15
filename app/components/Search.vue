@@ -1,17 +1,57 @@
 <template>
   <v-form @submit.prevent>
-    <v-row>
-      <v-col>
+    <v-row align="center">
+      <!-- filter by variable -->
+      <v-col cols="3">
+        <v-combobox
+          v-model="selectedVariableClasses"
+          no-filter
+          :items="variableClasses"
+          label="Filter by variable"
+          multiple
+          small-chips
+          outlined
+          @change="filterDatasets"
+          @blur="filterDatasets"
+        >
+          <template
+            #selection="{ attrs, item: variableClass, selected, parent }"
+          >
+            <v-chip
+              v-bind="attrs"
+              color="info"
+              style="color: black"
+              :input-value="selected"
+              label
+              small
+            >
+              <span class="pr-2">
+                {{ variableClass }}
+              </span>
+              <v-icon small @click="parent.selectItem(variableClass)">
+                $delete
+              </v-icon>
+            </v-chip>
+          </template>
+          <template #item="{ item: variableClass }">
+            <v-chip color="info" dark label small style="color: black">
+              {{ variableClass }}
+            </v-chip>
+          </template>
+        </v-combobox>
+      </v-col>
+      <!-- search by keyword -->
+      <v-col cols="5">
         <!-- keyword search -->
         <v-text-field
           id="search"
           v-model="search"
           clearable
           outlined
-          filled
           data-toggle="hideseek"
           label="Search for a keyword"
           @change="filterDatasets"
+          @blur="filterDatasets"
         >
           <template #append>
             <v-btn icon class="align-baseline" @click="filterDatasets">
@@ -20,68 +60,30 @@
           </template>
         </v-text-field>
       </v-col>
-    </v-row>
-    <!-- start and end date range -->
-    <v-row>
-      <v-col>
+      <v-col cols="2">
         <v-text-field
           v-model="startYear"
           outlined
-          dense
           label="Start Year"
           :rules="startYearRules"
           type="number"
           @change="filterDatasets"
+          @blur="filterDatasets"
         >
-          <template #prepend>
-            <h3 class="headline">Year range</h3>
-          </template>
         </v-text-field>
       </v-col>
-      <v-col>
+      <v-col cols="2">
         <v-text-field
           v-model="endYear"
           outlined
-          dense
           :rules="endYearRules"
           label="End Year"
           type="number"
           @change="filterDatasets"
+          @blur="filterDatasets"
         >
         </v-text-field>
       </v-col>
-    </v-row>
-    <!-- variable checkbox selector -->
-    <h3 class="headline my-3">Variables</h3>
-    <v-row>
-      <v-list
-        v-for="(variable, index) in variableClasses"
-        :key="index"
-        class="py-0 my-2"
-      >
-        <v-checkbox
-          v-model="selectedVariableClasses"
-          :value="variable.name"
-          :label="variable.name"
-          dense
-          hide-details
-          class="py-0 my-0"
-          @change="filterDatasets"
-        >
-          <template #label>
-            <v-chip
-              small
-              label
-              class="ma-1 width-50"
-              color="info"
-              text-color="black"
-            >
-              <v-icon>view_column</v-icon>
-              {{ variable.name }}
-            </v-chip>
-          </template>
-        </v-checkbox>
-      </v-list>
     </v-row>
   </v-form>
 </template>
@@ -136,10 +138,7 @@ class Search extends Vue {
     }
     const variableClasses = [];
     for (const variableClass of variableClassSet) {
-      variableClasses.push({
-        name: variableClass,
-        checked: false,
-      });
+      variableClasses.push(variableClass);
     }
     return variableClasses;
   }

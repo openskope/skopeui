@@ -1,70 +1,59 @@
 <template>
-  <v-row pa-2 mb-2 align-content-start justify-space-around>
+  <v-row align-content-start justify-space-around>
     <v-col xs4>
-      <div class="map px-2">
-        <client-only>
-          <l-map
-            :min-zoom="2"
-            :max-zoom="8"
-            :zoom="region.zoom"
-            :center="region.center"
-          >
-            <l-control-scale />
-            <l-tile-layer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-              attribution="Tiles &copy; Esri"
-            />
-            <l-rectangle :bounds="region.extents" :l-style="region.style" />
-          </l-map>
-        </client-only>
-      </div>
+      <client-only>
+        <l-map
+          :min-zoom="2"
+          :max-zoom="8"
+          :zoom="region.zoom"
+          :center="region.center"
+          style="position: relative; z-index: 1"
+        >
+          <l-control-scale />
+          <l-tile-layer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri"
+          />
+          <l-rectangle :bounds="region.extents" :l-style="region.style" />
+        </l-map>
+      </client-only>
     </v-col>
     <v-col xs8>
-      <div class="px-2">
-        <v-card elevation="0">
-          <v-card-title class="pb-0">
-            <h2 class="headline">
-              <nuxt-link :to="absoluteUrl" class="dataset-title">
-                {{ title }}
-              </nuxt-link>
-            </h2>
-          </v-card-title>
-          <v-subheader>
-            {{ spatialCoverage }} | {{ temporalCoverage }}
-          </v-subheader>
-          <v-card-text class="body">
-            <div v-html="$md.render(description)"></div>
-          </v-card-text>
-          <v-subheader><h3>Variables</h3></v-subheader>
-          <!-- FIXME: extract this to a component and reuse across the detail page -->
-          <v-list dense>
-            <v-list-item v-for="(variable, index) in variables" :key="index">
-              <v-list-item-content>
-                <v-list-item-title class="variable">
-                  <v-chip
-                    small
-                    label
-                    class="ma-2"
-                    color="info"
-                    text-color="black"
-                  >
-                    {{ variable.class }}
-                  </v-chip>
-                  {{ variable.name }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-          <v-card-text>
-            <div class="py-3 citation font-weight-bold">
-              Source:
-              <a target="_blank" :href="sourceUrl">
-                {{ sourceUrl }}
-              </a>
-            </div>
-          </v-card-text>
-        </v-card>
-      </div>
+      <v-card elevation="0">
+        <v-card-title class="ma-0 pb-0">
+          <h2 class="headline">
+            <nuxt-link :to="absoluteUrl" class="dataset-title">
+              {{ title }}
+            </nuxt-link>
+          </h2>
+        </v-card-title>
+        <v-subheader class="ma-0">
+          {{ spatialCoverage }} | {{ temporalCoverage }}
+        </v-subheader>
+        <v-card-text class="ma-0">
+          <span v-html="$md.render(description)"></span>
+        </v-card-text>
+        <v-subheader class="ma-0"><h3>Variables</h3></v-subheader>
+        <!-- FIXME: extract this to a component and reuse across the detail page -->
+        <v-list dense class="ma-0 pa-0">
+          <v-list-item v-for="(variable, index) in variables" :key="index">
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-chip small label color="info" text-color="black">
+                  {{ variable.class }}
+                </v-chip>
+                {{ variable.name }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+        <v-card-text class="citation font-weight-bold">
+          Source:
+          <a target="_blank" :href="sourceUrl">
+            {{ sourceUrl }}
+          </a>
+        </v-card-text>
+      </v-card>
     </v-col>
   </v-row>
 </template>
@@ -127,25 +116,10 @@ class Dataset extends Vue {
     }
     return "";
   }
-
-  // --------- METHODS ---------
-
-  initMap() {}
-
-  initLayers() {}
 }
 export default Dataset;
 </script>
 <style scoped>
-.map {
-  height: 100%;
-  position: relative;
-  z-index: 1;
-}
-.variable {
-  height: 3em;
-}
-
 .dataset-title {
   text-decoration: none;
   box-shadow: inset 0 -2px 0 #ee6c4d, 0 2px 0 #ee6c4d;
