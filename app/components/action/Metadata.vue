@@ -1,30 +1,24 @@
 <template>
   <v-card-text>
-    <v-row class="mb-4">
-      <v-list dense flat>
-        <v-list-item-title><strong>Variables:</strong></v-list-item-title>
-        <v-list-item
-          v-for="(variable, index) in metadata.variables"
-          :key="index"
-        >
-          <v-list-item-content>
-            <v-list-item-title>
-              <v-chip small label color="info" text-color="black">
-                <v-icon>view_column</v-icon>
-                {{ variable.class }}
-              </v-chip>
-              {{ variable.name }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-row>
-    <v-row>
-      <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-0">
-        <span class="font-weight-bold"> {{ label }}: </span>
-        <div v-html="$md.render(metadata[attr])"></div>
-      </div>
-    </v-row>
+    <v-list dense flat>
+      <v-subheader class="font-weight-bold ma-0 pa-0"
+        ><h3>Variables:</h3></v-subheader
+      >
+      <v-list-item v-for="(variable, index) in metadata.variables" :key="index">
+        <v-list-item-content>
+          <v-list-item-title>
+            <v-chip small label color="info" text-color="black">
+              {{ variable.class }}
+            </v-chip>
+            {{ variable.name }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+    <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-0">
+      <span class="font-weight-bold">{{ label }}</span>
+      <span v-html="$md.render(metadata[attr])"></span>
+    </div>
   </v-card-text>
 </template>
 

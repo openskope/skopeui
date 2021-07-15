@@ -17,11 +17,13 @@
         </v-btn>
       </template>
       <v-card>
-        <v-card-title>
-          <h3 class="font-weight-light">{{ metadata.title }}</h3>
+        <v-card-title style="background-color: #6db1bf">
+          <h3 class="font-weight-light" style="color: white">
+            {{ metadata.title }}
+          </h3>
           <v-spacer></v-spacer>
           <v-btn icon @click="showMetadata = false">
-            <v-icon color="error">fas fa-times</v-icon>
+            <v-icon color="white">fas fa-times</v-icon>
           </v-btn>
         </v-card-title>
         <v-card-text>
