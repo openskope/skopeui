@@ -9,7 +9,7 @@
           @click.stop="toggleDrawer(!drawer)"
         >
         </v-app-bar-nav-icon>
-        <v-toolbar-title class="mx-2 mt-2">
+        <v-toolbar-title class="mx-2">
           <nuxt-link class="skope-title ma-0 pa-0" to="/">SKOPE</nuxt-link>
           <p
             v-if="!isMdAndDown"
