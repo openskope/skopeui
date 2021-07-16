@@ -16,8 +16,9 @@
         University.
       </v-card-text>
       <v-divider></v-divider>
-      <span class="subtitle-1 font-weight-bold" style="color: white"
-        >&copy; 2016 - {{ new Date().getFullYear() }}</span
+      <span class="subtitle-1 font-weight-bold" style="color: white">
+        Synthesizing Knowledge of Past Environments (SKOPE) &copy; 2016 -
+        {{ new Date().getFullYear() }}</span
       >
       <TermsOfUse />
       <v-btn
