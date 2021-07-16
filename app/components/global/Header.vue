@@ -9,8 +9,15 @@
           @click.stop="toggleDrawer(!drawer)"
         >
         </v-app-bar-nav-icon>
-        <v-toolbar-title class="mx-2">
-          <nuxt-link class="skope-title" to="/">skope</nuxt-link>
+        <v-toolbar-title class="mx-2 mt-2">
+          <nuxt-link class="skope-title ma-0 pa-0" to="/">SKOPE</nuxt-link>
+          <p
+            v-if="!isMdAndDown"
+            class="subtitle-2 ma-0 pa-0"
+            style="color: white"
+          >
+            Synthesizing Knowledge of Past Environments
+          </p>
         </v-toolbar-title>
       </v-col>
       <v-col v-if="!isMdAndDown" md="7" class="grow">

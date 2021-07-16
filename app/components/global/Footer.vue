@@ -17,9 +17,9 @@
       </v-card-text>
       <v-divider></v-divider>
       <span class="subtitle-1 font-weight-bold" style="color: white">
-        Synthesizing Knowledge of Past Environments (SKOPE) &copy; 2016 -
-        {{ new Date().getFullYear() }}</span
-      >
+        &copy; 2016 -{{ new Date().getFullYear() }} Synthesizing Knowledge of
+        Past Environments (SKOPE)
+      </span>
       <TermsOfUse />
       <v-btn
         v-for="link in links"
