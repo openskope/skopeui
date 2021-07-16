@@ -29,7 +29,7 @@
           text
           outlined
           icon="draw"
-          color="secondary"
+          color="secondary darken-2"
           class="my-auto"
         >
           Use the draw toolbar on the left to select an area of study.

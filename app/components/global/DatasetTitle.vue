@@ -109,13 +109,6 @@ class DatasetTitle extends Vue {
       params: { id, variable },
     };
   }
-
-  instructions = [
-    "Welcome to the Synthesizing Knowledge of Past Environments (SKOPE) application! To examine data, click on a dataset name, pan & zoom the map, define your area of interest, then select a variable layer. ",
-    "To define a selected area, use the map tools pan and zoom into the map and draw a polygon to select an area of study. When you are satisfied with your selection, click next.",
-    "Instructions here",
-    "Instructions here",
-  ];
 }
 export default DatasetTitle;
 </script>
