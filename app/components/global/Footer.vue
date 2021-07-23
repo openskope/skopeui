@@ -54,9 +54,9 @@ class Footer extends Vue {
   links = [
     {
       id: "docs",
-      label: "Docs",
+      label: "User Guide",
       icon: "fas fa-question-circle",
-      url: "https://www.openskope.org/skope-users-guide ",
+      url: "https://www.openskope.org/skope-users-guide/",
     },
     {
       id: "contact",
@@ -68,7 +68,7 @@ class Footer extends Vue {
       id: "github",
       label: "GitHub",
       icon: "fab fa-github",
-      url: "https://github.com/openskope/skopeui",
+      url: "https://github.com/openskope/skopeui/",
     },
   ];
 }
