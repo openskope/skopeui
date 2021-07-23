@@ -3,23 +3,23 @@
     <h1 class="font-weight-light">
       {{ metadata.title }}
     </h1>
-    <v-btn
-      icon
-      depressed
-      fab
-      rounded
-      href="https://www.openskope.org/skope-users-guide/"
-      target="_blank"
-    >
-      <v-tooltip bottom>
-        <template #activator="{ on, attrs }">
-          <v-icon v-bind="attrs" color="grey" v-on="on"
-            >fas fa-question-circle</v-icon
-          >
-        </template>
-        <span>User Guide</span>
-      </v-tooltip>
-    </v-btn>
+    <v-tooltip bottom>
+      <template #activator="{ on, attrs }">
+        <v-btn
+          icon
+          depressed
+          fab
+          rounded
+          href="https://www.openskope.org/skope-users-guide/"
+          target="_blank"
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon color="grey">fas fa-question-circle</v-icon>
+        </v-btn>
+      </template>
+      <span>User Guide</span>
+    </v-tooltip>
     <v-dialog v-model="showMetadata" max-width="600px">
       <template #activator="{ on, attrs }">
         <v-btn icon depressed fab rounded v-bind="attrs" v-on="on">

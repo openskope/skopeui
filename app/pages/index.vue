@@ -29,23 +29,23 @@
       <v-col cols="12">
         <h1 class="font-weight-light">
           Select a Dataset
-          <v-btn
-            icon
-            depressed
-            fab
-            rounded
-            href="https://www.openskope.org/skope-users-guide/"
-            target="_blank"
-          >
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-icon v-bind="attrs" color="grey" v-on="on"
-                  >fas fa-question-circle</v-icon
-                >
-              </template>
-              <span>User Guide</span>
-            </v-tooltip>
-          </v-btn>
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                icon
+                depressed
+                fab
+                rounded
+                href="https://www.openskope.org/skope-users-guide/"
+                target="_blank"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon color="grey">fas fa-question-circle</v-icon>
+              </v-btn>
+            </template>
+            <span>User Guide</span>
+          </v-tooltip>
         </h1>
         <template v-for="dataset in datasets" router exact>
           <v-card
