@@ -181,6 +181,7 @@ class Map extends Vue {
   @Prop({ default: true })
   displayRaster;
 
+  isMapReady = false;
   opacity = 50;
   opacityRules = [
     (v) =>
@@ -265,6 +266,10 @@ class Map extends Vue {
     return this.metadata.variables;
   }
 
+  get wmsLayer() {
+    return this.fillTemplateYear(this.variable.wmsLayer);
+  }
+
   destroyed() {
     if (this.geoJsonUnwatcher) {
       this.geoJsonUnwatcher();
@@ -285,7 +290,6 @@ class Map extends Vue {
       if (this.isSkopeLayer(leafletLayer)) {
         const variable = _.find(this.variables, (v) => v.name === event.name);
         this.$api().dataset.setVariable(variable.id);
-        this.updateWmsLegend(map, leafletLayer.wmsParams.layers);
         leafletLayer.bringToFront();
       }
     };
@@ -310,6 +314,8 @@ class Map extends Vue {
       },
       { immediate: true }
     );
+    this.isMapReady = true;
+    this.updateWmsLegend();
   }
 
   addDrawToolbar(map) {
@@ -452,16 +458,17 @@ class Map extends Vue {
     this.legendImage = htmlElement;
   }
 
-  generateWmsLegendUrl(layerName) {
+  generateWmsLegendUrl() {
     const query = {
       REQUEST: "GetLegendGraphic",
       VERSION: "1.0.0",
       FORMAT: "image/png",
-      LAYER: layerName,
+      LAYER: this.wmsLayer,
       LEGEND_OPTIONS: "layout:vertical;dx:10",
     };
     const queryString = stringify(query);
     const legendUrl = this.skopeWmsUrl + queryString;
+    console.log("legendUrl: ", legendUrl);
     return legendUrl;
   }
 
@@ -474,17 +481,21 @@ class Map extends Vue {
     if (this.variable !== null && this.$refs.wmsLayers) {
       for (const wmsLayerRef of this.$refs.wmsLayers) {
         if (wmsLayerRef.name === this.variable.name) {
-          const layerName = this.fillTemplateYear(this.variable.wmsLayer);
           const wmsLayer = wmsLayerRef.mapObject;
-          wmsLayer.setParams({ layers: layerName }, false);
+          wmsLayer.setParams({ layers: this.wmsLayer }, false);
         }
       }
     }
   }
 
-  updateWmsLegend(map, layerName) {
+  @Watch("variable", { immediate: true, deep: true })
+  updateWmsLegend() {
+    if (!this.isMapReady) {
+      return;
+    }
+    const map = this.$refs.layerMap.mapObject;
     const L = this.$L;
-    const wmsLegendUrl = this.generateWmsLegendUrl(layerName);
+    const wmsLegendUrl = this.generateWmsLegendUrl();
     if (_.isNil(this.legendControl)) {
       const legend = L.control({ position: this.legendPosition });
       legend.onAdd = (map) => {

@@ -262,6 +262,7 @@ class Dataset extends VuexModule {
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
   }
 
+  // takes variable id to set variable object
   @Mutation
   setVariable(id) {
     for (const variable of this.metadata.variables) {
