@@ -78,7 +78,6 @@ class Header extends Vue {
   // --------- METHODS ---------
 
   toggleDrawer(drawer) {
-    console.log("drawer: ", drawer);
     this.$api().app.toggleDrawer(drawer);
   }
 }
