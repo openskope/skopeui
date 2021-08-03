@@ -65,7 +65,7 @@ import { Prop } from "vue-property-decorator";
 import { BaseMapProvider } from "@/store/modules/constants";
 
 @Component()
-class Dataset extends Vue {
+class ListItem extends Vue {
   @Prop()
   title; //: String
 
@@ -117,7 +117,7 @@ class Dataset extends Vue {
     return "";
   }
 }
-export default Dataset;
+export default ListItem;
 </script>
 <style scoped>
 .dataset-title {

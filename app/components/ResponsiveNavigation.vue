@@ -13,8 +13,8 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import LoadAnalysis from "@/components/global/LoadAnalysis.vue";
-import Navigation from "@/components/global/Navigation.vue";
+import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
+import Navigation from "@/components/Navigation.vue";
 
 @Component({
   components: {
@@ -22,7 +22,7 @@ import Navigation from "@/components/global/Navigation.vue";
     Navigation,
   },
 })
-class DiscoverSideBar extends Vue {
+class ResponsiveNavigation extends Vue {
   // --------- GETTERS ---------
 
   get isVisible() {
@@ -38,6 +38,6 @@ class DiscoverSideBar extends Vue {
   }
 }
 
-export default DiscoverSideBar;
+export default ResponsiveNavigation;
 </script>
 <style scoped></style>

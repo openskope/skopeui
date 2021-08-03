@@ -54,7 +54,7 @@
             elevation="2"
             outlined
           >
-            <Dataset
+            <ListItem
               :key="dataset.absolute_url"
               v-bind="dataset"
               class="my-2"
@@ -72,13 +72,13 @@
 <script>
 import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
-import Dataset from "@/components/selectDataset/Dataset.vue";
-import Search from "@/components/selectDataset/Search.vue";
+import ListItem from "@/components/dataset/ListItem.vue";
+import Search from "@/components/dataset/Search.vue";
 
 @Component({
   layout: "BaseDefault",
   components: {
-    Dataset,
+    ListItem,
     Search,
   },
 })

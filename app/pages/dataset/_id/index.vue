@@ -3,7 +3,7 @@
     <v-row>
       <LoadingSpinner v-if="isLoading"></LoadingSpinner>
       <v-col lg="12" md="12" sm="12" class="mb-3">
-        <DatasetTitle>
+        <SubHeader>
           <v-btn
             :disabled="!hasValidStudyArea"
             :to="visualizeLocation"
@@ -14,7 +14,7 @@
             Visualize Data
             <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
           </v-btn>
-        </DatasetTitle>
+        </SubHeader>
       </v-col>
       <v-col
         lg="12"
@@ -65,9 +65,9 @@
 import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
-import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
-import DatasetTitle from "@/components/global/DatasetTitle.vue";
-import Map from "@/components/shared/Map.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import SubHeader from "@/components/dataset/SubHeader.vue";
+import Map from "@/components/dataset/Map.vue";
 
 import { initializeDataset, clearGeoJson } from "@/store/actions";
 
@@ -79,7 +79,7 @@ const fillTemplate = require("es6-dynamic-template");
     // load time series plotly component lazily to avoid document is not defined errors
     // https://stackoverflow.com/a/50458090
     LoadingSpinner,
-    DatasetTitle,
+    SubHeader,
     Map,
   },
 })

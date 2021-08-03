@@ -187,7 +187,7 @@ import _ from "lodash";
 import { Component } from "nuxt-property-decorator";
 import { Prop, Watch } from "vue-property-decorator";
 import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
-import LoadingSpinner from "@/components/global/LoadingSpinner.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 @Component({
   components: {

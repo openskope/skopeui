@@ -177,7 +177,7 @@ export default Navigation;
 </script>
 
 <style scoped lang="sass">
-@import './assets/style/variables.scss'
+@import 'assets/style/variables'
 .step
   letter-spacing: .05em
   font: 1.75em 'Roboto', serif

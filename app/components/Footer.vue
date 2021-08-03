@@ -41,7 +41,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import TermsOfUse from "@/components/global/TermsOfUse.vue";
+import TermsOfUse from "@/components/TermsOfUse.vue";
 
 @Component({
   components: {

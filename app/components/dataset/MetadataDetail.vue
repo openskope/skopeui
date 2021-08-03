@@ -27,9 +27,9 @@ import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 
 @Component({
-  name: "Metadata",
+  name: "MetadataDetail",
 })
-class Metadata extends Vue {
+class MetadataDetail extends Vue {
   get metadata() {
     return this.$api().dataset.metadata;
   }
@@ -45,7 +45,7 @@ class Metadata extends Vue {
   }
 }
 
-export default Metadata;
+export default MetadataDetail;
 </script>
 
 <style scoped></style>

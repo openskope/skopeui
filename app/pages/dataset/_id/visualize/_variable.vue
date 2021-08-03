@@ -2,7 +2,7 @@
   <v-container fluid class="fill-height align-start">
     <v-row no-gutters>
       <v-col lg="12" md="12" sm="12" class="mb-3">
-        <DatasetTitle :select-variable="true">
+        <SubHeader :select-variable="true">
           <v-spacer></v-spacer>
           <v-btn
             :disabled="!hasValidStudyArea"
@@ -14,7 +14,7 @@
             Analyze Data
             <v-icon class="ml-2" small> fas fa-chevron-right </v-icon>
           </v-btn>
-        </DatasetTitle>
+        </SubHeader>
       </v-col>
       <!-- 2 column layout with map and time series-->
       <v-col
@@ -46,9 +46,9 @@
 
 <script>
 import { Component } from "nuxt-property-decorator";
-import Map from "@/components/shared/Map.vue";
-import TimeSeriesPlot from "@/components/shared/TimeSeriesPlot.vue";
-import DatasetTitle from "@/components/global/DatasetTitle.vue";
+import Map from "@/components/dataset/Map.vue";
+import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
+import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import _ from "lodash";
 import { initializeDataset } from "@/store/actions";
@@ -63,7 +63,7 @@ const setYearSelected = _.debounce(function (vue) {
     return route.fullPath;
   },
   components: {
-    DatasetTitle,
+    SubHeader,
     Map,
     TimeSeriesPlot,
   },

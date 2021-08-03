@@ -3,12 +3,12 @@
     <v-row class="fill-height">
       <!-- dataset title -->
       <v-col class="mb-3" lg="12" md="12" sm="12">
-        <DatasetTitle :select-variable="true">
+        <SubHeader :select-variable="true">
           <v-btn color="accent" depressed @click="exportData">
             Download
             <v-icon class="ml-2" small>download</v-icon>
           </v-btn>
-        </DatasetTitle>
+        </SubHeader>
       </v-col>
       <!-- time series -->
       <v-col class="timeseries-flex" lg="8" md="12">
@@ -289,8 +289,8 @@
 </template>
 
 <script>
-import TimeSeriesPlot from "@/components/shared/TimeSeriesPlot.vue";
-import DatasetTitle from "@/components/global/DatasetTitle.vue";
+import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
+import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { initializeDataset, retrieveAnalysis } from "@/store/actions";
@@ -304,7 +304,7 @@ import Papa from "papaparse";
   layout: "BaseDefault",
   components: {
     TimeSeriesPlot,
-    DatasetTitle,
+    SubHeader,
   },
 })
 class Analyze extends Vue {

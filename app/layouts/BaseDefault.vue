@@ -3,7 +3,7 @@
     <Header />
     <v-main>
       <v-container fluid>
-        <DiscoverSideBar />
+        <ResponsiveNavigation />
         <Messages />
         <nuxt />
       </v-container>
@@ -15,15 +15,15 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import Header from "@/components/global/Header";
-import DiscoverSideBar from "@/components/toggle/DiscoverSideBar";
-import Messages from "@/components/global/Messages";
-import Footer from "@/components/global/Footer";
+import Header from "@/components/Header";
+import ResponsiveNavigation from "@/components/ResponsiveNavigation";
+import Messages from "@/components/Messages";
+import Footer from "@/components/Footer";
 
 @Component({
   components: {
     Header,
-    DiscoverSideBar,
+    ResponsiveNavigation,
     Messages,
     Footer,
   },

@@ -44,8 +44,8 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import LoadAnalysis from "@/components/global/LoadAnalysis.vue";
-import Navigation from "@/components/global/Navigation.vue";
+import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
+import Navigation from "@/components/Navigation.vue";
 import _ from "lodash";
 
 @Component({

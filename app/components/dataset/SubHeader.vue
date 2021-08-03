@@ -44,7 +44,7 @@
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <Metadata />
+          <MetadataDetail />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -72,13 +72,13 @@
 <script>
 import Vue from "vue";
 import { Component, Prop } from "nuxt-property-decorator";
-import Metadata from "@/components/toggle/Metadata.vue";
+import MetadataDetail from "@/components/dataset/MetadataDetail.vue";
 import _ from "lodash";
 
 @Component({
-  components: { Metadata },
+  components: { MetadataDetail },
 })
-class DatasetTitle extends Vue {
+class SubHeader extends Vue {
   @Prop({ default: false })
   selectVariable;
 
@@ -127,5 +127,5 @@ class DatasetTitle extends Vue {
     };
   }
 }
-export default DatasetTitle;
+export default SubHeader;
 </script>
