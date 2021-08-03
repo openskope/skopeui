@@ -23,7 +23,6 @@
       <TermsOfUse />
       <v-btn
         v-for="link in links"
-        v-bind="attrs"
         :key="link.id"
         plain
         style="font-weight: bold"
@@ -31,7 +30,6 @@
         class="subtitle-1"
         target="_blank"
         :href="link.url"
-        v-on="on"
       >
         {{ link.label }}
       </v-btn>
