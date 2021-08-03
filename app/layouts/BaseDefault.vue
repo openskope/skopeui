@@ -16,8 +16,8 @@
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import Header from "@/components/global/Header";
-import DiscoverSideBar from "@/components/DiscoverSideBar";
-import Messages from "@/components/Messages";
+import DiscoverSideBar from "@/components/toggle/DiscoverSideBar";
+import Messages from "@/components/global/Messages";
 import Footer from "@/components/global/Footer";
 
 @Component({

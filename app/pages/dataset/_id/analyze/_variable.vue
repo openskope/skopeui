@@ -289,9 +289,7 @@
 </template>
 
 <script>
-import KernelRegression from "@/components/chart-form/KernelRegression.vue";
-import RunningAverage from "@/components/chart-form/RunningAverage.vue";
-import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
+import TimeSeriesPlot from "@/components/shared/TimeSeriesPlot.vue";
 import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
@@ -305,8 +303,6 @@ import Papa from "papaparse";
 @Component({
   layout: "BaseDefault",
   components: {
-    KernelRegression,
-    RunningAverage,
     TimeSeriesPlot,
     DatasetTitle,
   },

@@ -5,10 +5,8 @@
       <v-btn
         color="secondary"
         depressed
-        v-bind="attrs"
         class="mt-3 mx-3"
         @click="selectLoadRequestDataFile"
-        v-on="on"
       >
         <input
           id="loadRequestDataFile"
@@ -78,13 +76,6 @@ class LoadAnalysis extends Vue {
         this.$api().analysis.setRequestData(requestData);
         if (this.$route.name === "dataset-id-analyze-variable") {
           console.log("in analyze");
-          // this.$router.push({
-          //   name: "dataset-id-visualize-variable",
-          //   params: {
-          //     id: requestData.dataset_id,
-          //     variable: requestData.variable_id,
-          //   },
-          // });
         }
         this.$router.push({
           name: "dataset-id-analyze-variable",

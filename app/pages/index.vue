@@ -72,8 +72,8 @@
 <script>
 import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
-import Dataset from "@/components/Dataset.vue";
-import Search from "@/components/Search.vue";
+import Dataset from "@/components/selectDataset/Dataset.vue";
+import Search from "@/components/selectDataset/Search.vue";
 
 @Component({
   layout: "BaseDefault",

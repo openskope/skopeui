@@ -566,7 +566,7 @@ export default Map;
 .leaflet-top.leaflet-right
   .leaflet-control-layers:nth-child(1)
   .leaflet-control-layers-toggle {
-  background-image: url(/earth.svg);
+  background-image: url(/app/static/earth.svg);
 }
 
 #exportSelectedGeometry {

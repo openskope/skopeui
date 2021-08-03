@@ -46,8 +46,8 @@
 
 <script>
 import { Component } from "nuxt-property-decorator";
-import Map from "@/components/Map.vue";
-import TimeSeriesPlot from "@/components/TimeSeriesPlot.vue";
+import Map from "@/components/shared/Map.vue";
+import TimeSeriesPlot from "@/components/shared/TimeSeriesPlot.vue";
 import DatasetTitle from "@/components/global/DatasetTitle.vue";
 import Vue from "vue";
 import _ from "lodash";

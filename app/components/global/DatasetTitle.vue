@@ -72,7 +72,7 @@
 <script>
 import Vue from "vue";
 import { Component, Prop } from "nuxt-property-decorator";
-import Metadata from "@/components/action/Metadata.vue";
+import Metadata from "@/components/toggle/Metadata.vue";
 import _ from "lodash";
 
 @Component({
