@@ -23,6 +23,8 @@
       <!-- analysis form -->
       <v-col lg="4" md="12" class="timeseries-flex">
         <v-form
+          ref="analysisRequestForm"
+          v-model="analysisFormValid"
           class="pa-3 fill-height"
           style="background-color: #f4f7ff; width: 100%"
         >
@@ -265,16 +267,17 @@
                 label="Smoothing window"
                 suffix="time steps"
                 type="number"
+                :rules="[validateSmoothingWidth]"
               >
               </v-text-field>
             </v-col>
             <v-col class="shrink text-center" align-self="end">
               <v-btn
                 width="45%"
-                :disabled="isUpdateDisabled"
+                :disabled="!analysisFormValid"
                 class="font-weight-bold"
                 color="accent"
-                @click="updateTimeSeries"
+                @submit="updateTimeSeries"
                 >Update
               </v-btn>
               <v-btn width="45%" @click="clearTransformedTimeSeries"
@@ -313,6 +316,7 @@ class Analyze extends Vue {
   showTransformHint = false;
   showZonalStatisticHint = false;
   requestDataWatcher = null;
+  analysisFormValid = true;
 
   zonalStatistic = "mean";
 
@@ -561,10 +565,15 @@ class Analyze extends Vue {
   }
 
   get requestedSeries() {
-    const series = [{ name: "Original", smoother: { type: "NoSmoother" } }];
+    const series = [
+      {
+        name: this.hasTransformOption ? "Transformed" : "Original",
+        smoother: { type: "NoSmoother" },
+      },
+    ];
     if (this.hasSmoothingOption) {
       series.push({
-        name: "Transformed",
+        name: "Smoothed",
         smoother: this.smoothingFunction,
       });
     }
@@ -708,8 +717,17 @@ class Analyze extends Vue {
     this.$download.saveAs(content, `${request.dataset_id}.zip`);
   }
 
+  /**
+   * Invoked when the user submits a request for statistics or a different temporal range.
+   * Makes a request to skope-api with a new requested series and updates TimeSeriesPlot
+   * with the response time series.
+   * @returns {Promise<void>}
+   */
   async updateTimeSeries() {
     // grab form inputs and set them on the store
+    if (!this.analysisFormValid) {
+      return;
+    }
     const api = this.$api();
     console.log("submitting to web service");
     const requestData = {
@@ -746,6 +764,16 @@ class Analyze extends Vue {
     }
     if (year >= maxYear) {
       return `Please enter a max year <= ${maxYear}`;
+    }
+    return true;
+  }
+
+  validateSmoothingWidth(width) {
+    if (this.smoothingOption === "trailingAverage") {
+      return true;
+    }
+    if (width % 2 === 0) {
+      return "Please enter an odd width";
     }
     return true;
   }
