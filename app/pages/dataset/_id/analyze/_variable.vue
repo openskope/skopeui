@@ -350,6 +350,7 @@ class Analyze extends Vue {
       label: "None (time steps individually plotted)",
       id: "none",
       type: "NoSmoother",
+      method: "none",
       toRequestData: function (analyzeVue) {
         return {
           type: this.type,
@@ -362,11 +363,12 @@ class Analyze extends Vue {
     {
       label: "Centered Running Average",
       id: "centeredAverage",
+      method: "centered",
       type: "MovingAverageSmoother",
       toRequestData: function (analyzeVue) {
         return {
           type: this.type,
-          method: "centered",
+          method: this.method,
           width: analyzeVue.smoothingTimeStep,
         };
       },
@@ -378,11 +380,12 @@ class Analyze extends Vue {
     {
       label: "Trailing Running Average (- window width)",
       id: "trailingAverage",
+      method: "trailing",
       type: "MovingAverageSmoother",
       toRequestData: function (analyzeVue) {
         return {
           type: this.type,
-          method: "trailing",
+          method: this.method,
           width: analyzeVue.smoothingTimeStep,
         };
       },
@@ -652,16 +655,15 @@ class Analyze extends Vue {
 
   loadSmoothingOption(requestedSeries) {
     // locate the transformed time series in requested_series from the request data
-    const transformedSeries = requestedSeries.find(
-      (x) => x.name === "Transformed"
-    );
-    if (transformedSeries) {
-      // if the transformed time series exists, find the smoothing option that corresponds to the
-      // transformed time series smoother option and invoke fromRequestData to set the appropriate
+    const smoothedSeries = requestedSeries.find((x) => x.name === "Smoothed");
+    if (smoothedSeries) {
+      // if the smoothed time series exists, find the smoothing option that corresponds to the
+      // smoothed time series smoother option and invoke fromRequestData to set the appropriate
       // properties on this analyze vue component (if needed, e.g., smoothing time steps)
-      const smoother = transformedSeries.smoother;
+      const smoother = smoothedSeries.smoother;
+      console.log("smoother: ", smoother);
       const option = this.smoothingOptions.find(
-        (x) => x.type === smoother.type
+        (x) => x.method === smoother.method
       );
       option.fromRequestData(this, smoother);
     }
