@@ -51,7 +51,7 @@
           <v-card
             :key="dataset.absoluteUrl"
             class="pa-4 my-3"
-            elevation="2"
+            elevation="0"
             outlined
           >
             <ListItem

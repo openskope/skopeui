@@ -35,6 +35,7 @@
             <!-- /////////// STATS FOR TEMPORAL INTERVAL /////////// -->
             <v-col class="shrink" align-self="start">
               <v-data-table
+                dense
                 :disable-filtering="true"
                 :disable-pagination="true"
                 :disable-sort="true"
