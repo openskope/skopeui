@@ -25,10 +25,19 @@ export function summarize(timeseries) {
   // may need to make lowerExp and upperExp explicit, check with science team
   // https://mathjs.org/docs/reference/functions/format.html
   return {
-    stdDev: format(std(values), { precision }),
+    stdev: format(std(values), { precision }),
     mean: format(mean(values), { precision }),
     median: format(median(values), { precision }),
   };
+}
+
+export function formatStats(summaryStats, precision = DEFAULT_PRECISION) {
+  return summaryStats.map((s) => ({
+    name: s.name,
+    stdev: format(s.stdev, { precision }),
+    mean: format(s.mean, { precision }),
+    median: format(s.median, { precision }),
+  }));
 }
 
 /**

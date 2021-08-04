@@ -471,7 +471,7 @@ class Analyze extends Vue {
     {
       text: "Series",
       align: "start",
-      value: "series",
+      value: "name",
       class: "title",
     },
     {
@@ -486,7 +486,7 @@ class Analyze extends Vue {
     },
     {
       text: "Standard Deviation",
-      value: "stdDev",
+      value: "stdev",
       class: "title",
     },
   ];

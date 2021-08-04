@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Module, VuexModule, Mutation } from "vuex-module-decorators";
-import { summarize, extractYear } from "@/store/stats";
+import { formatStats, extractYear } from "@/store/stats";
 
 // expected response structure from the time series endpoint
 const EMPTY_RESPONSE = {
@@ -10,6 +10,7 @@ const EMPTY_RESPONSE = {
   zonal_statistic: "mean",
   dataset_id: "",
   variable_id: "",
+  summary_stats: [], // array of { name, mean, stdev, median }
 };
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
@@ -49,10 +50,7 @@ class Analysis extends VuexModule {
   }
 
   get summaryStatistics() {
-    return this.timeseries.map((ts) => ({
-      ...summarize(ts),
-      series: ts.name,
-    }));
+    return formatStats(this.response.summary_stats);
   }
 
   @Mutation

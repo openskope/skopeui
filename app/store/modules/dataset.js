@@ -115,7 +115,7 @@ class Dataset extends VuexModule {
   }
 
   get summaryStatistics() {
-    return { ...summarize(this.filteredTimeSeries), series: "Original" };
+    return { ...summarize(this.filteredTimeSeries), name: "Original" };
   }
 
   // FIXME: this may not be needed anymore
