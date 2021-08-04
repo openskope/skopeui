@@ -93,7 +93,7 @@
                   </v-tooltip>
                 </template>
               </v-select>
-              <v-alert v-else type="secondary">
+              <v-alert v-else type="warning">
                 Summary statistics are not available for a point geometry.
               </v-alert>
               <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
@@ -278,7 +278,7 @@
                 :disabled="!analysisFormValid"
                 class="font-weight-bold"
                 color="accent"
-                @submit="updateTimeSeries"
+                @click="updateTimeSeries"
                 >Update
               </v-btn>
               <v-btn width="45%" @click="clearTransformedTimeSeries"
@@ -727,6 +727,7 @@ class Analyze extends Vue {
   async updateTimeSeries() {
     // grab form inputs and set them on the store
     if (!this.analysisFormValid) {
+      console.log("invalid form, aborting update");
       return;
     }
     const api = this.$api();
@@ -751,7 +752,7 @@ class Analyze extends Vue {
     if (year < minYear) {
       return `Please enter a max year > ${minYear}`;
     }
-    if (year >= maxYear) {
+    if (year > maxYear) {
       return `Please enter a max year <= ${maxYear}`;
     }
     return true;
@@ -760,10 +761,10 @@ class Analyze extends Vue {
   validateMaxYear(year) {
     const minYear = this.temporalRange[0];
     const maxYear = this.temporalRange[1];
-    if (year <= minYear) {
+    if (year < minYear) {
       return `Please enter a max year > ${minYear}`;
     }
-    if (year >= maxYear) {
+    if (year > maxYear) {
       return `Please enter a max year <= ${maxYear}`;
     }
     return true;
