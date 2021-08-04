@@ -668,7 +668,6 @@ class Analyze extends Vue {
   }
 
   clearTransformedTimeSeries() {
-    this.transformOptions[0].generator();
     // clear smoothingOption and transformOption
     this.smoothingOption = "none";
     this.transformOption = "none";
