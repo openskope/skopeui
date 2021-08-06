@@ -382,6 +382,7 @@ class Map extends Vue {
       this.saveGeoJson(layer);
       this.drawnItems.addLayer(layer);
       this.enableEditOnly(map);
+      console.log("register toolbar handlers");
     });
     map.on(L.Draw.Event.DELETED, (event) => {
       clearGeoJson(this.$warehouse, this.$api());
@@ -411,8 +412,9 @@ class Map extends Vue {
   }
 
   /**
-   * persists geo json to the vuex store and local storage / warehouse and
+   * Persists geo json to the vuex store and local storage / warehouse and
    * converts leaflet circles to polygons
+   * @param layer
    */
   saveGeoJson(layer) {
     const data = layer.toGeoJSON();
@@ -532,8 +534,14 @@ class Map extends Vue {
     file.text().then((text) => {
       console.log("received possible geojson to load: ", text);
       try {
-        const geojson = JSON.parse(text);
-        this.$api().dataset.setGeoJson(geojson);
+        const geoJson = JSON.parse(text);
+        this.$api().dataset.setGeoJson(geoJson);
+        saveGeoJson(this.$warehouse, this.$api(), geoJson);
+        // assert that uploaded and store geojson are the same
+        console.log(
+          "assert same geojson: ",
+          geoJson === this.$api().dataset.geoJson
+        );
       } catch (error) {
         console.error(error);
         // FIXME: this should be a toast or other notification
