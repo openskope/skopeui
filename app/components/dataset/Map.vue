@@ -498,7 +498,7 @@ class Map extends Vue {
     const map = this.$refs.layerMap.mapObject;
     const L = this.$L;
     const wmsLegendUrl = this.generateWmsLegendUrl();
-    if (_.isNil(this.legendControl)) {
+    if (_.isNil(this.legendControl) && this.currentStep == 2) {
       const legend = L.control({ position: this.legendPosition });
       legend.onAdd = (map) => {
         const controlCss = "leaflet-control-wms-legend";

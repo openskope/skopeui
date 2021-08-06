@@ -19,7 +19,7 @@ export default {
         success: "#008148",
         error: "#CC0000",
         info: "#E0FBFC",
-        warning: "#FFD275",
+        warning: "#FAB716",
       },
       dark: {
         primary: "#3D5A80",
@@ -28,7 +28,7 @@ export default {
         success: "#008148",
         error: "#CC0000",
         info: "#E0FBFC",
-        warning: "#FFD275",
+        warning: "#FAB716",
       },
     },
   },
