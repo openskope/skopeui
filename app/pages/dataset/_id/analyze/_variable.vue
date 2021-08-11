@@ -55,17 +55,15 @@
                 item-value="id"
                 label="For each time step, summarize selected area as"
                 hint="Summary value of all selected pixels at each time step"
-                class="my-2"
               >
               </v-select>
-              <v-alert v-else type="warning">
+              <v-alert class="mt-4" v-else type="warning">
                 Summary statistics are not available for a point geometry.
               </v-alert>
               <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
               <v-select
                 v-model="transformOption"
                 :items="transformOptions"
-                class="my-4"
                 color="secondary"
                 dense
                 item-color="secondary"
@@ -73,20 +71,22 @@
                 item-value="id"
                 label="Select a transformation option"
                 :hint="transformHint(transformOption)"
+                class="mt-6"
               >
               </v-select>
               <template v-if="transformOption !== 'none'">
                 <v-row
                   v-if="transformOption === 'zscoreFixed'"
                   align="baseline"
-                  class="mt-5"
                   justify="start"
                   no-gutters
+                  class="mt-2"
                 >
                   <v-col class="mr-5">
                     <v-text-field
                       v-model="timeRange.lb.year"
                       dense
+                      outlined
                       label="Year (Lower Bound)"
                       type="number"
                       :rules="[validateMinYear]"
@@ -96,6 +96,7 @@
                     <v-text-field
                       v-model="timeRange.ub.year"
                       dense
+                      outlined
                       label="Year (Upper Bound)"
                       type="number"
                       :rules="[validateMaxYear]"
@@ -108,6 +109,7 @@
                   dense
                   label="Transform window"
                   outlined
+                  class="mt-2"
                   suffix="time steps"
                   type="number"
                 >
@@ -122,11 +124,15 @@
                 item-value="id"
                 label="Select a smoothing option"
                 :hint="smoothingHint(smoothingOption)"
+                class="mt-3"
               >
               </v-select>
               <v-text-field
                 v-if="hasSmoothingOption"
                 v-model="smoothingTimeStep"
+                dense
+                outlined
+                class="mt-2"
                 label="Smoothing window"
                 suffix="time steps"
                 type="number"
@@ -182,19 +188,6 @@ class Analyze extends Vue {
   analysisFormValid = true;
   zonalStatistic = "mean";
   timeout = 5000;
-
-  transformHint(transform) {
-    switch (transform) {
-      case "zscoreFixed":
-        return "Displays Z-score transformed values relative to a fixed interval selected by the user";
-      case "zscoreMoving":
-        return "Displays Z-score transformed values relative to a moving window of a size (n time steps) selected by the user";
-      case "zscoreSelected":
-        return "Displays Z-score transformed values using the selected interval";
-      default:
-        return "Modeled values are graphed without any transformation";
-    }
-  }
 
   zonalStatisticOptions = [
     {
@@ -271,20 +264,33 @@ class Analyze extends Vue {
     },
   ];
 
+  smoothingTimeStep = 9;
+
+  transformOption = "none";
+
+  transformHint(transform) {
+    switch (transform) {
+      case "zscoreFixed":
+        return "Displays Z-score transformed values relative to a fixed interval selected by the user";
+      case "zscoreMoving":
+        return "Displays Z-score transformed values relative to a moving window of a size (N time steps) selected by the user";
+      case "zscoreSelected":
+        return "Displays Z-score transformed values using the selected interval";
+      default:
+        return "Modeled values are graphed without any transformation";
+    }
+  }
+
   smoothingHint(smooth) {
     switch (smooth) {
       case "centeredAverage":
-        return `If window width is n, the graphed value for a given year is the ${this.zonalStatistic} the 2n+1 time step summary values for the selected area centered on that year`;
+        return `Plots the ${this.zonalStatistic} of the current years and the previous and successive (N-1)/2 years where N = odd window width`;
       case "trailingAverage":
-        return `If the window width entered is n, the graphed value for a year is the ${this.zonalStatistic}, of the n time step summary values for the current year and the n-1 preceding years`;
+        return `Plots the ${this.zonalStatistic} of the current year and the N-1 preceding years where N = window width`;
       default:
         return "No smoothing the summary values for a given year are graphed";
     }
   }
-
-  smoothingTimeStep = 9;
-
-  transformOption = "none";
 
   transformOptions = [
     {
