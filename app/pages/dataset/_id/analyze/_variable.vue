@@ -57,7 +57,7 @@
                 hint="Summary value of all selected pixels at each time step"
               >
               </v-select>
-              <v-alert class="mt-4" v-else type="warning">
+              <v-alert v-else class="mt-4" type="warning">
                 Summary statistics are not available for a point geometry.
               </v-alert>
               <!-- /////////// TRANSFORMATION OPTIONS /////////// -->

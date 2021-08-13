@@ -38,6 +38,7 @@
           :traces="traces"
           :year-selected="yearSelected"
           @yearSelected="setYear"
+          @selectedTemporalRange="updateTimeSeries"
         />
       </v-col>
     </v-row>
@@ -52,6 +53,7 @@ import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import _ from "lodash";
 import { initializeDataset } from "@/store/actions";
+import { toISODate } from "@/store/stats";
 
 const setYearSelected = _.debounce(function (vue) {
   vue.yearSelected = vue.formYearSelected;
@@ -97,6 +99,10 @@ class Visualize extends Vue {
     };
   }
 
+  get temporalRange() {
+    return this.$api().dataset.temporalRange;
+  }
+
   get traces() {
     return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
   }
@@ -113,6 +119,20 @@ class Visualize extends Vue {
 
   setYear(year) {
     this.yearSelected = year;
+  }
+
+  updateTimeSeries() {
+    const api = this.$api();
+    console.log("submitting to web service");
+    const requestData = {
+      ...api.dataset.defaultApiRequestData,
+      // override time range with values from temporal range
+      time_range: {
+        gte: toISODate(this.temporalRange[0]),
+        lte: toISODate(this.temporalRange[1]),
+      },
+    };
+    api.analysis.setRequestData(requestData);
   }
 }
 

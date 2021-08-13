@@ -40,7 +40,7 @@
           <v-col class="d-flex flex-row" @click="enableTemporalRangeEdit">
             <!-- temporal range -->
             <v-text-field
-              v-model="formTemporalRangeMin"
+              v-model.number="formTemporalRangeMin"
               label="Min Year"
               :disabled="!isTemporalRangeEditable"
               :min="minYear"
@@ -54,7 +54,7 @@
               <template #append-outer>to</template>
             </v-text-field>
             <v-text-field
-              v-model="formTemporalRangeMax"
+              v-model.number="formTemporalRangeMax"
               :disabled="!isTemporalRangeEditable"
               class="mx-2"
               label="Max Year"
