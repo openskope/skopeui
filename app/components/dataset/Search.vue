@@ -52,6 +52,7 @@
           label="Search for a keyword"
           @change="filterDatasets"
           @blur="filterDatasets"
+          @click:clear="filterDatasets"
         >
           <template #append>
             <v-btn icon class="align-baseline" @click="filterDatasets">
