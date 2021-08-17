@@ -52,7 +52,7 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import _ from "lodash";
-import { initializeDataset } from "@/store/actions";
+import { initializeDataset, loadRequestData } from "@/store/actions";
 import { toISODate } from "@/store/stats";
 
 const setYearSelected = _.debounce(function (vue) {
@@ -110,11 +110,14 @@ class Visualize extends Vue {
   created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
-    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
+    const api = this.$api();
+    initializeDataset(this.$warehouse, api, datasetId, variableId);
   }
 
   async mounted() {
-    this.setYear(this.$api().dataset.temporalRangeMin);
+    const api = this.$api();
+    await loadRequestData(api);
+    this.setYear(api.dataset.temporalRangeMin);
   }
 
   setYear(year) {

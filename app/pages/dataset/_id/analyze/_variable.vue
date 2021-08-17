@@ -47,7 +47,6 @@
             </v-col>
             <v-col class="grow">
               <v-select
-                v-if="isStudyAreaPolygon"
                 v-model="zonalStatistic"
                 :items="zonalStatisticOptions"
                 color="primary"
@@ -55,11 +54,9 @@
                 item-value="id"
                 label="For each time step, summarize selected area as"
                 hint="Summary value of all selected pixels at each time step"
+                :disabled="!isStudyAreaPolygon"
               >
               </v-select>
-              <v-alert v-else class="mt-4" type="warning">
-                Summary statistics are not available for a point geometry.
-              </v-alert>
               <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
               <v-select
                 v-model="transformOption"
@@ -165,7 +162,11 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import { initializeDataset, retrieveAnalysis } from "@/store/actions";
+import {
+  initializeDataset,
+  loadRequestData,
+  retrieveAnalysis,
+} from "@/store/actions";
 import { toISODate, extractYear } from "@/store/stats";
 import { buildReadme } from "@/store/modules/constants";
 import _ from "lodash";
@@ -490,9 +491,9 @@ class Analyze extends Vue {
   }
 
   async mounted() {
-    await this.loadRequestData();
-    // FIXME: assumes year timesteps
     const api = this.$api();
+    await loadRequestData(api);
+    // FIXME: assumes year timesteps
     this.timeRange.lb.year = api.dataset.minYear;
     this.timeRange.ub.year = api.dataset.maxYear;
     this.requestDataWatcher = this.$watch(
@@ -510,23 +511,12 @@ class Analyze extends Vue {
     if (this.requestDataWatcher) {
       this.requestDataWatcher();
     }
+    this.$api().analysis.setDefaultRequestData(
+      this.$api().dataset.defaultApiRequestData
+    );
   }
 
   // --------- MEHODS ---------
-
-  async loadRequestData() {
-    // FIXME: form state should be loaded from the store instead of initialized here, move this to an action instead
-
-    // load data from api.analysis.request if any
-    // assume that it would be cleared by any actions that invalidate the request data
-    // (change in dataset, study area, or variable)
-    const api = this.$api();
-    const requestData = api.analysis.request;
-    console.log("request data in the store: ", requestData);
-    if (_.isEmpty(requestData)) {
-      api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
-    }
-  }
 
   async initializeFormData(requestData) {
     this.zonalStatistic = requestData.zonal_statistic;

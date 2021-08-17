@@ -127,3 +127,14 @@ export function clearGeoJson(warehouse, api) {
   warehouse.remove(api.dataset.geoJsonKey);
   api.dataset.clearGeoJson();
 }
+
+// load data from api.analysis.request if any
+// assume that it would be cleared by any actions that invalidate the request data
+// (change in dataset, study area, or variable)
+export async function loadRequestData(api) {
+  const requestData = api.analysis.request;
+  console.log("request data in the store: ", requestData);
+  if (_.isEmpty(requestData)) {
+    api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
+  }
+}
