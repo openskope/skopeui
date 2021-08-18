@@ -1,8 +1,8 @@
+import { Analysis } from "@/store/modules/analysis";
 import { App } from "@/store/modules/app";
 import { Dataset } from "@/store/modules/dataset";
-import { Datasets } from "@/store/modules/datasets";
 import { Messages } from "@/store/modules/messages";
-import { Analysis } from "@/store/modules/analysis";
+import { Metadata } from "@/store/modules/metadata";
 
 export const state = () => ({});
 
@@ -10,6 +10,6 @@ export const modules = {
   analysis: Analysis,
   app: App,
   dataset: Dataset,
-  datasets: Datasets,
   messages: Messages,
+  metadata: Metadata,
 };

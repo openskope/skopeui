@@ -7,7 +7,10 @@
 //
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 import _ from "lodash";
-import { TIMESERIES_V2_ENDPOINT } from "@/store/modules/constants";
+import {
+  TIMESERIES_V2_ENDPOINT,
+  METADATA_ENDPOINT,
+} from "@/store/modules/constants";
 import { extractYear } from "@/store/stats";
 
 async function updateTimeSeries(api, data) {
@@ -100,14 +103,40 @@ export async function retrieveAnalysis(api, data) {
   }
 }
 
+export async function loadAllDatasetMetadata(api) {
+  try {
+    const response = await api.store.$axios.$get(METADATA_ENDPOINT);
+    // do something with
+    api.response.data;
+  } catch (e) {
+    console.error(e);
+    // should start to use the messages component to display user messages
+    alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
+  }
+}
+
+export async function loadMetadata(api, id) {
+  const datasetMetadata = api.metadata.find(id);
+  api.dataset.setMetadata(datasetMetadata);
+}
+
 export function saveGeoJson(warehouse, api, geoJson) {
   warehouse.set(api.dataset.geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
 }
 
+export function filterDatasetMetadata(api, filterCriteria) {
+  api.metadata.setFilterCriteria(filterCriteria);
+}
+
 export function initializeDataset(warehouse, api, metadataId, variableId) {
-  api.dataset.loadMetadata(metadataId);
-  api.dataset.loadVariable({ metadataId, variableId });
+  const datasetMetadata = api.metadata.find(id);
+  api.dataset.setMetadata(datasetMetadata);
+  if (variableId == null) {
+    // set a default variable if no variable id was passed in
+    variableId = this.metadata.variables[0].id;
+  }
+  api.dataset.setVariable(variableId);
   if (process.client) {
     initializeDatasetGeoJson(warehouse, api);
   }

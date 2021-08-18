@@ -1,9 +1,9 @@
 import { App } from "@/store/modules/app";
-import { Datasets } from "@/store/modules/datasets";
 import { Messages } from "@/store/modules/messages";
 import { getModule } from "vuex-module-decorators";
 import { Dataset } from "@/store/modules/dataset";
 import { Analysis } from "@/store/modules/analysis";
+import { Metadata } from "@/store/modules/metadata";
 
 export class API {
   constructor(store) {
@@ -18,16 +18,16 @@ export class API {
     return getModule(App, this.store);
   }
 
-  get datasets() {
-    return getModule(Datasets, this.store);
-  }
-
   get messages() {
     return getModule(Messages, this.store);
   }
 
   get dataset() {
     return getModule(Dataset, this.store);
+  }
+
+  get metadata() {
+    return getModule(Metadata, this.store);
   }
 }
 

@@ -74,6 +74,7 @@ import { Component } from "nuxt-property-decorator";
 import Vue from "vue";
 import ListItem from "@/components/dataset/ListItem.vue";
 import Search from "@/components/dataset/Search.vue";
+import { loadAllDatasetMetadata } from "@/store/actions";
 
 @Component({
   layout: "BaseDefault",
@@ -86,11 +87,12 @@ class LandingPage extends Vue {
   showSnack = false;
 
   get datasets() {
-    return this.$api().datasets.filteredDatasets;
+    return this.$api().metadata.filteredDatasets;
   }
 
   async fetch() {
-    this.$api().datasets.retrieveData();
+    console.log("Landing page: loading all dataset metadata");
+    loadAllDatasetMetadata(this.$api());
   }
 
   created() {

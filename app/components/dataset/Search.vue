@@ -92,6 +92,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import { filterDatasetMetadata, loadAllDatasetMetadata } from "@/store/actions";
 
 @Component({})
 class Search extends Vue {
@@ -104,7 +105,7 @@ class Search extends Vue {
   maxYear = this.currentYear;
 
   get datasets() {
-    return this.$api().datasets.filteredDatasets;
+    return this.$api().metadata.filteredDatasets;
   }
 
   get startYearRules() {
@@ -130,7 +131,7 @@ class Search extends Vue {
   }
 
   get variableClasses() {
-    const datasets = this.$api().datasets.all;
+    const datasets = this.$api().metadata.allDatasetMetadata;
     const variableClassSet = new Set();
     for (const dataset of datasets) {
       for (const variable of dataset.variables) {
@@ -145,13 +146,14 @@ class Search extends Vue {
   }
 
   async fetch() {
-    this.$api().datasets.retrieveData();
+    console.log("Search component fetch: loading all dataset metadata");
+    await loadAllDatasetMetadata(this.$api());
   }
 
   filterDatasets() {
     // update the store with the selected variable classes, year range, and optional
     // keyword query which will be applied as a filter across the available datasets
-    this.$api().datasets.filter({
+    filterDatasetMetadata(this.$api(), {
       selectedVariableClasses: this.selectedVariableClasses,
       yearStart: this.startYear,
       yearEnd: this.endYear,

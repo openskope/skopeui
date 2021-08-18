@@ -1,6 +1,5 @@
 import area from "@turf/area";
-import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ALL_DATA } from "@/store/data";
+import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
 
 const LOADING = "loading";
@@ -61,27 +60,15 @@ class Dataset extends VuexModule {
   // status types: loading | timeout | badrequest | servererror | success
   timeSeriesRequestStatus = LOADING_STATUS;
 
-  @Action
-  async loadVariable({ metadataId, variableId }) {
-    if (this.metadata == null) {
-      this.context.dispatch("loadMetadata", metadataId);
-    }
-    if (variableId == null) {
-      // set a default variable if no variable id was passed in
-      variableId = this.metadata.variables[0].id;
-    }
-    this.context.commit("setVariable", variableId);
-  }
-
-  @Action
-  loadMetadata(id) {
-    if (this.metadata == null || this.metadata.id !== id) {
-      const metadata = ALL_DATA.find((m) => m.id === id);
-      if (metadata) {
-        this.context.commit("setMetadata", metadata);
-      }
-    }
-  }
+  // @Action
+  // loadMetadata(id) {
+  //   if (this.metadata == null || this.metadata.id !== id) {
+  //     const metadata = allDatasetMetadata.find((m) => m.id === id);
+  //     if (metadata) {
+  //       this.context.commit("setMetadata", metadata);
+  //     }
+  //   }
+  // }
 
   get filteredTimeSeries() {
     return filterTimeSeries({
