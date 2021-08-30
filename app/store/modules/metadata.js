@@ -253,9 +253,11 @@ class Metadata extends VuexModule {
     return this.all_dataset_metadata;
   }
 
-  find(metadataId) {
-    const metadata = this.allMetadata.find((m) => m.id === metadataId);
-    return metadata;
+  get find() {
+    return (metadataId) => {
+      const metadata = this.allDatasetMetadata.find((m) => m.id === metadataId);
+      return metadata;
+    };
   }
 
   @Mutation

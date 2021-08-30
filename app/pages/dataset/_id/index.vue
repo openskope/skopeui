@@ -119,10 +119,25 @@ class DatasetDetail extends Vue {
     );
   }
 
-  async fetch() {
-    const datasetId = this.$route.params.id;
-    const variableId = this.$route.params.variable;
-    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
+  async fetch(context) {
+    console.log(
+      "fetch: loading dataset and variable from params: ",
+      context.params
+    );
+    const datasetId = context.params.id;
+    const variableId = context.params.variable;
+    console.log(
+      "fetch: initializing dataset with dataset id:",
+      datasetId,
+      " and variable ",
+      variableId
+    );
+    initializeDataset(
+      context.$warehouse,
+      context.$api(),
+      datasetId,
+      variableId
+    );
     this.confirmGeometry = this.hasValidStudyArea;
   }
 

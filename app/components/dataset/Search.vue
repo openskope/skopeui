@@ -145,11 +145,6 @@ class Search extends Vue {
     return variableClasses;
   }
 
-  async fetch() {
-    console.log("Search component fetch: loading all dataset metadata");
-    await loadAllDatasetMetadata(this.$api());
-  }
-
   filterDatasets() {
     // update the store with the selected variable classes, year range, and optional
     // keyword query which will be applied as a filter across the available datasets

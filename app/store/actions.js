@@ -105,9 +105,10 @@ export async function retrieveAnalysis(api, data) {
 
 export async function loadAllDatasetMetadata(api) {
   try {
-    const response = await api.store.$axios.$get(METADATA_ENDPOINT);
-    // do something with
-    api.response.data;
+    const all_dataset_metadata = await api.store.$axios.$get(METADATA_ENDPOINT);
+    // do something with response.data;
+    console.log("response data:", all_dataset_metadata);
+    api.metadata.setAllDatasetMetadata(all_dataset_metadata);
   } catch (e) {
     console.error(e);
     // should start to use the messages component to display user messages
@@ -130,11 +131,11 @@ export function filterDatasetMetadata(api, filterCriteria) {
 }
 
 export function initializeDataset(warehouse, api, metadataId, variableId) {
-  const datasetMetadata = api.metadata.find(id);
+  const datasetMetadata = api.metadata.find(metadataId);
   api.dataset.setMetadata(datasetMetadata);
   if (variableId == null) {
     // set a default variable if no variable id was passed in
-    variableId = this.metadata.variables[0].id;
+    variableId = datasetMetadata.variables[0].id;
   }
   api.dataset.setVariable(variableId);
   if (process.client) {
