@@ -228,7 +228,7 @@ class Map extends Vue {
   }
 
   get showMapControls() {
-    return this.currentStep >= 2;
+    return this.currentStep >= 1;
   }
 
   get layerOpacity() {
@@ -574,7 +574,7 @@ export default Map;
 .leaflet-top.leaflet-right
   .leaflet-control-layers:nth-child(1)
   .leaflet-control-layers-toggle {
-  background-image: url(/app/static/earth.svg);
+  background-image: url(/earth.svg);
 }
 
 #exportSelectedGeometry {
