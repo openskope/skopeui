@@ -31,7 +31,18 @@
         target="_blank"
         :href="link.url"
       >
+        <v-icon left light>{{ link.icon }}</v-icon>
         {{ link.label }}
+      </v-btn>
+      <v-btn
+        color="white"
+        class="subtitle-1"
+        plain
+        target="_blank"
+        :href="github.url"
+      >
+        <v-icon left light>{{ github.icon }}</v-icon>
+        Build: {{ buildId }}
       </v-btn>
     </v-card>
   </v-footer>
@@ -41,6 +52,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import { BUILD_ID } from "@/store/modules/_constants";
 import TermsOfUse from "@/components/TermsOfUse.vue";
 
 @Component({
@@ -49,6 +61,14 @@ import TermsOfUse from "@/components/TermsOfUse.vue";
   },
 })
 class Footer extends Vue {
+  buildId = BUILD_ID;
+  github = {
+    id: "github",
+    label: "GitHub",
+    icon: "fab fa-github",
+    url: "https://github.com/openskope/skopeui/",
+  };
+
   links = [
     {
       id: "docs",
@@ -61,12 +81,6 @@ class Footer extends Vue {
       label: "Contact",
       icon: "email",
       url: "https://www.comses.net/about/contact/",
-    },
-    {
-      id: "github",
-      label: "GitHub",
-      icon: "fab fa-github",
-      url: "https://github.com/openskope/skopeui/",
     },
   ];
 }

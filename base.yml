@@ -3,6 +3,4 @@ services:
   web:
     build: app
     restart: always
-    image: comses/skopeui/dev:latest
-    env_file:
-      - secrets/oauth.env
+    image: openskope/skopeui:latest

@@ -1,0 +1,9 @@
+# set to (dev | staging | prod)
+ENVIRONMENT=dev
+# for local usage
+# export SKOPE_API_HOST_URL="http://localhost:8001/"
+# export SKOPE_GEOSERVER_HOST_URL="http://localhost:8600/"# 
+#
+# for remote usage
+export SKOPE_API_HOST_URL="https://api.openskope.org/"
+export SKOPE_GEOSERVER_HOST_URL="https://app.openskope.org/"

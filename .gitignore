@@ -5,6 +5,7 @@ config.mk
 secrets/
 docker-compose.yml
 docker/
+keys/
 # Logs
 logs
 *.log
