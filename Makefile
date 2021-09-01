@@ -53,8 +53,8 @@ test: test-setup
 
 .PHONY: lint
 lint: build
-	docker-compose exec web yarn lintfix
+	docker-compose run --rm web yarn lintfix
 
 .PHONY: deploy
-deploy: build lint
+deploy: build
 	docker-compose up -d 
