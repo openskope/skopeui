@@ -1,6 +1,7 @@
 # backups
 *~
 # docker generated things
+config.mk
 secrets/
 docker-compose.yml
 docker/

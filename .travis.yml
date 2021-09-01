@@ -14,7 +14,8 @@ before_install:
   - chmod a+rx docker-compose
   - sudo mv docker-compose /usr/local/bin
   - sudo sysctl -w vm.max_map_count=262144
-  - ./build.sh prod
+  - ./config prod
+  - make build
 install:
   - docker --version
   - docker-compose run --rm web yarn build

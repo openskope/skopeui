@@ -6,9 +6,29 @@ This codebase provides a new user interface for the [NSF supported](https://www.
 
 The UI was developed using [Nuxt](https://nuxtjs.org/), [VueJS](https://vuejs.org/), [Leaflet](https://leafletjs.com/), and [Plotly JS](https://plotly.com/javascript/). 
 
-You can build and run the application with Docker and docker-compose by running:
+You can build in development mode with remote timeseries api and geoserserver urls using
 
+```bash
+./config dev
+make
 ```
-% ./build.sh dev # or 'staging' or 'prod'
-% docker-compose up -d
+
+If you want to develop the app with local timeseries api and geoserver urls you can do
+
+```bash
+./config dev local
+make
+```
+
+In staging or production you can use
+
+```bash
+./config prod
+make
+```
+
+To deploy the application just run
+
+```bash
+make deploy
 ```

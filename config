@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+ENVIR=$1
+SETTINGS=${2:-"remote"}
+
+cp "deploy/${SETTINGS}.env" config.mk
+./compose $ENVIR
