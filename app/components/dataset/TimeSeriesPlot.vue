@@ -47,9 +47,6 @@
               :max="maxYear - 1"
               type="number"
               :rules="[validateMinYear]"
-              hint="Press enter to update"
-              @keydown.enter="setTemporalRange"
-              @blur="setTemporalRange"
             >
               <template #append-outer>to</template>
             </v-text-field>
@@ -62,15 +59,26 @@
               :max="maxYear"
               :rules="[validateMaxYear]"
               type="number"
-              hint="Press enter to update"
-              @keydown.enter="setTemporalRange"
-              @blur="setTemporalRange"
             >
             </v-text-field>
-            <h3 class="mx-2 font-weight-light">
-              ({{ selectedTemporalRange[1] - selectedTemporalRange[0] + 1 }}
-              time steps)
-            </h3>
+            <div class="my-n4">
+              <small class="font-weight-bold">
+                {{ selectedTemporalRange[1] - selectedTemporalRange[0] + 1 }}
+                time steps
+              </small>
+              <div no-gutters>
+                <v-btn
+                  :disabled="!hasTemporalRangeChanges"
+                  x-small
+                  color="secondary"
+                  @click="setTemporalRange"
+                  >Apply</v-btn
+                >
+                <v-btn x-small color="secondary" @click="resetTemporalRange"
+                  >Reset</v-btn
+                >
+              </div>
+            </div>
           </v-col>
           <!-- step controls -->
           <v-col v-if="showStepControls" class="text-right">
@@ -469,6 +477,12 @@ class TimeSeriesPlot extends Vue {
     } else if (this.yearSelected > this.temporalRangeMax) {
       this.setYear(this.temporalRangeMax);
     }
+  }
+
+  resetTemporalRange() {
+    this.localTemporalRangeMin = this.$api().dataset.minYear;
+    this.localTemporalRangeMax = this.$api().dataset.maxYear;
+    this.setTemporalRange();
   }
 
   gotoFirstYear() {
