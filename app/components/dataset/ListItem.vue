@@ -4,7 +4,6 @@
       <client-only>
         <l-map
           :min-zoom="2"
-          :max-zoom="8"
           :zoom="region.zoom"
           :center="region.center"
           style="position: relative; z-index: 1"

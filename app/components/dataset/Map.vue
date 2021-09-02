@@ -100,13 +100,7 @@
     <!-- map -->
     <v-card-text class="map">
       <client-only placeholder="Loading map, please wait...">
-        <l-map
-          ref="layerMap"
-          :min-zoom="3"
-          :zoom="metadata.region.zoom"
-          :center="metadata.region.center"
-          @ready="mapReady"
-        >
+        <l-map ref="layerMap" @ready="mapReady">
           <l-tile-layer
             v-for="provider of leafletProviders"
             :key="provider.name"
@@ -195,7 +189,7 @@ class Map extends Vue {
   legendImage = null;
   legendControl = null;
   legendPosition = "bottomleft";
-  geoJsonUnwatcher = null;
+  geoJsonWatcher = null;
   polyStyle = {
     fillColor: "yellow",
     weight: 2,
@@ -271,8 +265,8 @@ class Map extends Vue {
   }
 
   destroyed() {
-    if (this.geoJsonUnwatcher) {
-      this.geoJsonUnwatcher();
+    if (this.geoJsonWatcher) {
+      this.geoJsonWatcher();
     }
   }
 
@@ -284,6 +278,7 @@ class Map extends Vue {
   }
 
   mapReady(map) {
+    console.log("mapReady");
     const handler = (event) => {
       console.log("handling layer change event ", { event });
       const leafletLayer = event.layer;
@@ -301,7 +296,7 @@ class Map extends Vue {
     map.fitBounds(this.metadata.region.extents, {
       padding: this.defaultBoundsPadding,
     });
-    this.geoJsonUnwatcher = this.$watch(
+    this.geoJsonWatcher = this.$watch(
       "geoJson",
       function (geoJson) {
         console.log("watcher updating geojson", geoJson);
@@ -408,7 +403,7 @@ class Map extends Vue {
     if (geoJsonLayer instanceof L.Marker) {
       padding = padding.map((x) => x * 15);
     }
-    map.fitBounds(this.drawnItems.getBounds(), { padding });
+    map.fitBounds(geoJsonLayer.getBounds(), { padding });
   }
 
   /**
@@ -470,7 +465,6 @@ class Map extends Vue {
     };
     const queryString = stringify(query);
     const legendUrl = this.skopeWmsUrl + queryString;
-    console.log("legendUrl: ", legendUrl);
     return legendUrl;
   }
 
