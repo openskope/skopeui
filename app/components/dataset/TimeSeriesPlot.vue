@@ -47,6 +47,7 @@
               :max="maxYear - 1"
               type="number"
               :rules="[validateMinYear]"
+              @keydown.enter="setTemporalRange"
             >
               <template #append-outer>to</template>
             </v-text-field>
@@ -59,6 +60,7 @@
               :max="maxYear"
               :rules="[validateMaxYear]"
               type="number"
+              @keydown.enter="setTemporalRange"
             >
             </v-text-field>
             <div class="my-n4">
