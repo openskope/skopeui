@@ -20,34 +20,7 @@
       </template>
       <span>User Guide</span>
     </v-tooltip>
-    <v-dialog v-model="showMetadata" max-width="600px">
-      <template #activator="{ on, attrs }">
-        <v-btn icon depressed fab rounded v-bind="attrs" v-on="on">
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-icon v-bind="attrs" color="secondary" v-on="on"
-                >fas fa-info-circle</v-icon
-              >
-            </template>
-            <span>Metadata</span>
-          </v-tooltip>
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title style="background-color: #6db1bf">
-          <h3 class="font-weight-light" style="color: white">
-            {{ metadata.title }}
-          </h3>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="showMetadata = false">
-            <v-icon color="white">fas fa-times</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <MetadataDetail />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <MetadataModal :metadata-id="metadata.id" />
     <v-select
       v-if="selectVariable"
       v-model="variable"
@@ -72,11 +45,11 @@
 <script>
 import Vue from "vue";
 import { Component, Prop } from "nuxt-property-decorator";
-import MetadataDetail from "@/components/dataset/MetadataDetail.vue";
+import MetadataModal from "@/components/dataset/MetadataModal.vue";
 import _ from "lodash";
 
 @Component({
-  components: { MetadataDetail },
+  components: { MetadataModal },
 })
 class SubHeader extends Vue {
   @Prop({ default: false })
@@ -84,7 +57,6 @@ class SubHeader extends Vue {
 
   stepNames = _.clone(this.$api().app.stepNames);
   showInstructions = false;
-  showMetadata = false;
   layerGroup = {
     icon: "fas fa-layer-group",
   };

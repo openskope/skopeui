@@ -108,8 +108,6 @@ export async function loadAllDatasetMetadata(api) {
     console.log("refreshing");
     try {
       const allDatasetMetadata = await api.store.$axios.$get(METADATA_ENDPOINT);
-      // do something with response.data;
-      console.log("response data:", allDatasetMetadata);
       api.metadata.setAllDatasetMetadata(allDatasetMetadata);
       api.metadata.setLastRefreshed();
     } catch (e) {

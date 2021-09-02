@@ -24,6 +24,7 @@
             <nuxt-link :to="absoluteUrl" class="dataset-title">
               {{ title }}
             </nuxt-link>
+            <MetadataModal :metadata-id="id" />
           </h2>
         </v-card-title>
         <v-subheader class="ma-0">
@@ -62,8 +63,11 @@ import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { Prop } from "vue-property-decorator";
 import { BaseMapProvider } from "@/store/modules/constants";
+import MetadataModal from "@/components/dataset/MetadataModal.vue";
 
-@Component()
+@Component({
+  components: { MetadataModal },
+})
 class ListItem extends Vue {
   @Prop()
   title; //: String

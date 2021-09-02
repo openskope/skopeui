@@ -108,8 +108,6 @@
             :name="provider.name"
             :attribution="provider.attribution"
             :visible="provider.default"
-            :min-zoom="provider.minZoom"
-            :max-zoom="provider.maxZoom"
             layer-type="base"
           />
           <l-rectangle
@@ -403,7 +401,8 @@ class Map extends Vue {
     if (geoJsonLayer instanceof L.Marker) {
       padding = padding.map((x) => x * 15);
     }
-    map.fitBounds(geoJsonLayer.getBounds(), { padding });
+    console.log("fitting bounds");
+    map.fitBounds(this.drawnItems.getBounds(), { padding });
   }
 
   /**

@@ -24,14 +24,17 @@
 
 <script>
 import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
+import { Component, Prop } from "nuxt-property-decorator";
 
 @Component({
   name: "MetadataDetail",
 })
 class MetadataDetail extends Vue {
+  @Prop()
+  metadataId;
+
   get metadata() {
-    return this.$api().dataset.metadata;
+    return this.$api().metadata.find(this.metadataId);
   }
 
   get metadataAttributes() {
@@ -47,5 +50,3 @@ class MetadataDetail extends Vue {
 
 export default MetadataDetail;
 </script>
-
-<style scoped></style>
