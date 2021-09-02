@@ -1,10 +1,10 @@
 import { find } from "lodash";
 import { API_HOST_URL, GEOSERVER_HOST_URL } from "@/store/modules/_constants";
 export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
-export const TIMESERIES_SERVICE_URI = "timeseries-service/api/v2/";
+export const TIMESERIES_SERVICE_URI = "timeseries-service/api/v2";
 export const SKOPE_WMS_ENDPOINT = `${GEOSERVER_HOST_URL}/${WMS_SERVER_URI}`;
-export const TIMESERIES_V2_ENDPOINT = `${API_HOST_URL}${TIMESERIES_SERVICE_URI}timeseries`;
-export const METADATA_ENDPOINT = `${API_HOST_URL}${TIMESERIES_SERVICE_URI}metadata`;
+export const TIMESERIES_V2_ENDPOINT = `${API_HOST_URL}/${TIMESERIES_SERVICE_URI}/timeseries`;
+export const METADATA_ENDPOINT = `${API_HOST_URL}/${TIMESERIES_SERVICE_URI}/metadata`;
 export const LEAFLET_PROVIDERS = [
   {
     name: "CartoDB.Positron",
