@@ -266,7 +266,7 @@ class Metadata extends VuexModule {
   }
 
   @Mutation
-  applyFilterCriteria(filterCriteria) {
+  setFilterCriteria(filterCriteria) {
     this.filterCriteria = filterCriteria;
   }
 }

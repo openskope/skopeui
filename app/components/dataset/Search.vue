@@ -44,21 +44,17 @@
       <v-col cols="5">
         <!-- keyword search -->
         <v-text-field
-          id="search"
-          v-model="search"
+          id="keywordQuery"
+          v-model="keywordSearchQuery"
           clearable
           outlined
           data-toggle="hideseek"
-          label="Search for a keyword"
+          label="Keyword search"
+          append-icon="search"
           @change="filterDatasets"
-          @blur="filterDatasets"
-          @click:clear="filterDatasets"
+          @click:clear="clearSearchQuery"
+          @click:append="filterDatasets"
         >
-          <template #append>
-            <v-btn icon class="align-baseline" @click="filterDatasets">
-              <v-icon>search</v-icon>
-            </v-btn>
-          </template>
         </v-text-field>
       </v-col>
       <v-col cols="2">
@@ -81,7 +77,6 @@
           label="End Year"
           type="number"
           @change="filterDatasets"
-          @blur="filterDatasets"
         >
         </v-text-field>
       </v-col>
@@ -92,12 +87,12 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import { filterDatasetMetadata, loadAllDatasetMetadata } from "@/store/actions";
+import { filterDatasetMetadata } from "@/store/actions";
 
 @Component({})
 class Search extends Vue {
   currentYear = new Date().getFullYear();
-  search = "";
+  keywordSearchQuery = "";
   startYear = 1;
   endYear = this.currentYear;
   selectedVariableClasses = [];
@@ -133,27 +128,31 @@ class Search extends Vue {
   get variableClasses() {
     const datasets = this.$api().metadata.allDatasetMetadata;
     const variableClassSet = new Set();
+    // use a Set to dedupe the variable classes
     for (const dataset of datasets) {
       for (const variable of dataset.variables) {
         variableClassSet.add(variable.class);
       }
     }
-    const variableClasses = [];
-    for (const variableClass of variableClassSet) {
-      variableClasses.push(variableClass);
-    }
-    return variableClasses;
+    return Array.from(variableClassSet);
   }
 
   filterDatasets() {
     // update the store with the selected variable classes, year range, and optional
     // keyword query which will be applied as a filter across the available datasets
-    filterDatasetMetadata(this.$api(), {
+    const criteria = {
       selectedVariableClasses: this.selectedVariableClasses,
       yearStart: this.startYear,
       yearEnd: this.endYear,
-      query: this.search,
-    });
+      query: this.keywordSearchQuery,
+    };
+    console.log("filtering datasets with criteria: ", criteria);
+    filterDatasetMetadata(this.$api(), criteria);
+  }
+
+  clearSearchQuery() {
+    this.keywordSearchQuery = "";
+    this.filterDatasets();
   }
 }
 
