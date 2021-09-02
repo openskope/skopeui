@@ -36,9 +36,9 @@ function matchesQueryFilter(query, dataset) {
 
 @Module({ stateFactory: true, name: "metadata", namespaced: true })
 class Metadata extends VuexModule {
-  loading = false;
-  retrieved_from_server = false;
-  all_dataset_metadata = [
+  lastRefreshed = null;
+  allMetadata = [];
+  DEFAULT_DATASET_METADATA = [
     {
       id: "paleocar",
       title: "PaleoCAR: SW USA Paleoclimatic Reconstruction",
@@ -56,6 +56,7 @@ class Metadata extends VuexModule {
         " May-Sept growing degree days (GDD), net water-year precipitation (previous Oct–Sept), and the direct precipitation maize " +
         " farming niche (>= 1800 growing Season F GDD & >= 300 mm water-year precipitation).",
       sourceUrl: "https://www.ncdc.noaa.gov/paleo/study/19783",
+      ordering: 1,
       type: "dataset",
       status: "Published",
       revised: "2016-04-01",
@@ -125,6 +126,7 @@ class Metadata extends VuexModule {
       description:
         "A recalibrated reconstruction of United States Summer PMDI over the last 2000 years. Updated half degree gridded Jun-Aug PMDI reconstructions from Cook et al. (2010). LBDA data in netCDF format are available from the [NOAA study page](https://www.ncdc.noaa.gov/paleo-search/study/22454).",
       type: "dataset",
+      ordering: 10,
       status: "Published",
       revised: "2017-08-03",
       region: {
@@ -176,6 +178,7 @@ class Metadata extends VuexModule {
     {
       id: "srtm",
       title: "SRTM 90m Digital Elevation Model V4.1",
+      ordering: 15,
       originator: "NASA Shuttle Radar Topographic Mission (SRTM)",
       references:
         "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data Version 4, available from the CGIAR-CSI SRTM 90m Database: http://srtm.csi.cgiar.org/.\n\nReuter H.I, A. Nelson, A. Jarvis, 2007, An evaluation of void filling interpolation methods for SRTM data, International Journal of Geographic Information Science, 21:9, 983-1008.",
@@ -250,7 +253,10 @@ class Metadata extends VuexModule {
   }
 
   get allDatasetMetadata() {
-    return this.all_dataset_metadata;
+    if (this.allMetadata.length === 0) {
+      return this.DEFAULT_DATASET_METADATA;
+    }
+    return this.allMetadata;
   }
 
   get find() {
@@ -260,9 +266,26 @@ class Metadata extends VuexModule {
     };
   }
 
+  get shouldRefresh() {
+    console.log("checking to see if we should refresh: ", this.lastRefreshed);
+    const MAX_REFRESH_TIME = 3600000; // 1 hour in milliseconds
+    return (
+      this.lastRefreshed === null ||
+      new Date() - this.lastRefreshed > MAX_REFRESH_TIME
+    );
+  }
+
   @Mutation
-  setAllDatasetMetadata(all_dataset_metadata) {
-    this.all_dataset_metadata = all_dataset_metadata;
+  setLastRefreshed() {
+    this.lastRefreshed = new Date();
+    console.log("last refreshed", this.lastRefreshed);
+  }
+
+  @Mutation
+  setAllDatasetMetadata(metadataList) {
+    console.log("setting all dataset metadata");
+    metadataList.sort((a, b) => a.ordering - b.ordering);
+    this.allMetadata = metadataList;
   }
 
   @Mutation

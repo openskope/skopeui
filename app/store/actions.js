@@ -104,15 +104,24 @@ export async function retrieveAnalysis(api, data) {
 }
 
 export async function loadAllDatasetMetadata(api) {
-  try {
-    const all_dataset_metadata = await api.store.$axios.$get(METADATA_ENDPOINT);
-    // do something with response.data;
-    console.log("response data:", all_dataset_metadata);
-    api.metadata.setAllDatasetMetadata(all_dataset_metadata);
-  } catch (e) {
-    console.error(e);
-    // should start to use the messages component to display user messages
-    alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
+  if (api.metadata.shouldRefresh) {
+    console.log("refreshing");
+    try {
+      const allDatasetMetadata = await api.store.$axios.$get(METADATA_ENDPOINT);
+      // do something with response.data;
+      console.log("response data:", allDatasetMetadata);
+      api.metadata.setAllDatasetMetadata(allDatasetMetadata);
+      api.metadata.setLastRefreshed();
+    } catch (e) {
+      console.error(e);
+      // should start to use the messages component to display user messages
+      alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
+    }
+  } else {
+    console.log(
+      "Not loading all metadata, already queried at ",
+      api.metadata.lastRefreshed
+    );
   }
 }
 
