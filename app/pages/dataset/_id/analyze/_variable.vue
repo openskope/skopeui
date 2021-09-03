@@ -614,7 +614,6 @@ class Analyze extends Vue {
       return;
     }
     const api = this.$api();
-    console.log("submitting to web service");
     const requestData = {
       ...api.dataset.defaultApiRequestData,
       // override zonal statistic, transform, time range, and requested series
@@ -626,6 +625,7 @@ class Analyze extends Vue {
       },
       requested_series: this.requestedSeries,
     };
+    console.log("submitting to web service: ", requestData);
     api.analysis.setRequestData(requestData);
   }
 

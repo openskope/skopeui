@@ -65,6 +65,7 @@ class Analysis extends VuexModule {
 
   @Mutation
   setRequestData(requestData) {
+    console.log("setting request data: ", requestData);
     this.request = requestData;
   }
 

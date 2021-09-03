@@ -129,7 +129,7 @@ class Dataset extends VuexModule {
    * Returns the last value with data in the defined temporal range
    */
   get temporalRangeMax() {
-    return this.temporalRange[1] - 1;
+    return this.temporalRange[1];
   }
 
   get isTimeSeriesLoading() {
@@ -146,8 +146,8 @@ class Dataset extends VuexModule {
       variable_id: this.variable.id,
       selected_area: this.geoJson?.geometry,
       time_range: {
-        gte: toISODate(this.minYear),
-        lte: toISODate(this.maxYear),
+        gte: toISODate(this.temporalRangeMin),
+        lte: toISODate(this.temporalRangeMax),
       },
       zonal_statistic: "mean",
       transform: { type: "NoTransform" },
@@ -223,10 +223,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setMetadata(metadata) {
-    if (metadata.id === this.metadata?.id) {
-      console.log("no-op: metadata already set on store", metadata.id);
-      return;
-    }
+    console.log("setting metadata: ", metadata);
     this.metadata = metadata;
     if (metadata) {
       this.temporalRange.splice(
