@@ -401,8 +401,8 @@ class Map extends Vue {
     if (geoJsonLayer instanceof L.Marker) {
       padding = padding.map((x) => x * 15);
     }
-    console.log("fitting bounds");
-    map.fitBounds(this.drawnItems.getBounds(), { padding });
+    console.log("fitting bounds: ", geoJsonLayer.getBounds());
+    map.fitBounds(geoJsonLayer.getBounds(), { padding });
   }
 
   /**

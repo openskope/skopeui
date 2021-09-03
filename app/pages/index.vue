@@ -92,7 +92,7 @@ class LandingPage extends Vue {
 
   async fetch() {
     console.log("Landing page: loading all dataset metadata");
-    loadAllDatasetMetadata(this.$api());
+    await loadAllDatasetMetadata(this.$api());
   }
 
   created() {
