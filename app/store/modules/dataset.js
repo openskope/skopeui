@@ -60,16 +60,6 @@ class Dataset extends VuexModule {
   // status types: loading | timeout | badrequest | servererror | success
   timeSeriesRequestStatus = LOADING_STATUS;
 
-  // @Action
-  // loadMetadata(id) {
-  //   if (this.metadata == null || this.metadata.id !== id) {
-  //     const metadata = allDatasetMetadata.find((m) => m.id === id);
-  //     if (metadata) {
-  //       this.context.commit("setMetadata", metadata);
-  //     }
-  //   }
-  // }
-
   get filteredTimeSeries() {
     return filterTimeSeries({
       timeseries: this.timeseries,
@@ -233,6 +223,10 @@ class Dataset extends VuexModule {
 
   @Mutation
   setMetadata(metadata) {
+    if (metadata.id === this.metadata?.id) {
+      console.log("no-op: metadata already set on store", metadata.id);
+      return;
+    }
     this.metadata = metadata;
     if (metadata) {
       this.temporalRange.splice(
@@ -245,7 +239,6 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTemporalRange(temporalRange) {
-    console.log("setting temporal range on dataset: ", temporalRange);
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
   }
 

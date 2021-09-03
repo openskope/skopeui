@@ -138,6 +138,10 @@ export function filterDatasetMetadata(api, filterCriteria) {
 }
 
 export function initializeDataset(warehouse, api, metadataId, variableId) {
+  if (metadataId === api.dataset.metadata?.id) {
+    console.log("Already initialized, ignoring request: ", metadataId);
+    return;
+  }
   const datasetMetadata = api.metadata.find(metadataId);
   api.dataset.setMetadata(datasetMetadata);
   if (variableId == null) {
