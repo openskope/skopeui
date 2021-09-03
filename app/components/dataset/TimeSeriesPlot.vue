@@ -265,10 +265,12 @@ class TimeSeriesPlot extends Vue {
   }
 
   get selectedTemporalRange() {
+    console.log("current temporal range", this.$api().dataset.temporalRange);
     return this.$api().dataset.temporalRange;
   }
 
   set selectedTemporalRange(temporalRange) {
+    console.log("setting temporal range", temporalRange);
     this.$api().dataset.setTemporalRange(temporalRange);
     this.$emit("selectedTemporalRange", temporalRange);
   }
@@ -388,6 +390,7 @@ class TimeSeriesPlot extends Vue {
    * otherwise returns the dataset store's time series
    */
   get timeSeriesData() {
+    console.log("traces: ", this.traces);
     return this.yearSelected
       ? this.traces.concat([this.yearSelectedSeries])
       : this.traces;

@@ -24,12 +24,15 @@ async function updateTimeSeries(api, data) {
   dataset.setTimeSeriesLoading();
   const start = time_range.gte;
   const end = time_range.lte;
+  console.log("trying to load time series from ", start, " to ", end);
   if (start > end) {
+    console.log("please select a start year before the end year");
     api.messages.info("Please select a start year before the end year");
     return;
   }
   try {
     const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
+    console.log("sent data ", data, " and received response ", response);
     const originalSeries = response.series[0];
     const timeseries = {
       x: _.range(
@@ -39,6 +42,7 @@ async function updateTimeSeries(api, data) {
       y: originalSeries.values,
       options: originalSeries.options,
     };
+    console.log("setting timeseries to: ", timeseries);
     const numberOfCells = response.n_cells;
     const totalCellArea = response.area;
     dataset.setTimeSeries({ timeseries, numberOfCells, totalCellArea });
@@ -80,6 +84,7 @@ export const loadTimeSeries = _.debounce(async function (api) {
   const dataset = api.dataset;
   console.log("loading time series? ", dataset.canHandleTimeSeriesRequest);
   if (dataset.canHandleTimeSeriesRequest) {
+    console.log("loading time series with ", dataset.timeseriesRequestData);
     updateTimeSeries(api, dataset.timeseriesRequestData);
   }
 }, 300);

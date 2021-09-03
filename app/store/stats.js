@@ -48,9 +48,10 @@ export function formatStats(summaryStats, precision = DEFAULT_PRECISION) {
  * @returns a new time series object for plotly adjusted based on the selected temporal range
  */
 export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
+  console.log("filtering time series: ", timeseries, temporalRange, minYear);
   if (timeseries.x.length > 0) {
     const minOffset = temporalRange[0] - minYear;
-    const maxOffset = temporalRange[1] - minYear;
+    const maxOffset = temporalRange[1] - minYear + 1;
     const x = timeseries.x.slice(minOffset, maxOffset);
     const y = timeseries.y.slice(minOffset, maxOffset);
     return { x, y, name: timeseries.options.name };

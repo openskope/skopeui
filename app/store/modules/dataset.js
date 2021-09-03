@@ -61,6 +61,19 @@ class Dataset extends VuexModule {
   timeSeriesRequestStatus = LOADING_STATUS;
 
   get filteredTimeSeries() {
+    if (
+      this.timeseries?.x.length ===
+      this.temporalRangeMax - this.temporalRangeMin + 1
+    ) {
+      // already filtered
+      return this.timeseries;
+    }
+    console.log(
+      "returning filtered time series: ",
+      this.timeseries,
+      this.temporalRangeMax - this.temporalRangeMin,
+      this.minYear
+    );
     return filterTimeSeries({
       timeseries: this.timeseries,
       temporalRange: this.temporalRange,
@@ -141,13 +154,13 @@ class Dataset extends VuexModule {
   }
 
   get defaultApiRequestData() {
-    return {
+    const defaultRequestData = {
       dataset_id: this.metadata.id,
       variable_id: this.variable.id,
       selected_area: this.geoJson?.geometry,
       time_range: {
-        gte: this.temporalRangeMin,
-        lte: this.temporalRangeMax,
+        gte: toISODate(this.temporalRangeMin),
+        lte: toISODate(this.temporalRangeMax),
       },
       zonal_statistic: "mean",
       transform: { type: "NoTransform" },
@@ -158,6 +171,8 @@ class Dataset extends VuexModule {
         },
       ],
     };
+    console.log("default request data: ", defaultRequestData);
+    return defaultRequestData;
   }
 
   get timeseriesRequestData() {
@@ -223,7 +238,10 @@ class Dataset extends VuexModule {
 
   @Mutation
   setMetadata(metadata) {
-    console.log("setting metadata: ", metadata);
+    if (metadata == this.metadata) {
+      console.log("identical metadata, no-op");
+      return;
+    }
     this.metadata = metadata;
     if (metadata) {
       this.temporalRange.splice(
@@ -236,6 +254,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTemporalRange(temporalRange) {
+    console.log("setting temporal range ", temporalRange);
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
   }
 
@@ -264,6 +283,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTimeSeries({ timeseries, numberOfCells, totalCellArea }) {
+    console.log("setting timeseries on dataset: ", timeseries);
     this.hasData = true;
     this.timeseries = timeseries;
     this.numberOfCells = numberOfCells;

@@ -526,6 +526,10 @@ class Analyze extends Vue {
       extractYear(requestData.time_range.gte),
       extractYear(requestData.time_range.lte),
     ]);
+    console.log(
+      "analysis set temporal range to ",
+      this.$api().dataset.temporalRange
+    );
   }
 
   loadTransformOption(transform) {
