@@ -146,8 +146,8 @@ class Dataset extends VuexModule {
       variable_id: this.variable.id,
       selected_area: this.geoJson?.geometry,
       time_range: {
-        gte: toISODate(this.temporalRangeMin),
-        lte: toISODate(this.temporalRangeMax),
+        gte: this.temporalRangeMin,
+        lte: this.temporalRangeMax,
       },
       zonal_statistic: "mean",
       transform: { type: "NoTransform" },
