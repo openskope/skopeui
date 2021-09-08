@@ -415,6 +415,14 @@ class Analyze extends Vue {
     return this.$api().dataset.temporalRange;
   }
 
+  get minYear() {
+    return this.$api().dataset.minYear;
+  }
+
+  get maxYear() {
+    return this.$api().dataset.maxYear;
+  }
+
   get studyAreaGeometry() {
     return this.$api().dataset.geoJson?.geometry;
   }
@@ -636,20 +644,18 @@ class Analyze extends Vue {
   }
 
   validateMinYear(year) {
-    const minYear = this.temporalRange[0];
-    const maxYear = this.temporalRange[1];
-    if (year < minYear) {
-      return `Please enter a max year > ${minYear}`;
+    if (year < this.minYear) {
+      return `Please enter a min year > ${this.minYear}`;
     }
-    if (year > maxYear) {
-      return `Please enter a max year <= ${maxYear}`;
+    if (year > this.maxYear) {
+      return `Please enter a min year <= ${this.maxYear}`;
     }
     return true;
   }
 
   validateMaxYear(year) {
-    const minYear = this.temporalRange[0];
-    const maxYear = this.temporalRange[1];
+    const minYear = this.minYear;
+    const maxYear = this.maxYear;
     if (year < minYear) {
       return `Please enter a max year > ${minYear}`;
     }
