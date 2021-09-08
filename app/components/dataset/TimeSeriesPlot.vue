@@ -220,9 +220,6 @@ class TimeSeriesPlot extends Vue {
   @Prop({})
   traces;
 
-  @Prop({})
-  transformedTimeSeries;
-
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
@@ -320,7 +317,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get layoutMetadata() {
-    const xaxisTitle =
+    const xAxisTitle =
       this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
@@ -330,9 +327,9 @@ class TimeSeriesPlot extends Vue {
         t: 10,
         pad: 4,
       },
-      showlegend: true,
+      showlegend: this.hasMultipleTimeSeries,
       xaxis: {
-        title: xaxisTitle,
+        title: xAxisTitle,
         linewidth: 3,
         gridwidth: 3,
       },
@@ -381,7 +378,12 @@ class TimeSeriesPlot extends Vue {
   }
 
   get hasTimeSeries() {
-    return this.traces[0].x.length > 0;
+    return this.traces != null && this.traces[0].x.length > 0;
+  }
+
+  get hasMultipleTimeSeries() {
+    // FIXME: assumes traces always has one element
+    return this.traces != null && this.traces.length > 1;
   }
 
   /**
