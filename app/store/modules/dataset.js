@@ -65,15 +65,10 @@ class Dataset extends VuexModule {
       this.timeseries?.x.length ===
       this.temporalRangeMax - this.temporalRangeMin + 1
     ) {
-      // already filtered
+      // FIXME: timeseries has already been filtered by the Analyze page, this
+      // makes navigation between analyze <-> visualize trickier as we have to special case
       return this.timeseries;
     }
-    console.log(
-      "returning filtered time series: ",
-      this.timeseries,
-      this.temporalRangeMax - this.temporalRangeMin,
-      this.minYear
-    );
     return filterTimeSeries({
       timeseries: this.timeseries,
       temporalRange: this.temporalRange,
@@ -106,14 +101,6 @@ class Dataset extends VuexModule {
 
   get summaryStatistics() {
     return { ...summarize(this.filteredTimeSeries), name: "Original" };
-  }
-
-  // FIXME: this may not be needed anymore
-  get timeZero() {
-    if (this.metadata) {
-      return this.metadata.timespan.period.timeZero || 0;
-    }
-    return 0;
   }
 
   get minYear() {

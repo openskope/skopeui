@@ -201,6 +201,8 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 @Component({
   components: {
+    // load time series plotly component lazily to avoid document is not defined errors
+    // https://stackoverflow.com/a/50458090
     Plotly: () => import("vue-plotly").then((p) => p.Plotly),
     LoadingSpinner,
   },
@@ -265,12 +267,10 @@ class TimeSeriesPlot extends Vue {
   }
 
   get selectedTemporalRange() {
-    console.log("current temporal range", this.$api().dataset.temporalRange);
     return this.$api().dataset.temporalRange;
   }
 
   set selectedTemporalRange(temporalRange) {
-    console.log("setting temporal range", temporalRange);
     this.$api().dataset.setTemporalRange(temporalRange);
     this.$emit("selectedTemporalRange", temporalRange);
   }
@@ -330,7 +330,7 @@ class TimeSeriesPlot extends Vue {
         t: 10,
         pad: 4,
       },
-      showlegend: false,
+      showlegend: true,
       xaxis: {
         title: xaxisTitle,
         linewidth: 3,
@@ -390,7 +390,6 @@ class TimeSeriesPlot extends Vue {
    * otherwise returns the dataset store's time series
    */
   get timeSeriesData() {
-    console.log("traces: ", this.traces);
     return this.yearSelected
       ? this.traces.concat([this.yearSelectedSeries])
       : this.traces;

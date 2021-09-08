@@ -499,7 +499,10 @@ class Analyze extends Vue {
     this.requestDataWatcher = this.$watch(
       "analysisRequestData",
       async function (data) {
-        console.log("analysis request data has changed: ", data);
+        console.log(
+          "analysis request data changed, initializing form and retrieving from API: ",
+          data
+        );
         await this.initializeFormData(data);
         await retrieveAnalysis(api, data);
       },
@@ -527,7 +530,7 @@ class Analyze extends Vue {
       extractYear(requestData.time_range.lte),
     ]);
     console.log(
-      "analysis set temporal range to ",
+      "analysis: initializeFormData sets temporal range to ",
       this.$api().dataset.temporalRange
     );
   }
@@ -547,7 +550,6 @@ class Analyze extends Vue {
       // smoothed time series smoother option and invoke fromRequestData to set the appropriate
       // properties on this analyze vue component (if needed, e.g., smoothing time steps)
       const smoother = smoothedSeries.smoother;
-      console.log("smoother: ", smoother);
       const option = this.smoothingOptions.find(
         (x) => x.method === smoother.method
       );
@@ -629,7 +631,7 @@ class Analyze extends Vue {
       },
       requested_series: this.requestedSeries,
     };
-    console.log("submitting to web service: ", requestData);
+    console.log("submitting to skope-api: ", requestData);
     api.analysis.setRequestData(requestData);
   }
 

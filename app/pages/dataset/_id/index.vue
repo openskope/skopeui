@@ -76,8 +76,6 @@ const fillTemplate = require("es6-dynamic-template");
 @Component({
   layout: "BaseDefault",
   components: {
-    // load time series plotly component lazily to avoid document is not defined errors
-    // https://stackoverflow.com/a/50458090
     LoadingSpinner,
     SubHeader,
     Map,
@@ -98,14 +96,6 @@ class DatasetDetail extends Vue {
 
   get metadata() {
     return this.$api().dataset.metadata;
-  }
-
-  get timespan() {
-    return this.$api().dataset.timespan;
-  }
-
-  get timeZero() {
-    return this.$api().dataset.timeZero;
   }
 
   get hasValidStudyArea() {
