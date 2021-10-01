@@ -1,5 +1,5 @@
 import { find } from "lodash";
-import { API_HOST_URL, GEOSERVER_HOST_URL } from "@/store/modules/_constants";
+import { API_HOST_URL, GEOSERVER_HOST_URL, BUILD_ID } from "@/store/modules/_constants";
 export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
 export const TIMESERIES_SERVICE_URI = "timeseries-service/api/v2";
 export const SKOPE_WMS_ENDPOINT = `${GEOSERVER_HOST_URL}/${WMS_SERVER_URI}`;
@@ -55,9 +55,10 @@ export class BaseMapProvider {
 export function buildReadme(requestData) {
   return `
 # SKOPE data for ${requestData.dataset_id} / ${requestData.variable_id}
+### [version: ${BUILD_ID}](https://github.com/openskope/skopeui)
 
 ## Terms of Service
-By using the SKOPE application, you assume any risk associated with its use. You are solely responsible for any damage or loss you may incur resulting from your reliance on or use of information. provided by SKOPE.
+By using the SKOPE application, you assume any risk associated with its use. You are solely responsible for any damage or loss you may incur resulting from your reliance on or use of information provided by SKOPE.
 
 ## Citation
 Use of data, graphics, or other information provided by SKOPE should be accompanied by a citation of the original data source (provided by SKOPE in the dataset metadata) and of the SKOPE application Web page. Example reference: (SKOPE 2021).
@@ -65,17 +66,17 @@ Use of data, graphics, or other information provided by SKOPE should be accompan
 Example Citation:
 > SKOPE 2021 SKOPE: Synthesizing Knowledge of Past Environments. https://app.openskope.org/. Accessed 1 July 2021.
 
-## Contact Us
-Please use the "Email Us" button on the application navigation bar or submit your message directly to https://www.comses.net/about/contact)
+## Contact
+For comments, feedback, or questions, please use the "Email Us" button on the application navigation bar or send us a note at skope-team@googlegroups.com
 
 Time range: ${requestData.time_range.gte} - ${requestData.time_range.lte} CE
 Location: ${JSON.stringify(requestData.selected_area, null, 2)}
 
 ## Files
-- \`request.json\` - a shareable file that contains all of the input parameters needed to recreate the analysis. You should be able to re-upload this file to SKOPE to generate the same analysis if the version is compatible
-- \`summaryStatistics.json\` - the mean, median, and standard deviation of the time series data
-- \`plot.png\` and \`plog.svg\` - plotly generated graph
-- \`timeseries.json\` and \`timeseries.csv\` - the timeseries data in JSON and long form CSV formats
-- \`studyarea.geojson\` - a GeoJSON file for the defined study area
+- \`request.json\` - A shareable file that contains all of the input parameters needed to recreate this analysis. You can upload this file to the SKOPE app to reproduce the data in this zipfile.
+- \`summary-statistics.json\` - The mean, median, and standard deviation of the time series data.
+- \`plot.png\` and \`plog.svg\` - Graph of the time series data.
+- \`timeseries.json\` and \`timeseries.csv\` - Timeseries data in JSON and long form CSV formats.
+- \`study-area.geojson\` - A GeoJSON file for the defined study area.
 `;
 }

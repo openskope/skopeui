@@ -50,7 +50,6 @@ class Dataset extends VuexModule {
   metadata = null;
   hasData = false;
   geoJson = null;
-  selectedAreaInSquareMeters = 0;
   // defined temporal range for the given dataset [min, max)
   temporalRange = [1, 2000];
   totalCellArea = 0;
@@ -89,6 +88,10 @@ class Dataset extends VuexModule {
 
   get canHandleTimeSeriesRequest() {
     return this.metadata != null && this.hasGeoJson && this.variable != null;
+  }
+
+  get selectedAreaInSquareMeters() {
+    return this.hasGeoJson ? area(this.geoJson) : 0;
   }
 
   get selectedAreaInSquareKm() {
@@ -259,13 +262,11 @@ class Dataset extends VuexModule {
   @Mutation
   setGeoJson(geoJson) {
     this.geoJson = geoJson;
-    this.selectedAreaInSquareMeters = geoJson ? area(geoJson) : 0;
   }
 
   @Mutation
   clearGeoJson() {
     this.geoJson = null;
-    this.selectedAreaInSquareMeters = 0;
   }
 
   @Mutation
