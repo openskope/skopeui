@@ -57,9 +57,6 @@ class SubHeader extends Vue {
 
   stepNames = _.clone(this.$api().app.stepNames);
   showInstructions = false;
-  layerGroup = {
-    icon: "fas fa-layer-group",
-  };
 
   get metadata() {
     return this.$api().dataset.metadata;

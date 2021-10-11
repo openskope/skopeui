@@ -1,5 +1,9 @@
 import { find } from "lodash";
-import { API_HOST_URL, GEOSERVER_HOST_URL, BUILD_ID } from "@/store/modules/_constants";
+import {
+  API_HOST_URL,
+  GEOSERVER_HOST_URL,
+  BUILD_ID,
+} from "@/store/modules/_constants";
 export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
 export const TIMESERIES_SERVICE_URI = "timeseries-service/api/v2";
 export const SKOPE_WMS_ENDPOINT = `${GEOSERVER_HOST_URL}/${WMS_SERVER_URI}`;

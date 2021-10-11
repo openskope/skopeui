@@ -188,12 +188,18 @@ class Map extends Vue {
   legendControl = null;
   legendPosition = "bottomleft";
   geoJsonWatcher = null;
-  polyStyle = {
-    fillColor: "yellow",
-    weight: 2,
-    opacity: 1,
-    color: "yellow",
-  };
+
+  get areaStyle() {
+    return {
+      fill: !this.isVisualize,
+      fillColor: "yellow",
+      fillOpacity: 0.1,
+      stroke: true,
+      weight: 3,
+      opacity: 1,
+      color: this.isVisualize ? "black" : "yellow",
+    };
+  }
 
   get stepNames() {
     return this.$api().app.stepNames;
@@ -243,11 +249,11 @@ class Map extends Vue {
   }
 
   get isSelectArea() {
-    return this.stepNames.findIndex((x) => x === this.$route.name) === 1;
+    return this.currentStep === 1;
   }
 
   get isVisualize() {
-    return this.stepNames.findIndex((x) => x === this.$route.name) === 2;
+    return this.currentStep === 2;
   }
 
   get variable() {
@@ -367,12 +373,12 @@ class Map extends Vue {
   registerToolbarHandlers(map) {
     const L = this.$L;
     // check for persisted geometry
-    map.on(L.Draw.Event.EDITRESIZE, (event) => this.saveGeoJson(event.layer));
-    map.on(L.Draw.Event.EDITMOVE, (event) => this.saveGeoJson(event.layer));
-    map.on(L.Draw.Event.EDITVERTEX, (e) => this.saveGeoJson(e.poly));
+    map.on(L.Draw.Event.EDITRESIZE, (event) => this.saveGeometry(event.layer));
+    map.on(L.Draw.Event.EDITMOVE, (event) => this.saveGeometry(event.layer));
+    map.on(L.Draw.Event.EDITVERTEX, (e) => this.saveGeometry(e.poly));
     map.on(L.Draw.Event.CREATED, (event) => {
       const layer = event.layer;
-      this.saveGeoJson(layer);
+      this.saveGeometry(layer);
       this.drawnItems.addLayer(layer);
       this.enableEditOnly(map);
       console.log("register toolbar handlers");
@@ -410,7 +416,7 @@ class Map extends Vue {
    * converts leaflet circles to polygons
    * @param layer
    */
-  saveGeoJson(layer) {
+  saveGeometry(layer) {
     const data = layer.toGeoJSON();
     if (layer instanceof L.Circle) {
       data.properties.radius = layer.getRadius();
@@ -436,7 +442,7 @@ class Map extends Vue {
           return new L.Marker(latlng);
         }
       },
-      style: this.polyStyle,
+      style: this.areaStyle,
     });
   }
 
