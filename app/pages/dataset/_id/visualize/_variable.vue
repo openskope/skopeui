@@ -76,9 +76,6 @@ class Visualize extends Vue {
   // it generates a @yearSelected event that calls setYear here which
   // propagates back down to the map and time series plot components
   yearSelected = 1500;
-  layerGroup = {
-    icon: "fas fa-layer-group",
-  };
   stepNames = _.clone(this.$api().app.stepNames);
 
   get currentStep() {

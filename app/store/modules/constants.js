@@ -80,7 +80,7 @@ Location: ${JSON.stringify(requestData.selected_area, null, 2)}
 - \`request.json\` - A shareable file that contains all of the input parameters needed to recreate this analysis. You can upload this file to the SKOPE app to reproduce the data in this zipfile.
 - \`summary-statistics.json\` - The mean, median, and standard deviation of the time series data.
 - \`plot.png\` and \`plog.svg\` - Graph of the time series data.
-- \`timeseries.json\` and \`timeseries.csv\` - Timeseries data in JSON and long form CSV formats.
+- \`time-series.json\` and \`time-series.csv\` - time series data in JSON and long form CSV formats.
 - \`study-area.geojson\` - A GeoJSON file for the defined study area.
 `;
 }

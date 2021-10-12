@@ -43,7 +43,7 @@ function toTemporalRange(metadata) {
 
 @Module({ stateFactory: true, name: "dataset", namespaced: true })
 class Dataset extends VuexModule {
-  timeseries = {
+  timeSeries = {
     x: [],
     y: [],
   };
@@ -61,15 +61,15 @@ class Dataset extends VuexModule {
 
   get filteredTimeSeries() {
     if (
-      this.timeseries?.x.length ===
+      this.timeSeries?.x.length ===
       this.temporalRangeMax - this.temporalRangeMin + 1
     ) {
-      // FIXME: timeseries has already been filtered by the Analyze page, this
+      // FIXME: timeSeries has already been filtered by the Analyze page, this
       // makes navigation between analyze <-> visualize trickier as we have to special case
-      return this.timeseries;
+      return this.timeSeries;
     }
     return filterTimeSeries({
-      timeseries: this.timeseries,
+      timeSeries: this.timeSeries,
       temporalRange: this.temporalRange,
       minYear: this.minYear,
     });
@@ -165,8 +165,8 @@ class Dataset extends VuexModule {
     return defaultRequestData;
   }
 
-  get timeseriesRequestData() {
-    // returns timeseries v2 request data
+  get timeSeriesRequestData() {
+    // returns timeSeries v2 request data
     if (this.canHandleTimeSeriesRequest) {
       return this.defaultApiRequestData;
     } else {
@@ -270,10 +270,10 @@ class Dataset extends VuexModule {
   }
 
   @Mutation
-  setTimeSeries({ timeseries, numberOfCells, totalCellArea }) {
-    console.log("setting timeseries on dataset: ", timeseries);
+  setTimeSeries({ timeSeries, numberOfCells, totalCellArea }) {
+    console.log("setting timeseries on dataset: ", timeSeries);
     this.hasData = true;
-    this.timeseries = timeseries;
+    this.timeSeries = timeSeries;
     this.numberOfCells = numberOfCells;
     this.totalCellArea = totalCellArea;
   }
@@ -281,7 +281,7 @@ class Dataset extends VuexModule {
   @Mutation
   clearTimeSeries() {
     this.hasData = false;
-    this.timeseries = {
+    this.timeSeries = {
       x: [],
       y: [],
     };

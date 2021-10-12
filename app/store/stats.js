@@ -10,18 +10,18 @@ const DEFAULT_PRECISION = 2;
 
 /**
  * Returns an object structure with { stdDev, mean, median } statistics for
- * the given timeseries.
- * @param {*} timeseries
- * @returns  {stdDev, mean, median} over the given timeseries
+ * the given time series.
+ * @param {*} timeSeries
+ * @returns  {stdDev, mean, median} over the given timeSeries
  */
-export function summarize(timeseries) {
+export function summarize(timeSeries) {
   // FIXME: replacing null values with 0 may work for some data but not all
   // need to clarify how to handle NODATA
-  const values = timeseries.y.map((v) => (v == null ? 0 : v));
+  const values = timeSeries.y.map((v) => (v == null ? 0 : v));
   if (values.length === 0) {
     return EMPTY_SUMMARY_STATISTICS;
   }
-  const precision = timeseries.precision ?? DEFAULT_PRECISION;
+  const precision = timeSeries.precision ?? DEFAULT_PRECISION;
   // may need to make lowerExp and upperExp explicit, check with science team
   // https://mathjs.org/docs/reference/functions/format.html
   return {
@@ -47,13 +47,13 @@ export function formatStats(summaryStats, precision = DEFAULT_PRECISION) {
  * @param {traces, temporalRange, minYear}
  * @returns a new time series object for plotly adjusted based on the selected temporal range
  */
-export function filterTimeSeries({ timeseries, temporalRange, minYear }) {
-  if (timeseries.x.length > 0) {
+export function filterTimeSeries({ timeSeries, temporalRange, minYear }) {
+  if (timeSeries.x.length > 0) {
     const minOffset = temporalRange[0] - minYear;
     const maxOffset = temporalRange[1] - minYear + 1;
-    const x = timeseries.x.slice(minOffset, maxOffset);
-    const y = timeseries.y.slice(minOffset, maxOffset);
-    return { x, y, name: timeseries.options.name };
+    const x = timeSeries.x.slice(minOffset, maxOffset);
+    const y = timeSeries.y.slice(minOffset, maxOffset);
+    return { x, y, name: timeSeries.options.name };
   } else {
     return { x: [], y: [] };
   }

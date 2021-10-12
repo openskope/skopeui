@@ -41,7 +41,7 @@
           min="0"
           max="100"
           type="number"
-          label="Set opacity"
+          label="Opacity"
           hint="0-100"
           append-outer-icon="add"
           prepend-icon="remove"
@@ -538,13 +538,13 @@ class Map extends Vue {
         saveGeoJson(this.$warehouse, this.$api(), geoJson);
         // assert that uploaded and store geojson are the same
         console.log(
-          "assert same geojson: ",
+          "geojson persisted to store? ",
           geoJson === this.$api().dataset.geoJson
         );
       } catch (error) {
         console.error(error);
         // FIXME: this should be a toast or other notification
-        alert("Sorry! We couldn't re-import this file: " + text);
+        alert("Sorry, we couldn't re-import this GeoJSON file: " + text);
       }
     });
   }

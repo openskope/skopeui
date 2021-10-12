@@ -32,7 +32,7 @@
                   cells)
                 </h3>
               </template>
-              <span>Total cell area used in this timeseries calculation</span>
+              <span>Total cell area used in this time series calculation</span>
             </v-tooltip>
           </v-col>
           <!-- temporal range input -->
@@ -172,7 +172,7 @@
       <client-only placeholder="Loading...">
         <Plotly
           ref="plot"
-          class="timeseries"
+          class="time-series"
           :data="timeSeriesData"
           :layout="layoutMetadata"
           :options="options"
@@ -227,7 +227,7 @@ class TimeSeriesPlot extends Vue {
   localTemporalRangeMin = 1;
   localTemporalRangeMax = 2020;
   isTemporalRangeEditable = false;
-  timeSeriesUnwatcher = null;
+  timeSeriesWatch = null;
 
   get formTemporalRangeMin() {
     return this.isTemporalRangeEditable
@@ -294,14 +294,6 @@ class TimeSeriesPlot extends Vue {
 
   get selectedAreaInSquareKm() {
     return this.$api().dataset.selectedAreaInSquareKm;
-  }
-
-  get geometry() {
-    return this.$api().dataset.geoJson?.geometry ?? null;
-  }
-
-  get metadata() {
-    return this.$api().dataset.metadata;
   }
 
   get minYear() {
@@ -405,7 +397,7 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.numberOfCells;
   }
 
-  get timeseriesRequestData() {
+  get timeSeriesRequestData() {
     return this.$api().dataset.timeSeriesRequestData;
   }
 
@@ -413,9 +405,10 @@ class TimeSeriesPlot extends Vue {
     await loadTimeSeries(this.$api());
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
-    this.timeSeriesUnwatcher = this.$watch(
-      "timeseriesRequestData",
+    this.timeSeriesWatch = this.$watch(
+      "timeSeriesRequestData",
       async function (data) {
+        console.log("Retrieving new time series");
         await retrieveTimeSeries(this.$api(), data);
       }
     );
@@ -431,8 +424,8 @@ class TimeSeriesPlot extends Vue {
   }
 
   destroyed() {
-    if (this.timeSeriesUnwatcher) {
-      this.timeSeriesUnwatcher();
+    if (this.timeSeriesWatch) {
+      this.timeSeriesWatcher();
     }
   }
 
@@ -584,7 +577,7 @@ class TimeSeriesPlot extends Vue {
 export default TimeSeriesPlot;
 </script>
 <style>
-.timeseries {
+.time-series {
   height: 100%;
 }
 </style>

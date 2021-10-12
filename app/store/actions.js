@@ -33,7 +33,7 @@ async function updateTimeSeries(api, data) {
   try {
     const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
     const originalSeries = response.series[0];
-    const timeseries = {
+    const timeSeries = {
       x: _.range(
         extractYear(originalSeries.time_range.gte),
         extractYear(originalSeries.time_range.lte) + 1
@@ -43,7 +43,7 @@ async function updateTimeSeries(api, data) {
     };
     const numberOfCells = response.n_cells;
     const totalCellArea = response.area;
-    dataset.setTimeSeries({ timeseries, numberOfCells, totalCellArea });
+    dataset.setTimeSeries({ timeSeries, numberOfCells, totalCellArea });
     dataset.setTimeSeriesLoaded();
   } catch (e) {
     dataset.clearTimeSeries();
@@ -51,7 +51,7 @@ async function updateTimeSeries(api, data) {
       // https://github.com/axios/axios#handling-errors
       const statusCode = e.response.status;
       const responseData = e.response.data;
-      console.error("failed timeseries request: ", {
+      console.error("failed timeSeries request: ", {
         statusCode,
         responseData,
       });
@@ -81,8 +81,8 @@ export const retrieveTimeSeries = _.debounce(updateTimeSeries, 300);
 export const loadTimeSeries = _.debounce(async function (api) {
   const dataset = api.dataset;
   if (dataset.canHandleTimeSeriesRequest) {
-    console.log("loading time series with ", dataset.timeseriesRequestData);
-    updateTimeSeries(api, dataset.timeseriesRequestData);
+    console.log("loading time series with ", dataset.timeSeriesRequestData);
+    updateTimeSeries(api, dataset.timeSeriesRequestData);
   }
 }, 300);
 
@@ -131,6 +131,7 @@ export async function loadMetadata(api, id) {
 }
 
 export function saveGeoJson(warehouse, api, geoJson) {
+  console.log("Saving new geojson, should trigger new request data: ", geoJson);
   warehouse.set(api.dataset.geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
 }

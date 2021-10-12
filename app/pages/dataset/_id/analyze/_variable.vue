@@ -604,8 +604,8 @@ class Analyze extends Vue {
     const zip = new JSZip();
     zip.file("request.json", JSON.stringify(request));
     zip.file("summary-statistics.json", JSON.stringify(summaryStatistics));
-    zip.file("timeseries.json", JSON.stringify(timeseries));
-    zip.file("timeseries.csv", Papa.unparse(this.tracesAsArrayOfObjects()));
+    zip.file("time-series.json", JSON.stringify(timeseries));
+    zip.file("time-series.csv", Papa.unparse(this.tracesAsArrayOfObjects()));
     zip.file("plot.png", await png.blob());
     zip.file("plot.svg", await svg.blob());
     zip.file("study-area.geojson", JSON.stringify(geoJson));
