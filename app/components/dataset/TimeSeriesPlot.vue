@@ -425,7 +425,7 @@ class TimeSeriesPlot extends Vue {
 
   destroyed() {
     if (this.timeSeriesWatch) {
-      this.timeSeriesWatcher();
+      this.timeSeriesWatch();
     }
   }
 
