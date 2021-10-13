@@ -118,10 +118,7 @@ class DatasetDetail extends Vue {
 
   fetch() {
     const params = this.$route.params;
-    console.log(
-      "fetch: loading dataset and variable from params: ",
-      params
-    );
+    console.log("fetch: loading dataset and variable from params: ", params);
     const datasetId = params.id;
     const variableId = params.variable;
     initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
