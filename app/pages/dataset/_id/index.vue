@@ -40,7 +40,7 @@
                     area?
                   </h3>
                 </v-card-text>
-                <v-card-actions class="justify-end">
+                <v-card-actions class="justify-space-between">
                   <v-btn outlined color="accent" @click="clearGeoJson">
                     Clear selected area
                   </v-btn>
@@ -83,8 +83,15 @@ const fillTemplate = require("es6-dynamic-template");
 })
 class DatasetDetail extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
-  dialog = false;
-  confirmGeometry = false;
+  shouldConfirmGeometry = true;
+
+  get confirmGeometry() {
+    return this.hasValidStudyArea && this.shouldConfirmGeometry;
+  }
+
+  set confirmGeometry(value) {
+    this.shouldConfirmGeometry = value;
+  }
 
   get isLoading() {
     return this.metadata == null;
@@ -100,7 +107,7 @@ class DatasetDetail extends Vue {
 
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
-    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
+    return this.$api().dataset.hasGeoJson;
   }
 
   get selectedArea() {
@@ -109,26 +116,15 @@ class DatasetDetail extends Vue {
     );
   }
 
-  async fetch(context) {
+  fetch() {
+    const params = this.$route.params;
     console.log(
       "fetch: loading dataset and variable from params: ",
-      context.params
+      params
     );
-    const datasetId = context.params.id;
-    const variableId = context.params.variable;
-    console.log(
-      "fetch: initializing dataset with dataset id:",
-      datasetId,
-      " and variable ",
-      variableId
-    );
-    initializeDataset(
-      context.$warehouse,
-      context.$api(),
-      datasetId,
-      variableId
-    );
-    this.confirmGeometry = this.hasValidStudyArea;
+    const datasetId = params.id;
+    const variableId = params.variable;
+    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
   }
 
   head() {
@@ -148,7 +144,6 @@ class DatasetDetail extends Vue {
   }
 
   clearGeoJson() {
-    this.confirmGeometry = false;
     clearGeoJson(this.$warehouse, this.$api());
   }
 }
