@@ -187,7 +187,7 @@ class Map extends Vue {
   legendImage = null;
   legendControl = null;
   legendPosition = "bottomleft";
-  geoJsonWatcher = null;
+  geoJsonWatch = null;
 
   get areaStyle() {
     return {
@@ -269,8 +269,8 @@ class Map extends Vue {
   }
 
   destroyed() {
-    if (this.geoJsonWatcher) {
-      this.geoJsonWatcher();
+    if (this.geoJsonWatch) {
+      this.geoJsonWatch();
     }
   }
 
@@ -300,7 +300,7 @@ class Map extends Vue {
     map.fitBounds(this.metadata.region.extents, {
       padding: this.defaultBoundsPadding,
     });
-    this.geoJsonWatcher = this.$watch(
+    this.geoJsonWatch = this.$watch(
       "geoJson",
       function (geoJson) {
         console.log("watcher updating geojson", geoJson);

@@ -1,27 +1,5 @@
 <template>
   <v-container fluid class="fill-height">
-    <v-snackbar
-      v-model="showSnack"
-      color="secondary darken-2"
-      text
-      right
-      outlined
-      timeout="10000"
-    >
-      <p style="font-size: 1.45rem">
-        Welcome to the Synthesizing Knowledge of Past Environments (SKOPE)
-        application! Filter datasets then select a dataset to examine.
-      </p>
-      <template #action="{ attrs }">
-        <v-btn
-          color="secondary darken-3"
-          v-bind="attrs"
-          @click="showSnack = false"
-        >
-          OK
-        </v-btn>
-      </template>
-    </v-snackbar>
     <v-row>
       <v-col md="12" lg="8" offset-lg="2">
         <Search />
@@ -77,15 +55,13 @@ import Search from "@/components/dataset/Search.vue";
 import { loadAllDatasetMetadata } from "@/store/actions";
 
 @Component({
-  layout: "BaseDefault",
+  layout: "DefaultLayout",
   components: {
     ListItem,
     Search,
   },
 })
 class LandingPage extends Vue {
-  showSnack = false;
-
   get datasets() {
     return this.$api().metadata.filteredDatasets;
   }
@@ -101,9 +77,7 @@ class LandingPage extends Vue {
     api.dataset.setMetadata(null);
   }
 
-  mounted() {
-    this.showSnack = true;
-  }
+  mounted() {}
 }
 export default LandingPage;
 </script>

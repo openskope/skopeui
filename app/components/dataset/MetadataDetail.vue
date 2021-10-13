@@ -7,7 +7,7 @@
       <v-list-item v-for="(variable, index) in metadata.variables" :key="index">
         <v-list-item-content>
           <v-list-item-title>
-            <v-chip small label color="info" text-color="black">
+            <v-chip small label color="primary" text-color="white">
               {{ variable.class }}
             </v-chip>
             {{ variable.name }}

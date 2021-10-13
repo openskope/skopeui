@@ -1,59 +1,25 @@
 <template>
-  <v-app-bar extended extension-height="25" color="primary" app>
-    <v-row align="end" align-content="space-between">
-      <v-col class="d-flex ma-0 pa-0 shrink" md="2" align-self="end">
-        <v-app-bar-nav-icon
-          v-if="isMdAndDown"
-          class="my-auto"
-          color="white"
-          @click.stop="toggleDrawer(!drawer)"
-        >
-        </v-app-bar-nav-icon>
-        <v-toolbar-title>
-          <nuxt-link class="skope-title ma-0 pa-0" to="/">
-            SKOPE
-            <p
-              v-if="!isMdAndDown"
-              class="subtitle-2 ma-0 pa-0"
-              style="color: white; font-size: 1rem"
-            >
-              Synthesizing Knowledge of Past Environments
-            </p></nuxt-link
-          >
-        </v-toolbar-title>
-      </v-col>
-      <v-col v-if="!isMdAndDown" md="7" class="grow">
-        <Navigation />
-      </v-col>
-      <v-col v-else align-self="center" class="grow text-right mx-2">
-        <h1 offset-y style="color: white">
-          <span style="border-bottom: #ee6c4d solid" class="pb-2">
-            <v-icon large color="white" class="mx-2">{{
-              steps[currentStepIndex].icon
-            }}</v-icon>
-            {{ currentStepName }}
-          </span>
-        </h1>
-      </v-col>
-      <v-col v-if="!isMdAndDown" md="3" class="text-right">
-        <LoadAnalysis></LoadAnalysis>
-      </v-col>
-    </v-row>
+  <v-app-bar src="/header.png" light dense prominent shrink-on-scroll app>
+    <v-app-bar-nav-icon
+      light
+      @click.stop="toggleNavigationDrawer()"
+    ></v-app-bar-nav-icon>
+    <v-app-bar-title>
+      <a class="skope-title pa-0 ma-0" href="https://www.openskope.org">
+        SKOPE
+        <div class="skope-subtitle pt-n3">
+          Synthesizing Knowledge of Past Environments
+        </div>
+      </a>
+    </v-app-bar-title>
   </v-app-bar>
 </template>
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
-import Navigation from "@/components/Navigation.vue";
 import _ from "lodash";
 
-@Component({
-  components: {
-    LoadAnalysis,
-    Navigation,
-  },
-})
+@Component({})
 class Header extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   steps = _.clone(this.$api().app.steps);
@@ -77,8 +43,8 @@ class Header extends Vue {
 
   // --------- METHODS ---------
 
-  toggleDrawer(drawer) {
-    this.$api().app.toggleDrawer(drawer);
+  toggleNavigationDrawer() {
+    this.$api().app.toggleNavigationDrawer();
   }
 }
 export default Header;
@@ -86,9 +52,15 @@ export default Header;
 <style scoped>
 .skope-title {
   text-decoration: none;
-  color: white;
-  font-family: "Roboto", serif;
+  color: rgb(172, 4, 4);
+  font-family: "Bitter", Georgia, serif;
   font-weight: bold;
-  font-size: 2em;
+  font-size: 2.3em;
+}
+
+.skope-subtitle {
+  color: rgb(172, 4, 4);
+  font-family: "Source Sans Pro", Helvetica, serif;
+  font-size: 1.5rem;
 }
 </style>
