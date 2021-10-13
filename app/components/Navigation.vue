@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer v-model="navigationVisible" app light>
     <v-list dense nav>
-      <v-btn-toggle class="w-100" v-model="currentStep">
+      <v-btn-toggle v-model="currentStep" class="w-100">
         <v-btn
           v-for="(step, index) in steps"
           :key="step.id"
@@ -137,12 +137,6 @@ class Navigation extends Vue {
   }
 
   isCurrentStep(index) {
-    console.log(
-      "checking index and current step index",
-      index,
-      " :: ",
-      this.currentStepIndex
-    );
     return this.currentStepIndex === index;
   }
 }

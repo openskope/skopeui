@@ -26,9 +26,9 @@
           <h2>Citation</h2>
           <p class="text-body-1">
             Use of data, graphics, or other information provided by SKOPE should
-            be accompanied by a citation to the application and of the original
-            data source (provided by SKOPE in the dataset metadata) and of the
-            SKOPE web application.
+            be accompanied by a citation of the original data source provided by
+            SKOPE in the dataset metadata and of the SKOPE web application
+            itself.
           </p>
 
           <h2>Example reference</h2>
@@ -49,10 +49,6 @@
           </p>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn depressed color="accent" @click.stop="acceptTerms"
-            >I accept</v-btn
-          >
           <v-btn
             href="https://www.openskope.org"
             outlined
@@ -61,6 +57,10 @@
           >
             I decline, return to www.openskope.org
           </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn depressed color="accent" @click.stop="acceptTerms"
+            >I accept</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -76,9 +76,7 @@ class TermsOfUse extends Vue {
 
   created() {
     if (process.client) {
-      const warehouse = this.$warehouse;
-      this.showTerms = !warehouse.get(this.termsAcceptedWarehouseKey);
-      console.log("warehouse? ", this.showTerms);
+      this.showTerms = !this.$warehouse.get(this.termsAcceptedWarehouseKey);
     }
   }
 
@@ -92,7 +90,6 @@ class TermsOfUse extends Vue {
   }
 
   declineTerms() {
-    console.log("declining terms");
     this.$warehouse.remove(this.termsAcceptedWarehouseKey);
   }
 }
