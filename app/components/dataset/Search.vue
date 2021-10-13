@@ -19,8 +19,7 @@
           >
             <v-chip
               v-bind="attrs"
-              color="info"
-              style="color: black"
+              color="black"
               :input-value="selected"
               label
               small
@@ -34,7 +33,7 @@
             </v-chip>
           </template>
           <template #item="{ item: variableClass }">
-            <v-chip color="info" dark label small style="color: black">
+            <v-chip color="black" dark label small>
               {{ variableClass }}
             </v-chip>
           </template>

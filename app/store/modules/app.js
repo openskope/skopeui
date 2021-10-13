@@ -2,7 +2,7 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 @Module({ stateFactory: true, namespaced: true, name: "app" })
 class App extends VuexModule {
-  isVisible = false;
+  isNavigationVisible = false;
 
   steps = [
     {
@@ -13,7 +13,7 @@ class App extends VuexModule {
     },
     {
       id: 2,
-      name: "dataset-id-studyarea",
+      name: "dataset-id",
       label: "Select Area",
       icon: "fas fa-map",
     },
@@ -31,30 +31,25 @@ class App extends VuexModule {
     },
   ];
 
-  stepNames = [
-    "index",
-    "dataset-id",
-    "dataset-id-visualize-variable",
-    "dataset-id-analyze-variable",
-  ];
-
-  /**
-   * Toggle drawer with options click filter datasets.
-   * @param {*} isVisible
-   */
-  @Mutation
-  setDrawer(isVisible) {
-    this.isVisible = isVisible;
+  get stepNames() {
+    return this.steps.map((step) => step.name);
   }
 
   /**
-   * Pass value to toggle drawer.
-   * @param {*} isVisible Value that determines show/hide (1/0)drawer
+   * Toggle drawer with options click filter datasets.
+   * @param {*} isNavigationVisible
    */
-  @Action({ commit: "setDrawer" })
-  toggleDrawer(isVisible) {
-    this.context.commit("setDrawer", isVisible);
-    return isVisible;
+  @Mutation
+  setNavigationVisible(isNavigationVisible) {
+    this.isNavigationVisible = isNavigationVisible;
+  }
+
+  /**
+   * Toggle navigation drawer visibility on / off.
+   */
+  @Action({ commit: "setNavigationVisible" })
+  toggleNavigationDrawer() {
+    return !this.isNavigationVisible;
   }
 }
 

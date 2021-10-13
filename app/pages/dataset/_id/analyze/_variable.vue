@@ -174,7 +174,7 @@ import JSZip from "jszip";
 import Papa from "papaparse";
 
 @Component({
-  layout: "BaseDefault",
+  layout: "DefaultLayout",
   components: {
     TimeSeriesPlot,
     SubHeader,

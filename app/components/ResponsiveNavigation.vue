@@ -1,13 +1,7 @@
 <template>
-  <v-navigation-drawer v-model="isVisible" temporary app>
-    <v-row>
-      <v-col cols="12">
-        <Navigation></Navigation>
-      </v-col>
-      <v-col cols="12" class="text-center">
-        <LoadAnalysis></LoadAnalysis>
-      </v-col>
-    </v-row>
+  <v-navigation-drawer permanent app>
+    <Navigation></Navigation>
+    <LoadAnalysis></LoadAnalysis>
   </v-navigation-drawer>
 </template>
 <script>
@@ -34,7 +28,7 @@ class ResponsiveNavigation extends Vue {
   }
 
   set isVisible(isVisible) {
-    this.$api().app.setDrawer(isVisible);
+    this.$api().app.setNavigationVisible(isVisible);
   }
 }
 

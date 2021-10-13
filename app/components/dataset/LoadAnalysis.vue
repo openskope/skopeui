@@ -1,24 +1,20 @@
 <template>
-  <v-row>
-    <v-col>
-      <!-- load analysis -->
-      <v-btn
-        color="secondary"
-        depressed
-        class="mt-3 mx-3"
-        @click="selectLoadRequestDataFile"
-      >
-        <input
-          id="loadRequestDataFile"
-          type="file"
-          accept=".json"
-          style="display: none"
-          @change="loadRequestData"
-        />
-        <h2 class="title">Load Analysis</h2>
-      </v-btn>
-    </v-col>
-  </v-row>
+  <!-- load analysis -->
+  <v-btn
+    color="secondary"
+    depressed
+    class="mt-3 mx-3"
+    @click="selectLoadRequestDataFile"
+  >
+    <input
+      id="loadRequestDataFile"
+      type="file"
+      accept=".json"
+      style="display: none"
+      @change="loadRequestData"
+    />
+    <h2 class="title">Load Analysis</h2>
+  </v-btn>
 </template>
 <script>
 import Vue from "vue";

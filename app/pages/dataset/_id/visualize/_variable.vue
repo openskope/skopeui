@@ -60,7 +60,7 @@ const setYearSelected = _.debounce(function (vue) {
 }, 350);
 
 @Component({
-  layout: "BaseDefault",
+  layout: "DefaultLayout",
   key: function (route) {
     return route.fullPath;
   },

@@ -74,7 +74,7 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
 const fillTemplate = require("es6-dynamic-template");
 
 @Component({
-  layout: "BaseDefault",
+  layout: "DefaultLayout",
   components: {
     LoadingSpinner,
     SubHeader,
