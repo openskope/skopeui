@@ -47,9 +47,9 @@ docker-compose.yml: base.yml config.mk $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
 	  *) @echo "invalid environment. must be either dev, staging or prod" 1>&2; exit 1;; \
 	esac
 
-.PHONY: test
-test: test-setup
-	docker-compose run --rm web yarn test
+.PHONY: buildprod
+buildprod: build
+	docker-compose run --rm web yarn build
 
 .PHONY: lint
 lint: build
