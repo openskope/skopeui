@@ -1,21 +1,19 @@
 <template>
   <v-container fluid class="fill-height">
-    <v-row>
-      <LoadingSpinner v-if="isLoading"></LoadingSpinner>
-      <v-col lg="12" md="12" sm="12" class="mb-3">
-        <SubHeader>
-          <v-btn
-            :disabled="!hasValidStudyArea"
-            :to="visualizeLocation"
-            nuxt
-            color="accent"
-            depressed
-          >
-            Visualize Data
-            <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
-          </v-btn>
-        </SubHeader>
-      </v-col>
+    <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+    <SubHeader>
+      <v-btn
+        :disabled="!hasValidStudyArea"
+        :to="visualizeLocation"
+        nuxt
+        color="accent"
+        depressed
+      >
+        Visualize Data
+        <v-icon small class="ml-2"> fas fa-chevron-right </v-icon>
+      </v-btn>
+    </SubHeader>
+    <v-row dense>
       <v-col
         lg="12"
         md="12"
