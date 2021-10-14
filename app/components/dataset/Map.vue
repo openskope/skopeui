@@ -20,7 +20,7 @@
               {{ selectedArea }} km<sup>2</sup>
             </h3>
           </template>
-          <span>Selected Area</span>
+          <span>Area of the selected geometry</span>
         </v-tooltip>
         <v-spacer></v-spacer>
         <v-alert

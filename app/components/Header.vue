@@ -5,7 +5,11 @@
       @click.stop="toggleNavigationDrawer()"
     ></v-app-bar-nav-icon>
     <v-app-bar-title>
-      <a class="skope-title pa-0 ma-0" href="https://www.openskope.org">
+      <a
+        class="skope-title pa-0 ma-0"
+        href="https://www.openskope.org"
+        target="_blank"
+      >
         SKOPE
         <div class="skope-subtitle pt-n3">
           Synthesizing Knowledge of Past Environments

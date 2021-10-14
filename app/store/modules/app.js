@@ -20,13 +20,13 @@ class App extends VuexModule {
     {
       id: 3,
       name: "dataset-id-visualize-variable",
-      label: "Visualize Data",
+      label: "Visualize",
       icon: "fas fa-chart-bar",
     },
     {
       id: 4,
       name: "dataset-id-analyze-variable",
-      label: "Analyze Data",
+      label: "Analyze",
       icon: "fas fa-chart-line",
     },
   ];
