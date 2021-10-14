@@ -19,21 +19,21 @@
     </v-col>
     <v-col xs8>
       <v-card elevation="0">
-        <v-card-title class="ma-0 pb-0">
-          <h2 class="headline">
+        <v-card-title class="ma-0 pa-0">
+          <div class="text-h6">
             <nuxt-link :to="absoluteUrl" class="dataset-title">
               {{ title }}
             </nuxt-link>
             <MetadataModal :metadata-id="id" />
-          </h2>
+          </div>
+          <div class="text-subtitle-2 pa-0 ma-0">
+            {{ spatialCoverage }} | {{ temporalCoverage }}
+          </div>
         </v-card-title>
-        <v-subheader class="ma-0">
-          {{ spatialCoverage }} | {{ temporalCoverage }}
-        </v-subheader>
-        <v-card-text class="ma-0">
+        <v-card-text class="mt-3 pa-0">
           <span v-html="$md.render(description)"></span>
         </v-card-text>
-        <v-subheader class="ma-0"><h3>Variables</h3></v-subheader>
+        <v-subheader class="ma-0 pa-0 text-h6">Variables</v-subheader>
         <!-- FIXME: extract this to a component and reuse across the detail page -->
         <v-list dense class="ma-0 pa-0">
           <v-list-item v-for="(variable, index) in variables" :key="index">
@@ -47,8 +47,8 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <v-card-text class="citation font-weight-bold">
-          Source:
+        <v-card-text class="ma-0 pa-0">
+          <b class="text-subtitle-1">Source:</b>
           <a target="_blank" :href="sourceUrl">
             {{ sourceUrl }}
           </a>
