@@ -1,9 +1,7 @@
 <template>
-  <v-container fluid class="fill-height">
-    <v-row>
-      <v-col md="12" lg="8" offset-lg="2">
-        <Search />
-      </v-col>
+  <v-container fluid>
+    <Search />
+    <v-row class="mt-n10">
       <v-col cols="12">
         <h1 class="font-weight-light">
           Select a Dataset
@@ -11,9 +9,7 @@
             <template #activator="{ on, attrs }">
               <v-btn
                 icon
-                depressed
                 fab
-                rounded
                 href="https://www.openskope.org/skope-users-guide/"
                 target="_blank"
                 v-bind="attrs"
@@ -22,7 +18,7 @@
                 <v-icon color="grey">fas fa-question-circle</v-icon>
               </v-btn>
             </template>
-            <span>User Guide</span>
+            <span>View user guide</span>
           </v-tooltip>
         </h1>
         <template v-for="dataset in datasets" router exact>
