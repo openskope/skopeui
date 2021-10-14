@@ -1,9 +1,11 @@
 <template>
   <v-app-bar src="/header.png" dense light shrink-on-scroll app>
-    <template v-slot:img="{ props }">
+    <template #img="{ props }">
       <v-img v-bind="props" cover></v-img>
     </template>
-    <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()" />
+    <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()">
+      <v-icon color="primary" x-large class="darken-3">fas fa-bars</v-icon>
+    </v-app-bar-nav-icon>
     <v-app-bar-title>
       <a
         class="skope-title pa-0 ma-0"
