@@ -8,7 +8,7 @@
       </v-list-item-content>
     </v-list-item>
     <v-divider />
-    <v-list nav>
+    <v-list shaped nav>
       <v-list-item
         v-for="(step, index) in steps"
         :key="step.id"
@@ -26,6 +26,10 @@
           <v-icon color="green darken-1">far fa-check-square</v-icon>
         </v-list-item-icon>
       </v-list-item>
+      <v-divider />
+      <v-list-item>
+        <LoadAnalysis />
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -33,9 +37,14 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
 import _ from "lodash";
 
-@Component()
+@Component({
+  components: {
+    LoadAnalysis,
+  },
+})
 class Navigation extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   steps = _.clone(this.$api().app.steps);
