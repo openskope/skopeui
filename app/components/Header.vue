@@ -1,9 +1,6 @@
 <template>
   <v-app-bar src="/header.png" light dense prominent shrink-on-scroll app>
-    <v-app-bar-nav-icon
-      light
-      @click.stop="toggleNavigationDrawer()"
-    ></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()" />
     <v-app-bar-title>
       <a
         class="skope-title pa-0 ma-0"
@@ -16,14 +13,21 @@
         </div>
       </a>
     </v-app-bar-title>
+    <v-spacer />
+    <LoadAnalysis />
   </v-app-bar>
 </template>
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
 import _ from "lodash";
 
-@Component({})
+@Component({
+  components: {
+    LoadAnalysis,
+  },
+})
 class Header extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   steps = _.clone(this.$api().app.steps);
