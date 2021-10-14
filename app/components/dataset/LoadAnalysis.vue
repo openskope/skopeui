@@ -1,11 +1,6 @@
 <template>
   <!-- load analysis -->
-  <v-btn
-    color="secondary"
-    depressed
-    class="mt-3 mx-3"
-    @click="selectLoadRequestDataFile"
-  >
+  <v-btn color="primary" tile class="mt-1" @click="selectLoadRequestDataFile">
     <input
       id="loadRequestDataFile"
       type="file"
@@ -13,7 +8,8 @@
       style="display: none"
       @change="loadRequestData"
     />
-    <h2 class="title">Load Analysis</h2>
+    <v-icon left dark>fas fa-upload</v-icon>
+    Upload SKOPE Analysis
   </v-btn>
 </template>
 <script>
