@@ -45,6 +45,8 @@
               :disabled="!isTemporalRangeEditable"
               :min="minYear"
               :max="maxYear - 1"
+              :hint="timeStepsLabel"
+              persistent-hint
               type="number"
               :rules="[validateMinYear]"
               @keydown.enter="setTemporalRange"
@@ -63,23 +65,17 @@
               @keydown.enter="setTemporalRange"
             >
             </v-text-field>
-            <div class="my-n4">
-              <small class="font-weight-bold">
-                {{ selectedTemporalRange[1] - selectedTemporalRange[0] + 1 }}
-                time steps
-              </small>
-              <div no-gutters>
-                <v-btn
-                  :disabled="!hasTemporalRangeChanges"
-                  x-small
-                  color="secondary"
-                  @click="setTemporalRange"
-                  >Apply</v-btn
-                >
-                <v-btn x-small color="secondary" @click="resetTemporalRange"
-                  >Reset</v-btn
-                >
-              </div>
+            <div class="mt-n3" no-gutters>
+              <v-btn
+                :disabled="!hasTemporalRangeChanges"
+                x-small
+                color="secondary"
+                @click="setTemporalRange"
+                >Apply</v-btn
+              >
+              <v-btn x-small color="secondary" @click="resetTemporalRange"
+                >Reset</v-btn
+              >
             </div>
           </v-col>
           <!-- step controls -->
@@ -228,6 +224,12 @@ class TimeSeriesPlot extends Vue {
   localTemporalRangeMax = 2020;
   isTemporalRangeEditable = false;
   timeSeriesWatch = null;
+
+  get timeStepsLabel() {
+    const timeSteps =
+      this.selectedTemporalRange[1] - this.selectedTemporalRange[0] + 1;
+    return `${timeSteps} time steps`;
+  }
 
   get formTemporalRangeMin() {
     return this.isTemporalRangeEditable
