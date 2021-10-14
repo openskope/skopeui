@@ -1,45 +1,45 @@
 <template>
-  <v-row class="my-0" no-gutters align="baseline" justify="start">
-    <h1 class="font-weight-light">
-      {{ metadata.title }}
-    </h1>
-    <v-tooltip bottom>
-      <template #activator="{ on, attrs }">
-        <v-btn
-          icon
-          depressed
-          fab
-          rounded
-          href="https://www.openskope.org/skope-users-guide/"
-          target="_blank"
-          v-bind="attrs"
-          v-on="on"
-        >
-          <v-icon color="grey">fas fa-question-circle</v-icon>
-        </v-btn>
-      </template>
-      <span>User Guide</span>
-    </v-tooltip>
-    <MetadataModal :metadata-id="metadata.id" />
-    <v-select
-      v-if="selectVariable"
-      v-model="variable"
-      label="Select a variable"
-      item-color="secondary"
-      color="secondary"
-      style="max-width: 25%; height: 0"
-      dense
-      :items="variables"
-      item-text="name"
-      item-value="id"
-      outlined
-      class="mx-3"
-    />
-    <v-spacer></v-spacer>
-    <span>
+  <v-row dense class="ma-0 pa-0">
+    <v-col class="ma-0 pa-0" cols="10">
+      <h3 class="text-h4">
+        {{ metadata.title }}
+        <MetadataModal :metadata-id="metadata.id" />
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              depressed
+              fab
+              href="https://www.openskope.org/skope-users-guide/"
+              target="_blank"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>fas fa-question-circle</v-icon>
+            </v-btn>
+          </template>
+          <span>View the SKOPE user guide (opens in a new tab)</span>
+        </v-tooltip>
+      </h3>
+      <v-select
+        v-if="selectVariable"
+        v-model="variable"
+        label="Select a variable"
+        item-color="secondary"
+        color="secondary"
+        style="max-width: 25%; height: 0"
+        dense
+        :items="variables"
+        item-text="name"
+        item-value="id"
+        outlined
+        class="mx-3"
+      />
+    </v-col>
+    <v-col align="right" cols="2">
       <!-- slot for next nav button -->
       <slot />
-    </span>
+    </v-col>
   </v-row>
 </template>
 <script>
