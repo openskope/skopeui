@@ -8,7 +8,7 @@
               fas fa-info-circle
             </v-icon>
           </template>
-          <span>Detailed Metadata</span>
+          <span>View detailed metadata for this dataset</span>
         </v-tooltip>
       </v-btn>
     </template>

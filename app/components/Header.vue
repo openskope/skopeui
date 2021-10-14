@@ -1,5 +1,8 @@
 <template>
-  <v-app-bar src="/header.png" light dense prominent shrink-on-scroll app>
+  <v-app-bar src="/header.png" dense light shrink-on-scroll app>
+    <template v-slot:img="{ props }">
+      <v-img v-bind="props" cover></v-img>
+    </template>
     <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()" />
     <v-app-bar-title>
       <a
@@ -8,7 +11,7 @@
         target="_blank"
       >
         SKOPE
-        <div class="skope-subtitle pt-n3">
+        <div class="skope-subtitle">
           Synthesizing Knowledge of Past Environments
         </div>
       </a>
@@ -57,18 +60,21 @@ class Header extends Vue {
 }
 export default Header;
 </script>
-<style scoped>
+<style lang="scss" scoped>
+$skope-title-color: rgb(172, 4, 4);
+$skope-title-font: "Bitter", Georgia, serif;
+
 .skope-title {
   text-decoration: none;
-  color: rgb(172, 4, 4);
-  font-family: "Bitter", Georgia, serif;
+  color: $skope-title-color;
+  font-family: $skope-title-font;
   font-weight: bold;
   font-size: 2.3em;
 }
 
 .skope-subtitle {
-  color: rgb(172, 4, 4);
-  font-family: "Source Sans Pro", Helvetica, serif;
-  font-size: 1.5rem;
+  color: $skope-title-color;
+  font-family: $skope-title-font;
+  font-size: 1.4rem;
 }
 </style>

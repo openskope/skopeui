@@ -1,6 +1,6 @@
 <template>
   <v-form @submit.prevent>
-    <v-row align="center" justify="center">
+    <v-row class="mb-n7" dense align="center" justify="center">
       <!-- filter by variable -->
       <v-col cols="3">
         <v-combobox

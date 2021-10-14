@@ -1,26 +1,32 @@
 <template>
   <v-container fluid>
-    <Search />
-    <v-row class="mt-n10">
-      <v-col cols="12">
-        <h1 class="font-weight-light">
+    <v-row dense>
+      <v-col class="ma-0">
+        <h1>
           Select a Dataset
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <v-btn
                 icon
+                link
                 fab
+                class="mt-n1 ml-n1"
                 href="https://www.openskope.org/skope-users-guide/"
                 target="_blank"
                 v-bind="attrs"
                 v-on="on"
               >
-                <v-icon color="grey">fas fa-question-circle</v-icon>
+                <v-icon>fas fa-question-circle</v-icon>
               </v-btn>
             </template>
-            <span>View user guide</span>
+            <span>View the SKOPE user guide (opens in a new tab)</span>
           </v-tooltip>
         </h1>
+      </v-col>
+    </v-row>
+    <Search />
+    <v-row dense class="ma-0 pa-0">
+      <v-col class="ma-0">
         <template v-for="dataset in datasets" router exact>
           <v-card
             :key="dataset.absoluteUrl"
@@ -28,11 +34,7 @@
             elevation="0"
             outlined
           >
-            <ListItem
-              :key="dataset.absolute_url"
-              v-bind="dataset"
-              class="my-2"
-            />
+            <ListItem :key="dataset.absolute_url" v-bind="dataset" />
           </v-card>
         </template>
         <v-alert v-if="datasets.length === 0" type="warning">
