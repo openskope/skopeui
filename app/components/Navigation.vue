@@ -1,22 +1,31 @@
 <template>
   <v-navigation-drawer v-model="navigationVisible" app light>
-    <v-list dense nav>
-      <v-btn-toggle v-model="currentStep" class="w-100">
-        <v-btn
-          v-for="(step, index) in steps"
-          :key="step.id"
-          nuxt
-          large
-          text
-          tile
-          :disabled="isDisabled(step.id)"
-          :class="isCurrentStep(step.id) ? 'v-item--active' : 'button'"
-          :to="locations[index]"
+    <v-list-item>
+      <v-list-item-content>
+        <v-list-item-title class="text-h5 skope-title"
+          >Workflow</v-list-item-title
         >
+      </v-list-item-content>
+    </v-list-item>
+    <v-divider />
+    <v-list nav>
+      <v-list-item
+        v-for="(step, index) in steps"
+        :key="step.id"
+        nuxt
+        :to="locations[index]"
+        :disabled="isDisabled(step.id)"
+      >
+        <v-list-item-icon>
           <v-icon>{{ step.icon }}</v-icon>
-          <span class="step mx-3">{{ step.label }}</span>
-        </v-btn>
-      </v-btn-toggle>
+        </v-list-item-icon>
+        <v-list-item-content>
+          {{ step.label }}
+        </v-list-item-content>
+        <v-list-item-icon v-if="isStepComplete(index)">
+          <v-icon color="green darken-1">far fa-check-square</v-icon>
+        </v-list-item-icon>
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -132,7 +141,7 @@ class Navigation extends Vue {
     }
   }
 
-  complete(index) {
+  isStepComplete(index) {
     return this.currentStepIndex > index;
   }
 
