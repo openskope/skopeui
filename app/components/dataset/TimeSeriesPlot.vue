@@ -45,8 +45,6 @@
               :disabled="!isTemporalRangeEditable"
               :min="minYear"
               :max="maxYear - 1"
-              :hint="timeStepsLabel"
-              persistent-hint
               type="number"
               :rules="[validateMinYear]"
               @keydown.enter="setTemporalRange"
@@ -58,6 +56,8 @@
               :disabled="!isTemporalRangeEditable"
               class="mx-2"
               label="Max Year"
+              :hint="timeStepsLabel"
+              persistent-hint
               :min="minYear + 1"
               :max="maxYear"
               :rules="[validateMaxYear]"
