@@ -9,7 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SKOPE_DEPLOY_ENVIRONMENT: staging
     steps:
     - uses: actions/checkout@v2
+    - name: set up config.mk
+      run: cp config.mk.template config.mk
     - name: Build nuxt site for production
       run: make buildprod
