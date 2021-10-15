@@ -30,7 +30,7 @@ clean:
 
 config.mk:
 	@echo 'WARNING: no config.mk found, using default template dev environment'
-	cp config.mk.template config.mk
+	SKOPE_DEPLOY_ENVIRONMENT=dev envsubst < config.mk.template > config.mk
 
 $(LOG_DATA_PATH):
 	mkdir -p $(LOG_DATA_PATH)
@@ -41,8 +41,10 @@ $(MAIL_API_KEY_PATH): | secrets
 $(SENTRY_DSN_PATH): | secrets
 	touch "$(SENTRY_DSN_PATH)"
 
-docker-compose.yml: base.yml config.mk $(ENVIRONMENT).yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
-	docker-compose -f base.yml -f "$(ENVIRONMENT).yml" config > docker-compose.yml
+DEPLOY_ENVIRONMENT ?= dev
+docker-compose.yml: base.yml config.mk ${DEPLOY_ENVIRONMENT}.yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
+	@echo "DEPLOY_ENVIRONMENT: ${DEPLOY_ENVIRONMENT}"
+	docker-compose -f base.yml -f "${DEPLOY_ENVIRONMENT}.yml" config > docker-compose.yml
 
 .PHONY: buildprod
 buildprod: build

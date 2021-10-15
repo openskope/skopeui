@@ -14,8 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: set up config.mk
-      run: cp config.mk.template config.mk
-    - name: report environment
-      run: echo "Currently in ${ENVIRONMENT}"
+      run: envsubst < config.mk.template > config.mk
     - name: Build nuxt site for production
       run: make buildprod

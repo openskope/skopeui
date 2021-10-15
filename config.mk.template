@@ -1,5 +1,5 @@
 # set to (dev | staging | prod)
-export ENVIRONMENT=${SKOPE_DEPLOY_ENVIRONMENT:-dev}
+export DEPLOY_ENVIRONMENT=${SKOPE_DEPLOY_ENVIRONMENT}
 # for local usage
 # export SKOPE_API_HOST_URL="http://localhost:8001"
 # export SKOPE_GEOSERVER_HOST_URL="http://localhost:8600"
