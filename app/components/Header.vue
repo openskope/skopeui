@@ -18,8 +18,10 @@
         </div>
       </a>
     </v-app-bar-title>
-    <v-spacer />
-    <LoadAnalysis />
+    <template v-if="$vuetify.breakpoint.mdAndUp">
+      <v-spacer />
+      <LoadAnalysis />
+    </template>
   </v-app-bar>
 </template>
 <script>
@@ -40,10 +42,6 @@ class Header extends Vue {
   // --------- GETTERS ---------
   get drawer() {
     return this.$api().app.isVisible;
-  }
-
-  get isMdAndDown() {
-    return this.$vuetify.breakpoint.mdAndDown;
   }
 
   get currentStepName() {
