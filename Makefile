@@ -41,7 +41,7 @@ $(MAIL_API_KEY_PATH): | secrets
 $(SENTRY_DSN_PATH): | secrets
 	touch "$(SENTRY_DSN_PATH)"
 
-docker-compose.yml: base.yml config.mk $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
+docker-compose.yml: base.yml config.mk $(ENVIRONMENT).yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
 	docker-compose -f base.yml -f "$(ENVIRONMENT).yml" config > docker-compose.yml
 
 .PHONY: buildprod
