@@ -42,10 +42,7 @@ $(SENTRY_DSN_PATH): | secrets
 	touch "$(SENTRY_DSN_PATH)"
 
 docker-compose.yml: base.yml config.mk $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
-	case "$(ENVIRONMENT)" in \
-	  dev|staging|prod) docker-compose -f base.yml -f "$(ENVIRONMENT).yml" config > docker-compose.yml;; \
-	  *) @echo "invalid environment. must be either dev, staging or prod" 1>&2; exit 1;; \
-	esac
+	docker-compose -f base.yml -f "$(ENVIRONMENT).yml" config > docker-compose.yml
 
 .PHONY: buildprod
 buildprod: build
