@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="navigationVisible" app light>
+  <v-navigation-drawer v-model="navigationVisible" app temporary light>
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title class="text-h6 skope-title">
@@ -162,8 +162,4 @@ class Navigation extends Vue {
 export default Navigation;
 </script>
 
-<style scoped>
-.v-btn-toggle {
-  flex-direction: column;
-}
-</style>
+<style scoped></style>

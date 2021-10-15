@@ -28,10 +28,6 @@ import Footer from "@/components/Footer";
     Footer,
   },
 })
-class DefaultLayout extends Vue {
-  get isMdAndDown() {
-    return this.$vuetify.breakpoint.mdAndDown;
-  }
-}
+class DefaultLayout extends Vue {}
 export default DefaultLayout;
 </script>

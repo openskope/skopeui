@@ -2,7 +2,7 @@
   <v-form @submit.prevent>
     <v-row class="mb-n7" dense align="center" justify="center">
       <!-- filter by variable -->
-      <v-col cols="3">
+      <v-col cols="12" md="3" sm="6">
         <v-combobox
           v-model="selectedVariableClasses"
           no-filter
@@ -19,7 +19,8 @@
           >
             <v-chip
               v-bind="attrs"
-              color="black"
+              color="primary"
+              dark
               :input-value="selected"
               label
               small
@@ -33,14 +34,14 @@
             </v-chip>
           </template>
           <template #item="{ item: variableClass }">
-            <v-chip color="black" dark label small>
+            <v-chip color="primary" dark label small>
               {{ variableClass }}
             </v-chip>
           </template>
         </v-combobox>
       </v-col>
       <!-- search by keyword -->
-      <v-col cols="5">
+      <v-col cols="12" md="5" sm="6">
         <!-- keyword search -->
         <v-text-field
           id="keywordQuery"
@@ -56,7 +57,7 @@
         >
         </v-text-field>
       </v-col>
-      <v-col cols="2">
+      <v-col cols="12" md="2" sm="6">
         <v-text-field
           v-model="startYear"
           outlined
@@ -68,7 +69,7 @@
         >
         </v-text-field>
       </v-col>
-      <v-col cols="2">
+      <v-col cols="12" md="2" sm="6">
         <v-text-field
           v-model="endYear"
           outlined
