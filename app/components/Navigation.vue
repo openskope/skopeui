@@ -2,9 +2,9 @@
   <v-navigation-drawer v-model="navigationVisible" app light>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="text-h5 skope-title"
-          >Workflow</v-list-item-title
-        >
+        <v-list-item-title class="text-h6 skope-title">
+          SKOPE Workflow
+        </v-list-item-title>
       </v-list-item-content>
     </v-list-item>
     <v-divider />

@@ -4,7 +4,7 @@
       <v-img v-bind="props" cover></v-img>
     </template>
     <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()">
-      <v-icon color="primary" x-large class="darken-3">fas fa-bars</v-icon>
+      <v-icon color="primary" x-large>fas fa-bars</v-icon>
     </v-app-bar-nav-icon>
     <v-app-bar-title>
       <a
@@ -63,9 +63,6 @@ class Header extends Vue {
 export default Header;
 </script>
 <style lang="scss" scoped>
-$skope-title-color: rgb(172, 4, 4);
-$skope-title-font: "Bitter", Georgia, serif;
-
 .skope-title {
   text-decoration: none;
   color: $skope-title-color;
@@ -75,7 +72,7 @@ $skope-title-font: "Bitter", Georgia, serif;
 }
 
 .skope-subtitle {
-  color: $skope-title-color;
+  color: $skope-dark-blue;
   font-family: $skope-title-font;
   font-size: 1.4rem;
 }
