@@ -1,6 +1,12 @@
 <template>
   <!-- load analysis -->
-  <v-btn color="primary" tile class="mt-1" @click="selectLoadRequestDataFile">
+  <v-btn
+    color="primary"
+    tile
+    rounded
+    class="mt-1"
+    @click="selectLoadRequestDataFile"
+  >
     <input
       id="loadRequestDataFile"
       type="file"
