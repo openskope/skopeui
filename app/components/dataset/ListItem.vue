@@ -33,20 +33,7 @@
         <v-card-text class="mt-3 pa-0">
           <span v-html="$md.render(description)"></span>
         </v-card-text>
-        <v-subheader class="ma-0 pa-0 text-h6">Variables</v-subheader>
-        <!-- FIXME: extract this to a component and reuse across the detail page -->
-        <v-list dense class="ma-0 pa-0">
-          <v-list-item v-for="(variable, index) in variables" :key="index">
-            <v-list-item-content>
-              <v-list-item-title>
-                <v-chip small label color="primary" text-color="white">
-                  {{ variable.class }}
-                </v-chip>
-                {{ variable.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+        <VariableList :variables="variables" />
         <v-card-text class="ma-0 pa-0">
           <b class="text-subtitle-1">Source:</b>
           <a target="_blank" :href="sourceUrl">
@@ -64,9 +51,10 @@ import { Component } from "nuxt-property-decorator";
 import { Prop } from "vue-property-decorator";
 import { BaseMapProvider } from "@/store/modules/constants";
 import MetadataModal from "@/components/dataset/MetadataModal.vue";
+import VariableList from "@/components/dataset/VariableList.vue";
 
 @Component({
-  components: { MetadataModal },
+  components: { MetadataModal, VariableList },
 })
 class ListItem extends Vue {
   @Prop()

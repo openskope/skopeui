@@ -22,7 +22,7 @@
           <v-icon color="white">fas fa-times</v-icon>
         </v-btn>
       </v-card-title>
-      <MetadataDetail :metadata-id="metadataId" />
+      <MetadataDetail :metadata="metadata" />
     </v-card>
   </v-dialog>
 </template>
