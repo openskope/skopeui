@@ -15,5 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: set up config.mk
       run: envsubst < config.mk.template > config.mk
-    - name: Build nuxt site for production
+    - name: Build nuxt site for production deployment
       run: make buildprod

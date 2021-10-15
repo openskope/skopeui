@@ -42,9 +42,9 @@ $(SENTRY_DSN_PATH): | secrets
 	touch "$(SENTRY_DSN_PATH)"
 
 DEPLOY_ENVIRONMENT ?= dev
-docker-compose.yml: base.yml config.mk ${DEPLOY_ENVIRONMENT}.yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
-	@echo "DEPLOY_ENVIRONMENT: ${DEPLOY_ENVIRONMENT}"
-	docker-compose -f base.yml -f "${DEPLOY_ENVIRONMENT}.yml" config > docker-compose.yml
+docker-compose.yml: base.yml config.mk $(DEPLOY_ENVIRONMENT).yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
+	@echo "DEPLOY_ENVIRONMENT: $(DEPLOY_ENVIRONMENT)"
+	docker-compose -f base.yml -f $(DEPLOY_ENVIRONMENT).yml config > docker-compose.yml
 
 .PHONY: buildprod
 buildprod: build
