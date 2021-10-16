@@ -3,7 +3,6 @@
     <v-row no-gutters>
       <v-col class="pa-0 ma-0">
         <SubHeader :select-variable="true">
-          <v-spacer></v-spacer>
           <v-btn
             :disabled="!hasValidStudyArea"
             :to="analyzeLocation"

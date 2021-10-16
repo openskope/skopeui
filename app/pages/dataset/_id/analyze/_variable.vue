@@ -1,8 +1,7 @@
 <template>
-  <v-container fluid class="fill-height">
-    <v-row class="fill-height">
-      <!-- dataset title -->
-      <v-col class="mb-3" lg="12" md="12" sm="12">
+  <v-container fluid class="fill-height align-start">
+    <v-row no-gutters>
+      <v-col>
         <SubHeader :select-variable="true">
           <v-btn color="accent" depressed @click="exportData">
             Download
@@ -10,8 +9,10 @@
           </v-btn>
         </SubHeader>
       </v-col>
+    </v-row>
+    <v-row class="pa-0 mx-0 mb-6" no-gutters>
       <!-- time series -->
-      <v-col class="timeseries-flex" lg="8" md="12">
+      <v-col class="timeseries-flex" cols="12" md="8">
         <TimeSeriesPlot
           ref="plot"
           :show-area="true"
@@ -21,12 +22,11 @@
         />
       </v-col>
       <!-- analysis form -->
-      <v-col lg="4" md="12" class="timeseries-flex">
+      <v-col cols="12" md="4" class="timeseries-flex">
         <v-form
           ref="analysisRequestForm"
           v-model="analysisFormValid"
-          class="pa-3 fill-height"
-          style="background-color: #f4f7ff; width: 100%"
+          class="pa-3 fill-height grey lighten-3"
         >
           <v-row class="flex-column fill-height">
             <v-col class="shrink" align-self="start">
@@ -49,7 +49,8 @@
               <v-select
                 v-model="zonalStatistic"
                 :items="zonalStatisticOptions"
-                color="primary"
+                dense
+                item-color="primary"
                 item-text="label"
                 item-value="id"
                 label="For each time step, summarize selected area as"
@@ -146,9 +147,9 @@
                 @click="updateTimeSeries"
                 >Update
               </v-btn>
-              <v-btn width="45%" @click="clearTransformedTimeSeries"
-                >Clear</v-btn
-              >
+              <v-btn width="45%" @click="clearTransformedTimeSeries">
+                Clear
+              </v-btn>
             </v-col>
           </v-row>
         </v-form>

@@ -65,7 +65,7 @@
               @keydown.enter="setTemporalRange"
             >
             </v-text-field>
-            <div class="mt-n3" no-gutters>
+            <div class="d-flex flex-column mt-n2">
               <v-btn
                 :disabled="!hasTemporalRangeChanges"
                 x-small
@@ -79,7 +79,7 @@
             </div>
           </v-col>
           <!-- step controls -->
-          <v-col v-if="showStepControls" class="text-right">
+          <v-col v-if="showStepControls" cols="auto" align="right">
             <v-tooltip bottom>
               <template #activator="{ attrs, on }">
                 <v-btn
@@ -145,7 +145,7 @@
               <span>Go to the last year of the defined temporal range</span>
             </v-tooltip>
           </v-col>
-          <v-col v-if="showArea" cols="auto" class="text-right">
+          <v-col v-if="showArea" cols="auto" align="right">
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <v-btn

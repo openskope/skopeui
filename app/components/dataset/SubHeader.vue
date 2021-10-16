@@ -37,7 +37,7 @@
         outlined
       />
     </v-col>
-    <v-col align="end" align-self="start">
+    <v-col align="right">
       <!-- slot for next nav button -->
       <slot />
     </v-col>
