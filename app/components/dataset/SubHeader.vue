@@ -1,42 +1,43 @@
 <template>
-  <v-row dense class="ma-0 pa-0">
-    <v-col class="ma-0 pa-0" cols="10">
-      <h3 class="text-h4">
+  <v-row dense align="start" justify="space-between">
+    <v-col cols="12" md="6">
+      <span class="text-h6">
         {{ metadata.title }}
-        <MetadataModal :metadata-id="metadata.id" />
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              icon
-              depressed
-              fab
-              href="https://www.openskope.org/skope-users-guide/"
-              target="_blank"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>fas fa-question-circle</v-icon>
-            </v-btn>
-          </template>
-          <span>View the SKOPE user guide (opens in a new tab)</span>
-        </v-tooltip>
-      </h3>
+      </span>
+      <MetadataModal :metadata-id="metadata.id" />
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            icon
+            depressed
+            fab
+            x-small
+            href="https://www.openskope.org/skope-users-guide/"
+            target="_blank"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>fas fa-question-circle</v-icon>
+          </v-btn>
+        </template>
+        <span>View the SKOPE user guide (opens in a new tab)</span>
+      </v-tooltip>
+    </v-col>
+    <v-col>
       <v-select
         v-if="selectVariable"
         v-model="variable"
         label="Select a variable"
         item-color="secondary"
         color="secondary"
-        style="max-width: 25%; height: 0"
         dense
         :items="variables"
         item-text="name"
         item-value="id"
         outlined
-        class="mx-3"
       />
     </v-col>
-    <v-col align="right" cols="2">
+    <v-col align="end" align-self="start">
       <!-- slot for next nav button -->
       <slot />
     </v-col>

@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="showMetadata" max-width="800px">
     <template #activator="{ on, attrs }">
-      <v-btn icon depressed fab rounded v-bind="attrs" v-on="on">
+      <v-btn icon depressed x-small fab rounded v-bind="attrs" v-on="on">
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
             <v-icon v-bind="attrs" color="secondary" v-on="on">

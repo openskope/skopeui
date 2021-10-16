@@ -8,7 +8,9 @@
         <nuxt />
       </v-container>
     </v-main>
-    <Footer />
+    <div class="mt-1">
+      <Footer />
+    </div>
   </v-app>
 </template>
 

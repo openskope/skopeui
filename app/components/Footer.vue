@@ -1,14 +1,8 @@
 <template>
   <!-- footer -->
-  <v-footer
-    app
-    absolute
-    color="secondary"
-    class="align-baseline"
-    style="color: white"
-  >
+  <v-footer app absolute dark color="secondary" class="mt-1 align-end">
     <v-card tile flat width="100%" color="secondary" class="text-center">
-      <v-card-text style="color: white" class="subtitle-2">
+      <v-card-text class="text-white text-subtitle-1">
         This material is based upon work supported by the National Science
         Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
         University, SMA 1439603 and 1637155 to the University of Illinois at
@@ -16,8 +10,8 @@
         University.
       </v-card-text>
       <v-divider></v-divider>
-      <span class="subtitle-1 font-weight-bold" style="color: white">
-        &copy; 2016 -{{ new Date().getFullYear() }} Synthesizing Knowledge of
+      <span class="text-subtitle-1 text-white">
+        &copy; 2016-{{ new Date().getFullYear() }} Synthesizing Knowledge of
         Past Environments (SKOPE)
       </span>
       <TermsOfUse />
@@ -25,9 +19,8 @@
         v-for="link in links"
         :key="link.id"
         plain
-        style="font-weight: bold"
         color="white"
-        class="subtitle-1"
+        class="text-subtitle-1"
         target="_blank"
         :href="link.url"
       >
@@ -36,7 +29,7 @@
       </v-btn>
       <v-btn
         color="white"
-        class="subtitle-1"
+        class="text-subtitle-1"
         plain
         target="_blank"
         :href="github.url"

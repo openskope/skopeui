@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-row no-gutters>
-      <v-col lg="12" md="12" sm="12" class="mb-3">
+      <v-col class="pa-0 ma-0">
         <SubHeader :select-variable="true">
           <v-spacer></v-spacer>
           <v-btn
@@ -16,9 +16,11 @@
           </v-btn>
         </SubHeader>
       </v-col>
+    </v-row>
+    <v-row class="pa-0 mb-6" no-gutters>
       <!-- 2 column layout with map and time series-->
       <v-col
-        class="d-flex map-flex mb-3 px-2"
+        class="d-flex map-flex pa-0 mb-3"
         lg="6"
         md="12"
         sm="12"
@@ -28,7 +30,7 @@
       </v-col>
       <!-- time series plot -->
       <v-col
-        class="d-flex map-flex px-2"
+        class="d-flex map-flex pa-0"
         lg="6"
         md="12"
         sm="12"
@@ -146,13 +148,13 @@ export default Visualize;
 
 @media all and (max-width: 960px) {
   .map-flex {
-    height: 400px;
+    height: 450px;
   }
 }
 
 @media all and (max-width: 600px) {
   .map-flex {
-    height: 350px;
+    height: 450px;
   }
 }
 </style>
