@@ -14,47 +14,39 @@
       </v-btn>
     </SubHeader>
     <v-row dense>
-      <v-col
-        lg="12"
-        md="12"
-        sm="12"
-        class="d-flex map-flex"
-        align-self="stretch"
-      >
+      <v-col cols="12" class="d-flex map-flex">
         <Map :display-raster="false" class="mx-auto"></Map>
       </v-col>
-      <v-col>
-        <client-only>
-          <v-dialog
-            v-model="confirmGeometry"
-            transition="dialog-bottom-transition"
-            max-width="600"
-          >
-            <template #default="confirmGeometry">
-              <v-card class="pa-6">
-                <v-card-text>
-                  <h3>
-                    Welcome back! Would you like to clear the currently selected
-                    area?
-                  </h3>
-                </v-card-text>
-                <v-card-actions class="justify-space-between">
-                  <v-btn outlined color="accent" @click="clearGeoJson">
-                    Clear selected area
-                  </v-btn>
-                  <v-btn
-                    depressed
-                    color="accent"
-                    @click="confirmGeometry.value = false"
-                  >
-                    Keep selected area
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </template>
-          </v-dialog>
-        </client-only>
-      </v-col>
+      <client-only>
+        <v-dialog
+          v-model="confirmGeometry"
+          transition="dialog-bottom-transition"
+          max-width="600"
+        >
+          <template #default="confirmGeometry">
+            <v-card class="pa-6">
+              <v-card-text>
+                <h3>
+                  Welcome back! Would you like to clear the currently selected
+                  area?
+                </h3>
+              </v-card-text>
+              <v-card-actions class="justify-space-between">
+                <v-btn outlined color="accent" @click="clearGeoJson">
+                  Clear selected area
+                </v-btn>
+                <v-btn
+                  depressed
+                  color="accent"
+                  @click="confirmGeometry.value = false"
+                >
+                  Keep selected area
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
+      </client-only>
     </v-row>
   </v-container>
 </template>

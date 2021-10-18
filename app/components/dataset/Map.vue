@@ -1,11 +1,5 @@
 <template>
-  <v-card
-    class="flex-grow-1 no-gutters"
-    height="100%"
-    width="100%"
-    style="z-index: 1"
-    outlined
-  >
+  <v-card class="pb-2" height="100%" width="100%" elevation="1" outlined>
     <v-toolbar flat class="ma-0 pa-0">
       <v-row class="mx-0" align="baseline">
         <!-- selected area -->
@@ -296,10 +290,8 @@ class Map extends Vue {
     map.on("baselayerchange", handler);
     this.addDrawToolbar(map);
     initializeDatasetGeoJson(this.$warehouse, this.$api());
+    console.log("initialized dataset geojson");
     this.registerToolbarHandlers(map);
-    map.fitBounds(this.metadata.region.extents, {
-      padding: this.defaultBoundsPadding,
-    });
     this.geoJsonWatch = this.$watch(
       "geoJson",
       function (geoJson) {
@@ -307,7 +299,15 @@ class Map extends Vue {
         if (geoJson === null) {
           this.drawnItems.clearLayers();
           this.disableEditOnly(map);
+          console.log(
+            "fitting to metadata bounds: ",
+            this.metadata.region.extents
+          );
+          map.fitBounds(this.metadata.region.extents, {
+            padding: this.defaultBoundsPadding,
+          });
         } else {
+          console.log("rendering selected area");
           this.renderSelectedArea(geoJson, map);
         }
       },
@@ -407,7 +407,6 @@ class Map extends Vue {
     if (geoJsonLayer instanceof L.Marker) {
       padding = padding.map((x) => x * 15);
     }
-    console.log("fitting bounds: ", geoJsonLayer.getBounds());
     map.fitBounds(geoJsonLayer.getBounds(), { padding });
   }
 

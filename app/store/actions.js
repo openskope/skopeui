@@ -163,7 +163,7 @@ export function initializeDatasetGeoJson(warehouse, api) {
     return;
   }
   const geoJson = warehouse.get(api.dataset.geoJsonKey) || null;
-  console.log("setting geo json: ", geoJson);
+  console.log("restoring geojson from warehouse: ", geoJson);
   api.dataset.setGeoJson(geoJson);
 }
 
