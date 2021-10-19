@@ -14,6 +14,7 @@
         :key="step.id"
         nuxt
         :to="locations[index]"
+        :inactive="isDisabled(step.id)"
         :disabled="isDisabled(step.id)"
       >
         <v-list-item-icon>

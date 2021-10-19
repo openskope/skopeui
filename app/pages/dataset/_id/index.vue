@@ -15,7 +15,11 @@
     </SubHeader>
     <v-row dense>
       <v-col cols="12" class="d-flex map-flex">
-        <Map :display-raster="false" class="mx-auto"></Map>
+        <Map
+          :display-raster="false"
+          class="mx-auto"
+          @mapReady="mapLoaded"
+        ></Map>
       </v-col>
       <client-only>
         <v-dialog
@@ -106,6 +110,12 @@ class DatasetDetail extends Vue {
     );
   }
 
+  get visualizeLocation() {
+    const id = this.$route.params.id;
+    const variable = this.$api().dataset.variable.id;
+    return { name: "dataset-id-visualize-variable", params: { id, variable } };
+  }
+
   fetch() {
     const params = this.$route.params;
     console.log("fetch: loading dataset and variable from params: ", params);
@@ -124,14 +134,12 @@ class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id);
   }
 
-  get visualizeLocation() {
-    const id = this.$route.params.id;
-    const variable = this.$api().dataset.variable.id;
-    return { name: "dataset-id-visualize-variable", params: { id, variable } };
-  }
-
   clearGeoJson() {
     clearGeoJson(this.$warehouse, this.$api());
+  }
+
+  mapLoaded(value) {
+    this.shouldConfirmGeometry = this.hasValidStudyArea;
   }
 }
 export default DatasetDetail;

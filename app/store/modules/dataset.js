@@ -261,7 +261,6 @@ class Dataset extends VuexModule {
 
   @Mutation
   setGeoJson(geoJson) {
-    console.log("store setting geojson to :", geoJson);
     this.geoJson = geoJson;
   }
 

@@ -181,7 +181,7 @@ class Map extends Vue {
   legendImage = null;
   legendControl = null;
   legendPosition = "bottomleft";
-  geoJsonWatch = null;
+  geoJsonWatcher = null;
 
   get areaStyle() {
     return {
@@ -205,10 +205,6 @@ class Map extends Vue {
 
   get geoJson() {
     return this.$api().dataset.geoJson;
-  }
-
-  get hasGeoJson() {
-    return this.$api().dataset.hasGeoJson;
   }
 
   get selectedArea() {
@@ -263,8 +259,8 @@ class Map extends Vue {
   }
 
   destroyed() {
-    if (this.geoJsonWatch) {
-      this.geoJsonWatch();
+    if (this.geoJsonWatcher) {
+      this.geoJsonWatcher();
     }
   }
 
@@ -292,7 +288,7 @@ class Map extends Vue {
     initializeDatasetGeoJson(this.$warehouse, this.$api());
     console.log("initialized dataset geojson");
     this.registerToolbarHandlers(map);
-    this.geoJsonWatch = this.$watch(
+    this.geoJsonWatcher = this.$watch(
       "geoJson",
       function (geoJson) {
         console.log("watcher updating geojson", geoJson);
@@ -314,6 +310,7 @@ class Map extends Vue {
       { immediate: true }
     );
     this.isMapReady = true;
+    this.$emit("mapReady", true);
     this.updateWmsLegend();
   }
 
