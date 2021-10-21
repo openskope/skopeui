@@ -1,7 +1,7 @@
 <template>
   <!-- footer -->
-  <v-footer app absolute dark color="secondary" class="mt-1 align-end">
-    <v-card tile flat width="100%" color="secondary" class="text-center">
+  <v-footer app absolute dark color="secondary">
+    <v-card tile flat color="secondary" class="text-center">
       <v-card-text class="text-white text-subtitle-1">
         This material is based upon work supported by the National Science
         Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State
