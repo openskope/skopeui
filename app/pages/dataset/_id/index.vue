@@ -27,24 +27,22 @@
           transition="dialog-bottom-transition"
           max-width="600"
         >
-          <template>
-            <v-card class="pa-6">
-              <v-card-text>
-                <h3>
-                  Welcome back! Would you like to clear the currently selected
-                  area?
-                </h3>
-              </v-card-text>
-              <v-card-actions class="justify-space-between">
-                <v-btn outlined color="accent" @click="clearGeoJson">
-                  Clear selected area
-                </v-btn>
-                <v-btn depressed color="accent" @click="keepGeometry">
-                  Keep selected area
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
+          <v-card class="pa-6">
+            <v-card-text>
+              <h3>
+                Welcome back! Would you like to clear the currently selected
+                area?
+              </h3>
+            </v-card-text>
+            <v-card-actions class="justify-space-between">
+              <v-btn outlined color="accent" @click="clearGeoJson">
+                Clear selected area
+              </v-btn>
+              <v-btn depressed color="accent" @click="keepGeometry">
+                Keep selected area
+              </v-btn>
+            </v-card-actions>
+          </v-card>
         </v-dialog>
       </client-only>
     </v-row>
