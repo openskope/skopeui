@@ -4,6 +4,8 @@ import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 class App extends VuexModule {
   isNavigationVisible = false;
 
+  isFirstVisit = true;
+
   steps = [
     {
       id: 1,
@@ -42,6 +44,11 @@ class App extends VuexModule {
   @Mutation
   setNavigationVisible(isNavigationVisible) {
     this.isNavigationVisible = isNavigationVisible;
+  }
+
+  @Mutation
+  setVisited() {
+    this.isFirstVisit = false;
   }
 
   /**

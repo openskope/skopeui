@@ -27,7 +27,7 @@
           transition="dialog-bottom-transition"
           max-width="600"
         >
-          <template #default="confirmGeometry">
+          <template>
             <v-card class="pa-6">
               <v-card-text>
                 <h3>
@@ -39,11 +39,7 @@
                 <v-btn outlined color="accent" @click="clearGeoJson">
                   Clear selected area
                 </v-btn>
-                <v-btn
-                  depressed
-                  color="accent"
-                  @click="confirmGeometry.value = false"
-                >
+                <v-btn depressed color="accent" @click="keepGeometry">
                   Keep selected area
                 </v-btn>
               </v-card-actions>
@@ -80,7 +76,13 @@ class DatasetDetail extends Vue {
   shouldConfirmGeometry = true;
 
   get confirmGeometry() {
-    return this.hasValidStudyArea && this.shouldConfirmGeometry;
+    return (
+      this.hasValidStudyArea && this.shouldConfirmGeometry && this.isFirstVisit
+    );
+  }
+
+  get isFirstVisit() {
+    return this.$api().app.isFirstVisit;
   }
 
   set confirmGeometry(value) {
@@ -140,6 +142,12 @@ class DatasetDetail extends Vue {
 
   mapLoaded(value) {
     this.shouldConfirmGeometry = this.hasValidStudyArea;
+  }
+
+  keepGeometry() {
+    this.shouldConfirmGeometry = false;
+    console.log("setting visited");
+    this.$api().app.setVisited();
   }
 }
 export default DatasetDetail;

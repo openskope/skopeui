@@ -116,6 +116,7 @@ class Visualize extends Vue {
     const api = this.$api();
     await loadRequestData(api);
     this.setYear(api.dataset.temporalRangeMin);
+    this.$api().app.setVisited();
   }
 
   setYear(year) {
