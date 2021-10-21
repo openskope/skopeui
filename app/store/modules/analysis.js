@@ -15,7 +15,7 @@ const EMPTY_RESPONSE = {
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
 class Analysis extends VuexModule {
-  request = {};
+  requestData = {};
   waitingForResponse = false;
   response = EMPTY_RESPONSE;
   responseError = {};
@@ -66,13 +66,18 @@ class Analysis extends VuexModule {
   @Mutation
   setRequestData(requestData) {
     console.log("setting request data: ", requestData);
-    this.request = requestData;
+    this.requestData = requestData;
   }
 
+  /**
+   * FIXME: this shouldn't require any arguments but default request data
+   * comes from the dataset store at the moment.
+   * @param {} defaultRequestData
+   */
   @Mutation
   setDefaultRequestData(defaultRequestData) {
     // clears the response as well
-    this.request = defaultRequestData;
+    this.requestData = defaultRequestData;
     this.response = EMPTY_RESPONSE;
   }
 

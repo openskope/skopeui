@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined height="100%" width="100%">
+  <v-card outlined height="110%" width="100%">
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">

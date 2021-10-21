@@ -97,12 +97,23 @@ const updateAnalysis = _.debounce(async function (api, data) {
 }, 300);
 
 export async function retrieveAnalysis(api, data) {
+  if (!isValidRequestData(data)) {
+    console.log(
+      "Unable to retrieve analysis with invalid request data: ",
+      data
+    );
+    return;
+  }
   api.analysis.setWaitingForResponse(true);
   try {
     await updateAnalysis(api, data);
   } finally {
     api.analysis.setWaitingForResponse(false);
   }
+}
+
+export function isValidRequestData(data) {
+  return !Object.values(data).some((attribute) => attribute == undefined);
 }
 
 export async function loadAllDatasetMetadata(api) {
@@ -172,12 +183,15 @@ export function clearGeoJson(warehouse, api) {
   api.dataset.clearGeoJson();
 }
 
-// load data from api.analysis.request if any
-// assume that it would be cleared by any actions that invalidate the request data
-// (change in dataset, study area, or variable)
+/**
+ * Loads data from api.analysis.request if it exists. Assumes that
+ * it would be cleared by any actions that invalidate the request data
+ * (change in dataset, study area, or variable)
+ *
+ * @param {*} api
+ */
 export async function loadRequestData(api) {
-  const requestData = api.analysis.request;
-  console.log("request data in the store: ", requestData);
+  const requestData = api.analysis.requestData;
   if (_.isEmpty(requestData)) {
     api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
   }
