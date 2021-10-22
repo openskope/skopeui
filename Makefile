@@ -10,6 +10,7 @@ SECRETS=$(SENTRY_DSN_PATH)
 BUILD_CONSTANTS_PATH=app/store/modules/_constants.js
 BUILD_ID=$(shell git describe --tags --abbrev=1)
 
+.PHONY: $(BUILD_CONSTANTS_PATH)
 $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk
 	envsubst < app/store/modules/_constants.js.template > app/store/modules/_constants.js
 	@echo 'export const BUILD_ID = "${BUILD_ID}";' >> $(BUILD_CONSTANTS_PATH)
