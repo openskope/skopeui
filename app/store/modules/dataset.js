@@ -228,7 +228,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setMetadata(metadata) {
-    if (metadata == this.metadata) {
+    if (metadata === this.metadata) {
       console.log("identical metadata, no-op");
       return;
     }

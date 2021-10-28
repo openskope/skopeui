@@ -72,21 +72,21 @@ class LoadAnalysis extends Vue {
       try {
         const requestData = JSON.parse(text);
         this.$api().analysis.setRequestData(requestData);
-        if (this.$route.name === "dataset-id-analyze-variable") {
-          console.log("in analyze");
-        }
-        this.$router.push({
-          name: "dataset-id-analyze-variable",
-          params: {
-            id: requestData.dataset_id,
-            variable: requestData.variable_id,
+        this.$router.push(
+          {
+            name: "dataset-id-analyze-variable",
+            params: {
+              id: requestData.dataset_id,
+              variable: requestData.variable_id,
+            },
           },
-        });
+          function () {
+            console.log("router push completed", requestData);
+          }
+        );
       } catch (error) {
         console.error(error);
-        alert(
-          "This should not be an alert but something bad happened when we tried to import this file."
-        );
+        alert("Unable to import the request file.");
       }
     });
   }

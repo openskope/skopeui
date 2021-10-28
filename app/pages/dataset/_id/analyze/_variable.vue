@@ -486,6 +486,11 @@ class Analyze extends Vue {
   async created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
+    this.initialize(datasetId, variableId);
+  }
+
+  initialize(datasetId, variableId) {
+    console.log("initializing with: ", { datasetId, variableId });
     const api = this.$api();
     initializeDataset(this.$warehouse, api, datasetId, variableId);
   }
@@ -522,7 +527,12 @@ class Analyze extends Vue {
     );
   }
 
-  // --------- MEHODS ---------
+  beforeRouteUpdate(to, from, next) {
+    console.log("before route update [", from, " -> ", to, "]");
+    this.initialize(to.params.id, to.params.variable);
+  }
+
+  // --------- METHODS ---------
 
   async initializeFormData(requestData) {
     this.zonalStatistic = requestData.zonal_statistic;
