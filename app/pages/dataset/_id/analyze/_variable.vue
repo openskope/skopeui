@@ -528,7 +528,6 @@ class Analyze extends Vue {
   }
 
   beforeRouteUpdate(to, from, next) {
-    console.log("before route update [", from, " -> ", to, "]");
     this.initialize(to.params.id, to.params.variable);
   }
 
@@ -617,7 +616,12 @@ class Analyze extends Vue {
     zip.file("README.md", buildReadme(requestData));
 
     const content = await zip.generateAsync({ type: "blob" });
-    this.$download.saveAs(content, `${requestData.dataset_id}.zip`);
+    const filename = this.generateDownloadFilename(requestData);
+    this.$download.saveAs(content, `${filename}.zip`);
+  }
+
+  generateDownloadFilename(requestData) {
+    return `${requestData.dataset_id}_${requestData.variable_id}`;
   }
 
   /**

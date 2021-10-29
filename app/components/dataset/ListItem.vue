@@ -2,19 +2,21 @@
   <v-row align-content-start justify-space-around>
     <v-col xs4>
       <client-only>
-        <l-map
-          :min-zoom="2"
-          :zoom="region.zoom"
-          :center="region.center"
-          style="position: relative; z-index: 1"
-        >
-          <l-control-scale />
-          <l-tile-layer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-            attribution="Tiles &copy; Esri"
-          />
-          <l-rectangle :bounds="region.extents" :l-style="region.style" />
-        </l-map>
+        <nuxt-link :to="absoluteUrl">
+          <l-map
+            :min-zoom="2"
+            :zoom="region.zoom"
+            :center="region.center"
+            style="position: relative; z-index: 1"
+          >
+            <l-control-scale />
+            <l-tile-layer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+              attribution="Tiles &copy; Esri"
+            />
+            <l-rectangle :bounds="region.extents" :l-style="region.style" />
+          </l-map>
+        </nuxt-link>
       </client-only>
     </v-col>
     <v-col xs8>
