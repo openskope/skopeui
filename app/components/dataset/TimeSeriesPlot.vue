@@ -6,7 +6,7 @@
         <v-row align="baseline" justify="space-between">
           <!-- area -->
           <v-col v-if="showArea" cols="auto" class="d-flex">
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ on, attrs }">
                 <h3
                   v-bind="attrs"
@@ -20,7 +20,7 @@
               <span>Selected area in square kilometers</span>
             </v-tooltip>
             <v-divider vertical class="mx-2"></v-divider>
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ on, attrs }">
                 <h3
                   v-bind="attrs"
@@ -80,7 +80,7 @@
           </v-col>
           <!-- step controls -->
           <v-col v-if="showStepControls" cols="auto" align="right">
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
                   icon
@@ -94,7 +94,7 @@
               </template>
               <span>Go to the first year of the defined temporal range</span>
             </v-tooltip>
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
                   icon
@@ -108,15 +108,17 @@
               </template>
               <span>Previous year</span>
             </v-tooltip>
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn icon v-bind="attrs" v-on="on" @click="togglePlay">
                   <v-icon color="accent">{{ playIcon }}</v-icon>
                 </v-btn>
               </template>
-              <span>Play</span>
+              <span>{{
+                isAnimationPlaying ? "Pause animation" : "Animate layers"
+              }}</span>
             </v-tooltip>
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
                   icon
@@ -130,7 +132,7 @@
               </template>
               <span>Next year</span>
             </v-tooltip>
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
                   icon
@@ -146,7 +148,7 @@
             </v-tooltip>
           </v-col>
           <v-col v-if="showArea" cols="auto" align="right">
-            <v-tooltip bottom>
+            <v-tooltip top>
               <template #activator="{ on, attrs }">
                 <v-btn
                   v-bind="attrs"
