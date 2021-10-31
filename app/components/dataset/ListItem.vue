@@ -7,7 +7,7 @@
             :min-zoom="2"
             :zoom="region.zoom"
             :center="region.center"
-            style="position: relative; z-index: 1"
+            class="list-item-map"
           >
             <l-control-scale />
             <l-tile-layer
@@ -124,5 +124,11 @@ export default ListItem;
 .dataset-title:hover {
   box-shadow: inset 0 -30px 0 #ee6c4d, 0 2px 0 #ee6c4d;
   color: white;
+}
+
+.list-item-map {
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
 }
 </style>

@@ -13,10 +13,10 @@
         target="_blank"
       >
         SKOPE
-        <div class="skope-subtitle">
-          Synthesizing Knowledge of Past Environments
-        </div>
       </a>
+      <div class="skope-subtitle">
+        Synthesizing Knowledge of Past Environments
+      </div>
     </v-app-bar-title>
     <template v-if="$vuetify.breakpoint.mdAndUp">
       <v-spacer />
@@ -72,6 +72,7 @@ export default Header;
 .skope-subtitle {
   color: $skope-dark-blue;
   font-family: $skope-title-font;
-  font-size: 1.4rem;
+  font-weight: bolder;
+  font-size: 1.2rem;
 }
 </style>
