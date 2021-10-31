@@ -1,10 +1,10 @@
 <template>
   <v-card-text>
-    <VariableList :variables="metadata.variables" />
     <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-0">
-      <span class="text-subtitle-2">{{ label }}</span>
+      <span class="text-h5">{{ label }}</span>
       <span v-html="$md.render(metadata[attr])"></span>
     </div>
+    <VariableList :variables="metadata.variables" />
   </v-card-text>
 </template>
 
@@ -25,9 +25,9 @@ class MetadataDetail extends Vue {
 
   get metadataAttributes() {
     return {
-      originator: "Originator",
       uncertainty: "Uncertainty",
       methodSummary: "Method Summary",
+      originator: "Originator",
       references: "References",
       contactInformation: "Contact Information",
     };

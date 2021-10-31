@@ -4,11 +4,14 @@
       <v-btn icon depressed x-small fab rounded v-bind="attrs" v-on="on">
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
-            <v-icon v-bind="attrs" color="secondary" v-on="on">
-              fas fa-info-circle
+            <v-icon v-bind="attrs" color="red accent-4" v-on="on">
+              fas fa-exclamation-triangle
             </v-icon>
           </template>
-          <span>View detailed metadata for this dataset</span>
+          <span>
+            View dataset metadata with <strong>important details</strong> on
+            <strong>uncertainty</strong> and <strong>provenance</strong>
+          </span>
         </v-tooltip>
       </v-btn>
     </template>
