@@ -27,11 +27,19 @@ function matchesVariableFilter(selectedVariableClasses, dataset) {
 }
 
 function matchesQueryFilter(query, dataset) {
+  if (query.length === 0) {
+    // an empty query matches all datasets
+    return true;
+  }
   const q = query.toLowerCase();
-  return query.length > 0
-    ? dataset.title.toLowerCase().includes(q) ||
-        dataset.description.toLowerCase().includes(q)
-    : true;
+  const variableCorpus = dataset.variables
+    .map((v) => `${v.class} ${v.name} ${v.description}`.toLowerCase())
+    .join(" ");
+  return (
+    dataset.title.toLowerCase().includes(q) ||
+    dataset.description.toLowerCase().includes(q) ||
+    variableCorpus.includes(q)
+  );
 }
 
 @Module({ stateFactory: true, name: "metadata", namespaced: true })
