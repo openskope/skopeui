@@ -142,7 +142,6 @@ export async function loadMetadata(api, id) {
 }
 
 export function saveGeoJson(warehouse, api, geoJson) {
-  console.log("Saving new geojson, should trigger new request data: ", geoJson);
   warehouse.set(api.dataset.geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
 }
@@ -151,16 +150,30 @@ export function filterDatasetMetadata(api, filterCriteria) {
   api.metadata.setFilterCriteria(filterCriteria);
 }
 
-export function initializeDataset(warehouse, api, metadataId, variableId) {
+export async function initializeDataset(
+  warehouse,
+  api,
+  metadataId,
+  variableId
+) {
+  await loadAllDatasetMetadata(api);
   if (metadataId === api.dataset.metadata?.id) {
     console.log("Already initialized, ignoring request: ", metadataId);
     return;
   }
-  const datasetMetadata = api.metadata.find(metadataId);
+  const datasetMetadata = await api.metadata.find(metadataId);
+  if (datasetMetadata === null) {
+    alert(
+      "Please try again later, we were unable to locate dataset metadata for " +
+        metadataId
+    );
+    return;
+  }
   api.dataset.setMetadata(datasetMetadata);
   if (variableId == null) {
     // set a default variable if no variable id was passed in
     variableId = datasetMetadata.variables[0].id;
+    console.log("set default variable on dataset: ", variableId);
   }
   api.dataset.setVariable(variableId);
   if (process.client) {
@@ -170,12 +183,14 @@ export function initializeDataset(warehouse, api, metadataId, variableId) {
 
 export function initializeDatasetGeoJson(warehouse, api) {
   if (api.dataset.hasGeoJson) {
-    console.log("dataset store already has geojson, no-op");
+    console.log(
+      "dataset store already has geojson, no need to restore from warehouse"
+    );
     return;
   }
   const geoJson = warehouse.get(api.dataset.geoJsonKey) || null;
-  console.log("restoring geojson from warehouse: ", geoJson);
   api.dataset.setGeoJson(geoJson);
+  console.log("restored geojson from warehouse: ", geoJson);
 }
 
 export function clearGeoJson(warehouse, api) {

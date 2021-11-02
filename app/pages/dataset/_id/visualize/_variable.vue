@@ -105,11 +105,11 @@ class Visualize extends Vue {
     return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
   }
 
-  created() {
+  async fetch() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
     const api = this.$api();
-    initializeDataset(this.$warehouse, api, datasetId, variableId);
+    await initializeDataset(this.$warehouse, api, datasetId, variableId);
   }
 
   async mounted() {

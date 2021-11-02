@@ -59,8 +59,6 @@ import Map from "@/components/dataset/Map.vue";
 
 import { initializeDataset, clearGeoJson } from "@/store/actions";
 
-const fillTemplate = require("es6-dynamic-template");
-
 @Component({
   layout: "DefaultLayout",
   components: {
@@ -116,12 +114,16 @@ class DatasetDetail extends Vue {
     return { name: "dataset-id-visualize-variable", params: { id, variable } };
   }
 
-  fetch() {
+  async fetch() {
     const params = this.$route.params;
-    console.log("fetch: loading dataset and variable from params: ", params);
     const datasetId = params.id;
     const variableId = params.variable;
-    initializeDataset(this.$warehouse, this.$api(), datasetId, variableId);
+    await initializeDataset(
+      this.$warehouse,
+      this.$api(),
+      datasetId,
+      variableId
+    );
   }
 
   head() {

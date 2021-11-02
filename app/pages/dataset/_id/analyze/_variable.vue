@@ -486,13 +486,12 @@ class Analyze extends Vue {
   async created() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
-    this.initialize(datasetId, variableId);
+    await this.initialize(datasetId, variableId);
   }
 
-  initialize(datasetId, variableId) {
-    console.log("initializing with: ", { datasetId, variableId });
+  async initialize(datasetId, variableId) {
     const api = this.$api();
-    initializeDataset(this.$warehouse, api, datasetId, variableId);
+    await initializeDataset(this.$warehouse, api, datasetId, variableId);
   }
 
   async fetch() {
@@ -527,8 +526,8 @@ class Analyze extends Vue {
     );
   }
 
-  beforeRouteUpdate(to, from, next) {
-    this.initialize(to.params.id, to.params.variable);
+  async beforeRouteUpdate(to, from, next) {
+    await this.initialize(to.params.id, to.params.variable);
   }
 
   // --------- METHODS ---------
