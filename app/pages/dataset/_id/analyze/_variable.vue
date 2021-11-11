@@ -1,155 +1,159 @@
 <template>
   <v-container fluid class="fill-height align-start">
-    <v-row no-gutters>
-      <v-col>
-        <SubHeader :select-variable="true">
-          <v-btn color="accent" depressed @click="exportData">
-            Download
-            <v-icon class="ml-2" small>download</v-icon>
-          </v-btn>
-        </SubHeader>
-      </v-col>
-    </v-row>
-    <v-row dense>
-      <!-- time series -->
-      <v-col class="timeseries-flex" cols="12" lg="8">
-        <TimeSeriesPlot
-          ref="plot"
-          :show-area="true"
-          :show-step-controls="false"
-          :traces="traces"
-          @selectedTemporalRange="updateTimeSeries"
-        />
-      </v-col>
-      <!-- analysis form -->
-      <v-col cols="12" lg="4" class="stats-form">
-        <v-form
-          ref="analysisRequestForm"
-          v-model="analysisFormValid"
-          class="pa-3 grey lighten-3"
-          :class="{ 'mt-10': $vuetify.breakpoint.mdAndDown }"
-        >
-          <span class="subtitle">Statistics for the Temporal Interval</span>
-          <v-data-table
-            dense
-            :disable-pagination="true"
-            :headers="statisticsHeaders"
-            :hide-default-footer="true"
-            :items="summaryStatistics"
+    <LoadingSpinner v-if="isLoadingMetadata"></LoadingSpinner>
+    <template v-else>
+      <v-row no-gutters>
+        <v-col>
+          <SubHeader :select-variable="true">
+            <v-btn color="accent" depressed @click="exportData">
+              Download
+              <v-icon class="ml-2" small>download</v-icon>
+            </v-btn>
+          </SubHeader>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <!-- time series -->
+        <v-col class="timeseries-flex" cols="12" lg="8">
+          <TimeSeriesPlot
+            ref="plot"
+            :show-area="true"
+            :show-step-controls="false"
+            :traces="traces"
+            @selectedTemporalRange="updateTimeSeries"
+          />
+        </v-col>
+        <!-- analysis form -->
+        <v-col cols="12" lg="4" class="stats-form">
+          <v-form
+            ref="analysisRequestForm"
+            v-model="analysisFormValid"
+            class="pa-3 grey lighten-3"
+            :class="{ 'mt-10': $vuetify.breakpoint.mdAndDown }"
           >
-          </v-data-table>
-          <v-select
-            v-model="zonalStatistic"
-            class="mt-3"
-            :items="zonalStatisticOptions"
-            item-color="primary"
-            item-text="label"
-            item-value="id"
-            label="For each time step, summarize selected area as"
-            hint="Summary value of all selected pixels at each time step"
-            :disabled="!isStudyAreaPolygon"
-          >
-          </v-select>
-          <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
-          <v-select
-            v-model="transformOption"
-            :items="transformOptions"
-            color="secondary"
-            item-color="secondary"
-            item-text="label"
-            item-value="id"
-            label="Select a transformation option"
-            :hint="transformHint(transformOption)"
-          >
-          </v-select>
-          <template v-if="transformOption !== 'none'">
-            <v-row
-              v-if="transformOption === 'zscoreFixed'"
-              align="baseline"
-              justify="start"
-              no-gutters
-              class="mt-2"
-            >
-              <v-col class="mr-5">
-                <v-text-field
-                  v-model="timeRange.lb.year"
-                  dense
-                  outlined
-                  label="Year (Lower Bound)"
-                  type="number"
-                  :rules="[validateMinYear]"
-                ></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  v-model="timeRange.ub.year"
-                  dense
-                  outlined
-                  label="Year (Upper Bound)"
-                  type="number"
-                  :rules="[validateMaxYear]"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-text-field
-              v-if="transformOption === 'zscoreMoving'"
-              v-model="zScoreMovingIntervalTimeSteps"
+            <span class="subtitle">Statistics for the Temporal Interval</span>
+            <v-data-table
               dense
-              label="Transform window"
+              :disable-pagination="true"
+              :headers="statisticsHeaders"
+              :hide-default-footer="true"
+              :items="summaryStatistics"
+            >
+            </v-data-table>
+            <v-select
+              v-model="zonalStatistic"
+              class="mt-3"
+              :items="zonalStatisticOptions"
+              item-color="primary"
+              item-text="label"
+              item-value="id"
+              label="For each time step, summarize selected area as"
+              hint="Summary value of all selected pixels at each time step"
+              :disabled="!isStudyAreaPolygon"
+            >
+            </v-select>
+            <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
+            <v-select
+              v-model="transformOption"
+              :items="transformOptions"
+              color="secondary"
+              item-color="secondary"
+              item-text="label"
+              item-value="id"
+              label="Select a transformation option"
+              :hint="transformHint(transformOption)"
+            >
+            </v-select>
+            <template v-if="transformOption !== 'none'">
+              <v-row
+                v-if="transformOption === 'zscoreFixed'"
+                align="baseline"
+                justify="start"
+                no-gutters
+                class="mt-2"
+              >
+                <v-col class="mr-5">
+                  <v-text-field
+                    v-model="timeRange.lb.year"
+                    dense
+                    outlined
+                    label="Year (Lower Bound)"
+                    type="number"
+                    :rules="[validateMinYear]"
+                  ></v-text-field>
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="timeRange.ub.year"
+                    dense
+                    outlined
+                    label="Year (Upper Bound)"
+                    type="number"
+                    :rules="[validateMaxYear]"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-text-field
+                v-if="transformOption === 'zscoreMoving'"
+                v-model="zScoreMovingIntervalTimeSteps"
+                dense
+                label="Transform window"
+                outlined
+                class="mt-2"
+                suffix="time steps"
+                type="number"
+              >
+              </v-text-field>
+            </template>
+            <v-select
+              v-model="smoothingOption"
+              :items="smoothingOptions"
+              color="primary"
+              item-color="secondary"
+              item-text="label"
+              item-value="id"
+              label="Select a smoothing option"
+              :hint="smoothingHint(smoothingOption)"
+              class="mt-3"
+            >
+            </v-select>
+            <v-text-field
+              v-if="hasSmoothingOption"
+              v-model="smoothingTimeStep"
+              dense
               outlined
               class="mt-2"
+              label="Smoothing window"
               suffix="time steps"
               type="number"
+              :rules="[validateSmoothingWidth]"
             >
             </v-text-field>
-          </template>
-          <v-select
-            v-model="smoothingOption"
-            :items="smoothingOptions"
-            color="primary"
-            item-color="secondary"
-            item-text="label"
-            item-value="id"
-            label="Select a smoothing option"
-            :hint="smoothingHint(smoothingOption)"
-            class="mt-3"
-          >
-          </v-select>
-          <v-text-field
-            v-if="hasSmoothingOption"
-            v-model="smoothingTimeStep"
-            dense
-            outlined
-            class="mt-2"
-            label="Smoothing window"
-            suffix="time steps"
-            type="number"
-            :rules="[validateSmoothingWidth]"
-          >
-          </v-text-field>
-          <v-row dense>
-            <v-col>
-              <v-btn @click="clearTransformedTimeSeries">Clear</v-btn>
-            </v-col>
-            <v-col align="end">
-              <v-btn
-                :disabled="!analysisFormValid"
-                class="font-weight-bold"
-                color="accent"
-                @click="updateTimeSeries"
-                >Update
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-col>
-    </v-row>
+            <v-row dense>
+              <v-col>
+                <v-btn @click="clearTransformedTimeSeries">Clear</v-btn>
+              </v-col>
+              <v-col align="end">
+                <v-btn
+                  :disabled="!analysisFormValid"
+                  class="font-weight-bold"
+                  color="accent"
+                  @click="updateTimeSeries"
+                  >Update
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-col>
+      </v-row>
+    </template>
   </v-container>
 </template>
 
 <script>
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import {
@@ -170,6 +174,7 @@ import Papa from "papaparse";
   components: {
     TimeSeriesPlot,
     SubHeader,
+    LoadingSpinner,
   },
 })
 class Analyze extends Vue {
@@ -399,6 +404,10 @@ class Analyze extends Vue {
     return this.$api().analysis.response;
   }
 
+  get isLoadingMetadata() {
+    return this.metadata == null;
+  }
+
   get metadata() {
     return this.$api().dataset.metadata;
   }
@@ -483,7 +492,7 @@ class Analyze extends Vue {
 
   // --------- LIFECYCLE HOOKS ---------
 
-  async created() {
+  async mounted() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
     await this.initialize(datasetId, variableId);
