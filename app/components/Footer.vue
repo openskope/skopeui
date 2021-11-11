@@ -73,7 +73,7 @@ class Footer extends Vue {
       id: "contact",
       label: "Contact",
       icon: "email",
-      url: "https://www.comses.net/about/contact/",
+      url: "mailto: skope-team@googlegroups.com",
     },
   ];
 }

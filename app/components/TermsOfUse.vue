@@ -42,9 +42,9 @@
 
           <h2>Contact us</h2>
           <p class="text-body-1">
-            Please use the "Contact" button in the footer or
-            <a href="https://www.comses.net/about/contact/">
-              use our contact form.
+            Please use the "Contact" button in the footer or send us an email at
+            <a href="mailto: skope-team@googlegroups.com">
+              skope-team@googlegroups.com
             </a>
           </p>
         </v-card-text>
