@@ -11,11 +11,12 @@
     <v-list shaped nav>
       <v-list-item
         v-for="(step, index) in steps"
-        :key="step.id"
+        exact-path="true"
+        :key="index"
         nuxt
         :to="locations[index]"
-        :inactive="isDisabled(step.id)"
-        :disabled="isDisabled(step.id)"
+        :inactive="isDisabled(index)"
+        :disabled="isDisabled(index)"
       >
         <v-list-item-icon>
           <v-icon>{{ step.icon }}</v-icon>
@@ -49,10 +50,8 @@ import _ from "lodash";
 class Navigation extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   steps = _.clone(this.$api().app.steps);
-  currentStep = 1;
 
   // --------- GETTERS ---------
-
   get navigationVisible() {
     return this.$api().app.isNavigationVisible;
   }
@@ -108,7 +107,7 @@ class Navigation extends Vue {
   }
 
   get hasMetadata() {
-    return !_.isUndefined(this.$route.params.id);
+    return this.$route.params.id != null;
   }
 
   get hasValidStudyArea() {
@@ -139,13 +138,28 @@ class Navigation extends Vue {
   // --------- METHODS ---------
 
   isDisabled(stepId) {
-    switch (stepId) {
+    switch (this.currentStepIndex) {
+      case 0:
+        switch (stepId) {
+          case 1:
+            return !this.hasMetadata;
+          case 2:
+            return !this.hasValidStudyArea;
+          case 3:
+            return !this.canAnalyze;
+          default:
+            return false;
+        }
+      case 1:
+        if ([2, 3].includes(stepId)) {
+          return !this.hasValidStudyArea;
+        }
+        return false;
       case 2:
-        return !this.hasMetadata;
-      case 3:
-        return !this.hasValidStudyArea;
-      case 4:
-        return !this.canAnalyze;
+        if (stepId === 3) {
+          return !this.canAnalyze;
+        }
+        return false;
       default:
         return false;
     }
@@ -153,10 +167,6 @@ class Navigation extends Vue {
 
   isStepComplete(index) {
     return this.currentStepIndex > index;
-  }
-
-  isCurrentStep(index) {
-    return this.currentStepIndex === index;
   }
 }
 
