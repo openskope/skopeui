@@ -6,4 +6,4 @@ export DEPLOY_ENVIRONMENT=${SKOPE_DEPLOY_ENVIRONMENT}
 #
 # for remote usage
 export SKOPE_API_HOST_URL="https://api.openskope.org"
-export SKOPE_GEOSERVER_HOST_URL="https://app.openskope.org"
+export SKOPE_GEOSERVER_HOST_URL="https://geoserver.openskope.org"
