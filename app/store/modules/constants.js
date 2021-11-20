@@ -14,7 +14,7 @@ export const LEAFLET_PROVIDERS = [
     name: "CartoDB.Positron",
     url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
     maxZoom: 19,
-    visible: false,
+    visible: true,
     attribution:
       'OpenStreetMap &copy; <a href="//carto.com/attributions">CARTO</a>',
     subdomains: "abcd",
@@ -43,7 +43,7 @@ export const LEAFLET_PROVIDERS = [
     url:
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri et al",
-    visible: true,
+    visible: false,
   },
 ];
 
