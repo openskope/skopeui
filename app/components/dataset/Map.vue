@@ -101,7 +101,7 @@
             :url="provider.url"
             :name="provider.name"
             :attribution="provider.attribution"
-            :visible="provider.default"
+            :visible="provider.visible"
             layer-type="base"
           />
           <l-rectangle
