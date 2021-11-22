@@ -11,8 +11,8 @@
     <v-list shaped nav>
       <v-list-item
         v-for="(step, index) in steps"
-        exact-path="true"
         :key="index"
+        exact-path="true"
         nuxt
         :to="locations[index]"
         :inactive="isDisabled(index)"

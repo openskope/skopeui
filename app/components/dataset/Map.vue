@@ -94,14 +94,14 @@
     <!-- map -->
     <v-card-text class="map">
       <client-only placeholder="Loading map, please wait...">
-        <l-map ref="layerMap" @ready="mapReady">
+        <l-map ref="layerMap" min-zoom="2" @ready="mapReady">
           <l-tile-layer
             v-for="provider of leafletProviders"
             :key="provider.name"
             :url="provider.url"
             :name="provider.name"
             :attribution="provider.attribution"
-            :visible="provider.visible"
+            :visible="isVisible(provider)"
             layer-type="base"
           />
           <l-rectangle
@@ -174,7 +174,7 @@ class Map extends Vue {
       (v && v >= 0 && v <= 100) || "Please enter an opacity between 0 and 100.",
   ];
   // default opacity for the dataset bounding box
-  defaultDatasetOpacity = 0.05;
+  defaultDatasetOpacity = 0.0;
   // default padding for fitBounds
   defaultBoundsPadding = [3, 3];
   defaultCircleToPolygonEdges = 32;
@@ -262,6 +262,10 @@ class Map extends Vue {
     if (this.geoJsonWatcher) {
       this.geoJsonWatcher();
     }
+  }
+
+  isVisible(provider) {
+    return this.currentStep === provider.visible;
   }
 
   decreaseOpacity() {
