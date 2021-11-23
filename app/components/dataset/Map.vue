@@ -491,6 +491,7 @@ class Map extends Vue {
   }
 
   @Watch("variable", { immediate: true, deep: true })
+  @Watch("layerOpacity")
   updateWmsLegend() {
     if (!this.isMapReady) {
       return;
