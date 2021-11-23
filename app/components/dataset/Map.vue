@@ -466,6 +466,7 @@ class Map extends Vue {
       VERSION: "1.0.0",
       FORMAT: "image/png",
       LAYER: this.wmsLayer,
+      ENV: "opacity:" + this.opacity/100,
       LEGEND_OPTIONS: "layout:vertical;dx:10",
     };
     const queryString = stringify(query);
