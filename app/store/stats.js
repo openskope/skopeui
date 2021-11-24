@@ -32,9 +32,9 @@ export function summarize(timeSeries) {
 export function formatStats(summaryStats, precision = DEFAULT_PRECISION) {
   return summaryStats.map((s) => ({
     name: s.name,
-    stdev: format(s.stdev, { precision }),
-    mean: format(s.mean, { precision }),
-    median: format(s.median, { precision }),
+    stdev: format(s.stdev, { notation: "fixed", precision }),
+    mean: format(s.mean, { notation: "fixed", precision }),
+    median: format(s.median, { notation: "fixed", precision }),
   }));
 }
 
