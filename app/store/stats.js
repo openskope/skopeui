@@ -15,9 +15,7 @@ const DEFAULT_PRECISION = 2;
  * @returns  {stdDev, mean, median} over the given timeSeries
  */
 export function summarize(timeSeries) {
-  // FIXME: replacing null values with 0 may work for some data but not all
-  // need to clarify how to handle NODATA
-  const values = timeSeries.y.map((v) => (v == null ? 0 : v));
+  const values = timeSeries.y;
   if (values.length === 0) {
     return EMPTY_SUMMARY_STATISTICS;
   }
@@ -25,9 +23,9 @@ export function summarize(timeSeries) {
   // may need to make lowerExp and upperExp explicit, check with science team
   // https://mathjs.org/docs/reference/functions/format.html
   return {
-    stdev: format(std(values), { precision }),
-    mean: format(mean(values), { precision }),
-    median: format(median(values), { precision }),
+    stdev: format(std(values), { notation: "fixed", precision }),
+    mean: format(mean(values), { notation: "fixed", precision }),
+    median: format(median(values), { notation: "fixed", precision }),
   };
 }
 
