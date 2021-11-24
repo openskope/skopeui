@@ -466,6 +466,7 @@ class Map extends Vue {
       VERSION: "1.0.0",
       FORMAT: "image/png",
       LAYER: this.wmsLayer,
+      ENV: `opacity:${this.layerOpacity}`,
       LEGEND_OPTIONS: "layout:vertical;dx:10",
     };
     const queryString = stringify(query);
@@ -490,6 +491,7 @@ class Map extends Vue {
   }
 
   @Watch("variable", { immediate: true, deep: true })
+  @Watch("layerOpacity")
   updateWmsLegend() {
     if (!this.isMapReady) {
       return;
