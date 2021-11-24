@@ -337,6 +337,7 @@ class TimeSeriesPlot extends Vue {
       font: {
         size: 16,
       },
+      shapes: this.shapes,
     };
   }
 
@@ -369,6 +370,26 @@ class TimeSeriesPlot extends Vue {
     return { x, y, type: "scatter", mode: "lines+markers" };
   }
 
+  get shapes() {
+    if (!_.isNull(this.yearSelected)) {
+      const sortedValues = _.sortBy(this.traces[0].y);
+      return [
+        {
+          type: "line",
+          x0: this.yearSelected,
+          x1: this.yearSelected,
+          y0: sortedValues[0],
+          y1: sortedValues[sortedValues.length - 1],
+          line: {
+            color: "rgb(255, 140, 0)",
+            width: 2,
+          },
+        },
+      ];
+    }
+    return [];
+  }
+
   get canHandleTimeSeriesRequest() {
     return this.$api().dataset.canHandleTimeSeriesRequest;
   }
@@ -388,9 +409,7 @@ class TimeSeriesPlot extends Vue {
    * otherwise returns the dataset store's time series
    */
   get timeSeriesData() {
-    return this.yearSelected
-      ? this.traces.concat([this.yearSelectedSeries])
-      : this.traces;
+    return this.traces;
   }
 
   get totalCellArea() {
