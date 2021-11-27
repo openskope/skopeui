@@ -131,6 +131,8 @@ module.exports = {
     manifest: {
       short_name: 'skope',
       name: 'SKOPE: Synthesizing Knowledge of Past Environments',
+      prefer_related_applications: false,
+      display: 'fullscreen',
     }
   },
 
