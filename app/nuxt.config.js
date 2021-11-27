@@ -12,14 +12,6 @@ module.exports = {
       { hid: "description", name: "description", content: pkg.description },
     ],
     link: [
-      { rel: "icon", type: "image/png", href: "/favicon-32x32.png" },
-      { rel: "icon", type: "image/png", href: "/favicon-16x16.png" },
-      {
-        rel: "apple-touch-icon",
-        sizes: "180x180",
-        href: "/apple-touch-icon.png",
-      },
-      { rel: "manifest", href: "/site.webmanifest" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css?family=Material+Icons",
@@ -64,7 +56,6 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     "@nuxtjs/axios",
-    "@nuxtjs/pwa",
     // https://www.npmjs.com/package/@nuxtjs/markdownit
     "@nuxtjs/markdownit",
     [
@@ -133,8 +124,15 @@ module.exports = {
 
   buildModules: [
     "@nuxtjs/vuetify",
+    "@nuxtjs/pwa",
     ["@nuxtjs/google-analytics", { id: "UA-109730826-1" }],
   ],
+  pwa: {
+    manifest: {
+      short_name: 'skope',
+      name: 'SKOPE: Synthesizing Knowledge of Past Environments',
+    }
+  },
 
   vuetify: {
     optionsPath: "./assets/style/vuetify.js",
