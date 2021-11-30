@@ -1,4 +1,4 @@
-import { format, std, mean, median } from "mathjs";
+import { format, std, mean, median, filter } from "mathjs";
 
 const EMPTY_SUMMARY_STATISTICS = {
   stdDev: "N/A",
@@ -15,7 +15,7 @@ const DEFAULT_PRECISION = 2;
  * @returns  {stdDev, mean, median} over the given timeSeries
  */
 export function summarize(timeSeries) {
-  const values = timeSeries.y;
+  const values = filter(timeSeries.y, (x) => x !== null);
   if (values.length === 0) {
     return EMPTY_SUMMARY_STATISTICS;
   }
