@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined height="110%" width="100%">
+  <v-card outlined height="100%" width="100%">
     <LoadingSpinner v-if="isLoading" />
     <v-card-text v-else-if="isLoaded" style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
@@ -317,11 +317,11 @@ class TimeSeriesPlot extends Vue {
       this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
-        l: 80,
+        l: 60,
         r: 10,
         b: 60,
         t: 10,
-        pad: 4,
+        pad: 2,
       },
       showlegend: this.hasMultipleTimeSeries,
       xaxis: {
@@ -335,7 +335,7 @@ class TimeSeriesPlot extends Vue {
         gridwidth: 3,
       },
       font: {
-        size: 16,
+        size: 14,
       },
       shapes: this.shapes,
     };
@@ -344,7 +344,7 @@ class TimeSeriesPlot extends Vue {
   get options() {
     return {
       modeBarButtonsToRemove: ["toImage"],
-      // responsive: true
+      responsive: true,
     };
   }
 
@@ -372,17 +372,17 @@ class TimeSeriesPlot extends Vue {
 
   get shapes() {
     if (!_.isNull(this.yearSelected)) {
-      const sortedValues = _.sortBy(this.traces[0].y);
       return [
         {
           type: "line",
           x0: this.yearSelected,
           x1: this.yearSelected,
-          y0: sortedValues[0],
-          y1: sortedValues[sortedValues.length - 1],
+          yref: "paper",
+          y0: 0,
+          y1: 1,
           line: {
             color: "rgb(255, 140, 0)",
-            width: 2,
+            width: 3,
           },
         },
       ];
@@ -403,11 +403,6 @@ class TimeSeriesPlot extends Vue {
     return this.traces != null && this.traces.length > 1;
   }
 
-  /**
-   * FIXME: should refactor
-   * Returns analysis store's time series if displayTransformedTimeSeries = true
-   * otherwise returns the dataset store's time series
-   */
   get timeSeriesData() {
     return this.traces;
   }
@@ -584,14 +579,14 @@ class TimeSeriesPlot extends Vue {
   }
 
   @Watch("timeSeriesData")
-  getTimeSeriesData(timeSeriesData) {
+  watchTimeSeriesData(timeSeriesData) {
     if (this.$refs.plot) {
       this.$refs.plot.update(timeSeriesData, this.layoutMetadata);
     }
   }
 
   @Watch("layoutMetadata")
-  getLayoutMetadata(layoutMetadata) {
+  watchLayoutMetadata(layoutMetadata) {
     if (this.$refs.plot) {
       this.$refs.plot.update(this.timeSeriesData, layoutMetadata);
     }
