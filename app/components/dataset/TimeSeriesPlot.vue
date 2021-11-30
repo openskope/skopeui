@@ -317,8 +317,6 @@ class TimeSeriesPlot extends Vue {
       this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
-        l: 60,
-        r: 10,
         b: 60,
         t: 10,
         pad: 2,
@@ -328,11 +326,13 @@ class TimeSeriesPlot extends Vue {
         title: xAxisTitle,
         linewidth: 3,
         gridwidth: 3,
+        automargin: true,
       },
       yaxis: {
         title: this.variable.name,
         linewidth: 3,
         gridwidth: 3,
+        automargin: true,
       },
       font: {
         size: 14,
