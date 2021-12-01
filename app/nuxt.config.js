@@ -129,11 +129,11 @@ module.exports = {
   ],
   pwa: {
     manifest: {
-      short_name: 'skope',
-      name: 'SKOPE: Synthesizing Knowledge of Past Environments',
+      short_name: "skope",
+      name: "SKOPE: Synthesizing Knowledge of Past Environments",
       prefer_related_applications: false,
-      display: 'fullscreen',
-    }
+      display: "fullscreen",
+    },
   },
 
   vuetify: {

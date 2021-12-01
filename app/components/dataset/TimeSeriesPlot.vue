@@ -356,20 +356,6 @@ class TimeSeriesPlot extends Vue {
     }
   }
 
-  /**
-   * returns a single point timeseries to mark the selected year ranging from ymin to ymax
-   */
-  get yearSelectedSeries() {
-    let x = [];
-    let y = [];
-    if (!_.isNull(this.yearSelected)) {
-      x = [this.yearSelected, this.yearSelected];
-      // a bounds single pass function would be more efficient
-      y = [_.min(this.traces[0].y), _.max(this.traces[0].y)];
-    }
-    return { x, y, type: "scatter", mode: "lines+markers" };
-  }
-
   get shapes() {
     if (!_.isNull(this.yearSelected)) {
       return [
@@ -399,7 +385,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get hasMultipleTimeSeries() {
-    // FIXME: assumes traces always has one element
+    // FIXME: assume traces always has one element
     return this.traces != null && this.traces.length > 1;
   }
 

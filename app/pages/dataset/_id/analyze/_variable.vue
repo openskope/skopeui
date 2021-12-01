@@ -521,7 +521,7 @@ class Analyze extends Vue {
           await this.initializeFormData(data);
           await retrieveAnalysis(api, data);
         },
-        { immediate: true }
+        { immediate: true, deep: true }
       );
     }
   }
