@@ -1,0 +1,56 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Synthesizing Knowledge of Past Environments
+message: >-
+  Please cite this software using the metadata from
+  'preferred-citation'.
+type: software
+authors:
+  - given-names: Allen
+    family-names: Lee
+    email: allen.lee@asu.edu
+    affiliation: Arizona State University
+    orcid: 'https://orcid.org/0000-0002-6523-6079'
+  - given-names: Christine
+    family-names: Nguyễn
+    email: christine.n.nguyen@asu.edu
+    affiliation: Arizona State University
+  - given-names: Calvin
+    family-names: Pritchard
+    email: pritchard.calvin@gmail.com
+    orcid: 'https://orcid.org/0000-0002-4557-8602'
+  - given-names: Kyle
+    family-names: Bocinsky
+    email: bocinsky@gmail.com
+    affiliation: University of Montana
+    orcid: 'https://orcid.org/0000-0003-1862-3428'
+  - given-names: Keith
+    family-names: Kintigh
+    email: kintigh@asu.edu
+    affiliation: Arizona State University
+repository-code: 'https://github.com/openskope/skopeui'
+url: 'https://www.openskope.org'
+repository: 'https://github.com/openskope/skopeui'
+abstract: >-
+  SKOPE (Synthesizing Knowledge of Past Environments)
+  is a National Science Foundation-funded, online
+  resource that enables users to easily discover,
+  explore, visualize, and synthesize knowledge of
+  environments in the recent or remote past.  Given a
+  location and temporal interval, SKOPE offers easy,
+  interactive access to sources of long-term,
+  high-resolution environmental data reaching back
+  more than 2000 years. SKOPE is intended for use by
+  diverse professional and academic communities, as
+  well as the general public.
+keywords:
+  - environmental data
+  - precipitation
+  - palmer drought severity index
+  - PDSI
+license: MIT
+commit: 9fa4c7eecdf1a61b5191ce703823bf666d57e994
+version: v2021.10-alpha
+date-released: '2021-10-15'
