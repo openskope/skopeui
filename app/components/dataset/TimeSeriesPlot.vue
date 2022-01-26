@@ -273,7 +273,7 @@ class TimeSeriesPlot extends Vue {
 
   set selectedTemporalRange(temporalRange) {
     this.$api().dataset.setTemporalRange(temporalRange);
-    this.$emit("selectedTemporalRange", temporalRange);
+    this.$emit("selected-temporal-range", temporalRange);
   }
 
   get temporalRangeMin() {
@@ -458,7 +458,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   setYear(year) {
-    this.$emit("yearSelected", year);
+    this.$emit("year-selected", year);
   }
 
   setTemporalRange() {

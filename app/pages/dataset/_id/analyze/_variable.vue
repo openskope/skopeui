@@ -20,7 +20,7 @@
             :show-area="true"
             :show-step-controls="false"
             :traces="traces"
-            @selectedTemporalRange="updateTimeSeries"
+            @selected-temporal-range="updateTimeSeries"
           />
         </v-col>
         <!-- analysis form -->

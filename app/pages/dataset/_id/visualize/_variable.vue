@@ -38,8 +38,8 @@
         <TimeSeriesPlot
           :traces="traces"
           :year-selected="yearSelected"
-          @yearSelected="setYear"
-          @selectedTemporalRange="updateTimeSeries"
+          @year-selected="setYear"
+          @selected-temporal-range="updateTimeSeries"
         />
       </v-col>
     </v-row>
@@ -74,7 +74,7 @@ const setYearSelected = _.debounce(function (vue) {
 class Visualize extends Vue {
   // yearSelected state is managed by this component.
   // when a year is selected in the time series plot
-  // it generates a @yearSelected event that calls setYear here which
+  // it generates a @year-selected event that calls setYear here which
   // propagates back down to the map and time series plot components
   yearSelected = 1500;
   stepNames = _.clone(this.$api().app.stepNames);
