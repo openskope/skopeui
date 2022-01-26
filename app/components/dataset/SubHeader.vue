@@ -70,7 +70,11 @@ class SubHeader extends Vue {
   set variable(variableId) {
     const id = this.$route.params.id;
     const name = this.$route.name;
-    console.log("setting variable: ", variableId);
+    console.log("route name: ", name);
+    if (name === "dataset-id-analyze-variable") {
+      console.log("setting analysis request data variable id: ", variableId);
+    } else {
+    }
     this.$api().dataset.setVariable(variableId);
     this.$router.push({
       name,

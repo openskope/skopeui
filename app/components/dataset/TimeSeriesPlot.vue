@@ -192,8 +192,7 @@
 <script>
 import Vue from "vue";
 import _ from "lodash";
-import { Component } from "nuxt-property-decorator";
-import { Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch } from "nuxt-property-decorator";
 import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 

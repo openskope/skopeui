@@ -155,7 +155,7 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
+import { Component, Watch } from "nuxt-property-decorator";
 import {
   initializeDataset,
   initializeDatasetGeoJson,
@@ -490,6 +490,10 @@ class Analyze extends Vue {
     return this.$api().analysis.requestData;
   }
 
+  get variable() {
+    return this.$api().dataset.variable;
+  }
+
   // --------- LIFECYCLE HOOKS ---------
 
   async mounted() {
@@ -636,8 +640,8 @@ class Analyze extends Vue {
    * Invoked when the user submits a request for statistics or a different temporal range.
    * Makes a request to skope-api with a new requested series and updates TimeSeriesPlot
    * with the response time series.
-   * @returns {Promise<void>}
    */
+  @Watch("variable")
   async updateTimeSeries() {
     // grab form inputs and set them on the store
     if (!this.analysisFormValid) {

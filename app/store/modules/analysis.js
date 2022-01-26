@@ -15,6 +15,9 @@ const EMPTY_RESPONSE = {
 
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
 class Analysis extends VuexModule {
+  // requestData: see
+  // https://api.openskope.org/redoc#operation/retrieveTimeseries
+  // for parameters + descriptions
   requestData = {};
   waitingForResponse = false;
   response = EMPTY_RESPONSE;
@@ -29,6 +32,11 @@ class Analysis extends VuexModule {
     } else {
       return null;
     }
+  }
+
+  @Mutation
+  setVariableId(variableId) {
+    this.requestData.variable_id = variableId;
   }
 
   /**

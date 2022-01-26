@@ -140,8 +140,7 @@
 
 <script>
 import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
-import { Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch } from "nuxt-property-decorator";
 import {
   LEAFLET_PROVIDERS,
   SKOPE_WMS_ENDPOINT,

@@ -49,8 +49,7 @@
 
 <script>
 import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
-import { Prop } from "vue-property-decorator";
+import { Component, Prop } from "nuxt-property-decorator";
 import { BaseMapProvider } from "@/store/modules/constants";
 import MetadataModal from "@/components/dataset/MetadataModal.vue";
 import VariableList from "@/components/dataset/VariableList.vue";
