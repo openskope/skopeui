@@ -424,12 +424,16 @@ class Analyze extends Vue {
     return this.$api().dataset.maxYear;
   }
 
+  get studyAreaGeoJson() {
+    return this.$api().dataset.geoJson;
+  }
+
   get studyAreaGeometry() {
-    return this.$api().dataset.geoJson?.geometry;
+    return this.studyAreaGeoJson.geometry;
   }
 
   get isStudyAreaPolygon() {
-    return this.studyAreaGeometry?.type !== "Point";
+    return this.studyAreaGeometry.type !== "Point";
   }
 
   get isLoading() {

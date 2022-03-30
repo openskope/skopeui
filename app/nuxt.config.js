@@ -123,10 +123,7 @@ module.exports = {
 
   dev: process.env.NODE_ENV !== "production",
 
-  buildModules: [
-    "@nuxtjs/vuetify",
-    "@nuxtjs/pwa",
-  ],
+  buildModules: ["@nuxtjs/vuetify", "@nuxtjs/pwa"],
   pwa: {
     manifest: {
       short_name: "skope",

@@ -147,7 +147,7 @@ class Dataset extends VuexModule {
     const defaultRequestData = {
       dataset_id: this.metadata.id,
       variable_id: this.variable.id,
-      selected_area: this.geoJson?.geometry,
+      selected_area: this.geoJson,
       time_range: {
         gte: toISODate(this.temporalRangeMin),
         lte: toISODate(this.temporalRangeMax),
