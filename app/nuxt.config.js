@@ -44,6 +44,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    { src: "~/plugins/vue-gtag.js", ssr: true },
     { src: "~/plugins/nuxt-leaflet.js", ssr: false },
     { src: "~/plugins/axios.js", ssr: false },
     { src: "~/plugins/store.js", ssr: true },
@@ -125,7 +126,6 @@ module.exports = {
   buildModules: [
     "@nuxtjs/vuetify",
     "@nuxtjs/pwa",
-    ["@nuxtjs/google-analytics", { id: "UA-109730826-1" }],
   ],
   pwa: {
     manifest: {
