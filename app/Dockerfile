@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:lts-buster
+FROM node:lts-bullseye
 
 LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
 
