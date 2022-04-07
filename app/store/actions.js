@@ -8,7 +8,7 @@
 // Could use or take from https://github.com/bvaughn/debounce-decorator
 import _ from "lodash";
 import {
-  TIMESERIES_V2_ENDPOINT,
+  TIMESERIES_ENDPOINT,
   METADATA_ENDPOINT,
 } from "@/store/modules/constants";
 import { extractYear } from "@/store/stats";
@@ -31,7 +31,7 @@ async function updateTimeSeries(api, data) {
     return;
   }
   try {
-    const response = await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data);
+    const response = await api.store.$axios.$post(TIMESERIES_ENDPOINT, data);
     const originalSeries = response.series[0];
     const timeSeries = {
       x: _.range(
@@ -89,7 +89,7 @@ export const loadTimeSeries = _.debounce(async function (api) {
 const updateAnalysis = _.debounce(async function (api, data) {
   try {
     api.analysis.setResponse(
-      await api.store.$axios.$post(TIMESERIES_V2_ENDPOINT, data)
+      await api.store.$axios.$post(TIMESERIES_ENDPOINT, data)
     );
   } catch (e) {
     api.analysis.setResponseError(e);
