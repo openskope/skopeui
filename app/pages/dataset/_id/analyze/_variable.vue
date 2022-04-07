@@ -428,12 +428,25 @@ class Analyze extends Vue {
     return this.$api().dataset.geoJson;
   }
 
-  get studyAreaGeometry() {
-    return this.studyAreaGeoJson.geometry;
-  }
-
   get isStudyAreaPolygon() {
-    return this.studyAreaGeometry.type !== "Point";
+    const geojson = this.studyAreaGeoJson;
+    switch (geojson.type) {
+      case "Point":
+        return false;
+      case "Polygon":
+        return true;
+      case "Feature":
+        return geojson.geometry.type === "Polygon";
+      case "FeatureCollection":
+        for (const feature of geojson.features) {
+          if (feature.geometry.type === "Polygon") {
+            return true;
+          }
+        }
+        return false;
+      default:
+        return false;
+    }
   }
 
   get isLoading() {
@@ -618,7 +631,7 @@ class Analyze extends Vue {
     const plots = await this.$refs.plot.getTimeSeriesPlotImage();
     const png = await fetch(plots.png);
     const svg = await fetch(plots.svg);
-    const geoJson = this.studyAreaGeometry;
+    const geoJson = this.studyAreaGeoJson;
     const requestData = this.$api().analysis.requestData;
 
     const zip = new JSZip();
