@@ -94,7 +94,7 @@
     <!-- map -->
     <v-card-text class="map">
       <client-only placeholder="Loading map, please wait...">
-        <l-map ref="layerMap" min-zoom="2" @ready="mapReady">
+        <l-map ref="layerMap" :min-zoom="2" @ready="mapReady">
           <l-tile-layer
             v-for="provider of leafletProviders"
             :key="provider.name"
@@ -166,6 +166,9 @@ class Map extends Vue {
   @Prop({ default: true })
   displayRaster;
 
+  @Prop({ default: 32 })
+  circleToPolygonEdges;
+
   isMapReady = false;
   opacity = 50;
   opacityRules = [
@@ -176,7 +179,6 @@ class Map extends Vue {
   defaultDatasetOpacity = 0.0;
   // default padding for fitBounds
   defaultBoundsPadding = [3, 3];
-  defaultCircleToPolygonEdges = 32;
   legendImage = null;
   legendControl = null;
   legendPosition = "bottomleft";
@@ -294,9 +296,9 @@ class Map extends Vue {
     this.geoJsonWatcher = this.$watch(
       "geoJson",
       function (geoJson) {
-        console.log("watcher updating geojson", geoJson);
+        console.log("watcher discovered updated geojson", geoJson);
+        this.drawnItems.clearLayers();
         if (geoJson === null) {
-          this.drawnItems.clearLayers();
           this.disableEditOnly(map);
           console.log(
             "fitting to metadata bounds: ",
@@ -306,7 +308,6 @@ class Map extends Vue {
             padding: this.defaultBoundsPadding,
           });
         } else {
-          console.log("rendering selected area");
           this.renderSelectedArea(geoJson, map);
         }
       },
@@ -373,15 +374,15 @@ class Map extends Vue {
   registerToolbarHandlers(map) {
     const L = this.$L;
     // check for persisted geometry
-    map.on(L.Draw.Event.EDITRESIZE, (event) => this.saveGeometry(event.layer));
-    map.on(L.Draw.Event.EDITMOVE, (event) => this.saveGeometry(event.layer));
-    map.on(L.Draw.Event.EDITVERTEX, (e) => this.saveGeometry(e.poly));
+    map.on(L.Draw.Event.EDITED, (layerGroup) => {
+      layerGroup.layers.eachLayer((layer) => {
+        this.saveGeometry(layer);
+      });
+    });
     map.on(L.Draw.Event.CREATED, (event) => {
       const layer = event.layer;
       this.saveGeometry(layer);
-      this.drawnItems.addLayer(layer);
       this.enableEditOnly(map);
-      console.log("register toolbar handlers");
     });
     map.on(L.Draw.Event.DELETED, (event) => {
       clearGeoJson(this.$warehouse, this.$api());
@@ -397,14 +398,13 @@ class Map extends Vue {
     if (!map) {
       map = this.$refs.layerMap.mapObject;
     }
-    // remove all existing layers from the FeatureGroup
-    this.drawnItems.clearLayers();
     geoJsonLayer.eachLayer((l) => {
       this.drawnItems.addLayer(l);
     });
     this.enableEditOnly(map);
     let padding = this.defaultBoundsPadding;
     if (geoJsonLayer instanceof L.Marker) {
+      console.log("adding extra padding for L.Marker");
       padding = padding.map((x) => x * 15);
     }
     map.fitBounds(geoJsonLayer.getBounds(), { padding });
@@ -416,23 +416,23 @@ class Map extends Vue {
    * @param layer
    */
   saveGeometry(layer) {
-    const data = layer.toGeoJSON();
+    const geoJson = layer.toGeoJSON();
     if (layer instanceof L.Circle) {
-      data.properties.radius = layer.getRadius();
+      geoJson.properties.radius = layer.getRadius();
       const geometry = circleToPolygon(
-        data.geometry.coordinates,
+        geoJson.geometry.coordinates,
         layer.getRadius(),
-        this.defaultCircleToPolygonEdges
+        this.circleToPolygonEdges
       );
-      data.geometry = geometry;
+      geoJson.geometry = geometry;
     }
     // save geoJSON in local storage (consider pushing into the vuex store)
-    saveGeoJson(this.$warehouse, this.$api(), data);
+    saveGeoJson(this.$warehouse, this.$api(), geoJson);
   }
 
   toLeafletLayer(geoJson) {
     const L = this.$L;
-    return L.geoJson(geoJson, {
+    return L.geoJSON(geoJson, {
       // convert persisted circles to L.Circle instead of L.Marker
       pointToLayer: (feature, latlng) => {
         if (feature.properties.radius) {
@@ -446,12 +446,14 @@ class Map extends Vue {
   }
 
   disableEditOnly(map) {
-    this.drawControlEditOnly.remove(map);
+    map.removeControl(this.drawControlEditOnly);
+    // this.drawControlEditOnly.remove(map);
     this.drawControlFull.addTo(map);
   }
 
   enableEditOnly(map) {
-    this.drawControlFull.remove(map);
+    map.removeControl(this.drawControlFull);
+    // this.drawControlFull.remove(map);
     this.drawControlEditOnly.addTo(map);
   }
 
@@ -535,7 +537,6 @@ class Map extends Vue {
       console.log("received possible geojson to load: ", text);
       try {
         const geoJson = JSON.parse(text);
-        this.$api().dataset.setGeoJson(geoJson);
         saveGeoJson(this.$warehouse, this.$api(), geoJson);
         // assert that uploaded and store geojson are the same
         console.log(
