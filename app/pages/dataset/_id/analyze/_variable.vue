@@ -585,7 +585,9 @@ class Analyze extends Vue {
 
   loadSmoothingOption(requestedSeriesOptions) {
     // locate the transformed time series in requested_series from the request data
-    const smoothedSeriesOption = requestedSeriesOptions.find((x) => x.name === "Smoothed");
+    const smoothedSeriesOption = requestedSeriesOptions.find(
+      (x) => x.name === "Smoothed"
+    );
     if (smoothedSeriesOption) {
       // if the smoothed time series exists, find the smoothing option that corresponds to the
       // smoothed time series smoother option and invoke fromRequestData to set the appropriate
