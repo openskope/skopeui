@@ -487,7 +487,7 @@ class Analyze extends Vue {
       .toRequestData(this);
   }
 
-  get requestedSeries() {
+  get requestedSeriesOptions() {
     const series = [
       {
         name: this.hasTransformOption ? "Transformed" : "Original",
@@ -564,7 +564,7 @@ class Analyze extends Vue {
 
   async initializeFormData(requestData) {
     this.zonalStatistic = requestData.zonal_statistic;
-    this.loadSmoothingOption(requestData.requested_series);
+    this.loadSmoothingOption(requestData.requested_series_options);
     this.loadTransformOption(requestData.transform);
     this.$api().dataset.setTemporalRange([
       extractYear(requestData.time_range.gte),
@@ -583,10 +583,10 @@ class Analyze extends Vue {
     }
   }
 
-  loadSmoothingOption(requestedSeries) {
+  loadSmoothingOption(requestedSeriesOptions) {
     // locate the transformed time series in requested_series from the request data
-    const smoothedSeries = requestedSeries.find((x) => x.name === "Smoothed");
-    if (smoothedSeries) {
+    const smoothedSeriesOption = requestedSeriesOptions.find((x) => x.name === "Smoothed");
+    if (smoothedSeriesOption) {
       // if the smoothed time series exists, find the smoothing option that corresponds to the
       // smoothed time series smoother option and invoke fromRequestData to set the appropriate
       // properties on this analyze vue component (if needed, e.g., smoothing time steps)
@@ -675,7 +675,7 @@ class Analyze extends Vue {
         gte: toISODate(this.temporalRange[0]),
         lte: toISODate(this.temporalRange[1]),
       },
-      requested_series: this.requestedSeries,
+      requested_series_options: this.requestedSeriesOptions,
     };
     console.log("submitting to skope-api: ", requestData);
     api.analysis.setRequestData(requestData);

@@ -91,7 +91,7 @@ class Analysis extends VuexModule {
 
   @Mutation
   setResponseError(e) {
-    console.log({ e });
+    console.error("analysis store response error: ", { e });
     this.responseError = e;
   }
 }

@@ -4,6 +4,7 @@ import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
 
 const LOADING = "loading";
 const SUCCESS = "success";
+const DEFAULT_MAX_PROCESSING_TIME = 8000;
 
 const LOADING_STATUS = {
   status: LOADING,
@@ -154,12 +155,13 @@ class Dataset extends VuexModule {
       },
       zonal_statistic: "mean",
       transform: { type: "NoTransform" },
-      requested_series: [
+      requested_series_options: [
         {
           name: "Original",
           smoother: { type: "NoSmoother" },
         },
       ],
+      max_processing_time: DEFAULT_MAX_PROCESSING_TIME,
     };
     console.log("default request data: ", defaultRequestData);
     return defaultRequestData;
