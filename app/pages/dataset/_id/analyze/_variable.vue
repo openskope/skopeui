@@ -592,7 +592,7 @@ class Analyze extends Vue {
       // if the smoothed time series exists, find the smoothing option that corresponds to the
       // smoothed time series smoother option and invoke fromRequestData to set the appropriate
       // properties on this analyze vue component (if needed, e.g., smoothing time steps)
-      const smoother = smoothedSeries.smoother;
+      const smoother = smoothedSeriesOption.smoother;
       const option = this.smoothingOptions.find(
         (x) => x.method === smoother.method
       );
