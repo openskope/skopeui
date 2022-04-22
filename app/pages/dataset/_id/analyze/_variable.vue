@@ -163,7 +163,10 @@ import {
   retrieveAnalysis,
 } from "@/store/actions";
 import { toISODate, extractYear } from "@/store/stats";
-import { buildReadme } from "@/store/modules/constants";
+import {
+  buildReadme,
+  DEFAULT_CENTERED_SMOOTHING_WIDTH,
+} from "@/store/modules/constants";
 import _ from "lodash";
 import JSZip from "jszip";
 import Papa from "papaparse";
@@ -262,7 +265,7 @@ class Analyze extends Vue {
     },
   ];
 
-  smoothingTimeStep = 9;
+  smoothingTimeStep = DEFAULT_CENTERED_SMOOTHING_WIDTH;
 
   transformOption = "none";
 

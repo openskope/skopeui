@@ -5,6 +5,7 @@ import {
   BUILD_ID,
 } from "@/store/modules/_constants";
 export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
+export const DEFAULT_CENTERED_SMOOTHING_WIDTH = 11;
 export const SKOPE_WMS_ENDPOINT = `${GEOSERVER_HOST_URL}/${WMS_SERVER_URI}`;
 export const TIMESERIES_ENDPOINT = `${API_HOST_URL}/timeseries`;
 export const METADATA_ENDPOINT = `${API_HOST_URL}/metadata`;
