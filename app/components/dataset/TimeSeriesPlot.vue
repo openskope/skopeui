@@ -36,50 +36,55 @@
             </v-tooltip>
           </v-col>
           <!-- temporal range input -->
-          <!-- lower temporal range input -->
-          <v-col class="d-flex flex-row" @click="enableTemporalRangeEdit">
-            <!-- temporal range -->
-            <v-text-field
-              v-model.number="formTemporalRangeMin"
-              label="Min Year"
-              :disabled="!isTemporalRangeEditable"
-              :min="minYear"
-              :max="maxYear - 1"
-              type="number"
-              :rules="[validateMinYear]"
-              @keydown.enter="setTemporalRange"
+          <v-form v-model="isTemporalRangeValid">
+            <v-col
+              class="d-flex flex-row"
+              cols="auto"
+              @click="enableTemporalRangeEdit"
             >
-              <template #append-outer>to</template>
-            </v-text-field>
-            <v-text-field
-              v-model.number="formTemporalRangeMax"
-              :disabled="!isTemporalRangeEditable"
-              class="mx-2"
-              label="Max Year"
-              :hint="timeStepsLabel"
-              persistent-hint
-              :min="minYear + 1"
-              :max="maxYear"
-              :rules="[validateMaxYear]"
-              type="number"
-              @keydown.enter="setTemporalRange"
-            >
-            </v-text-field>
-            <div class="d-flex flex-column mt-n2">
-              <v-btn
-                :disabled="!hasTemporalRangeChanges"
-                x-small
-                color="secondary"
-                @click="setTemporalRange"
-                >Apply</v-btn
+              <!-- temporal range -->
+              <v-text-field
+                v-model.number="formTemporalRangeMin"
+                label="Min Year"
+                :disabled="!isTemporalRangeEditable"
+                :min="minYear"
+                :max="maxYear - 1"
+                type="number"
+                :rules="[validateMinYear]"
+                @keydown.enter="setTemporalRange"
               >
-              <v-btn x-small color="secondary" @click="resetTemporalRange"
-                >Reset</v-btn
+                <template #append-outer>to</template>
+              </v-text-field>
+              <v-text-field
+                v-model.number="formTemporalRangeMax"
+                :disabled="!isTemporalRangeEditable"
+                class="mx-2"
+                label="Max Year"
+                :hint="timeStepsLabel"
+                persistent-hint
+                :min="minYear + 1"
+                :max="maxYear"
+                :rules="[validateMaxYear]"
+                type="number"
+                @keydown.enter="setTemporalRange"
               >
-            </div>
-          </v-col>
+              </v-text-field>
+              <div class="d-flex flex-column mt-n2">
+                <v-btn
+                  :disabled="!hasTemporalRangeChanges || !isTemporalRangeValid"
+                  x-small
+                  color="secondary"
+                  @click="setTemporalRange"
+                  >Apply</v-btn
+                >
+                <v-btn x-small color="secondary" @click="resetTemporalRange"
+                  >Reset</v-btn
+                >
+              </div>
+            </v-col>
+          </v-form>
           <!-- step controls -->
-          <v-col v-if="showStepControls" cols="auto" align="right">
+          <v-col v-if="showStepControls" cols="4" align="right">
             <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
@@ -224,6 +229,7 @@ class TimeSeriesPlot extends Vue {
   localTemporalRangeMin = 1;
   localTemporalRangeMax = 2020;
   isTemporalRangeEditable = false;
+  isTemporalRangeValid = false;
   timeSeriesWatch = null;
 
   get timeStepsLabel() {
@@ -463,6 +469,9 @@ class TimeSeriesPlot extends Vue {
   setTemporalRange() {
     // no-op if local temporal range min and max are equal to the selected temporal range
     if (!this.hasTemporalRangeChanges) {
+      return;
+    }
+    if (!this.isTemporalRangeValid) {
       return;
     }
     this.selectedTemporalRange = [
