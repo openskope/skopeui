@@ -36,7 +36,7 @@
                 </h3>
               </v-card-text>
               <v-card-actions class="justify-space-between">
-                <v-btn outlined color="accent" @click="clearGeoJson">
+                <v-btn outlined color="accent" @click="clearGeometry">
                   Clear selected area
                 </v-btn>
                 <v-btn depressed color="accent" @click="keepGeometry">
@@ -138,7 +138,9 @@ class DatasetDetail extends Vue {
     return /^\w+$/.test(params.id);
   }
 
-  clearGeoJson() {
+  clearGeometry() {
+    this.shouldConfirmGeometry = false;
+    this.$api().app.setVisited();
     clearGeoJson(this.$warehouse, this.$api());
   }
 
@@ -148,7 +150,6 @@ class DatasetDetail extends Vue {
 
   keepGeometry() {
     this.shouldConfirmGeometry = false;
-    console.log("setting visited");
     this.$api().app.setVisited();
   }
 }
