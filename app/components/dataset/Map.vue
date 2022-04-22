@@ -327,20 +327,22 @@ class Map extends Vue {
         rectangle: {
           shapeOptions: {
             color: "yellow",
-            fill: "yellow",
           },
+          metric: ["km"],
         },
         circle: {
           shapeOptions: {
             color: "yellow",
-            fill: "yellow",
           },
+          metric: ["km"],
         },
         polygon: {
           shapeOptions: {
             color: "yellow",
-            fill: "yellow",
           },
+          metric: ["km"],
+          showArea: true,
+          showLength: true,
         },
       },
       edit: {
