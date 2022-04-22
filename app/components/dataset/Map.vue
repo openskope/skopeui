@@ -277,9 +277,7 @@ class Map extends Vue {
   }
 
   mapReady(map) {
-    console.log("mapReady");
     const handler = (event) => {
-      console.log("handling layer change event ", { event });
       const leafletLayer = event.layer;
       if (this.isSkopeLayer(leafletLayer)) {
         const variable = _.find(this.variables, (v) => v.name === event.name);
@@ -291,12 +289,10 @@ class Map extends Vue {
     map.on("baselayerchange", handler);
     this.addDrawToolbar(map);
     initializeDatasetGeoJson(this.$warehouse, this.$api());
-    console.log("initialized dataset geojson");
     this.registerToolbarHandlers(map);
     this.geoJsonWatcher = this.$watch(
       "geoJson",
       function (geoJson) {
-        console.log("watcher discovered updated geojson", geoJson);
         this.drawnItems.clearLayers();
         if (geoJson === null) {
           this.disableEditOnly(map);
@@ -404,7 +400,6 @@ class Map extends Vue {
     this.enableEditOnly(map);
     let padding = this.defaultBoundsPadding;
     if (geoJsonLayer instanceof L.Marker) {
-      console.log("adding extra padding for L.Marker");
       padding = padding.map((x) => x * 15);
     }
     map.fitBounds(geoJsonLayer.getBounds(), { padding });
@@ -534,7 +529,6 @@ class Map extends Vue {
   loadGeoJson(event) {
     const file = event.target.files[0];
     file.text().then((text) => {
-      console.log("received possible geojson to load: ", text);
       try {
         const geoJson = JSON.parse(text);
         saveGeoJson(this.$warehouse, this.$api(), geoJson);
@@ -546,7 +540,7 @@ class Map extends Vue {
       } catch (error) {
         console.error(error);
         // FIXME: this should be a toast or other notification
-        alert("Sorry, we couldn't re-import this GeoJSON file: " + text);
+        alert("Sorry, we couldn't import this GeoJSON file: " + text);
       }
     });
   }
@@ -558,7 +552,6 @@ class Map extends Vue {
   exportSelectedGeometry(event) {
     const geoJson = this.geoJson;
     if (geoJson) {
-      console.log("exporting selected geoJson: ", { geoJson });
       const convertedArea =
         "text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(geoJson));
