@@ -1,5 +1,5 @@
 <template>
-  <!-- load analysis -->
+  <!-- load analysis button / component -->
   <v-btn
     color="primary"
     tile
@@ -15,7 +15,7 @@
       @change="loadRequestData"
     />
     <v-icon left dark>fas fa-upload</v-icon>
-    Upload SKOPE Analysis
+    Load skope-request.json file
   </v-btn>
 </template>
 <script>
@@ -24,34 +24,6 @@ import { Component } from "nuxt-property-decorator";
 
 @Component({})
 class LoadAnalysis extends Vue {
-  links = [
-    {
-      id: "github",
-      label: "GitHub",
-      icon: "fab fa-github",
-      url: "https://github.com/openskope/skopeui",
-    },
-    {
-      id: "email",
-      label: "Email us",
-      icon: "email",
-      url: "https://www.comses.net/about/contact/",
-    },
-    {
-      id: "docs",
-      label: "Documentation",
-      icon: "fas fa-question-circle",
-      url: "https://www.openskope.org/skope-users-guide ",
-    },
-  ];
-
-  /**
-   *  Determine if current breakpoint is <= medium.
-   */
-  get isMdAndDown() {
-    return this.$vuetify.breakpoint.mdAndDown;
-  }
-
   /**
    * Returns the id loadRequestFile to trigger a select file
    * window on click.

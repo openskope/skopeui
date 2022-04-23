@@ -70,10 +70,10 @@ Time range: ${requestData.time_range.gte} - ${requestData.time_range.lte} CE
 Location: ${JSON.stringify(requestData.selected_area, null, 2)}
 
 ## Files
-- \`request.json\` - A shareable file that contains all of the input parameters needed to recreate this analysis. You can upload this file to the SKOPE app to reproduce the data in this zipfile.
-- \`summary-statistics.json\` - The mean, median, and standard deviation of the time series data.
+- \`skope-request.json\` - A plaintext JSON file with all input parameters needed to recreate this analysis. Load this file into the SKOPE app to regenerate the data in this zipfile.
+- \`summary-statistics.json\` - The computed mean, median, and standard deviation of the time series data.
 - \`plot.png\` and \`plog.svg\` - Graph of the time series data.
 - \`time-series.json\` and \`time-series.csv\` - time series data in JSON and long form CSV formats.
-- \`study-area.geojson\` - A GeoJSON file for the defined study area.
+- \`study-area.geojson\` - GeoJSON file with the defined study area.
 `;
 }

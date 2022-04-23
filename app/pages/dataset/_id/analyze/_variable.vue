@@ -651,7 +651,7 @@ class Analyze extends Vue {
     const requestData = this.$api().analysis.requestData;
 
     const zip = new JSZip();
-    zip.file("request.json", JSON.stringify(requestData));
+    zip.file("skope-request.json", JSON.stringify(requestData));
     zip.file("summary-statistics.json", JSON.stringify(summaryStatistics));
     zip.file("time-series.json", JSON.stringify(timeseries));
     zip.file("time-series.csv", Papa.unparse(this.tracesAsArrayOfObjects()));

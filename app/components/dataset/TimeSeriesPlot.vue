@@ -327,7 +327,8 @@ class TimeSeriesPlot extends Vue {
   }
 
   get yAxisTitle() {
-    return !this.yAxisLabel ? this.variable.name : this.yAxisLabel;
+    const variableName = this.variable.name;
+    return !this.yAxisLabel ? variableName : `${this.yAxisLabel}`;
   }
 
   get layoutMetadata() {
@@ -338,6 +339,7 @@ class TimeSeriesPlot extends Vue {
         pad: 2,
       },
       showlegend: this.hasMultipleTimeSeries,
+      legend: { x: 1, y: 0.5 },
       xaxis: {
         title: this.xAxisTitle,
         linewidth: 3,
