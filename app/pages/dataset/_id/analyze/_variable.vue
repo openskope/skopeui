@@ -20,6 +20,7 @@
             :show-area="true"
             :show-step-controls="false"
             :traces="traces"
+            :y-axis-label="yAxisLabel"
             @selected-temporal-range="updateTimeSeries"
           />
         </v-col>
@@ -188,7 +189,6 @@ class Analyze extends Vue {
   requestDataWatcher = null;
   analysisFormValid = true;
   zonalStatistic = "mean";
-  timeout = 5000;
 
   zonalStatisticOptions = [
     {
@@ -214,6 +214,7 @@ class Analyze extends Vue {
 
   smoothingOption = "none";
 
+  // constants data structure of available smoothing options to present in the UI
   smoothingOptions = [
     {
       label: "None (time steps individually plotted)",
@@ -293,6 +294,7 @@ class Analyze extends Vue {
     }
   }
 
+  // constants data structure for available transform options to display in the UI
   transformOptions = [
     {
       label: "None: Modeled values displayed",
@@ -347,7 +349,7 @@ class Analyze extends Vue {
       },
     },
     {
-      label: "Z-Score wrt moving interval (Z recalculated on moving basis)",
+      label: "Z-Score wrt moving interval",
       id: "zscoreMoving",
       type: "ZScoreMovingInterval",
       toRequestData: function (analyzeVue) {
@@ -387,7 +389,10 @@ class Analyze extends Vue {
     },
   ];
 
+  yAxisLabel = null;
+
   // --------- GETTERS ---------
+
   get summaryStatistics() {
     if (this.$api().analysis.summaryStatistics.length === 0) {
       return [this.$api().dataset.summaryStatistics];
@@ -461,7 +466,8 @@ class Analyze extends Vue {
   }
 
   get traces() {
-    const transformedTimeSeries = this.$api().analysis.timeseries.map((ts) => ({
+    const timeseries = this.$api().analysis.timeseries;
+    const transformedTimeSeries = timeseries.map((ts) => ({
       ...ts,
       type: "scatter",
     }));
@@ -544,6 +550,11 @@ class Analyze extends Vue {
           );
           await this.initializeFormData(data);
           await retrieveAnalysis(api, data);
+          if (this.hasTransformOption) {
+            this.yAxisLabel = this.transformOptions.find(
+              (x) => x.id === this.transformOption
+            ).label;
+          }
         },
         { immediate: true, deep: true }
       );

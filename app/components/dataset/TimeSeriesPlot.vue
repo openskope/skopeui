@@ -222,6 +222,9 @@ class TimeSeriesPlot extends Vue {
   @Prop({})
   traces;
 
+  @Prop({ default: null })
+  yAxisLabel;
+
   // "play" automatically advances the timeseries year
   animationSpeed = 2000;
   isAnimationPlaying = false;
@@ -317,9 +320,17 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.variable;
   }
 
+  get xAxisTitle() {
+    return this.yearSelected == null
+      ? "Year"
+      : `<b>Year ${this.yearSelected}</b>`;
+  }
+
+  get yAxisTitle() {
+    return _.isBlank(this.yAxisLabel) ? this.variable.name : this.yAxisLabel;
+  }
+
   get layoutMetadata() {
-    const xAxisTitle =
-      this.yearSelected == null ? "Year" : `<b>Year ${this.yearSelected}</b>`;
     return {
       margin: {
         b: 60,
@@ -328,13 +339,13 @@ class TimeSeriesPlot extends Vue {
       },
       showlegend: this.hasMultipleTimeSeries,
       xaxis: {
-        title: xAxisTitle,
+        title: this.xAxisTitle,
         linewidth: 3,
         gridwidth: 3,
         automargin: true,
       },
       yaxis: {
-        title: this.variable.name,
+        title: this.yAxisTitle,
         linewidth: 3,
         gridwidth: 3,
         automargin: true,
