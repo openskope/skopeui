@@ -84,7 +84,7 @@
             </v-col>
           </v-form>
           <!-- step controls -->
-          <v-col v-if="showStepControls" cols="4" align="right">
+          <v-col v-if="showStepControls" align="right">
             <v-tooltip top>
               <template #activator="{ attrs, on }">
                 <v-btn
