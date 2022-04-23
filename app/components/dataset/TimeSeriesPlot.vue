@@ -327,7 +327,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   get yAxisTitle() {
-    return _.isBlank(this.yAxisLabel) ? this.variable.name : this.yAxisLabel;
+    return !this.yAxisLabel ? this.variable.name : this.yAxisLabel;
   }
 
   get layoutMetadata() {
