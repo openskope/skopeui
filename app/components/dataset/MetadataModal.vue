@@ -40,11 +40,10 @@ import MetadataDetail from "@/components/dataset/MetadataDetail.vue";
 class MetadataModal extends Vue {
   showMetadata = false;
 
-  @Prop()
+  @Prop({})
   metadataId;
 
   get metadata() {
-    console.log("using metadata with id: ", this.metadataId);
     return this.$api().metadata.find(this.metadataId);
   }
 }

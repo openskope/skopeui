@@ -97,6 +97,7 @@ const updateAnalysis = _.debounce(async function (api, data) {
 }, 300);
 
 export async function retrieveAnalysis(api, data) {
+  console.log("RETRIEVING ANALYSIS");
   if (!isValidRequestData(data)) {
     console.log(
       "Unable to retrieve analysis with invalid request data: ",
@@ -104,6 +105,12 @@ export async function retrieveAnalysis(api, data) {
     );
     return;
   }
+  // reload skope geometry + temporal range
+  api.dataset.setGeoJson(data.selected_area);
+  api.dataset.setTemporalRange([
+    extractYear(data.time_range.gte),
+    extractYear(data.time_range.lte),
+  ]);
   api.analysis.setWaitingForResponse(true);
   try {
     await updateAnalysis(api, data);
@@ -158,7 +165,12 @@ export async function initializeDataset(
 ) {
   await loadAllDatasetMetadata(api);
   if (metadataId === api.dataset.metadata?.id) {
-    console.log("Already initialized, ignoring request: ", metadataId);
+    console.log(
+      "Already initialized dataset metadata, ignoring request: ",
+      metadataId,
+      " existing: ",
+      api.dataset.metadata.id
+    );
     return;
   }
   const datasetMetadata = await api.metadata.find(metadataId);
@@ -205,9 +217,20 @@ export function clearGeoJson(warehouse, api) {
  *
  * @param {*} api
  */
-export async function loadRequestData(api) {
+export async function initializeRequestData(api) {
   const requestData = api.analysis.requestData;
   if (_.isEmpty(requestData)) {
+    console.log("request data was empty! setting default data");
     api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
   }
+}
+
+export async function loadRequestData(api, requestData) {
+  // be the source of truth for all things dataset + analysis store related
+  api.dataset.setTemporalRange([
+    extractYear(requestData.time_range.gte),
+    extractYear(requestData.time_range.lte),
+  ]);
+  api.dataset.setGeoJson(requestData.selected_area);
+  api.analysis.setRequestData(requestData);
 }

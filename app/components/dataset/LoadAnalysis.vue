@@ -12,15 +12,16 @@
       type="file"
       accept=".json"
       style="display: none"
-      @change="loadRequestData"
+      @change="handleLoadRequestDataFile"
     />
     <v-icon left dark>fas fa-upload</v-icon>
-    Load skope-request.json file
+    Load skope-request.json file (still in testing beta)
   </v-btn>
 </template>
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import { initializeDataset, loadRequestData } from "@/store/actions";
 
 @Component({})
 class LoadAnalysis extends Vue {
@@ -37,13 +38,19 @@ class LoadAnalysis extends Vue {
    * to select a file
    * @param event A click event
    */
-  loadRequestData(event) {
+  handleLoadRequestDataFile(event) {
     const file = event.target.files[0];
     file.text().then((text) => {
-      console.log("received request data: ", text);
       try {
         const requestData = JSON.parse(text);
-        this.$api().analysis.setRequestData(requestData);
+        console.log(
+          "going to ",
+          requestData.dataset_id,
+          "/",
+          requestData.variable_id
+        );
+        const api = this.$api();
+        const warehouse = this.$warehouse;
         this.$router.push(
           {
             name: "dataset-id-analyze-variable",
@@ -52,8 +59,25 @@ class LoadAnalysis extends Vue {
               variable: requestData.variable_id,
             },
           },
-          function () {
+          async function () {
             console.log("router push completed", requestData);
+            await initializeDataset(
+              warehouse,
+              api,
+              requestData.dataset_id,
+              requestData.variable_id
+            );
+            await loadRequestData(api, requestData);
+          },
+          async function () {
+            console.log("router push aborted", requestData);
+            await initializeDataset(
+              warehouse,
+              api,
+              requestData.dataset_id,
+              requestData.variable_id
+            );
+            await loadRequestData(api, requestData);
           }
         );
       } catch (error) {

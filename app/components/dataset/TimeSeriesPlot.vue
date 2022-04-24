@@ -423,17 +423,30 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.timeSeriesRequestData;
   }
 
-  async mounted() {
+  async fetch() {
+    // only load time series in visualize page
+    console.log("FETCHING IN ", this.$route.name);
+    const api = this.$api();
+    console.log(
+      "what was selected temporal range before: ",
+      this.selectedTemporalRange
+    );
     await loadTimeSeries(this.$api());
+    console.log(
+      "setting form temporal range to selected temporal range: ",
+      this.selectedTemporalRange
+    );
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
-    this.timeSeriesWatch = this.$watch(
-      "timeSeriesRequestData",
-      async function (data) {
-        console.log("Retrieving new time series");
-        await retrieveTimeSeries(this.$api(), data);
-      }
-    );
+    if (this.$route.name === "dataset-id-visualize-variable") {
+      this.timeSeriesWatch = this.$watch(
+        "timeSeriesRequestData",
+        async function (data) {
+          console.log("Retrieving new time series");
+          await retrieveTimeSeries(this.$api(), data);
+        }
+      );
+    }
   }
 
   enableTemporalRangeEdit() {

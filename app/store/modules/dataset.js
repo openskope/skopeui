@@ -35,6 +35,17 @@ const NO_STUDY_AREA_STATUS = {
   ],
 };
 
+function temporalRangeIntersect(firstTemporalRange, secondTemporalRange) {
+  return [
+    firstTemporalRange[0] > secondTemporalRange[0]
+      ? firstTemporalRange[0]
+      : secondTemporalRange[0],
+    firstTemporalRange[1] < secondTemporalRange[1]
+      ? firstTemporalRange[1]
+      : secondTemporalRange[1],
+  ];
+}
+
 function toTemporalRange(metadata) {
   return [
     parseInt(metadata.timespan.period.gte),
@@ -163,7 +174,7 @@ class Dataset extends VuexModule {
       ],
       max_processing_time: DEFAULT_MAX_PROCESSING_TIME,
     };
-    console.log("default request data: ", defaultRequestData);
+    console.log("retrieving default request data: ", defaultRequestData);
     return defaultRequestData;
   }
 
@@ -236,10 +247,11 @@ class Dataset extends VuexModule {
     }
     this.metadata = metadata;
     if (metadata) {
+      console.log("SETTING TEMPORAL RANGE TO METADATA DEFAULT TEMPORAL RANGE");
       this.temporalRange.splice(
         0,
         this.temporalRange.length,
-        ...toTemporalRange(metadata)
+        ...temporalRangeIntersect(this.temporalRange, toTemporalRange(metadata))
       );
     }
   }
@@ -248,6 +260,7 @@ class Dataset extends VuexModule {
   setTemporalRange(temporalRange) {
     console.log("setting temporal range ", temporalRange);
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
+    console.log("TEMPORAL RANGE NOW: ", this.temporalRange);
   }
 
   // takes variable id to set variable object
@@ -273,7 +286,6 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTimeSeries({ timeSeries, numberOfCells, totalCellArea }) {
-    console.log("setting timeseries on dataset: ", timeSeries);
     this.hasData = true;
     this.timeSeries = timeSeries;
     this.numberOfCells = numberOfCells;

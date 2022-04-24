@@ -159,8 +159,7 @@ import Vue from "vue";
 import { Component, Watch } from "nuxt-property-decorator";
 import {
   initializeDataset,
-  initializeDatasetGeoJson,
-  loadRequestData,
+  initializeRequestData,
   retrieveAnalysis,
 } from "@/store/actions";
 import { toISODate, extractYear } from "@/store/stats";
@@ -525,22 +524,19 @@ class Analyze extends Vue {
   async mounted() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
+    // FIXME: assumes year timesteps
     await this.initialize(datasetId, variableId);
   }
 
   async initialize(datasetId, variableId) {
     const api = this.$api();
-    await initializeDataset(this.$warehouse, api, datasetId, variableId);
-  }
-
-  async fetch() {
-    const api = this.$api();
-    await loadRequestData(api);
-    // FIXME: assumes year timesteps
+    api.dataset.setVariable(variableId);
     this.timeRange.lb.year = api.dataset.minYear;
     this.timeRange.ub.year = api.dataset.maxYear;
+    await initializeDataset(this.$warehouse, api, datasetId, variableId);
+    console.log("INITIALIZING");
+    await initializeRequestData(api);
     if (process.client) {
-      initializeDatasetGeoJson(this.$warehouse, api);
       this.requestDataWatcher = this.$watch(
         "analysisRequestData",
         async function (data) {
@@ -570,7 +566,7 @@ class Analyze extends Vue {
     );
   }
 
-  async beforeRouteUpdate(to, from, next) {
+  async beforeRouteUpdate(to, from) {
     await this.initialize(to.params.id, to.params.variable);
   }
 
@@ -580,14 +576,6 @@ class Analyze extends Vue {
     this.zonalStatistic = requestData.zonal_statistic;
     this.loadSmoothingOption(requestData.requested_series_options);
     this.loadTransformOption(requestData.transform);
-    this.$api().dataset.setTemporalRange([
-      extractYear(requestData.time_range.gte),
-      extractYear(requestData.time_range.lte),
-    ]);
-    console.log(
-      "analysis: initializeFormData sets temporal range to ",
-      this.$api().dataset.temporalRange
-    );
   }
 
   loadTransformOption(transform) {
@@ -682,6 +670,10 @@ class Analyze extends Vue {
       return;
     }
     const api = this.$api();
+    if (api.analysis.waitingForResponse) {
+      return;
+    }
+    console.log("updating time series with new request data");
     const requestData = {
       ...api.dataset.defaultApiRequestData,
       // override zonal statistic, transform, time range, and requested series
