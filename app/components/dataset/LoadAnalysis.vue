@@ -15,7 +15,7 @@
       @change="handleLoadRequestDataFile"
     />
     <v-icon left dark>fas fa-upload</v-icon>
-    Load skope-request.json file (still in testing beta)
+    Load skope-request.json file (experimental)
   </v-btn>
 </template>
 <script>

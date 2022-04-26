@@ -2,6 +2,8 @@ import area from "@turf/area";
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
 
+import _ from "lodash";
+
 const LOADING = "loading";
 const SUCCESS = "success";
 const DEFAULT_MAX_PROCESSING_TIME = 8000;
@@ -35,15 +37,18 @@ const NO_STUDY_AREA_STATUS = {
   ],
 };
 
-function temporalRangeIntersect(firstTemporalRange, secondTemporalRange) {
-  return [
-    firstTemporalRange[0] > secondTemporalRange[0]
-      ? firstTemporalRange[0]
-      : secondTemporalRange[0],
-    firstTemporalRange[1] < secondTemporalRange[1]
-      ? firstTemporalRange[1]
-      : secondTemporalRange[1],
-  ];
+function temporalRangeIntersect(candidateTemporalRange, datasetTemporalRange) {
+  const start = _.clamp(
+    candidateTemporalRange[0],
+    datasetTemporalRange[0],
+    datasetTemporalRange[1]
+  );
+  const end = _.clamp(
+    candidateTemporalRange[1],
+    datasetTemporalRange[0],
+    datasetTemporalRange[1]
+  );
+  return [start, end];
 }
 
 function toTemporalRange(metadata) {
@@ -247,18 +252,35 @@ class Dataset extends VuexModule {
     }
     this.metadata = metadata;
     if (metadata) {
-      console.log("SETTING TEMPORAL RANGE TO METADATA DEFAULT TEMPORAL RANGE");
+      const defaultTemporalRange = toTemporalRange(metadata);
+      console.log(
+        "SETTING TEMPORAL RANGE TO METADATA DEFAULT TEMPORAL RANGE: ",
+        defaultTemporalRange
+      );
       this.temporalRange.splice(
         0,
         this.temporalRange.length,
-        ...temporalRangeIntersect(this.temporalRange, toTemporalRange(metadata))
+        ...temporalRangeIntersect(this.temporalRange, defaultTemporalRange)
       );
     }
   }
 
   @Mutation
   setTemporalRange(temporalRange) {
-    console.log("setting temporal range ", temporalRange);
+    console.log(
+      "clamping temporal range ",
+      temporalRange,
+      " to [",
+      this.minYear,
+      ", ",
+      this.maxYear,
+      "]"
+    );
+    temporalRange[0] = _.clamp(temporalRange[0], this.minYear, this.maxYear);
+    temporalRange[1] = _.clamp(temporalRange[1], this.minYear, this.maxYear);
+    if (temporalRange[0] > temporalRange[1]) {
+      temporalRange[0] = temporalRange[1];
+    }
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
     console.log("TEMPORAL RANGE NOW: ", this.temporalRange);
   }

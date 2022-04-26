@@ -281,7 +281,7 @@ class TimeSeriesPlot extends Vue {
 
   set selectedTemporalRange(temporalRange) {
     this.$api().dataset.setTemporalRange(temporalRange);
-    this.$emit("selected-temporal-range", temporalRange);
+    this.$emit("selected-temporal-range", this.selectedTemporalRange);
   }
 
   get temporalRangeMin() {
@@ -425,19 +425,16 @@ class TimeSeriesPlot extends Vue {
 
   async fetch() {
     // only load time series in visualize page
-    console.log("FETCHING IN ", this.$route.name);
     const api = this.$api();
-    console.log(
-      "what was selected temporal range before: ",
-      this.selectedTemporalRange
-    );
-    await loadTimeSeries(this.$api());
+    // clamp temporal range
+    api.dataset.setTemporalRange(api.dataset.temporalRange);
     console.log(
       "setting form temporal range to selected temporal range: ",
       this.selectedTemporalRange
     );
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
+    await loadTimeSeries(this.$api());
     if (this.$route.name === "dataset-id-visualize-variable") {
       this.timeSeriesWatch = this.$watch(
         "timeSeriesRequestData",
@@ -459,7 +456,7 @@ class TimeSeriesPlot extends Vue {
   }
 
   destroyed() {
-    if (this.timeSeriesWatch) {
+    if (this.timeSeriesWatch instanceof Function) {
       this.timeSeriesWatch();
     }
   }

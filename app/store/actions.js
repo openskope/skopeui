@@ -22,14 +22,6 @@ async function updateTimeSeries(api, data) {
     return;
   }
   dataset.setTimeSeriesLoading();
-  const start = time_range.gte;
-  const end = time_range.lte;
-  if (start > end) {
-    // FIXME: api.messages currently unused
-    alert("Please select a start year <= end year");
-    // api.messages.info("Please select a start year before the end year");
-    return;
-  }
   try {
     const response = await api.store.$axios.$post(TIMESERIES_ENDPOINT, data);
     const originalSeries = response.series[0];
