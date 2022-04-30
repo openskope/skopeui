@@ -16,7 +16,7 @@ const EMPTY_RESPONSE = {
 @Module({ stateFactory: true, name: "analysis", namespaced: true })
 class Analysis extends VuexModule {
   // requestData: see
-  // https://api.openskope.org/redoc#operation/retrieveTimeseries
+  // https://api.openskope.org/redoc#operation/retrieve_timeseries_timeseries_post
   // for parameters + descriptions
   requestData = {};
   waitingForResponse = false;
@@ -74,6 +74,11 @@ class Analysis extends VuexModule {
   @Mutation
   setRequestData(requestData) {
     this.requestData = requestData;
+  }
+
+  @Mutation
+  setGeoJson(geoJson) {
+    this.requestData.selected_area = geoJson;
   }
 
   /**

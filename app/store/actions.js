@@ -141,8 +141,16 @@ export async function loadMetadata(api, id) {
 }
 
 export function saveGeoJson(warehouse, api, geoJson) {
-  warehouse.set(api.dataset.geoJsonKey, geoJson);
+  const geoJsonKey = api.dataset.geoJsonKey;
+  console.log("SAVING GEOJSON TO WAREHOUSE WITH KEY: ", geoJsonKey);
+  warehouse.set(geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
+  if (!_.isEmpty(api.analysis.requestData)) {
+    // FIXME: hack to prevent cached geojson
+    // should see if we can unify the dataset + analysis stores 
+    // and make them more coherent to prevent this kind of thing
+    api.analysis.setGeoJson(geoJson);
+  }
 }
 
 export function filterDatasetMetadata(api, filterCriteria) {
