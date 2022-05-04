@@ -551,6 +551,9 @@ class Analyze extends Vue {
               (x) => x.id === this.transformOption
             ).label;
           }
+          else {
+            this.yAxisLabel = "";
+          }
         },
         { immediate: true, deep: true }
       );

@@ -142,7 +142,6 @@ export async function loadMetadata(api, id) {
 
 export function saveGeoJson(warehouse, api, geoJson) {
   const geoJsonKey = api.dataset.geoJsonKey;
-  console.log("SAVING GEOJSON TO WAREHOUSE WITH KEY: ", geoJsonKey);
   warehouse.set(geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
   if (!_.isEmpty(api.analysis.requestData)) {
@@ -202,7 +201,6 @@ export function initializeDatasetGeoJson(warehouse, api) {
   }
   const geoJson = warehouse.get(api.dataset.geoJsonKey) || null;
   api.dataset.setGeoJson(geoJson);
-  console.log("restored geojson from warehouse: ", geoJson);
 }
 
 export function clearGeoJson(warehouse, api) {
