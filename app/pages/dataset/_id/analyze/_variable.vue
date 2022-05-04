@@ -550,8 +550,7 @@ class Analyze extends Vue {
             this.yAxisLabel = this.transformOptions.find(
               (x) => x.id === this.transformOption
             ).label;
-          }
-          else {
+          } else {
             this.yAxisLabel = "";
           }
         },
