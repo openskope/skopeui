@@ -1,5 +1,6 @@
 # Synthesizing Knowledge of Past Environments
 
+[![DOI](https://zenodo.org/badge/159711888.svg)](https://zenodo.org/badge/latestdoi/159711888)
 [![Build/Test Docker Image CI](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml)
 
 This codebase provides a new user interface for the [NSF supported](https://www.openskope.org/skope-nsf-proposal) [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) project.
