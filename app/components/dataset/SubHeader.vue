@@ -1,6 +1,6 @@
 <template>
   <v-row dense align="start" justify="space-between">
-    <v-col cols="12" sm="9">
+    <v-col md="6" sm="9" cols="12">
       <span class="text-h6">
         {{ metadata.title }}
       </span>
