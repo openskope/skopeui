@@ -15,7 +15,6 @@ import { extractYear } from "@/store/stats";
 
 async function updateTimeSeries(api, data) {
   const dataset = api.dataset;
-  const { time_range } = data;
   if (!dataset.canHandleTimeSeriesRequest) {
     console.log("Cannot handle timeseries request. Aborting.");
     dataset.setTimeSeriesNoArea();
@@ -162,6 +161,7 @@ export async function initializeDataset(
   metadataId,
   variableId
 ) {
+  console.log("initializeDataset ", { metadataId, variableId });
   await loadAllDatasetMetadata(api);
   if (metadataId === api.dataset.metadata?.id) {
     console.log(
@@ -216,15 +216,26 @@ export function clearGeoJson(warehouse, api) {
  * @param {*} api
  */
 export async function initializeRequestData(api) {
-  const requestData = api.analysis.requestData;
-  if (_.isEmpty(requestData)) {
-    console.log("request data was empty! setting default data");
-    api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
+  // merge dataset default api request data with existing api request data
+  const analysisRequestData = api.analysis.requestData;
+  const incomingRequestData = api.dataset.defaultApiRequestData;
+  if (!_.isEmpty(analysisRequestData)) {
+    console.log(
+      "Setting transform, zonal_statistic and requested_series_options for request data to ",
+      { analysisRequestData }
+    );
+    incomingRequestData.transform = analysisRequestData.transform;
+    incomingRequestData.zonal_statistic = analysisRequestData.zonal_statistic;
+    incomingRequestData.requested_series_options =
+      analysisRequestData.requested_series_options;
+    console.log("incoming request data: ", { incomingRequestData });
   }
+  api.analysis.setDefaultRequestData(incomingRequestData);
 }
 
 export async function loadRequestData(api, requestData) {
-  // be the source of truth for all things dataset + analysis store related
+  // FIXME: need to be the source of truth for all things dataset + analysis store related
+  // should be able to initialize the dataset + analysis stores from this single call
   api.dataset.setTemporalRange([
     extractYear(requestData.time_range.gte),
     extractYear(requestData.time_range.lte),

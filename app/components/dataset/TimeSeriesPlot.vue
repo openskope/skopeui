@@ -428,10 +428,6 @@ class TimeSeriesPlot extends Vue {
     const api = this.$api();
     // clamp temporal range
     api.dataset.setTemporalRange(api.dataset.temporalRange);
-    console.log(
-      "setting form temporal range to selected temporal range: ",
-      this.selectedTemporalRange
-    );
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
     await loadTimeSeries(this.$api());

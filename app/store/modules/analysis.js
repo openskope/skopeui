@@ -73,6 +73,7 @@ class Analysis extends VuexModule {
 
   @Mutation
   setRequestData(requestData) {
+    console.log("Setting analysis request data: ", { requestData });
     this.requestData = requestData;
   }
 
@@ -82,13 +83,15 @@ class Analysis extends VuexModule {
   }
 
   /**
-   * FIXME: this shouldn't require any arguments but default request data
-   * comes from the dataset store at the moment.
+   * set request data and clear the response
    * @param {} defaultRequestData
    */
   @Mutation
   setDefaultRequestData(defaultRequestData) {
     // clears the response as well
+    console.log("setting analysis request data to default: ", {
+      defaultRequestData,
+    });
     this.requestData = defaultRequestData;
     this.response = EMPTY_RESPONSE;
   }

@@ -564,9 +564,13 @@ class Analyze extends Vue {
     if (this.requestDataWatcher) {
       this.requestDataWatcher();
     }
+    // FIXME: resets the analysis options when we leave this component
+    // is this desired behavior?
+    /*
     this.$api().analysis.setDefaultRequestData(
       this.$api().dataset.defaultApiRequestData
     );
+    */
   }
 
   async beforeRouteUpdate(to, from) {

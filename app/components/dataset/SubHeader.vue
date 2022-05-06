@@ -1,6 +1,6 @@
 <template>
   <v-row dense align="start" justify="space-between">
-    <v-col cols="12" md="6">
+    <v-col cols="12" sm="9">
       <span class="text-h6">
         {{ metadata.title }}
       </span>
@@ -23,9 +23,8 @@
         <span>View the SKOPE user guide (opens in a new tab)</span>
       </v-tooltip>
     </v-col>
-    <v-col>
+    <v-col v-if="selectVariable">
       <v-select
-        v-if="selectVariable"
         v-model="variable"
         label="Select a variable"
         item-color="secondary"
@@ -37,7 +36,7 @@
         outlined
       />
     </v-col>
-    <v-col align="right">
+    <v-col cols="3" class="ml-auto" align="end">
       <!-- slot for next nav button -->
       <slot />
     </v-col>

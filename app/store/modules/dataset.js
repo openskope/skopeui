@@ -37,7 +37,7 @@ const NO_STUDY_AREA_STATUS = {
   ],
 };
 
-function temporalRangeIntersect(candidateTemporalRange, datasetTemporalRange) {
+function clampTemporalRange(candidateTemporalRange, datasetTemporalRange) {
   const start = _.clamp(
     candidateTemporalRange[0],
     datasetTemporalRange[0],
@@ -254,13 +254,13 @@ class Dataset extends VuexModule {
     if (metadata) {
       const defaultTemporalRange = toTemporalRange(metadata);
       console.log(
-        "SETTING TEMPORAL RANGE TO METADATA DEFAULT TEMPORAL RANGE: ",
-        defaultTemporalRange
+        "finding intersection of existing temporal range and dataset default",
+        { currentTemporalRange: this.temporalRange, defaultTemporalRange }
       );
       this.temporalRange.splice(
         0,
         this.temporalRange.length,
-        ...temporalRangeIntersect(this.temporalRange, defaultTemporalRange)
+        ...clampTemporalRange(this.temporalRange, defaultTemporalRange)
       );
     }
   }

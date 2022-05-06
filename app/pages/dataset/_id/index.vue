@@ -69,7 +69,7 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
     Map,
   },
 })
-class DatasetDetail extends Vue {
+class SelectDatasetArea extends Vue {
   stepNames = _.clone(this.$api().app.stepNames);
   shouldConfirmGeometry = true;
 
@@ -128,12 +128,6 @@ class DatasetDetail extends Vue {
     );
   }
 
-  head() {
-    return {
-      title: this.metadata?.title ?? "Select Area",
-    };
-  }
-
   validate({ params }) {
     return /^\w+$/.test(params.id);
   }
@@ -153,7 +147,7 @@ class DatasetDetail extends Vue {
     this.$api().app.setVisited();
   }
 }
-export default DatasetDetail;
+export default SelectDatasetArea;
 </script>
 <style>
 .map-flex {

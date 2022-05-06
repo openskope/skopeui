@@ -39,7 +39,6 @@
           :traces="traces"
           :year-selected="yearSelected"
           @year-selected="setYear"
-          @selected-temporal-range="updateTimeSeries"
         />
       </v-col>
     </v-row>
@@ -53,8 +52,7 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import _ from "lodash";
-import { initializeDataset, initializeRequestData } from "@/store/actions";
-import { toISODate } from "@/store/stats";
+import { initializeDataset } from "@/store/actions";
 
 @Component({
   layout: "DefaultLayout",
@@ -75,13 +73,25 @@ class Visualize extends Vue {
   yearSelected = 1500;
   stepNames = _.clone(this.$api().app.stepNames);
 
-  get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name);
+  async fetch() {
+    const datasetId = this.$route.params.id;
+    const variableId = this.$route.params.variable;
+    const api = this.$api();
+    await initializeDataset(this.$warehouse, api, datasetId, variableId);
+    console.log("visualize fetch completed");
+  }
+
+  async mounted() {
+    const api = this.$api();
+    // await initializeRequestData(api);
+    this.setYear(api.dataset.temporalRangeMin);
+    this.$api().app.setVisited();
+    console.log("visualize mounted");
   }
 
   get hasValidStudyArea() {
-    // return whether study area geometry has been defined
-    return this.currentStep === 0 || this.$api().dataset.hasGeoJson;
+    // returns true if dataset store has a study area geometry
+    return this.$api().dataset.hasGeoJson;
   }
 
   get analyzeLocation() {
@@ -101,36 +111,8 @@ class Visualize extends Vue {
     return [{ ...this.$api().dataset.filteredTimeSeries, type: "scatter" }];
   }
 
-  async fetch() {
-    const datasetId = this.$route.params.id;
-    const variableId = this.$route.params.variable;
-    const api = this.$api();
-    await initializeDataset(this.$warehouse, api, datasetId, variableId);
-  }
-
-  async mounted() {
-    const api = this.$api();
-    await initializeRequestData(api);
-    this.setYear(api.dataset.temporalRangeMin);
-    this.$api().app.setVisited();
-  }
-
   setYear(year) {
     this.yearSelected = year;
-  }
-
-  updateTimeSeries() {
-    const api = this.$api();
-    console.log("submitting to web service");
-    const requestData = {
-      ...api.dataset.defaultApiRequestData,
-      // override time range with values from temporal range
-      time_range: {
-        gte: toISODate(this.temporalRange[0]),
-        lte: toISODate(this.temporalRange[1]),
-      },
-    };
-    api.analysis.setRequestData(requestData);
   }
 }
 
