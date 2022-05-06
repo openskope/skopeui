@@ -162,7 +162,7 @@ import {
   initializeRequestData,
   retrieveAnalysis,
 } from "@/store/actions";
-import { toISODate, extractYear } from "@/store/stats";
+import { toISODate } from "@/store/stats";
 import {
   buildReadme,
   DEFAULT_CENTERED_SMOOTHING_WIDTH,
@@ -437,20 +437,21 @@ class Analyze extends Vue {
 
   get isStudyAreaPolygon() {
     const geojson = this.studyAreaGeoJson;
+    const polygons = ["Polygon", "MultiPolygon"];
     switch (geojson.type) {
       case "Point":
         return false;
       case "Polygon":
+      case "MultiPolygon":
         return true;
       case "Feature":
-        return geojson.geometry.type === "Polygon";
+        return polygons.includes(geojson.geometry.type);
       case "FeatureCollection":
         for (const feature of geojson.features) {
-          if (feature.geometry.type === "Polygon") {
+          if (polygons.includes(feature.geometry.type)) {
             return true;
           }
         }
-        return false;
       default:
         return false;
     }
