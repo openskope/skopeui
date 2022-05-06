@@ -439,8 +439,6 @@ class Analyze extends Vue {
     const geojson = this.studyAreaGeoJson;
     const polygons = ["Polygon", "MultiPolygon"];
     switch (geojson.type) {
-      case "Point":
-        return false;
       case "Polygon":
       case "MultiPolygon":
         return true;

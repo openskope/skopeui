@@ -1,7 +1,7 @@
 {
   "name": "skopeui",
-  "version": "1.0.0",
-  "description": "SkopeUI v2 with VueJS, Nuxt, and Vuetify",
+  "version": "v2022.05.1",
+  "description": "Synthesizing Knowledge of Past Environments: Providing intuitive access to data from the Southwest US Paleoclimate Reconstruction (PaleoCAR), the NASA Shuttle Radar Topographic Mission (SRTM), the Living Blended Drought Atlas (LBDA) (and hopefully more datasets to come!)",
   "author": "Allen Lee",
   "private": true,
   "scripts": {

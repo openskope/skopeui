@@ -128,6 +128,21 @@ class SelectDatasetArea extends Vue {
     );
   }
 
+  head() {
+    if (this.metadata) {
+      return {
+        title: this.metadata.title,
+        meta: [
+          {
+            hid: "description",
+            name: "description",
+            content: this.metadata.description,
+          },
+        ],
+      };
+    }
+  }
+
   validate({ params }) {
     return /^\w+$/.test(params.id);
   }
