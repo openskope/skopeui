@@ -20,6 +20,7 @@
     "@nuxtjs/hapi": "^3.0.0",
     "@nuxtjs/markdownit": "^2.0.0",
     "@nuxtjs/pwa": "^3.3.5",
+    "@nuxtjs/sentry": "^5.1.7",
     "@nuxtjs/vuetify": "^1.11.3",
     "@turf/turf": "^6.3.0",
     "circle-to-polygon": "^2.0.2",

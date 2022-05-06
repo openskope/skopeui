@@ -59,6 +59,8 @@ module.exports = {
     "@nuxtjs/axios",
     // https://www.npmjs.com/package/@nuxtjs/markdownit
     "@nuxtjs/markdownit",
+    // sentry integration
+    "@nuxtjs/sentry",
     [
       "vue-warehouse/nuxt",
       {
@@ -85,6 +87,12 @@ module.exports = {
    */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+  },
+  /*
+   * Sentry configuration
+   */
+  sentry: {
+    dsn: "https://79be8c27ac14446e8af51b6d5f3dc90f@sentry.comses.net/5",
   },
 
   /*
