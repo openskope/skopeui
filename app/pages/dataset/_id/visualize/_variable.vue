@@ -56,10 +56,6 @@ import _ from "lodash";
 import { initializeDataset, initializeRequestData } from "@/store/actions";
 import { toISODate } from "@/store/stats";
 
-const setYearSelected = _.debounce(function (vue) {
-  vue.yearSelected = vue.formYearSelected;
-}, 350);
-
 @Component({
   layout: "DefaultLayout",
   key: function (route) {
