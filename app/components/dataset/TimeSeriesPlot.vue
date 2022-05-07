@@ -1,7 +1,6 @@
 <template>
   <v-card outlined height="100%" width="100%">
-    <LoadingSpinner v-if="isLoading" />
-    <v-card-text v-else-if="isLoaded" style="height: 90%">
+    <v-card-text style="height: 90%">
       <v-toolbar flat class="py-0 my-0">
         <v-row align="baseline" justify="space-between">
           <!-- area -->
@@ -183,14 +182,6 @@
         />
       </client-only>
     </v-card-text>
-    <v-alert v-else class="m-1 p-3" :type="timeSeriesRequestStatus.type">
-      <p
-        v-for="message in timeSeriesRequestStatus.messages"
-        :key="message.value"
-      >
-        {{ message.value }}
-      </p>
-    </v-alert>
   </v-card>
 </template>
 
@@ -292,14 +283,6 @@ class TimeSeriesPlot extends Vue {
 
   get timeSeriesRequestStatus() {
     return this.$api().dataset.timeSeriesRequestStatus;
-  }
-
-  get isLoading() {
-    return this.$api().dataset.isTimeSeriesLoading;
-  }
-
-  get isLoaded() {
-    return this.$api().dataset.isTimeSeriesLoaded;
   }
 
   get selectedAreaInSquareKm() {

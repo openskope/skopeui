@@ -159,6 +159,7 @@ import Vue from "vue";
 import { Component, Watch } from "nuxt-property-decorator";
 import {
   initializeDataset,
+  initializeDatasetGeoJson,
   initializeRequestData,
   retrieveAnalysis,
 } from "@/store/actions";
@@ -166,6 +167,8 @@ import { toISODate } from "@/store/stats";
 import {
   buildReadme,
   DEFAULT_CENTERED_SMOOTHING_WIDTH,
+  SMOOTHING_OPTIONS,
+  TRANSFORM_OPTIONS,
 } from "@/store/modules/constants";
 import _ from "lodash";
 import JSZip from "jszip";
@@ -173,7 +176,6 @@ import Papa from "papaparse";
 
 @Component({
   layout: "DefaultLayout",
-  fetchOnServer: false,
   components: {
     TimeSeriesPlot,
     SubHeader,
@@ -185,7 +187,6 @@ class Analyze extends Vue {
   showSmoothingHint = false;
   showTransformHint = false;
   showZonalStatisticHint = false;
-  requestDataWatcher = null;
   analysisFormValid = true;
   zonalStatistic = "mean";
 
@@ -212,58 +213,6 @@ class Analyze extends Vue {
   };
 
   smoothingOption = "none";
-
-  // constants data structure of available smoothing options to present in the UI
-  smoothingOptions = [
-    {
-      label: "None (time steps individually plotted)",
-      id: "none",
-      type: "NoSmoother",
-      method: "none",
-      toRequestData: function (analyzeVue) {
-        return {
-          type: this.type,
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        analyzeVue.smoothingOption = this.id;
-      },
-    },
-    {
-      label: "Centered Running Average",
-      id: "centeredAverage",
-      method: "centered",
-      type: "MovingAverageSmoother",
-      toRequestData: function (analyzeVue) {
-        return {
-          type: this.type,
-          method: this.method,
-          width: analyzeVue.smoothingTimeStep,
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        analyzeVue.smoothingOption = this.id;
-        analyzeVue.smoothingTimeStep = requestData.width;
-      },
-    },
-    {
-      label: "Trailing Running Average (- window width)",
-      id: "trailingAverage",
-      method: "trailing",
-      type: "MovingAverageSmoother",
-      toRequestData: function (analyzeVue) {
-        return {
-          type: this.type,
-          method: this.method,
-          width: analyzeVue.smoothingTimeStep,
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        analyzeVue.smoothingOption = this.id;
-        analyzeVue.smoothingTimeStep = requestData.width;
-      },
-    },
-  ];
 
   smoothingTimeStep = DEFAULT_CENTERED_SMOOTHING_WIDTH;
 
@@ -293,77 +242,6 @@ class Analyze extends Vue {
     }
   }
 
-  // constants data structure for available transform options to display in the UI
-  transformOptions = [
-    {
-      label: "None: Modeled values displayed",
-      id: "none",
-      type: "NoTransform",
-      toRequestData: function () {
-        return {
-          type: this.type,
-        };
-      },
-      fromRequestData: function (analyzeVue) {
-        analyzeVue.transformOption = this.id;
-      },
-    },
-    {
-      label: "Z-Score wrt selected interval",
-      id: "zscoreSelected",
-      type: "ZScoreFixedInterval",
-      toRequestData: function () {
-        return {
-          type: this.type,
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        if (requestData.time_range) {
-          // FIXME: refactor this, we have two mappings for ZScoreFixedIntervals and
-          // the only way to disambiguate them at the moment is testing for requestData.time_range
-          analyzeVue.transformOption = "zscoreFixed";
-          analyzeVue.time_range = requestData.time_range;
-        } else {
-          analyzeVue.transformOption = this.id;
-        }
-      },
-    },
-    {
-      label: "Z-Score wrt fixed interval",
-      id: "zscoreFixed",
-      type: "ZScoreFixedInterval",
-      toRequestData: function (analyzeVue) {
-        return {
-          type: this.type,
-          time_range: {
-            gte: toISODate(analyzeVue.timeRange.lb.year),
-            lte: toISODate(analyzeVue.timeRange.ub.year),
-          },
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        // FIXME: this does not get called due to multiple mappings for ZScoreFixedIntervals
-        analyzeVue.transformOption = this.id;
-        analyzeVue.time_range = requestData.time_range;
-      },
-    },
-    {
-      label: "Z-Score wrt moving interval",
-      id: "zscoreMoving",
-      type: "ZScoreMovingInterval",
-      toRequestData: function (analyzeVue) {
-        return {
-          type: this.type,
-          width: analyzeVue.zScoreMovingIntervalTimeSteps,
-        };
-      },
-      fromRequestData: function (analyzeVue, requestData) {
-        analyzeVue.transformOption = this.id;
-        analyzeVue.zScoreMovingIntervalTimeSteps = requestData.width;
-      },
-    },
-  ];
-
   statisticsHeaders = [
     {
       text: "Series",
@@ -391,6 +269,14 @@ class Analyze extends Vue {
   yAxisLabel = null;
 
   // --------- GETTERS ---------
+
+  get transformOptions() {
+    return TRANSFORM_OPTIONS;
+  }
+
+  get smoothingOptions() {
+    return SMOOTHING_OPTIONS;
+  }
 
   get summaryStatistics() {
     if (this.$api().analysis.summaryStatistics.length === 0) {
@@ -437,6 +323,9 @@ class Analyze extends Vue {
 
   get isStudyAreaPolygon() {
     const geojson = this.studyAreaGeoJson;
+    if (!geojson) {
+      return false;
+    }
     const polygons = ["Polygon", "MultiPolygon"];
     switch (geojson.type) {
       case "Polygon":
@@ -514,54 +403,29 @@ class Analyze extends Vue {
     return this.$api().analysis.requestData;
   }
 
-  get variable() {
-    return this.$api().dataset.variable;
-  }
-
   // --------- LIFECYCLE HOOKS ---------
 
-  async mounted() {
+  async fetch() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
     // FIXME: assumes year timesteps
-    await this.initialize(datasetId, variableId);
-  }
-
-  async initialize(datasetId, variableId) {
     const api = this.$api();
-    api.dataset.setVariable(variableId);
+    await initializeDataset(this.$warehouse, api, datasetId, variableId);
     this.timeRange.lb.year = api.dataset.minYear;
     this.timeRange.ub.year = api.dataset.maxYear;
-    await initializeDataset(this.$warehouse, api, datasetId, variableId);
-    console.log("INITIALIZING");
-    await initializeRequestData(api);
-    if (process.client) {
-      this.requestDataWatcher = this.$watch(
-        "analysisRequestData",
-        async function (data) {
-          console.log(
-            "analysis request data changed, initializing form and retrieving from API: ",
-            data
-          );
-          await this.initializeFormData(data);
-          await retrieveAnalysis(api, data);
-          if (this.hasTransformOption) {
-            this.yAxisLabel = this.transformOptions.find(
-              (x) => x.id === this.transformOption
-            ).label;
-          } else {
-            this.yAxisLabel = "";
-          }
-        },
-        { immediate: true, deep: true }
-      );
-    }
+    console.log("INITIALIZED");
+  }
+
+  async mounted() {
+    const api = this.$api();
+    await initializeDatasetGeoJson(this.$warehouse, api);
+    api.analysis.setGeoJson(api.dataset.geoJson);
+    const requestData = await initializeRequestData(api);
+    await this.initializeFormData(requestData);
+    console.log("CLIENT SIDE MOUNT");
   }
 
   destroyed() {
-    if (this.requestDataWatcher) {
-      this.requestDataWatcher();
-    }
     // FIXME: resets the analysis options when we leave this component
     // is this desired behavior?
     /*
@@ -571,9 +435,11 @@ class Analyze extends Vue {
     */
   }
 
+  /*
   async beforeRouteUpdate(to, from) {
     await this.initialize(to.params.id, to.params.variable);
   }
+  */
 
   // --------- METHODS ---------
 
@@ -609,11 +475,10 @@ class Analyze extends Vue {
 
   clearTransformedTimeSeries() {
     // clear smoothingOption and transformOption
+    const api = this.$api();
     this.smoothingOption = "none";
     this.transformOption = "none";
-    this.$api().analysis.setDefaultRequestData(
-      this.$api().dataset.defaultApiRequestData
-    );
+    api.analysis.setDefaultRequestData(api.dataset.defaultApiRequestData);
   }
 
   tracesAsArrayOfObjects() {
@@ -662,12 +527,26 @@ class Analyze extends Vue {
     return `${requestData.dataset_id}_${requestData.variable_id}`;
   }
 
+  @Watch("analysisRequestData")
+  async updateAnalysisRequestData() {
+    console.log("Watching analysis store request data triggered");
+    const data = this.analysisRequestData;
+    await this.initializeFormData(data);
+    await retrieveAnalysis(this.$api(), data);
+    if (this.hasTransformOption) {
+      this.yAxisLabel = this.transformOptions.find(
+        (x) => x.id === this.transformOption
+      ).label;
+    } else {
+      this.yAxisLabel = "";
+    }
+  }
+
   /**
    * Invoked when the user submits a request for statistics or a different temporal range.
    * Makes a request to skope-api with a new requested series and updates TimeSeriesPlot
    * with the response time series.
    */
-  @Watch("variable")
   async updateTimeSeries() {
     // grab form inputs and set them on the store
     if (!this.analysisFormValid) {

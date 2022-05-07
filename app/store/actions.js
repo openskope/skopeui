@@ -74,6 +74,8 @@ export const loadTimeSeries = _.debounce(async function (api) {
   if (dataset.canHandleTimeSeriesRequest) {
     console.log("loading time series with ", dataset.timeSeriesRequestData);
     updateTimeSeries(api, dataset.timeSeriesRequestData);
+  } else {
+    console.log("cannot handle time series request: ");
   }
 }, 300);
 
@@ -219,18 +221,23 @@ export async function initializeRequestData(api) {
   // merge dataset default api request data with existing api request data
   const analysisRequestData = api.analysis.requestData;
   const incomingRequestData = api.dataset.defaultApiRequestData;
-  if (!_.isEmpty(analysisRequestData)) {
-    console.log(
-      "Setting transform, zonal_statistic and requested_series_options for request data to ",
-      { analysisRequestData }
-    );
+  console.log(
+    "Setting transform, zonal_statistic and requested_series_options for request data to ",
+    { analysisRequestData }
+  );
+  if (analysisRequestData?.transform) {
     incomingRequestData.transform = analysisRequestData.transform;
+  }
+  if (analysisRequestData?.zonal_statistic) {
     incomingRequestData.zonal_statistic = analysisRequestData.zonal_statistic;
+  }
+  if (analysisRequestData?.requested_series_options) {
     incomingRequestData.requested_series_options =
       analysisRequestData.requested_series_options;
-    console.log("incoming request data: ", { incomingRequestData });
   }
+  console.log("incoming request data: ", { incomingRequestData });
   api.analysis.setDefaultRequestData(incomingRequestData);
+  return incomingRequestData;
 }
 
 export async function loadRequestData(api, requestData) {

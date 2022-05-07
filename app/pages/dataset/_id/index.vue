@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="fill-height">
-    <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+    <LoadingSpinner v-if="isLoadingMetadata"></LoadingSpinner>
     <template v-else>
       <SubHeader>
         <v-btn
@@ -87,7 +87,7 @@ class SelectDatasetArea extends Vue {
     this.shouldConfirmGeometry = value;
   }
 
-  get isLoading() {
+  get isLoadingMetadata() {
     return this.metadata == null;
   }
 

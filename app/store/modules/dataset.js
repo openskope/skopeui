@@ -1,20 +1,17 @@
 import area from "@turf/area";
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
+import { DEFAULT_MAX_PROCESSING_TIME } from "@/store/modules/constants";
 
 import _ from "lodash";
 
-const LOADING = "loading";
-const SUCCESS = "success";
-const DEFAULT_MAX_PROCESSING_TIME = 8000;
-
 const LOADING_STATUS = {
-  status: LOADING,
+  status: "loading",
   type: "info",
   messages: [{ type: "info", value: "Loading time series data." }],
 };
 const SUCCESS_STATUS = {
-  status: SUCCESS,
+  status: "success",
   type: "info",
   messages: [{ type: "info", value: "Success" }],
 };
@@ -154,14 +151,6 @@ class Dataset extends VuexModule {
    */
   get temporalRangeMax() {
     return this.temporalRange[1];
-  }
-
-  get isTimeSeriesLoading() {
-    return this.timeSeriesRequestStatus.status === LOADING;
-  }
-
-  get isTimeSeriesLoaded() {
-    return this.timeSeriesRequestStatus.status === SUCCESS;
   }
 
   get defaultApiRequestData() {
