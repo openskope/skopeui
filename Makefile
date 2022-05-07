@@ -2,11 +2,8 @@ include config.mk
 
 .DEFAULT_GOAL := build
 LOG_DATA_PATH=docker/logs
-SENTRY_DSN_PATH=secrets/sentry_dsn
 # FIXME: mail api currently unused until we need email from the app
 MAIL_API_KEY_PATH=secrets/mail_api_key
-SENTRY_DSN=$(shell cat $(SENTRY_DSN_PATH))
-SECRETS=$(SENTRY_DSN_PATH)
 BUILD_CONSTANTS_PATH=app/store/modules/_constants.js
 BUILD_ID=$(shell git describe --tags --abbrev=1)
 
@@ -14,7 +11,6 @@ BUILD_ID=$(shell git describe --tags --abbrev=1)
 $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk
 	envsubst < app/store/modules/_constants.js.template > app/store/modules/_constants.js
 	@echo 'export const BUILD_ID = "${BUILD_ID}";' >> $(BUILD_CONSTANTS_PATH)
-	@echo 'export const SENTRY_DSN = "${SENTRY_DSN}";' >> $(BUILD_CONSTANTS_PATH)
 
 .PHONY: build | secrets
 build: docker-compose.yml app/store/modules/_constants.js
@@ -38,9 +34,6 @@ $(LOG_DATA_PATH):
 
 $(MAIL_API_KEY_PATH): | secrets
 	touch "$(MAIL_API_KEY_PATH)"
-
-$(SENTRY_DSN_PATH): | secrets
-	touch "$(SENTRY_DSN_PATH)"
 
 DEPLOY_ENVIRONMENT ?= dev
 docker-compose.yml: base.yml config.mk $(DEPLOY_ENVIRONMENT).yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)

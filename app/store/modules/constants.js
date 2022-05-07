@@ -4,6 +4,7 @@ import {
   GEOSERVER_HOST_URL,
   BUILD_ID,
 } from "@/store/modules/_constants";
+
 export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
 export const DEFAULT_CENTERED_SMOOTHING_WIDTH = 11;
 export const DEFAULT_MAX_PROCESSING_TIME = 10000; // in ms
