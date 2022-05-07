@@ -55,7 +55,6 @@ class SubHeader extends Vue {
   @Prop({ default: false })
   selectVariable;
 
-  stepNames = _.clone(this.$api().app.stepNames);
   showInstructions = false;
 
   get metadata() {
@@ -69,11 +68,6 @@ class SubHeader extends Vue {
   set variable(variableId) {
     const id = this.$route.params.id;
     const name = this.$route.name;
-    console.log("route name: ", name);
-    if (name === "dataset-id-analyze-variable") {
-      console.log("setting analysis request data variable id: ", variableId);
-    } else {
-    }
     this.$api().dataset.setVariable(variableId);
     this.$router.push({
       name,
@@ -86,10 +80,6 @@ class SubHeader extends Vue {
 
   get variables() {
     return this.metadata.variables;
-  }
-
-  get currentStep() {
-    return this.stepNames.findIndex((x) => x === this.$route.name);
   }
 
   location(variable) {

@@ -96,15 +96,19 @@ class Dataset extends VuexModule {
     return this.geoJson != null;
   }
 
+  get hasMetadata() {
+    return this.metadata != null;
+  }
+
   get geoJsonKey() {
-    if (this.metadata == null) {
-      return "skope:geometry";
+    if (this.hasMetadata) {
+      return `geojson:${this.metadata.id}`;
     }
-    return `geojson:${this.metadata.id}`;
+    return "skope:geometry";
   }
 
   get canHandleTimeSeriesRequest() {
-    return this.metadata != null && this.hasGeoJson && this.variable != null;
+    return this.hasMetadata && this.hasGeoJson && this.variable != null;
   }
 
   get selectedAreaInSquareMeters() {
@@ -132,7 +136,7 @@ class Dataset extends VuexModule {
   }
 
   get timespan() {
-    if (this.metadata) {
+    if (this.hasMetadata) {
       return toTemporalRange(this.metadata);
     }
     return [1, new Date().getFullYear()];
@@ -282,7 +286,7 @@ class Dataset extends VuexModule {
       temporalRange[0] = temporalRange[1];
     }
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
-    console.log("TEMPORAL RANGE NOW: ", this.temporalRange);
+    console.log("SET TEMPORAL RANGE to: ", this.temporalRange);
   }
 
   // takes variable id to set variable object
@@ -298,6 +302,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setGeoJson(geoJson) {
+    console.log("Setting geojson on dataset");
     this.geoJson = geoJson;
   }
 

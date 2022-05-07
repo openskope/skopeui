@@ -198,7 +198,6 @@
 import Vue from "vue";
 import _ from "lodash";
 import { Component, Prop, Watch } from "nuxt-property-decorator";
-import { loadTimeSeries, retrieveTimeSeries } from "@/store/actions";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 @Component({
@@ -233,7 +232,6 @@ class TimeSeriesPlot extends Vue {
   localTemporalRangeMax = 2020;
   isTemporalRangeEditable = false;
   isTemporalRangeValid = false;
-  timeSeriesWatch = null;
 
   get timeStepsLabel() {
     const timeSteps =
@@ -423,23 +421,12 @@ class TimeSeriesPlot extends Vue {
     return this.$api().dataset.timeSeriesRequestData;
   }
 
-  async fetch() {
-    // only load time series in visualize page
+  mounted() {
     const api = this.$api();
     // clamp temporal range
     api.dataset.setTemporalRange(api.dataset.temporalRange);
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
-    await loadTimeSeries(this.$api());
-    if (this.$route.name === "dataset-id-visualize-variable") {
-      this.timeSeriesWatch = this.$watch(
-        "timeSeriesRequestData",
-        async function (data) {
-          console.log("Retrieving new time series");
-          await retrieveTimeSeries(this.$api(), data);
-        }
-      );
-    }
   }
 
   enableTemporalRangeEdit() {
@@ -449,12 +436,6 @@ class TimeSeriesPlot extends Vue {
     this.localTemporalRangeMin = this.selectedTemporalRange[0];
     this.localTemporalRangeMax = this.selectedTemporalRange[1];
     this.isTemporalRangeEditable = true;
-  }
-
-  destroyed() {
-    if (this.timeSeriesWatch instanceof Function) {
-      this.timeSeriesWatch();
-    }
   }
 
   validateMinYear(value) {

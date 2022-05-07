@@ -52,7 +52,12 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Vue from "vue";
 import _ from "lodash";
-import { initializeDataset } from "@/store/actions";
+import {
+  initializeDataset,
+  initializeDatasetGeoJson,
+  loadTimeSeries,
+  retrieveTimeSeries,
+} from "@/store/actions";
 
 @Component({
   layout: "DefaultLayout",
@@ -72,21 +77,46 @@ class Visualize extends Vue {
   // propagates back down to the map and time series plot components
   yearSelected = 1500;
   stepNames = _.clone(this.$api().app.stepNames);
+  timeSeriesWatch = null;
 
   async fetch() {
     const datasetId = this.$route.params.id;
     const variableId = this.$route.params.variable;
-    const api = this.$api();
-    await initializeDataset(this.$warehouse, api, datasetId, variableId);
-    console.log("visualize fetch completed");
+    await initializeDataset(
+      this.$warehouse,
+      this.$api(),
+      datasetId,
+      variableId
+    );
   }
 
   async mounted() {
     const api = this.$api();
-    // await initializeRequestData(api);
+    await initializeDatasetGeoJson(this.$warehouse, api);
+    this.timeSeriesWatch = this.$watch(
+      "timeSeriesRequestData",
+      async function (data) {
+        if (data) {
+          console.log("Retrieving new time series: ", { data });
+          await retrieveTimeSeries(api, data);
+        } else {
+          console.log("loading default time series: ", {
+            data: api.dataset.defaultApiRequestData,
+          });
+          await loadTimeSeries(api);
+        }
+      },
+      { immediate: true }
+    );
     this.setYear(api.dataset.temporalRangeMin);
-    this.$api().app.setVisited();
+    api.app.setVisited();
     console.log("visualize mounted");
+  }
+
+  destroyed() {
+    if (this.timeSeriesWatch instanceof Function) {
+      this.timeSeriesWatch();
+    }
   }
 
   get hasValidStudyArea() {
