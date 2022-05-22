@@ -15,5 +15,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: set up config.mk
       run: envsubst < config.mk.template > config.mk
+    - name: convert CITATION.cff into citation text file for build constants
+      uses: citation-file-format/cffconvert-github-action@2.0.0
+      with:
+        args: "-f apalike -o _citation.txt"
     - name: Build nuxt site for production deployment
       run: make buildprod

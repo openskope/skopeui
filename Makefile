@@ -13,9 +13,9 @@ $(CITATION_TXT_FILE):
 
 .PHONY: $(BUILD_CONSTANTS_PATH)
 $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk $(CITATION_TXT_FILE)
-	@echo 'export const CITATION_TXT = "$(shell cat _citation.txt)";' > $(BUILD_CONSTANTS_PATH)
+	echo 'export const CITATION_TXT = "$(shell cat _citation.txt)";' > $(BUILD_CONSTANTS_PATH)
 	envsubst < app/store/modules/_constants.js.template >> $(BUILD_CONSTANTS_PATH)
-	@echo 'export const BUILD_ID = "${BUILD_ID}";' >> $(BUILD_CONSTANTS_PATH)
+	echo 'export const BUILD_ID = "${BUILD_ID}";' >> $(BUILD_CONSTANTS_PATH)
 
 .PHONY: build | secrets
 build: docker-compose.yml $(BUILD_CONSTANTS_PATH)
