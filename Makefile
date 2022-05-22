@@ -46,7 +46,7 @@ docker-compose.yml: base.yml config.mk $(DEPLOY_ENVIRONMENT).yml $(LOG_DATA_PATH
 	docker-compose -f base.yml -f $(DEPLOY_ENVIRONMENT).yml config > docker-compose.yml
 
 .PHONY: buildprod
-buildprod: build
+buildprod: build lint
 	docker-compose run --rm web yarn build
 
 .PHONY: lint
