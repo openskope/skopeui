@@ -32,13 +32,10 @@
           </p>
 
           <h2>Example reference</h2>
-          <p class="text-body-1">(SKOPE 2021)</p>
+          <p class="text-body-1">(SKOPE 2022)</p>
 
           <h2>Example Citation</h2>
-          <blockquote class="blockquote">
-            SKOPE 2021 SKOPE: Synthesizing Knowledge of Past Environments.
-            https://app.openskope.org/. Accessed 1 July 2021.
-          </blockquote>
+          <blockquote class="blockquote">{{ citationText }}</blockquote>
 
           <h2>Contact us</h2>
           <p class="text-body-1">
@@ -69,6 +66,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
+import { CITATION_TXT } from "@/store/modules/_constants";
 
 @Component()
 class TermsOfUse extends Vue {
@@ -78,6 +76,10 @@ class TermsOfUse extends Vue {
     if (process.client) {
       this.showTerms = !this.$warehouse.get(this.termsAcceptedWarehouseKey);
     }
+  }
+
+  get citationText() {
+    return CITATION_TXT;
   }
 
   get termsAcceptedWarehouseKey() {

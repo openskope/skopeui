@@ -1,6 +1,7 @@
 # backups
 *~
 # docker generated things
+_citation.txt
 config.mk
 secrets/
 docker-compose.yml
