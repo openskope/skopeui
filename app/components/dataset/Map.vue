@@ -296,13 +296,6 @@ class Map extends Vue {
         this.drawnItems.clearLayers();
         if (geoJson === null) {
           this.disableEditOnly(map);
-          console.log(
-            "fitting to metadata bounds: ",
-            this.metadata.region.extents
-          );
-          map.fitBounds(this.metadata.region.extents, {
-            padding: this.defaultBoundsPadding,
-          });
         } else {
           this.renderSelectedArea(geoJson, map);
         }

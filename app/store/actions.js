@@ -126,7 +126,9 @@ export async function loadAllDatasetMetadata(api) {
     } catch (e) {
       console.error(e);
       // should start to use the messages component to display user messages
-      alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
+      if (process.client) {
+        alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
+      }
     }
   } else {
     console.log(
@@ -176,10 +178,12 @@ export async function initializeDataset(
   }
   const datasetMetadata = await api.metadata.find(metadataId);
   if (datasetMetadata === null) {
-    alert(
-      "Please try again later, we were unable to locate dataset metadata for " +
-        metadataId
-    );
+    if (process.client) {
+      alert(
+        "Please try again later, we were unable to locate dataset metadata for " +
+          metadataId
+      );
+    }
     return;
   }
   api.dataset.setMetadata(datasetMetadata);
