@@ -2,6 +2,8 @@
 
 FROM node:lts-bullseye
 
+ENV NODE_OPTIONS="--openssl-legacy-provider"
+
 LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
 
 EXPOSE 3000
