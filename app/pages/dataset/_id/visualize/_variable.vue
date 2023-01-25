@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { Component } from "nuxt-property-decorator";
+import { Component, Watch } from "nuxt-property-decorator";
 import Map from "@/components/dataset/Map.vue";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
@@ -117,6 +117,10 @@ class Visualize extends Vue {
     if (this.timeSeriesWatch instanceof Function) {
       this.timeSeriesWatch();
     }
+  }
+
+  get timeSeriesRequestData() {
+    return this.$api().dataset.timeSeriesRequestData;
   }
 
   get hasValidStudyArea() {
