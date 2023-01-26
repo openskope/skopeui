@@ -19,7 +19,7 @@ $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk $(CI
 
 .PHONY: build | secrets
 build: docker-compose.yml $(BUILD_CONSTANTS_PATH)
-	docker-compose build --pull
+	docker compose build --pull
 
 .PHONY: secrets
 secrets: $(SECRETS)
@@ -43,16 +43,16 @@ $(MAIL_API_KEY_PATH): | secrets
 DEPLOY_ENVIRONMENT ?= dev
 docker-compose.yml: base.yml config.mk $(DEPLOY_ENVIRONMENT).yml $(LOG_DATA_PATH) $(BUILD_CONSTANTS_PATH)
 	@echo "DEPLOY_ENVIRONMENT: $(DEPLOY_ENVIRONMENT)"
-	docker-compose -f base.yml -f $(DEPLOY_ENVIRONMENT).yml config > docker-compose.yml
+	docker compose -f base.yml -f $(DEPLOY_ENVIRONMENT).yml config > docker-compose.yml
 
 .PHONY: buildprod
 buildprod: build
-	docker-compose run --rm web yarn build
+	docker compose run --rm web yarn build
 
 .PHONY: lint
 lint: build
-	docker-compose run --rm web yarn lintfix
+	docker compose run --rm web yarn lintfix
 
 .PHONY: deploy
 deploy: build
-	docker-compose up -d 
+	docker compose up -d 
