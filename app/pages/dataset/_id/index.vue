@@ -70,7 +70,6 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
   },
 })
 class SelectDatasetArea extends Vue {
-  stepNames = _.clone(this.$api().app.stepNames);
   shouldConfirmGeometry = true;
 
   get confirmGeometry() {
@@ -89,6 +88,10 @@ class SelectDatasetArea extends Vue {
 
   get isLoadingMetadata() {
     return this.metadata == null;
+  }
+
+  get stepNames() {
+    return this.$api().app.stepNames;
   }
 
   get currentStep() {
@@ -140,6 +143,29 @@ class SelectDatasetArea extends Vue {
           },
         ],
       };
+    }
+  }
+
+  asyncData({ req, res }) {
+    if (process.server) {
+      if (req.method === "POST") {
+        console.log("incoming request: ", req.body);
+        const qs = require("querystring");
+        let body = "";
+        let data = "";
+        while ((data = req.read())) {
+          body += data;
+        }
+        const postData = qs.parse(body);
+        console.log(
+          "XXX: posted geojson, now do something with it: ",
+          postData
+        );
+        const geoJsonData = JSON.parse(postData.data);
+        console.log("geo json data: ", geoJsonData);
+      } else {
+        console.log("not a post request");
+      }
     }
   }
 
