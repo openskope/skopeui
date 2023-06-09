@@ -59,7 +59,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Map from "@/components/dataset/Map.vue";
 
-import { initializeDataset, clearGeoJson } from "@/store/actions";
+import { initializeDataset, saveGeoJson, clearGeoJson } from "@/store/actions";
 
 @Component({
   layout: "DefaultLayout",
@@ -71,6 +71,7 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
 })
 class SelectDatasetArea extends Vue {
   shouldConfirmGeometry = true;
+  formPostGeoJson = "";
 
   get confirmGeometry() {
     return (
@@ -107,12 +108,6 @@ class SelectDatasetArea extends Vue {
     return this.$api().dataset.hasGeoJson;
   }
 
-  get selectedArea() {
-    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
-      2
-    );
-  }
-
   get visualizeLocation() {
     const id = this.$route.params.id;
     const variable = this.$api().dataset.variable.id;
@@ -129,6 +124,13 @@ class SelectDatasetArea extends Vue {
       datasetId,
       variableId
     );
+  }
+
+  mounted() {
+    if (this.formPostGeoJson) {
+      saveGeoJson(this.$warehouse, this.$api(), this.formPostGeoJson);
+      this.formPostGeoJson = "";
+    }
   }
 
   head() {
@@ -149,7 +151,6 @@ class SelectDatasetArea extends Vue {
   asyncData({ req, res }) {
     if (process.server) {
       if (req.method === "POST") {
-        console.log("incoming request: ", req.body);
         const qs = require("querystring");
         let body = "";
         let data = "";
@@ -161,8 +162,7 @@ class SelectDatasetArea extends Vue {
           "XXX: posted geojson, now do something with it: ",
           postData
         );
-        const geoJsonData = JSON.parse(postData.data);
-        console.log("geo json data: ", geoJsonData);
+        return { formPostGeoJson: postData.studyArea };
       } else {
         console.log("not a post request");
       }

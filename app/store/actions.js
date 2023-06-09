@@ -148,9 +148,9 @@ export function saveGeoJson(warehouse, api, geoJson) {
   warehouse.set(geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
   if (!_.isEmpty(api.analysis.requestData)) {
-    // FIXME: hack to prevent cached geojson
-    // should see if we can unify the dataset + analysis stores
-    // and make them more coherent to prevent this kind of thing
+    // FIXME: needed to prevent cached geojson from lingering in the analysis store
+    // should see if we can unify the dataset + analysis store apis
+    // and make them more coherent to reduce the need for this kind of manual updating
     api.analysis.setGeoJson(geoJson);
   }
 }
