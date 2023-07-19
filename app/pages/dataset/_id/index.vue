@@ -61,6 +61,22 @@ import Map from "@/components/dataset/Map.vue";
 
 import { initializeDataset, saveGeoJson, clearGeoJson } from "@/store/actions";
 
+function getBody(request) {
+  const qs = require("querystring");
+  return new Promise((resolve) => {
+    const bodyArray = [];
+    let body;
+    request
+      .on("data", (chunk) => {
+        bodyArray.push(chunk);
+      })
+      .on("end", () => {
+        body = Buffer.concat(bodyArray).toString();
+        resolve(qs.parse(body));
+      });
+  });
+}
+
 @Component({
   layout: "DefaultLayout",
   components: {
@@ -150,20 +166,11 @@ class SelectDatasetArea extends Vue {
     }
   }
 
-  asyncData({ req, res }) {
+  async asyncData({ req, res }) {
     if (process.server) {
       if (req.method === "POST") {
-        const qs = require("querystring");
-        let body = "";
-        let data = "";
-        while ((data = req.read())) {
-          body += data;
-        }
-        const postData = qs.parse(body);
-        console.log(
-          "XXX: posted geojson, now do something with it: ",
-          postData
-        );
+        const postData = await getBody(req);
+        console.log("Received POST data: ", postData);
         if (postData) {
           try {
             const studyAreaGeoJson = JSON.parse(postData.studyArea);
@@ -172,6 +179,8 @@ class SelectDatasetArea extends Vue {
             console.log("error parsing geojson: ", e);
           }
         }
+        let body = "";
+        let chunk = "";
       } else {
         console.log("not a post request");
       }
