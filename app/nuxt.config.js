@@ -96,29 +96,6 @@ module.exports = {
   },
 
   /*
-   ** use bell auth configuration instead: https://github.com/hapijs/bell
-   */
-  auth: {
-    keys: {
-      GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || "",
-      GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || "",
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
-      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
-    },
-    COOKIE_ENCRYPTION_PASSWORD: process.env.SECRET_KEY,
-    strategies: {
-      github: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-      },
-      google: {
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      },
-    },
-  },
-
-  /*
    ** process environment variables
    */
   env: {},
