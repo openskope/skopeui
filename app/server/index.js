@@ -8,7 +8,8 @@ const server = new Server({
   port: process.env.PORT || 3000,
 });
 
-server.register([
+server
+  .register([
     {
       plugin: HapiNuxt,
     },
