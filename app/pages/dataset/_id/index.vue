@@ -142,15 +142,6 @@ class SelectDatasetArea extends Vue {
     );
   }
 
-  mounted() {
-    console.log("MOUNTED");
-    if (this.formPostGeoJson) {
-      console.log("form post geojson: ", this.formPostGeoJson);
-      this.shouldConfirmGeometry = false;
-      saveGeoJson(this.$warehouse, this.$api(), this.formPostGeoJson);
-    }
-  }
-
   head() {
     if (this.metadata) {
       return {
@@ -170,7 +161,10 @@ class SelectDatasetArea extends Vue {
     if (process.server) {
       if (req.method === "POST") {
         const postData = await getBody(req);
-        console.log("Received POST data: ", postData);
+        console.log(
+          "Received POST data, attempting to parse as geojson",
+          postData
+        );
         if (postData) {
           try {
             const studyAreaGeoJson = JSON.parse(postData.studyArea);
@@ -179,8 +173,6 @@ class SelectDatasetArea extends Vue {
             console.log("error parsing geojson: ", e);
           }
         }
-        let body = "";
-        let chunk = "";
       } else {
         console.log("not a post request");
       }

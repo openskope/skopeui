@@ -18,6 +18,7 @@ class Analysis extends VuexModule {
   // requestData: see
   // https://api.openskope.org/redoc#operation/retrieve_timeseries_timeseries_post
   // for parameters + descriptions
+  // FIXME: requestData.selected_area should be synced with the dataset store's geoJson
   requestData = {};
   waitingForResponse = false;
   response = EMPTY_RESPONSE;
@@ -79,6 +80,7 @@ class Analysis extends VuexModule {
 
   @Mutation
   setGeoJson(geoJson) {
+    console.log("Setting analysis selected_area");
     this.requestData.selected_area = geoJson;
   }
 

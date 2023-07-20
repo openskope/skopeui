@@ -90,7 +90,6 @@ const updateAnalysis = _.debounce(async function (api, data) {
 }, 300);
 
 export async function retrieveAnalysis(api, data) {
-  console.log("RETRIEVING ANALYSIS");
   if (!isValidRequestData(data)) {
     console.log(
       "Unable to retrieve analysis with invalid request data: ",
@@ -98,7 +97,7 @@ export async function retrieveAnalysis(api, data) {
     );
     return;
   }
-  // reload skope geometry + temporal range
+  // update dataset store's skope geometry + temporal range
   api.dataset.setGeoJson(data.selected_area);
   api.dataset.setTemporalRange([
     extractYear(data.time_range.gte),
