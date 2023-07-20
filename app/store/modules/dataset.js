@@ -7,19 +7,17 @@ import _ from "lodash";
 
 const LOADING_STATUS = {
   status: "loading",
-  type: "info",
-  messages: [{ type: "info", value: "Loading time series data." }],
+  messages: [{ type: "warning", value: "Loading time series data." }],
 };
 const SUCCESS_STATUS = {
   status: "success",
-  type: "info",
   messages: [{ type: "info", value: "Success" }],
 };
 const TIMEOUT_STATUS = {
   status: "timeout",
   messages: [
     {
-      type: "warning",
+      type: "error",
       value: "Timeout exceeded, please try again with a smaller study area.",
     },
   ],
@@ -28,7 +26,7 @@ const NO_STUDY_AREA_STATUS = {
   status: "no-area",
   messages: [
     {
-      type: "warning",
+      type: "error",
       value: "Please enter a study area.",
     },
   ],
@@ -260,22 +258,14 @@ class Dataset extends VuexModule {
 
   @Mutation
   setTemporalRange(temporalRange) {
-    console.log(
-      "clamping temporal range ",
-      temporalRange,
-      " to [",
-      this.minYear,
-      ", ",
-      this.maxYear,
-      "]"
-    );
+    console.log(`dataset.setTemporalRange to ${temporalRange}`);
     temporalRange[0] = _.clamp(temporalRange[0], this.minYear, this.maxYear);
     temporalRange[1] = _.clamp(temporalRange[1], this.minYear, this.maxYear);
     if (temporalRange[0] > temporalRange[1]) {
       temporalRange[0] = temporalRange[1];
     }
     this.temporalRange.splice(0, this.temporalRange.length, ...temporalRange);
-    console.log("SET TEMPORAL RANGE to: ", this.temporalRange);
+    console.log("CLAMPED dataset.setTemporalRange: ", this.temporalRange);
   }
 
   // takes variable id to set variable object
@@ -291,7 +281,7 @@ class Dataset extends VuexModule {
 
   @Mutation
   setGeoJson(geoJson) {
-    console.log("Setting geojson on dataset");
+    console.log("datasetStore.setGeoJson");
     this.geoJson = geoJson;
   }
 
