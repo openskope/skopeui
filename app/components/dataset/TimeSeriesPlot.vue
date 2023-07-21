@@ -172,6 +172,15 @@
       </v-toolbar>
       <!-- time series plot -->
       <client-only placeholder="Loading...">
+        <template v-if="timeSeriesRequestStatus.status !== 'success'">
+          <v-alert
+            v-for="(message, index) in timeSeriesRequestStatus.messages"
+            :key="index"
+            :type="message.type"
+          >
+            {{ message.value }}
+          </v-alert>
+        </template>
         <Plotly
           ref="plot"
           class="time-series"

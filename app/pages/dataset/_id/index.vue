@@ -59,7 +59,23 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import Map from "@/components/dataset/Map.vue";
 
-import { initializeDataset, clearGeoJson } from "@/store/actions";
+import { initializeDataset, saveGeoJson, clearGeoJson } from "@/store/actions";
+
+function getBody(request) {
+  const qs = require("querystring");
+  return new Promise((resolve) => {
+    const bodyArray = [];
+    let body;
+    request
+      .on("data", (chunk) => {
+        bodyArray.push(chunk);
+      })
+      .on("end", () => {
+        body = Buffer.concat(bodyArray).toString();
+        resolve(qs.parse(body));
+      });
+  });
+}
 
 @Component({
   layout: "DefaultLayout",
@@ -70,8 +86,8 @@ import { initializeDataset, clearGeoJson } from "@/store/actions";
   },
 })
 class SelectDatasetArea extends Vue {
-  stepNames = _.clone(this.$api().app.stepNames);
   shouldConfirmGeometry = true;
+  formPostGeoJson = "";
 
   get confirmGeometry() {
     return (
@@ -91,6 +107,10 @@ class SelectDatasetArea extends Vue {
     return this.metadata == null;
   }
 
+  get stepNames() {
+    return this.$api().app.stepNames;
+  }
+
   get currentStep() {
     return this.stepNames.findIndex((x) => x === this.$route.name);
   }
@@ -102,12 +122,6 @@ class SelectDatasetArea extends Vue {
   get hasValidStudyArea() {
     // return whether study area geometry has been defined
     return this.$api().dataset.hasGeoJson;
-  }
-
-  get selectedArea() {
-    return (this.$api().dataset.selectedAreaInSquareMeters / 1000000.0).toFixed(
-      2
-    );
   }
 
   get visualizeLocation() {
@@ -143,6 +157,28 @@ class SelectDatasetArea extends Vue {
     }
   }
 
+  async asyncData({ req, res }) {
+    if (process.server) {
+      if (req.method === "POST") {
+        const postData = await getBody(req);
+        console.log(
+          "Received POST data, attempting to parse as geojson",
+          postData
+        );
+        if (postData) {
+          try {
+            const studyAreaGeoJson = JSON.parse(postData.studyArea);
+            return { formPostGeoJson: studyAreaGeoJson };
+          } catch (e) {
+            console.log("error parsing geojson: ", e);
+          }
+        }
+      } else {
+        console.log("not a post request");
+      }
+    }
+  }
+
   validate({ params }) {
     return /^\w+$/.test(params.id);
   }
@@ -154,7 +190,13 @@ class SelectDatasetArea extends Vue {
   }
 
   mapLoaded(value) {
-    this.shouldConfirmGeometry = this.hasValidStudyArea;
+    console.log("map loaded, form post geojson: ", this.formPostGeoJson);
+    if (this.formPostGeoJson) {
+      this.shouldConfirmGeometry = false;
+      saveGeoJson(this.$warehouse, this.$api(), this.formPostGeoJson);
+    } else {
+      this.shouldConfirmGeometry = this.hasValidStudyArea;
+    }
   }
 
   keepGeometry() {

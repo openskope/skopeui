@@ -90,7 +90,6 @@ const updateAnalysis = _.debounce(async function (api, data) {
 }, 300);
 
 export async function retrieveAnalysis(api, data) {
-  console.log("RETRIEVING ANALYSIS");
   if (!isValidRequestData(data)) {
     console.log(
       "Unable to retrieve analysis with invalid request data: ",
@@ -98,7 +97,7 @@ export async function retrieveAnalysis(api, data) {
     );
     return;
   }
-  // reload skope geometry + temporal range
+  // update dataset store's skope geometry + temporal range
   api.dataset.setGeoJson(data.selected_area);
   api.dataset.setTemporalRange([
     extractYear(data.time_range.gte),
@@ -148,9 +147,9 @@ export function saveGeoJson(warehouse, api, geoJson) {
   warehouse.set(geoJsonKey, geoJson);
   api.dataset.setGeoJson(geoJson);
   if (!_.isEmpty(api.analysis.requestData)) {
-    // FIXME: hack to prevent cached geojson
-    // should see if we can unify the dataset + analysis stores
-    // and make them more coherent to prevent this kind of thing
+    // FIXME: needed to prevent cached geojson from lingering in the analysis store
+    // should see if we can unify the dataset + analysis store apis
+    // and make them more coherent to reduce the need for this kind of manual updating
     api.analysis.setGeoJson(geoJson);
   }
 }

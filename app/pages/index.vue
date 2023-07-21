@@ -74,8 +74,6 @@ class LandingPage extends Vue {
     api.dataset.clearTimeSeries();
     api.dataset.setMetadata(null);
   }
-
-  mounted() {}
 }
 export default LandingPage;
 </script>
