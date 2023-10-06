@@ -25,11 +25,6 @@ authors:
   orcid: "https://orcid.org/0000-0001-9140-936X"
 - family-names: "McPhillips"
   given-names: "Timothy"
-- family-names: "Nguyễn"
-  given-names: "Christine"    
-- family-names: "Pritchard"
-  given-names: "Calvin"
-  orcid: "https://orcid.org/0000-0002-4557-8602"  
 title: "Synthesizing Knowledge of Past Environments (SKOPE) Web Application"
 doi: "10.5281/zenodo.6522974"
 abstract: >
