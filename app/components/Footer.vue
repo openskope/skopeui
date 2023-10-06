@@ -14,6 +14,7 @@
         &copy; 2016-{{ new Date().getFullYear() }} Synthesizing Knowledge of
         Past Environments (SKOPE)
       </span>
+      <Citation />
       <TermsOfUse />
       <v-btn
         v-for="link in links"
@@ -47,10 +48,12 @@ import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
 import { BUILD_ID } from "@/store/modules/_constants";
 import TermsOfUse from "@/components/TermsOfUse.vue";
+import Citation from "@/components/Citation.vue";
 
 @Component({
   components: {
     TermsOfUse,
+    Citation,
   },
 })
 class Footer extends Vue {

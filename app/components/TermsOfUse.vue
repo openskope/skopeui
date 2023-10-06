@@ -40,7 +40,8 @@
 
           <h2>Contact us</h2>
           <p class="text-body-1">
-            Please use the "Contact" button in the footer or send us an email at
+            Feedback is welcome! You can reach us via the "Contact" button in
+            the footer or by sending an email to
             <a href="mailto: skope-team@googlegroups.com">
               skope-team@googlegroups.com
             </a>
