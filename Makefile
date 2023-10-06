@@ -7,13 +7,16 @@ MAIL_API_KEY_PATH=secrets/mail_api_key
 BUILD_CONSTANTS_PATH=app/store/modules/_constants.js
 BUILD_ID=$(shell git describe --tags --abbrev=1)
 CITATION_TXT_FILE=_citation.txt
+CITATION_BIB_FILE=_citation.bib
 
 $(CITATION_TXT_FILE):
 	docker run --rm -v $(PWD):/app citationcff/cffconvert -f apalike -o $(CITATION_TXT_FILE)
+	docker run --rm -v $(PWD):/app citationcff/cffconvert -f bibtex -o $(CITATION_BIB_FILE)
 
 .PHONY: $(BUILD_CONSTANTS_PATH)
 $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk $(CITATION_TXT_FILE)
-	echo 'export const CITATION_TXT = "$(shell cat _citation.txt)";' > $(BUILD_CONSTANTS_PATH)
+	echo 'export const CITATION_TXT = "$(shell cat ${CITATION_TXT_FILE})";' > $(BUILD_CONSTANTS_PATH)
+	echo 'export const CITATION_BIB = "$(shell cat ${CITATION_BIB_FILE})";' >> $(BUILD_CONSTANTS_PATH)
 	envsubst < app/store/modules/_constants.js.template >> $(BUILD_CONSTANTS_PATH)
 	echo 'export const BUILD_ID = "${BUILD_ID}";' >> $(BUILD_CONSTANTS_PATH)
 

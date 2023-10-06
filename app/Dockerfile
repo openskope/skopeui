@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:lts-bullseye
+FROM node:lts-bookworm
 
 ENV NODE_OPTIONS="--openssl-legacy-provider"
 

@@ -36,6 +36,7 @@
 
           <h2>Example Citation</h2>
           <blockquote class="blockquote">{{ citationText }}</blockquote>
+          <blockquote class="blockquote">{{ citationBibTex }}</blockquote>
 
           <h2>Contact us</h2>
           <p class="text-body-1">
@@ -66,7 +67,7 @@
 <script>
 import Vue from "vue";
 import { Component } from "nuxt-property-decorator";
-import { CITATION_TXT } from "@/store/modules/_constants";
+import { CITATION_TXT, CITATION_BIB } from "@/store/modules/_constants";
 
 @Component()
 class TermsOfUse extends Vue {
@@ -80,6 +81,10 @@ class TermsOfUse extends Vue {
 
   get citationText() {
     return CITATION_TXT;
+  }
+
+  get citationBibTex() {
+    return CITATION_BIB;
   }
 
   get termsAcceptedWarehouseKey() {
