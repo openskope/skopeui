@@ -25,8 +25,13 @@
           </p>
 
           <h2>Example Citation</h2>
-          <blockquote class="blockquote">{{ citationText }}</blockquote>
-          <blockquote class="blockquote">{{ citationBibTex }}</blockquote>
+          <blockquote class="blockquote" @click="copyToClipboard">
+            {{ citationText }}
+          </blockquote>
+          <h2>BibTeX</h2>
+          <blockquote class="blockquote" @click="copyToClipboard">
+            {{ citationBibTex }}
+          </blockquote>
 
           <h2>Contact us</h2>
           <p class="text-body-1 px-2">
@@ -36,6 +41,12 @@
               skope-team@googlegroups.com
             </a>
           </p>
+          <v-snackbar v-model="clipboardMessage" timeout="6000">
+            <p class="text-center">
+              Citation text copied to clipboard. Use <kbd>Ctrl + V</kbd> to
+              paste.
+            </p>
+          </v-snackbar>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -49,6 +60,7 @@ import { CITATION_TXT, CITATION_BIB } from "@/store/modules/_constants";
 @Component()
 class Citation extends Vue {
   showCitation = false;
+  clipboardMessage = false;
 
   get citationText() {
     return CITATION_TXT;
@@ -56,6 +68,14 @@ class Citation extends Vue {
 
   get citationBibTex() {
     return CITATION_BIB;
+  }
+
+  copyToClipboard(evt, data) {
+    const srcElement = evt.srcElement;
+    const citationText = srcElement.innerText;
+    navigator.clipboard.writeText(citationText).then(() => {
+      this.clipboardMessage = true;
+    });
   }
 }
 

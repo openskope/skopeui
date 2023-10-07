@@ -36,6 +36,7 @@
 
           <h2>Example Citation</h2>
           <blockquote class="blockquote">{{ citationText }}</blockquote>
+          <h2>BibTeX</h2>
           <blockquote class="blockquote">{{ citationBibTex }}</blockquote>
 
           <h2>Contact us</h2>
