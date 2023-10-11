@@ -31,13 +31,24 @@
             itself.
           </p>
 
-          <h2>Example reference</h2>
-          <p class="text-body-1">(SKOPE 2022)</p>
-
-          <h2>Example Citation</h2>
-          <blockquote class="blockquote">{{ citationText }}</blockquote>
-          <h2>BibTeX</h2>
-          <blockquote class="blockquote">{{ citationBibTex }}</blockquote>
+          <h2>Example Citation (click text to copy)</h2>
+          <v-textarea
+            v-model="citationText"
+            class="blockquote"
+            readonly
+            no-resize
+            @click="copyToClipboard"
+          >
+          </v-textarea>
+          <h2>BibTeX (click text to copy)</h2>
+          <v-textarea
+            v-model="citationBibTex"
+            class="blockquote"
+            readonly
+            no-resize
+            @click="copyToClipboard"
+          >
+          </v-textarea>
 
           <h2>Contact us</h2>
           <p class="text-body-1">
@@ -74,6 +85,7 @@ import { CITATION_TXT, CITATION_BIB } from "@/store/modules/_constants";
 @Component()
 class TermsOfUse extends Vue {
   showTerms = true;
+  clipboardMessage = false;
 
   created() {
     if (process.client) {
@@ -100,6 +112,15 @@ class TermsOfUse extends Vue {
 
   declineTerms() {
     this.$warehouse.remove(this.termsAcceptedWarehouseKey);
+  }
+
+  copyToClipboard(evt, data) {
+    const srcElement = evt.srcElement;
+    const citationText = srcElement.value;
+    navigator.clipboard.writeText(citationText).then(() => {
+      srcElement.select();
+      this.clipboardMessage = true;
+    });
   }
 }
 

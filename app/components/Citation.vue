@@ -26,19 +26,19 @@
 
           <h2>Example Citation (click text to copy)</h2>
           <v-textarea
+            v-model="citationText"
             class="blockquote"
             readonly
             no-resize
-            v-model="citationText"
             @click="copyToClipboard"
           >
           </v-textarea>
           <h2>BibTeX (click text to copy)</h2>
           <v-textarea
+            v-model="citationBibTex"
             class="blockquote"
             readonly
             no-resize
-            v-model="citationBibTex"
             @click="copyToClipboard"
           >
           </v-textarea>
@@ -83,7 +83,6 @@ class Citation extends Vue {
   copyToClipboard(evt, data) {
     const srcElement = evt.srcElement;
     const citationText = srcElement.value;
-    console.log("citation text: ", citationText);
     navigator.clipboard.writeText(citationText).then(() => {
       srcElement.select();
       this.clipboardMessage = true;
