@@ -9,7 +9,7 @@ BUILD_ID=$(shell git describe --tags --abbrev=1)
 CITATION_TXT_FILE=_citation.txt
 CITATION_BIB_FILE=_citation.bib
 
-$(CITATION_TXT_FILE):
+$(CITATION_TXT_FILE): CITATION.cff
 	docker run --rm -v $(PWD):/app citationcff/cffconvert -f apalike -o $(CITATION_TXT_FILE)
 	docker run --rm -v $(PWD):/app citationcff/cffconvert -f bibtex -o $(CITATION_BIB_FILE)
 
