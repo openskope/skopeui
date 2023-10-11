@@ -470,6 +470,7 @@ class TimeSeriesPlot extends Vue {
       this.localTemporalRangeMin,
       this.localTemporalRangeMax,
     ];
+    console.log("setting temporal range editable to false");
     this.isTemporalRangeEditable = false;
     // if yearSelected is set, clamp it to the new temporal range min / max if needed
     if (this.yearSelected == null) {

@@ -24,14 +24,24 @@
             itself.
           </p>
 
-          <h2>Example Citation</h2>
-          <blockquote class="blockquote" @click="copyToClipboard">
-            {{ citationText }}
-          </blockquote>
-          <h2>BibTeX</h2>
-          <blockquote class="blockquote" @click="copyToClipboard">
-            {{ citationBibTex }}
-          </blockquote>
+          <h2>Example Citation (click text to copy)</h2>
+          <v-textarea
+            class="blockquote"
+            readonly
+            no-resize
+            v-model="citationText"
+            @click="copyToClipboard"
+          >
+          </v-textarea>
+          <h2>BibTeX (click text to copy)</h2>
+          <v-textarea
+            class="blockquote"
+            readonly
+            no-resize
+            v-model="citationBibTex"
+            @click="copyToClipboard"
+          >
+          </v-textarea>
 
           <h2>Contact us</h2>
           <p class="text-body-1 px-2">
@@ -72,8 +82,10 @@ class Citation extends Vue {
 
   copyToClipboard(evt, data) {
     const srcElement = evt.srcElement;
-    const citationText = srcElement.innerText;
+    const citationText = srcElement.value;
+    console.log("citation text: ", citationText);
     navigator.clipboard.writeText(citationText).then(() => {
+      srcElement.select();
       this.clipboardMessage = true;
     });
   }
