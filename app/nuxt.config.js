@@ -92,7 +92,7 @@ module.exports = {
    * Sentry configuration
    */
   sentry: {
-    dsn: "https://79be8c27ac14446e8af51b6d5f3dc90f@sentry.comses.net/5",
+    dsn: "https://9b9dc2f60562380edeb675c39fe1c896@sentry.comses.net/4",
   },
 
   /*
