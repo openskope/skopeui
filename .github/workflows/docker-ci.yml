@@ -12,7 +12,7 @@ jobs:
     env:
       SKOPE_DEPLOY_ENVIRONMENT: staging
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: set up config.mk
       run: envsubst < config.mk.template > config.mk
     - name: convert CITATION.cff into citation text file for build constants
