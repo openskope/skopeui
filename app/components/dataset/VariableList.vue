@@ -10,6 +10,7 @@
       <v-list-item-content>
         <v-list-item-title>
           {{ variable.name }}
+          <em v-if="variable.units"> ({{ variable.units }}) </em>
         </v-list-item-title>
       </v-list-item-content>
     </v-list-item>

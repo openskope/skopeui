@@ -24,6 +24,10 @@ $(BUILD_CONSTANTS_PATH): app/store/modules/_constants.js.template config.mk $(CI
 build: docker-compose.yml $(BUILD_CONSTANTS_PATH)
 	docker compose build --pull
 
+.PHONY: build-clean | secrets
+build-clean: docker-compose.yml $(BUILD_CONSTANTS_PATH)
+	docker compose build --pull --no-cache
+
 .PHONY: secrets
 secrets: $(SECRETS)
 	mkdir -p secrets
