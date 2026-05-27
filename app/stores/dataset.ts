@@ -42,7 +42,19 @@ function selectedAreaInSquareKmFromGeoJson(geoJson: unknown): string {
   }
 }
 
-type DatasetVariable = { id: string | null } & Record<string, unknown>;
+type DatasetVariable = {
+  id: string | null;
+  name?: string;
+  class?: string;
+  units?: string;
+  description?: string;
+  styles?: string;
+  min?: number;
+  max?: number;
+  visible?: boolean;
+  colormap?: string;
+  colormap_stops?: string[];
+} & Record<string, unknown>;
 
 export const useDatasetStore = defineStore("dataset", {
   state: () => ({
@@ -73,15 +85,24 @@ export const useDatasetStore = defineStore("dataset", {
       mean: "N/A",
       median: "N/A",
     } as Record<string, unknown>,
+    jobIds: {} as Record<string, string>,
   }),
   getters: {
+    timeseriesTrace: (state) => {
+      if (!state.hasData) return null;
+      return {
+        x: state.timeSeries.x,
+        y: state.timeSeries.y,
+        name: state.timeSeries.options?.name || "Original",
+      };
+    },
     geoJsonKey: (state) => {
       const metadataId = (state.metadata as any)?.id;
       return metadataId ? `geojson:${metadataId}` : "skope:geometry";
     },
     defaultApiRequestData: (state) => {
       const metadata = state.metadata as any;
-      const variable = state.variable as any;
+      const variable = state.variable;
       const [minYear, maxYear] = state.temporalRange;
       return {
         dataset_id: metadata?.id,
@@ -149,6 +170,12 @@ export const useDatasetStore = defineStore("dataset", {
       this.canHandleTimeSeriesRequest = false;
       this.selectedAreaInSquareKm = "0.00";
       this.timeSeriesRequestData = this.defaultApiRequestData;
+    },
+    setJobId(varId: string, jobId: string) {
+      this.jobIds[varId] = jobId;
+    },
+    clearJobIds() {
+      this.jobIds = {};
     },
     setTimeSeriesLoading() {
       this.timeSeriesRequestStatus = { ...LOADING_STATUS };

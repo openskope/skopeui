@@ -78,6 +78,9 @@
     </v-toolbar>
     <v-card-text class="map">
       <div ref="mapContainer" class="maplibre-map"></div>
+      <div v-if="isStepLoading" class="map-step-loading">
+        <v-progress-circular indeterminate color="primary" size="48" width="4" />
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -86,24 +89,32 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import maplibregl from "maplibre-gl";
+import { SkopeColorbar } from "@/utils/SkopeColorbar";
 import type { Geoman } from "@geoman-io/maplibre-geoman-free";
 import { createGeomanInstance } from "@geoman-io/maplibre-geoman-free";
 import circleToPolygon from "circle-to-polygon";
 import { bbox as turfBbox } from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@geoman-io/maplibre-geoman-free/dist/maplibre-geoman.css";
-import { LEAFLET_PROVIDERS } from "@/store/modules/constants";
+import {
+  LEAFLET_PROVIDERS,
+  TILES_ENDPOINT,
+} from "@/store/modules/constants";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 import { getInitialMapViewport } from "@/composables/useMapInitialViewport";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
 
+const COLOR_MAX_PCT = 0.5;
+
+let colorbar: SkopeColorbar | null = null;
+
 const props = defineProps({
-  year: { type: Number, default: 2000 },
+  step: { type: Number, default: 2000 },
   displayRaster: { type: Boolean, default: true },
   circleToPolygonEdges: { type: Number, default: 32 },
 });
-const emit = defineEmits(["mapReady"]);
+const emit = defineEmits(["mapReady", "stepReady"]);
 
 const route = useRoute();
 const appStore = useAppStore();
@@ -111,6 +122,7 @@ const datasetStore = useDatasetStore();
 const legacyActions = useLegacyStoreActions();
 
 const mapContainer = ref<HTMLElement | null>(null);
+const isStepLoading = ref(false);
 
 const stepNames = computed(() => appStore.stepNames);
 const metadata = computed(() => datasetStore.metadata as any);
@@ -121,6 +133,12 @@ const initialMapViewport = computed(() => getInitialMapViewport(metadata.value))
 const initialMapZoom = computed(() => initialMapViewport.value.zoom);
 const initialMapCenter = computed(() => initialMapViewport.value.center);
 
+const cogBaseUrl = computed(getCogBaseUrl);
+const legendVisible = computed(() => props.displayRaster && !!cogBaseUrl.value);
+const variableUnit = computed(() => datasetStore.variable?.units ?? null);
+// Raw numeric values (used for midpoint arithmetic)
+const minVal = computed(() => datasetStore.variable?.min ?? 0);
+const maxVal = computed(() => datasetStore.variable?.max ?? 100);
 type MapLibreBaseLayer = {
   id: string;
   name: string;
@@ -174,13 +192,22 @@ const baseLayerOptions = computed(() =>
   mapBaseLayers.map((provider) => ({ title: provider.name, value: provider.id }))
 );
 
+const STEP_DISPLAY_DURATION_MS = 1000;
+
 let map: maplibregl.Map | null = null;
 let gm: Geoman | null = null;
 let ignoreStoreWatch = false;
 let syncDrawQueue: Promise<void> = Promise.resolve();
 let isMapLoaded = false;
 let pendingStudyAreaGeoJson: any = null;
+let stepDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
 
+const COG_A = { sourceId: "cog-source-a", layerId: "cog-layer-a" };
+const COG_B = { sourceId: "cog-source-b", layerId: "cog-layer-b" };
+let cogFront = COG_A;  // currently visible slot
+let cogBack  = COG_B;  // currently loading / empty slot
+let pendingIdleSwap: (() => void) | null = null;
+const FILL_LAYER_ID = "dataset-region-fill";
 const STUDY_AREA_SOURCE_ID = "study-area-display";
 const STUDY_AREA_FILL_LAYER_ID = "study-area-display-fill";
 const STUDY_AREA_LINE_LAYER_ID = "study-area-display-outline";
@@ -231,6 +258,115 @@ function baseStyle(): maplibregl.StyleSpecification {
       layout: { visibility: provider.id === activeBaseLayerId ? "visible" : "none" },
     })),
   } as maplibregl.StyleSpecification;
+}
+
+function getCogBaseUrl(): string | null {
+  if (!props.displayRaster || !route.params.variable) return null;
+  const datasetId = route.params.id;
+  const varId = route.params.variable;
+  return `${TILES_ENDPOINT}/${datasetId}/${varId}`;
+}
+
+function getCogFullUrl(baseUrl, step) {
+  if (datasetStore.variable.min == null || datasetStore.variable.max == null){
+    console.warn(`Variable ${datasetStore.variable?.id} is missing min/max — falling back to rescale 0,100`)
+  } 
+  const min = datasetStore.variable?.min ?? 0;
+  const max = (datasetStore.variable?.max ?? 100) * COLOR_MAX_PCT;
+  const urlStep = step.toString().padStart(4, "0"); // TODO: Add flexibility for different time resolutions
+  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?colormap=${datasetStore.variable.colormap}&rescale=${min},${max}`;
+}
+
+function getCogBounds(): number[] | undefined {
+  const extents = metadata.value?.region?.extents;
+  const nw = extents?.[0];
+  const se = extents?.[1];
+  if (Array.isArray(nw) && Array.isArray(se)) {
+    const [north, west] = nw;
+    const [south, east] = se;
+    return [west, south, east, north];
+  }
+  return undefined;
+}
+
+function addCogSlot(slot: typeof COG_A, step: number, opacity: number) {
+  if (!map || !isMapLoaded || !cogBaseUrl.value) return;
+  const url = getCogFullUrl(cogBaseUrl.value, step);
+  const bounds = getCogBounds();
+  map.addSource(slot.sourceId, {
+    type: "raster",
+    tiles: [url],
+    tileSize: 128,
+    ...(bounds && { bounds }),
+  });
+  map.addLayer(
+    { id: slot.layerId, type: "raster", source: slot.sourceId,
+      paint: { "raster-opacity": opacity } },
+    FILL_LAYER_ID,
+  );
+}
+
+function removeCogSlot(slot: typeof COG_A) {
+  if (!map) return;
+  if (map.getLayer(slot.layerId))   map.removeLayer(slot.layerId);
+  if (map.getSource(slot.sourceId)) map.removeSource(slot.sourceId);
+}
+
+function cancelPendingSwap() {
+  if (stepDisplayTimeout) {
+    clearTimeout(stepDisplayTimeout);
+    stepDisplayTimeout = null;
+  }
+  if (pendingIdleSwap) {
+    map?.off("idle", pendingIdleSwap);
+    pendingIdleSwap = null;
+    removeCogSlot(cogBack);  // discard the back buffer that was loading
+  }
+}
+
+function addCogRasterLayer(step: number) {
+  if (!map || !isMapLoaded || !cogBaseUrl.value) return;
+  cancelPendingSwap();
+  removeCogSlot(cogFront);
+  removeCogSlot(cogBack);
+  cogFront = COG_A;
+  cogBack  = COG_B;
+  addCogSlot(cogFront, step, 0.7);
+}
+
+function removeCogRasterLayer() {
+  if (!map || !isMapLoaded) return;
+  cancelPendingSwap();
+  removeCogSlot(cogFront);
+  removeCogSlot(cogBack);
+  isStepLoading.value = false;
+}
+
+function updateRasterLayer(step: number) {
+  if (!map || !isMapLoaded || !cogBaseUrl.value) return;
+  if (!map.getSource(cogFront.sourceId)) {
+    addCogRasterLayer(step);
+    return;
+  }
+
+  cancelPendingSwap();
+  addCogSlot(cogBack, step, 0);  // load invisibly
+  isStepLoading.value = true;
+
+  pendingIdleSwap = () => {
+    if (!map || !isMapLoaded) return;
+    if (!map.getSource(cogBack.sourceId)) return;  // guard: swap was cancelled
+    map.setPaintProperty(cogBack.layerId, "raster-opacity", 0.7);
+    removeCogSlot(cogFront);
+    [cogFront, cogBack] = [cogBack, cogFront];      // swap references
+    pendingIdleSwap = null;
+    isStepLoading.value = false;
+    stepDisplayTimeout = setTimeout(() => {
+      stepDisplayTimeout = null;
+      emit("stepReady");
+    }, STEP_DISPLAY_DURATION_MS);
+  };
+  map.once("idle", pendingIdleSwap);
 }
 
 function mapExtentPolygon(extents: any): any {
@@ -456,10 +592,9 @@ function addMetadataExtentLayer() {
 
   const sourceId = "dataset-region";
   const lineLayerId = "dataset-region-outline";
-  const fillLayerId = "dataset-region-fill";
 
   if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
-  if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
+  if (map.getLayer(FILL_LAYER_ID)) map.removeLayer(FILL_LAYER_ID);
   if (map.getSource(sourceId)) map.removeSource(sourceId);
 
   map.addSource(sourceId, {
@@ -468,7 +603,7 @@ function addMetadataExtentLayer() {
   });
 
   map.addLayer({
-    id: fillLayerId,
+    id: FILL_LAYER_ID,
     type: "fill",
     source: sourceId,
     paint: { "fill-color": "#f0f4ff", "fill-opacity": 0.05 },
@@ -532,6 +667,8 @@ onMounted(() => {
     addMetadataExtentLayer();
     legacyActions.initializeDatasetGeoJson();
 
+    addCogRasterLayer(props.step);
+
     if (isSelectArea.value) {
       gm = await createGeomanInstance(map as any, {});
       await gm.addControls();
@@ -543,6 +680,25 @@ onMounted(() => {
     } else {
       updateStudyAreaDisplay(pendingStudyAreaGeoJson ?? datasetStore.geoJson);
       pendingStudyAreaGeoJson = null;
+    }
+
+    if (props.displayRaster) {
+      const colormapStops = datasetStore.variable.colormap_stops;
+      if (!Array.isArray(colormapStops) || colormapStops.length < 2) {
+        console.error(
+          `Variable '${datasetStore.variable.id}' has invalid colormap_stops (got ${JSON.stringify(colormapStops)}). Colorbar will not be shown.`
+        );
+        messageStore.error("Colormap data is missing or invalid for this variable. The legend cannot be displayed.");
+      } else {
+        colorbar = new SkopeColorbar({
+          colors: colormapStops,
+          vmin: minVal.value,
+          vmax: maxVal.value * COLOR_MAX_PCT,
+          units: variableUnit.value ?? undefined,
+          vmaxPct: COLOR_MAX_PCT,
+        });
+        map.addControl(colorbar, "bottom-left");
+      }
     }
 
     emit("mapReady", true);
@@ -583,12 +739,53 @@ watch(
   }
 );
 
+watch(
+  () => props.step,
+  (step: number) => {
+    updateRasterLayer(step);
+  }
+);
+
+watch([minVal, maxVal, variableUnit], () => {
+  colorbar?.update({
+    vmin: minVal.value,
+    vmax: maxVal.value * COLOR_MAX_PCT,
+    units: variableUnit.value ?? undefined,
+  });
+});
+
+watch(legendVisible, (visible) => {
+  visible ? colorbar?.show() : colorbar?.hide();
+});
+
+watch(
+  cogBaseUrl,
+  (url) => {
+    removeCogRasterLayer();
+    if (url) {
+      addCogRasterLayer(props.step);
+    }
+  }
+);
+
 onUnmounted(() => {
   isMapLoaded = false;
   pendingStudyAreaGeoJson = null;
+  if (stepDisplayTimeout) {
+    clearTimeout(stepDisplayTimeout);
+    stepDisplayTimeout = null;
+  }
+  if (pendingIdleSwap && map) {
+    map.off("idle", pendingIdleSwap);
+    pendingIdleSwap = null;
+  }
   if (gm) {
     gm.destroy();
     gm = null;
+  }
+  if (colorbar && map) {
+    map.removeControl(colorbar);
+    colorbar = null;
   }
   if (map) {
     map.remove();
@@ -607,11 +804,23 @@ onUnmounted(() => {
   height: calc(95% - 48px);
   position: relative;
   z-index: 1;
+  overflow: visible;
 }
 
 .maplibre-map {
   height: 100%;
   width: 100%;
+}
+
+.map-step-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
 }
 
 .basemap-select {
@@ -626,4 +835,22 @@ onUnmounted(() => {
 :deep(.mapboxgl-ctrl-draw-btn) {
   min-width: 28px;
 }
+
+:deep(.skope-colorbar) {
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 4px;
+  padding: 6px 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  font-size: 11px;
+}
+
+:deep(.skope-colorbar__units) {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+
+
 </style>

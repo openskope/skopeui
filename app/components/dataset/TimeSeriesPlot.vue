@@ -33,12 +33,12 @@
           <v-text-field
             v-model.number="formTemporalRangeMin"
             class="time-series-range-field"
-            label="Min Year"
+            label="From"
             :disabled="!isTemporalRangeEditable"
-            :min="minYear"
-            :max="maxYear - 1"
+            :min="minStep"
+            :max="maxStep - 1"
             type="number"
-            :rules="[validateMinYear]"
+            :rules="[validateMinStep]"
             @keydown.enter="setTemporalRange"
           >
             <template #append-outer>to</template>
@@ -46,13 +46,13 @@
           <v-text-field
             v-model.number="formTemporalRangeMax"
             class="time-series-range-field"
-            label="Max Year"
+            label="To"
             :disabled="!isTemporalRangeEditable"
             :hint="timeStepsLabel"
             persistent-hint
-            :min="minYear + 1"
-            :max="maxYear"
-            :rules="[validateMaxYear]"
+            :min="minStep + 1"
+            :max="maxStep"
+            :rules="[validateMaxStep]"
             type="number"
             @keydown.enter="setTemporalRange"
           />
@@ -72,16 +72,16 @@
         </v-form>
 
         <div v-if="showStepControls" class="time-series-toolbar__group time-series-toolbar__group--actions">
-          <v-tooltip location="top" text="Go to the first year of the defined temporal range">
+          <v-tooltip location="top" text="Go to the first timestep of the defined temporal range">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="gotoFirstYear">
+              <v-btn icon v-bind="props" color="accent" @click="gotoFirstStep">
                 <v-icon>mdi-skip-previous</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" text="Previous year">
+          <v-tooltip location="top" text="Previous timestep">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="previousYear">
+              <v-btn icon v-bind="props" color="accent" @click="previousStep">
                 <v-icon>mdi-chevron-left</v-icon>
               </v-btn>
             </template>
@@ -93,16 +93,16 @@
               </v-btn>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" text="Next year">
+          <v-tooltip location="top" text="Next timestep">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="nextYear">
+              <v-btn icon v-bind="props" color="accent" @click="nextStep">
                 <v-icon>mdi-chevron-right</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" text="Go to the last year of the defined temporal range">
+          <v-tooltip location="top" text="Go to the last timestep of the defined temporal range">
             <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="gotoLastYear">
+              <v-btn icon v-bind="props" color="accent" @click="gotoLastStep">
                 <v-icon>mdi-skip-next</v-icon>
               </v-btn>
             </template>
@@ -126,10 +126,19 @@
       </div>
 
       <div class="time-series-plot-shell">
+        <div v-if="timeSeriesRequestStatus.status === 'loading'" class="timeseries-loading-overlay">
+          <v-progress-circular indeterminate color="primary" size="52" width="4" />
+          <p class="loading-message mt-4">{{ loadingMessage }}</p>
+        </div>
         <client-only placeholder="Loading...">
-          <template v-if="timeSeriesRequestStatus.status !== 'success'">
+          <template
+            v-if="timeSeriesRequestStatus.status !== 'success'
+              && timeSeriesRequestStatus.status !== 'loading'"
+          >
             <v-alert
-              v-for="(message, index) in timeSeriesRequestStatus.messages"
+              v-for="(message, index) in timeSeriesRequestStatus.messages.filter(
+                (m) => m.type !== 'error'
+              )"
               :key="index"
               :type="message.type"
               class="mb-2"
@@ -143,7 +152,7 @@
             :data="timeSeriesData"
             :layout="layoutMetadata"
             :options="options"
-            @click="updatePlotlyYear"
+            @click="updatePlotlyStep"
           />
         </client-only>
       </div>
@@ -152,13 +161,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, defineAsyncComponent } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted, defineAsyncComponent } from "vue";
 import _ from "lodash";
 import { useRoute } from "vue-router";
 import { useDatasetStore } from "@/stores/dataset";
 
 const props = defineProps<{
-  yearSelected?: number | null;
+  stepSelected?: number | null;
   showStepControls?: boolean;
   showArea?: boolean;
   traces?: any[];
@@ -166,7 +175,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "year-selected", year: number): void;
+  (e: "step-selected", step: number): void;
   (e: "selected-temporal-range", range: [number, number]): void;
 }>();
 
@@ -185,6 +194,28 @@ const isTemporalRangeEditable = ref(false);
 const isTemporalRangeValid = ref(false);
 const plotlyRef = ref<any>(null);
 
+const PROGRESSIVE_MESSAGES = [
+  { delay: 8_000, text: "Still working..." },
+  { delay: 16_000, text: "Hang tight, almost there..." },
+  { delay: 24_000, text: "This is taking longer than usual, but we'll get there..." },
+];
+
+const loadingMessage = ref("");
+let progressiveTimers: ReturnType<typeof setTimeout>[] = [];
+
+function startProgressiveMessages() {
+  clearProgressiveMessages();
+  progressiveTimers = PROGRESSIVE_MESSAGES.map(({ delay, text }) =>
+    setTimeout(() => { loadingMessage.value = text; }, delay)
+  );
+}
+
+function clearProgressiveMessages() {
+  progressiveTimers.forEach(clearTimeout);
+  progressiveTimers = [];
+  loadingMessage.value = "";
+}
+
 // Computed
 const selectedTemporalRange = computed({
   get() { return datasetStore.temporalRange; },
@@ -198,8 +229,8 @@ const temporalRangeMin = computed(() => datasetStore.temporalRangeMin);
 const temporalRangeMax = computed(() => datasetStore.temporalRangeMax);
 const timeSeriesRequestStatus = computed(() => datasetStore.timeSeriesRequestStatus);
 const selectedAreaInSquareKm = computed(() => datasetStore.selectedAreaInSquareKm);
-const minYear = computed(() => datasetStore.minYear);
-const maxYear = computed(() => datasetStore.maxYear);
+const minStep = computed(() => datasetStore.minYear);
+const maxStep = computed(() => datasetStore.maxYear);
 const variable = computed(() => datasetStore.variable as any);
 const totalCellArea = computed(() => datasetStore.totalCellAreaInSquareKm);
 const numberOfCells = computed(() => datasetStore.numberOfCells);
@@ -229,7 +260,7 @@ const timeStepsLabel = computed(() => {
 });
 
 const xAxisTitle = computed(() =>
-  props.yearSelected == null ? "Year" : `<b>Year ${props.yearSelected}</b>`
+  props.stepSelected == null ? "Timestep" : `<b>Timestep ${props.stepSelected}</b>`
 );
 
 const yAxisTitle = computed(() => {
@@ -238,11 +269,11 @@ const yAxisTitle = computed(() => {
 });
 
 const shapes = computed(() => {
-  if (!_.isNull(props.yearSelected ?? null)) {
+  if (!_.isNull(props.stepSelected ?? null)) {
     return [{
       type: "line",
-      x0: props.yearSelected,
-      x1: props.yearSelected,
+      x0: props.stepSelected,
+      x1: props.stepSelected,
       yref: "paper",
       y0: 0,
       y1: 1,
@@ -307,33 +338,33 @@ function enableTemporalRangeEdit() {
   isTemporalRangeEditable.value = true;
 }
 
-function validateMinYear(value: number) {
-  if (value < minYear.value) return `Please enter a min year >= ${minYear.value}`;
-  if (value >= maxYear.value) return `Please enter a min year < ${maxYear.value}`;
+function validateMinStep(value: number) {
+  if (value < minStep.value) return `Please enter a min step >= ${minStep.value}`;
+  if (value >= maxStep.value) return `Please enter a min step < ${maxStep.value}`;
   return true;
 }
 
-function validateMaxYear(value: number) {
-  if (value <= minYear.value) return `Please enter a max year > ${minYear.value}`;
-  if (value > maxYear.value) return `Please enter a max year <= ${maxYear.value}`;
+function validateMaxStep(value: number) {
+  if (value <= minStep.value) return `Please enter a max step > ${minStep.value}`;
+  if (value > maxStep.value) return `Please enter a max step <= ${maxStep.value}`;
   return true;
 }
 
-function updatePlotlyYear(data: any) {
-  setYear(data.points[0].x);
+function updatePlotlyStep(data: any) {
+  setStep(data.points[0].x);
 }
 
-function setYear(year: number) {
-  emit("year-selected", year);
+function setStep(step: number) {
+  emit("step-selected", step);
 }
 
 function setTemporalRange() {
   if (!hasTemporalRangeChanges.value || !isTemporalRangeValid.value) return;
   selectedTemporalRange.value = [localTemporalRangeMin.value, localTemporalRangeMax.value];
   isTemporalRangeEditable.value = false;
-  if (props.yearSelected == null) return;
-  if (props.yearSelected < temporalRangeMin.value) setYear(temporalRangeMin.value);
-  else if (props.yearSelected > temporalRangeMax.value) setYear(temporalRangeMax.value);
+  if (props.stepSelected == null) return;
+  if (props.stepSelected < temporalRangeMin.value) setStep(temporalRangeMin.value);
+  else if (props.stepSelected > temporalRangeMax.value) setStep(temporalRangeMax.value);
 }
 
 function resetTemporalRange() {
@@ -342,37 +373,39 @@ function resetTemporalRange() {
   setTemporalRange();
 }
 
-function gotoFirstYear() {
+function gotoFirstStep() {
   if (variable.value === null) return;
-  setYear(temporalRangeMin.value);
+  setStep(temporalRangeMin.value);
 }
 
-function gotoLastYear() {
+function gotoLastStep() {
   if (variable.value === null) return;
-  setYear(temporalRangeMax.value);
+  setStep(temporalRangeMax.value);
 }
 
-function nextYear() {
+function nextStep() {
   if (variable.value === null) return;
-  setYear(_.clamp(parseInt(String(props.yearSelected)) + 1, temporalRangeMin.value, temporalRangeMax.value));
+  setStep(_.clamp(parseInt(String(props.stepSelected)) + 1, temporalRangeMin.value, temporalRangeMax.value));
 }
 
-function previousYear() {
+function previousStep() {
   if (variable.value === null) return;
-  setYear(_.clamp((props.yearSelected ?? 0) - 1, temporalRangeMin.value, temporalRangeMax.value));
+  setStep(_.clamp((props.stepSelected ?? 0) - 1, temporalRangeMin.value, temporalRangeMax.value));
+}
+
+function advanceAnimation() {
+  if (!isAnimationPlaying.value) return;
+  if ((props.stepSelected ?? 0) >= temporalRangeMax.value) {
+    isAnimationPlaying.value = false;
+    return;
+  }
+  nextStep();
 }
 
 function togglePlay() {
   isAnimationPlaying.value = !isAnimationPlaying.value;
   if (isAnimationPlaying.value) {
-    const interval = setInterval(() => {
-      if (isAnimationPlaying.value && (props.yearSelected ?? 0) < temporalRangeMax.value) {
-        nextYear();
-      } else {
-        isAnimationPlaying.value = false;
-        clearInterval(interval);
-      }
-    }, animationSpeed.value);
+    advanceAnimation();  // kick off first step; map drives the rest via advanceAnimation()
   }
 }
 
@@ -383,7 +416,17 @@ async function getTimeSeriesPlotImage() {
   return { png, svg };
 }
 
-defineExpose({ getTimeSeriesPlotImage });
+watch(
+  () => timeSeriesRequestStatus.value.status,
+  (status) => {
+    if (status === "loading") startProgressiveMessages();
+    else clearProgressiveMessages();
+  }
+);
+
+onUnmounted(() => { clearProgressiveMessages(); });
+
+defineExpose({ getTimeSeriesPlotImage, advanceAnimation });
 
 onMounted(() => {
   localTemporalRangeMin.value = selectedTemporalRange.value[0];
@@ -391,7 +434,7 @@ onMounted(() => {
 });
 
 watch(
-  () => [minYear.value, maxYear.value, selectedTemporalRange.value[0], selectedTemporalRange.value[1]],
+  () => [minStep.value, maxStep.value, selectedTemporalRange.value[0], selectedTemporalRange.value[1]],
   ([nextMin, nextMax, selectedMin, selectedMax]) => {
     // Keep the selected range within metadata bounds when datasets/routes change.
     if (selectedMin < nextMin || selectedMax > nextMax || selectedMin > selectedMax) {
@@ -481,10 +524,28 @@ watch(layoutMetadata, (layout) => {
 }
 
 .time-series-plot-shell {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
+}
+
+.timeseries-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.80);
+  pointer-events: none;
+}
+
+.loading-message {
+  font-size: 13px;
+  color: #596d7b;
 }
 
 .time-series {

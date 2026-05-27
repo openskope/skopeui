@@ -26,7 +26,7 @@
         sm="12"
         align-self="stretch"
       >
-        <Map :year="yearSelected" :display-raster="false" map-engine="maplibre" />
+        <Map :step="stepSelected" :display-raster="true" map-engine="maplibre" @step-ready="onStepReady" />
       </v-col>
       <!-- time series plot -->
       <v-col
@@ -37,11 +37,12 @@
         align-self="stretch"
       >
         <TimeSeriesPlot
+          ref="timeSeriesPlotRef"
           :show-area="true"
           :show-step-controls="true"
           :traces="traces"
-          :year-selected="yearSelected"
-          @year-selected="setYear"
+          :step-selected="stepSelected"
+          @step-selected="setStep"
         />
       </v-col>
     </v-row>
@@ -57,10 +58,10 @@ import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import _ from "lodash";
-import { TIMESERIES_ENDPOINT } from "@/store/modules/constants";
 import { extractYear } from "@/store/stats";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
+import { useMessagesStore } from "@/stores/messages";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 
 definePageMeta({
@@ -71,9 +72,11 @@ definePageMeta({
 const route = useRoute();
 const appStore = useAppStore();
 const datasetStore = useDatasetStore();
+const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
 
-const yearSelected = ref(1500);
+const stepSelected = ref(1500);
+const timeSeriesPlotRef = ref();
 let stopTimeSeriesWatch: (() => void) | null = null;
 
 const hasValidStudyArea = computed(() => datasetStore.hasGeoJson);
@@ -82,26 +85,18 @@ const analyzeLocation = computed(() => ({
   params: { id: route.params.id, variable: route.params.variable },
 }));
 const isLoadingMetadata = computed(() => datasetStore.metadata == null);
-const traces = computed(() => [{ ...datasetStore.filteredTimeSeries(), type: "scatter" }]);
+const traces = computed(() => {
+  const ts = datasetStore.timeseriesTrace;
+  if (!ts) return [];
+  return [{ ...ts, type: "scatter" }];
+});
 
-function setYear(year: number) {
-  yearSelected.value = year;
+function setStep(step: number) {
+  stepSelected.value = step;
 }
 
-async function requestJson(url: string, options: RequestInit = {}) {
-  const response = await fetch(url, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-  if (!response.ok) {
-    const responseData = await response
-      .json()
-      .catch(() => ({ detail: [{ msg: response.statusText }] }));
-    const error: any = new Error(`Request failed with status ${response.status}`);
-    error.response = { status: response.status, data: responseData };
-    throw error;
-  }
-  return response.json();
+function onStepReady() {
+  timeSeriesPlotRef.value?.advanceAnimation();
 }
 
 async function updateTimeSeries(data: any) {
@@ -111,10 +106,10 @@ async function updateTimeSeries(data: any) {
   }
   datasetStore.setTimeSeriesLoading();
   try {
-    const response = await requestJson(TIMESERIES_ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const varId = route.params.variable as string;
+    const jobId = datasetStore.jobIds?.[varId];
+    const {newJobId, response} = await legacyActions.resolveTimeSeries(jobId, data);
+    datasetStore.setJobId(varId, newJobId);
     const originalSeries = response.series[0];
     const timeSeries = {
       x: _.range(
@@ -134,11 +129,23 @@ async function updateTimeSeries(data: any) {
     datasetStore.clearTimeSeries();
     if (e.response) {
       const { status, data: responseData } = e.response;
-      if (status === 504) datasetStore.setTimeSeriesTimeout();
-      else if (status >= 500) datasetStore.setTimeSeriesServerError(responseData.detail || []);
-      else if (status >= 400) datasetStore.setTimeSeriesBadRequest(responseData.detail || []);
+      const detail = Array.isArray(responseData.detail)
+      ? responseData.detail
+      : [{ msg: responseData.detail }];
+      if (status === 504) {
+        datasetStore.setTimeSeriesTimeout();
+        messageStore.error("Request timed out. Try a smaller area or shorter date range.");
+      } else if (status >= 500) {
+        datasetStore.setTimeSeriesServerError(detail);
+        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Server error. Please try again.");
+      } else if (status >= 400) {
+        datasetStore.setTimeSeriesBadRequest(detail);
+        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Bad request.");
+      }
     } else {
-      datasetStore.setTimeSeriesTimeout();
+      const msg = e.message || "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
+      datasetStore.setTimeSeriesServerError([{ msg }]);
+      messageStore.error(msg);
     }
   }
 }
@@ -156,8 +163,10 @@ await useAsyncData(
       route.params.id as string,
       route.params.variable as string
     );
+    stepSelected.value = datasetStore.temporalRangeMin;
     return true;
-  }
+  },
+  { server: false }
 );
 
 onMounted(() => {
@@ -173,7 +182,6 @@ onMounted(() => {
     },
     { immediate: true }
   );
-  yearSelected.value = datasetStore.temporalRangeMin;
   appStore.setVisited();
 });
 

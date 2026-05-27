@@ -156,12 +156,12 @@ import { toISODate, extractYear } from "@/store/stats";
 import {
   buildReadme,
   DEFAULT_CENTERED_SMOOTHING_WIDTH,
-  TIMESERIES_ENDPOINT,
   SMOOTHING_OPTIONS,
   TRANSFORM_OPTIONS,
 } from "@/store/modules/constants";
 import { useAnalysisStore } from "@/stores/analysis";
 import { useDatasetStore } from "@/stores/dataset";
+import { useMessagesStore } from "@/stores/messages";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 import _ from "lodash";
 import JSZip from "jszip";
@@ -173,6 +173,7 @@ const route = useRoute();
 const { mdAndDown } = useDisplay();
 const analysisStore = useAnalysisStore();
 const datasetStore = useDatasetStore();
+const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
 const { $download } = useNuxtApp() as any;
 
@@ -292,22 +293,6 @@ function smoothingHint(smooth: string) {
   }
 }
 
-async function requestJson(url: string, options: RequestInit = {}) {
-  const response = await fetch(url, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-  if (!response.ok) {
-    const responseData = await response
-      .json()
-      .catch(() => ({ detail: [{ msg: response.statusText }] }));
-    const error: any = new Error(`Request failed with status ${response.status}`);
-    error.response = { status: response.status, data: responseData };
-    throw error;
-  }
-  return response.json();
-}
-
 async function retrieveAnalysis(data: any) {
   if (Object.values(data).some((v) => v == undefined)) return;
   datasetStore.setGeoJson(data.selected_area);
@@ -315,17 +300,35 @@ async function retrieveAnalysis(data: any) {
     extractYear(data.time_range.gte),
     extractYear(data.time_range.lte),
   ]);
-  analysisStore.setWaitingForResponse(true);
+  datasetStore.setTimeSeriesLoading();
   try {
-    const response = await requestJson(TIMESERIES_ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const varId = route.params.variable as string;
+    const jobId = datasetStore.jobIds?.[varId];
+    const {newJobId, response} = await legacyActions.resolveTimeSeries(jobId, data);
+    datasetStore.setJobId(varId, newJobId);
     analysisStore.setResponse(response);
-  } catch (e) {
-    analysisStore.setResponseError(e);
-  } finally {
-    analysisStore.setWaitingForResponse(false);
+    datasetStore.setTimeSeriesLoaded();
+  } catch (e: any) {
+    if (e.response) {
+      const { status, data: responseData } = e.response;
+      const detail = Array.isArray(responseData.detail)
+      ? responseData.detail
+      : [{ msg: responseData.detail }];
+      if (status === 504) {
+        datasetStore.setTimeSeriesTimeout();
+        messageStore.error("Request timed out. Try a smaller area or shorter date range.");
+      } else if (status >= 500) {
+        datasetStore.setTimeSeriesServerError(detail);
+        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Server error. Please try again.");
+      } else if (status >= 400) {
+        datasetStore.setTimeSeriesBadRequest(detail);
+        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Bad request.");
+      }
+    } else {
+      const msg = e.message || "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
+      datasetStore.setTimeSeriesServerError([{ msg }]);
+      messageStore.error(msg);
+    }
   }
 }
 
@@ -399,7 +402,7 @@ async function exportData() {
 }
 
 async function updateTimeSeries() {
-  if (!analysisFormValid.value || analysisStore.waitingForResponse) return;
+  if (!analysisFormValid.value || datasetStore.timeSeriesRequestStatus.status === "loading") return;
   const requestData = {
     ...datasetStore.defaultApiRequestData,
     zonal_statistic: zonalStatistic.value,
@@ -452,7 +455,8 @@ await useAsyncData(
     timeRange.value.lb.year = datasetStore.minYear;
     timeRange.value.ub.year = datasetStore.maxYear;
     return true;
-  }
+  },
+  { server: false }
 );
 
 onMounted(async () => {
