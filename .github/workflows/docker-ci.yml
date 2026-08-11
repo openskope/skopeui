@@ -2,9 +2,9 @@ name: Build/Test Docker Image CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -12,12 +12,12 @@ jobs:
     env:
       SKOPE_DEPLOY_ENVIRONMENT: staging
     steps:
-    - uses: actions/checkout@v4
-    - name: set up config.mk
-      run: envsubst < config.mk.template > config.mk
-    - name: convert CITATION.cff into citation text file for build constants
-      uses: citation-file-format/cffconvert-github-action@2.0.0
-      with:
-        args: "-f apalike -o _citation.txt"
-    - name: Build nuxt site for production deployment
-      run: make buildprod
+      - uses: actions/checkout@v4
+      - name: set up config.mk
+        run: envsubst < config.mk.template > config.mk
+      - name: convert CITATION.cff into citation text file for build constants
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "-f apalike -o _citation.txt"
+      - name: Build nuxt site for production deployment
+        run: make buildprod

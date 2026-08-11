@@ -3,7 +3,7 @@ import {
   TIMESERIES_SUBMIT_ENDPOINT,
   TIMESERIES_STATUS_ENDPOINT,
   TIMESERIES_REFINE_ENDPOINT,
-} from "../store/modules/constants"; 
+} from "../store/modules/constants";
 import { extractYear } from "../store/stats";
 import { useAnalysisStore } from "../stores/analysis";
 import { useDatasetStore } from "../stores/dataset";
@@ -24,7 +24,9 @@ async function requestJson(url: string, options: RequestInit = {}) {
     const responseData = await response
       .json()
       .catch(() => ({ detail: [{ msg: response.statusText }] }));
-    const error = new Error(`Request failed with status ${response.status}`) as Error & {
+    const error = new Error(
+      `Request failed with status ${response.status}`,
+    ) as Error & {
       response?: { status: number; data: unknown };
     };
     error.response = {
@@ -54,7 +56,7 @@ export function useLegacyStoreActions() {
 
   async function initializeDataset(
     metadataId: string,
-    variableId?: string | null
+    variableId?: string | null,
   ) {
     await loadAllDatasetMetadata();
 
@@ -67,7 +69,7 @@ export function useLegacyStoreActions() {
       if (typeof window !== "undefined") {
         alert(
           "Please try again later, we were unable to locate dataset metadata for " +
-            metadataId
+            metadataId,
         );
       }
       return;
@@ -76,7 +78,9 @@ export function useLegacyStoreActions() {
     datasetStore.setMetadata(datasetMetadata);
 
     const incomingVariableId =
-      variableId == null ? (datasetMetadata as any).variables?.[0]?.id : variableId;
+      variableId == null
+        ? (datasetMetadata as any).variables?.[0]?.id
+        : variableId;
 
     if (incomingVariableId != null) {
       datasetStore.setVariable(incomingVariableId);
@@ -134,7 +138,11 @@ export function useLegacyStoreActions() {
     const timeoutSeconds = 60;
     const deadline = Date.now() + timeoutSeconds * 1000;
 
-    while (result.status !== "SUCCESS" && result.status !== "FAILED" && Date.now() < deadline) {
+    while (
+      result.status !== "SUCCESS" &&
+      result.status !== "FAILED" &&
+      Date.now() < deadline
+    ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       result = await requestJson(`${statusUrl}`);
     }
@@ -143,10 +151,13 @@ export function useLegacyStoreActions() {
       return result;
     }
     if (result.status === "FAILED") {
-      const error = new Error(`Request failed with status ${result.status}`) as Error & {
+      const error = new Error(
+        `Request failed with status ${result.status}`,
+      ) as Error & {
         response?: { status: number; data: unknown };
       };
-      const failMsg: string = result.error ?? result.detail ?? "Analysis job failed";
+      const failMsg: string =
+        result.error ?? result.detail ?? "Analysis job failed";
       error.response = {
         status: 500,
         data: { detail: [{ msg: failMsg }] },
@@ -159,12 +170,24 @@ export function useLegacyStoreActions() {
     };
     error.response = {
       status: 504,
-      data: { detail: [{ msg: "Request timed out after waiting for " + timeoutSeconds + " seconds" }] },
+      data: {
+        detail: [
+          {
+            msg:
+              "Request timed out after waiting for " +
+              timeoutSeconds +
+              " seconds",
+          },
+        ],
+      },
     };
     throw error;
   }
 
-  async function refineTimeSeriesAnalysis(jobId: string, requestData: Record<string, any>) {
+  async function refineTimeSeriesAnalysis(
+    jobId: string,
+    requestData: Record<string, any>,
+  ) {
     const requestPayload = {
       extraction_id: jobId,
       zonal_statistic: requestData.zonal_statistic,
@@ -178,11 +201,17 @@ export function useLegacyStoreActions() {
     });
   }
 
-  async function resolveTimeSeries(existingJobId: string | undefined, requestData: Record<string, any>) {
+  async function resolveTimeSeries(
+    existingJobId: string | undefined,
+    requestData: Record<string, any>,
+  ) {
     if (existingJobId) {
       try {
-        const response = await refineTimeSeriesAnalysis(existingJobId, requestData);
-        return {newJobId: existingJobId, response: response};
+        const response = await refineTimeSeriesAnalysis(
+          existingJobId,
+          requestData,
+        );
+        return { newJobId: existingJobId, response: response };
       } catch (error: any) {
         if (error.response?.status !== 404 && error.response?.status !== 422) {
           throw error;
@@ -193,7 +222,7 @@ export function useLegacyStoreActions() {
     const newJobId = await submitTimeSeriesRequest(requestData);
     const response = await pollTimeSeriesStatus(newJobId);
     const result = response.result;
-    return {newJobId, response: result};
+    return { newJobId, response: result };
   }
 
   return {

@@ -25,7 +25,13 @@ export class SkopeColorbar implements maplibregl.IControl {
   private static readonly PAD = 6;
   private static readonly TICKS = 5;
 
-  constructor(opts: { colors: string[]; vmin: number; vmax: number; units?: string; vmaxPct?: number }) {
+  constructor(opts: {
+    colors: string[];
+    vmin: number;
+    vmax: number;
+    units?: string;
+    vmaxPct?: number;
+  }) {
     this._colors = opts.colors;
     this._vmin = opts.vmin;
     this._vmax = opts.vmax;
@@ -82,11 +88,12 @@ export class SkopeColorbar implements maplibregl.IControl {
     const range = this._vmax - this._vmin || 1;
     const tickLines = Array.from({ length: TICKS }, (_, i) => {
       const v = this._vmax - (i / (TICKS - 1)) * range;
-      const y = (PAD + 0.5) + ((BAR_H - 1) * (this._vmax - v)) / range;
-      const annotation = (i === 0 && this._vmaxPct !== undefined)
-        ? `<text x="${labelX}" y="${(y + 11).toFixed(1)}" dominant-baseline="middle"
+      const y = PAD + 0.5 + ((BAR_H - 1) * (this._vmax - v)) / range;
+      const annotation =
+        i === 0 && this._vmaxPct !== undefined
+          ? `<text x="${labelX}" y="${(y + 11).toFixed(1)}" dominant-baseline="middle"
                 font-size="8" font-family="sans-serif" fill="#888" font-style="italic">(${Math.round(this._vmaxPct * 100)}% of max)</text>`
-        : "";
+          : "";
       return `
         <line x1="${tickX}" y1="${y.toFixed(1)}" x2="${tickX + 4}" y2="${y.toFixed(1)}"
               stroke="#666" stroke-width="1"/>

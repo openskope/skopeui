@@ -5,7 +5,10 @@
         {{ metadata?.title }}
       </span>
       <MetadataModal :metadata-id="metadata?.id" />
-      <v-tooltip location="bottom" text="View the SKOPE user guide (opens in a new tab)">
+      <v-tooltip
+        location="bottom"
+        text="View the SKOPE user guide (opens in a new tab)"
+      >
         <template #activator="{ props }">
           <v-btn
             icon
@@ -54,7 +57,9 @@ const metadata = computed(() => datasetStore.metadata as any);
 const variables = computed(() => metadata.value?.variables ?? []);
 
 const variable = computed({
-  get() { return datasetStore.variable as any; },
+  get() {
+    return datasetStore.variable as any;
+  },
   set(variableId: string) {
     datasetStore.setVariable(variableId);
     router.push({

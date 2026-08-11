@@ -33,6 +33,8 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
     maxYear: 3,
     canHandleTimeSeriesRequest: true,
     timeSeriesRequestData: { dataset_id: "paleocar", variable_id: "tasmax" },
+    timeSeriesRequestStatus: { status: "idle", messages: [] },
+    jobIds: {} as Record<string, string>,
     defaultApiRequestData: {
       dataset_id: "paleocar",
       variable_id: "tasmax",
@@ -40,6 +42,9 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
       time_range: { gte: "0001-01-01", lte: "0003-01-01" },
     },
     summaryStatistics: { name: "Original", mean: 1, median: 1, stdev: 0 },
+    setJobId: vi.fn((varId: string, jobId: string) => {
+      (store as any).jobIds[varId] = jobId;
+    }),
     clearTimeSeries: vi.fn(),
     setMetadata: vi.fn((value: unknown) => {
       (store as any).metadata = value;
@@ -61,7 +66,11 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
     setTimeSeriesBadRequest: vi.fn(),
     setTimeSeriesServerError: vi.fn(),
     setTimeSeriesTimeout: vi.fn(),
-    filteredTimeSeries: vi.fn(() => ({ x: [1, 2, 3], y: [10, 20, 30], name: "Original" })),
+    filteredTimeSeries: vi.fn(() => ({
+      x: [1, 2, 3],
+      y: [10, 20, 30],
+      name: "Original",
+    })),
   });
 
   Object.assign(store, overrides);

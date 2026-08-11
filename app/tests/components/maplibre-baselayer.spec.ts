@@ -2,6 +2,8 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { defineComponent, h, nextTick } from "vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import MapLibre from "@/components/dataset/MapLibre.client.vue";
+
 type MockLayer = {
   id: string;
   type: string;
@@ -124,7 +126,10 @@ const mocks = vi.hoisted(() => {
     }
 
     addLayer(layer: any) {
-      this.style.layers.push({ ...layer, layout: layer.layout ? { ...layer.layout } : undefined });
+      this.style.layers.push({
+        ...layer,
+        layout: layer.layout ? { ...layer.layout } : undefined,
+      });
     }
 
     removeLayer(id: string) {
@@ -155,6 +160,15 @@ vi.mock("@/stores/dataset", () => ({
   useDatasetStore: () => mocks.datasetStore,
 }));
 
+vi.mock("@/stores/messages", () => ({
+  useMessagesStore: () => ({
+    error: vi.fn(),
+    info: vi.fn(),
+    dismiss: vi.fn(),
+    clearMessages: vi.fn(),
+  }),
+}));
+
 vi.mock("@/composables/useLegacyStoreActions", () => ({
   useLegacyStoreActions: () => mocks.legacyActions,
 }));
@@ -164,6 +178,7 @@ vi.mock("@/composables/useMapInitialViewport", () => ({
 }));
 
 vi.mock("@/store/modules/constants", () => ({
+  TILES_ENDPOINT: "https://test.example.com/tiles",
   LEAFLET_PROVIDERS: [
     {
       name: "CartoDB.Positron",
@@ -193,8 +208,6 @@ vi.mock("@geoman-io/maplibre-geoman-free", () => ({
   createGeomanInstance: vi.fn(async () => mocks.geomanInstance),
 }));
 
-import MapLibrePoc from "@/components/dataset/MapLibrePoc.client.vue";
-
 const VTooltipStub = defineComponent({
   name: "VTooltipStub",
   template: '<div><slot name="activator" :props="{}" /><slot /></div>',
@@ -220,22 +233,22 @@ const VSelectStub = defineComponent({
           },
         },
         (props.items as any[]).map((item: any) =>
-          h("option", { key: item.value, value: item.value }, item.title)
-        )
+          h("option", { key: item.value, value: item.value }, item.title),
+        ),
       );
   },
 });
 
 const uiStubs = {
-  "v-card": { template: '<div><slot /></div>' },
-  "v-toolbar": { template: '<div><slot /></div>' },
-  "v-row": { template: '<div><slot /></div>' },
-  "v-spacer": { template: '<div />' },
-  "v-alert": { template: '<div><slot /></div>' },
-  "v-text-field": { template: '<input />' },
-  "v-btn": { template: '<button><slot /></button>' },
-  "v-icon": { template: '<i><slot /></i>' },
-  "v-card-text": { template: '<div><slot /></div>' },
+  "v-card": { template: "<div><slot /></div>" },
+  "v-toolbar": { template: "<div><slot /></div>" },
+  "v-row": { template: "<div><slot /></div>" },
+  "v-spacer": { template: "<div />" },
+  "v-alert": { template: "<div><slot /></div>" },
+  "v-text-field": { template: "<input />" },
+  "v-btn": { template: "<button><slot /></button>" },
+  "v-icon": { template: "<i><slot /></i>" },
+  "v-card-text": { template: "<div><slot /></div>" },
   "v-tooltip": VTooltipStub,
   "v-select": VSelectStub,
 };
@@ -256,7 +269,7 @@ describe("MapLibre basemap selector", () => {
   });
 
   it("[behavior] defaults to the step-configured basemap", async () => {
-    await mount(MapLibrePoc, {
+    await mount(MapLibre, {
       global: {
         stubs: uiStubs,
       },
@@ -274,7 +287,7 @@ describe("MapLibre basemap selector", () => {
   });
 
   it("[behavior] updates basemap visibility when selection changes", async () => {
-    const wrapper = mount(MapLibrePoc, {
+    const wrapper = mount(MapLibre, {
       global: {
         stubs: uiStubs,
       },
@@ -283,7 +296,9 @@ describe("MapLibre basemap selector", () => {
     await flushPromises();
     await nextTick();
 
-    await wrapper.find('[data-test="basemap-select"]').setValue("cartodb-positron");
+    await wrapper
+      .find('[data-test="basemap-select"]')
+      .setValue("cartodb-positron");
     await flushPromises();
     await nextTick();
 
@@ -292,12 +307,12 @@ describe("MapLibre basemap selector", () => {
     expect(map.setLayoutProperty).toHaveBeenCalledWith(
       "basemap-layer-cartodb-positron",
       "visibility",
-      "visible"
+      "visible",
     );
     expect(map.setLayoutProperty).toHaveBeenCalledWith(
       "basemap-layer-esri-worldtopomap",
       "visibility",
-      "none"
+      "none",
     );
 
     const topo = map.getLayer("basemap-layer-esri-worldtopomap");
@@ -327,7 +342,7 @@ describe("MapLibre basemap selector", () => {
       },
     };
 
-    await mount(MapLibrePoc, {
+    await mount(MapLibre, {
       global: {
         stubs: uiStubs,
       },

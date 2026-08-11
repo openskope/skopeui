@@ -37,8 +37,7 @@
             readonly
             no-resize
             @click="copyToClipboard"
-          >
-          </v-textarea>
+          />
           <h2>BibTeX (click text to copy)</h2>
           <v-textarea
             v-model="citationBibTex"
@@ -46,8 +45,7 @@
             readonly
             no-resize
             @click="copyToClipboard"
-          >
-          </v-textarea>
+          />
 
           <h2>Contact us</h2>
           <p class="text-body-1">
@@ -67,7 +65,7 @@
           >
             I decline, return to www.openskope.org
           </v-btn>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn variant="flat" color="accent" @click.stop="acceptTerms"
             >I accept</v-btn
           >

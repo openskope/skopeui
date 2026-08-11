@@ -2,7 +2,10 @@
   <v-card variant="outlined" class="time-series-card">
     <v-card-text class="time-series-card__content">
       <div class="time-series-toolbar">
-        <div v-if="showArea" class="time-series-toolbar__group time-series-toolbar__group--metrics">
+        <div
+          v-if="showArea"
+          class="time-series-toolbar__group time-series-toolbar__group--metrics"
+        >
           <v-tooltip location="top" text="Selected area in square kilometers">
             <template #activator="{ props }">
               <h3
@@ -13,7 +16,10 @@
               </h3>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" text="Total cell area used in this time series calculation">
+          <v-tooltip
+            location="top"
+            text="Total cell area used in this time series calculation"
+          >
             <template #activator="{ props }">
               <h3
                 v-bind="props"
@@ -71,8 +77,14 @@
           </div>
         </v-form>
 
-        <div v-if="showStepControls" class="time-series-toolbar__group time-series-toolbar__group--actions">
-          <v-tooltip location="top" text="Go to the first timestep of the defined temporal range">
+        <div
+          v-if="showStepControls"
+          class="time-series-toolbar__group time-series-toolbar__group--actions"
+        >
+          <v-tooltip
+            location="top"
+            text="Go to the first timestep of the defined temporal range"
+          >
             <template #activator="{ props }">
               <v-btn icon v-bind="props" color="accent" @click="gotoFirstStep">
                 <v-icon>mdi-skip-previous</v-icon>
@@ -86,7 +98,10 @@
               </v-btn>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" :text="isAnimationPlaying ? 'Pause animation' : 'Animate layers'">
+          <v-tooltip
+            location="top"
+            :text="isAnimationPlaying ? 'Pause animation' : 'Animate layers'"
+          >
             <template #activator="{ props }">
               <v-btn icon v-bind="props" @click="togglePlay">
                 <v-icon color="accent">{{ playIcon }}</v-icon>
@@ -100,7 +115,10 @@
               </v-btn>
             </template>
           </v-tooltip>
-          <v-tooltip location="top" text="Go to the last timestep of the defined temporal range">
+          <v-tooltip
+            location="top"
+            text="Go to the last timestep of the defined temporal range"
+          >
             <template #activator="{ props }">
               <v-btn icon v-bind="props" color="accent" @click="gotoLastStep">
                 <v-icon>mdi-skip-next</v-icon>
@@ -109,7 +127,10 @@
           </v-tooltip>
         </div>
 
-        <div v-if="showArea" class="time-series-toolbar__group time-series-toolbar__group--actions">
+        <div
+          v-if="showArea"
+          class="time-series-toolbar__group time-series-toolbar__group--actions"
+        >
           <v-tooltip location="top" text="Return to Select Area">
             <template #activator="{ props }">
               <v-btn
@@ -126,18 +147,30 @@
       </div>
 
       <div class="time-series-plot-shell">
-        <div v-if="timeSeriesRequestStatus.status === 'loading'" class="timeseries-loading-overlay">
-          <v-progress-circular indeterminate color="primary" size="52" width="4" />
+        <div
+          v-if="timeSeriesRequestStatus.status === 'loading'"
+          class="timeseries-loading-overlay"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            size="52"
+            width="4"
+          />
           <p class="loading-message mt-4">{{ loadingMessage }}</p>
         </div>
         <client-only placeholder="Loading...">
           <template
-            v-if="timeSeriesRequestStatus.status !== 'success'
-              && timeSeriesRequestStatus.status !== 'loading'"
+            v-if="
+              timeSeriesRequestStatus.status !== 'success' &&
+              timeSeriesRequestStatus.status !== 'loading'
+            "
           >
             <v-alert
-              v-for="(message, index) in timeSeriesRequestStatus.messages.filter(
-                (m) => m.type !== 'error'
+              v-for="(
+                message, index
+              ) in timeSeriesRequestStatus.messages.filter(
+                (m) => m.type !== 'error',
               )"
               :key="index"
               :type="message.type"
@@ -161,7 +194,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, defineAsyncComponent } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onUnmounted,
+  defineAsyncComponent,
+} from "vue";
 import _ from "lodash";
 import { useRoute } from "vue-router";
 import { useDatasetStore } from "@/stores/dataset";
@@ -180,7 +220,9 @@ const emit = defineEmits<{
 }>();
 
 // Lazy-load PlotlyClient to avoid SSR issues
-const Plotly = defineAsyncComponent(() => import("@/components/dataset/PlotlyClient.vue"));
+const Plotly = defineAsyncComponent(
+  () => import("@/components/dataset/PlotlyClient.vue"),
+);
 
 const datasetStore = useDatasetStore();
 const route = useRoute();
@@ -197,7 +239,10 @@ const plotlyRef = ref<any>(null);
 const PROGRESSIVE_MESSAGES = [
   { delay: 8_000, text: "Still working..." },
   { delay: 16_000, text: "Hang tight, almost there..." },
-  { delay: 24_000, text: "This is taking longer than usual, but we'll get there..." },
+  {
+    delay: 24_000,
+    text: "This is taking longer than usual, but we'll get there...",
+  },
 ];
 
 const loadingMessage = ref("");
@@ -206,7 +251,9 @@ let progressiveTimers: ReturnType<typeof setTimeout>[] = [];
 function startProgressiveMessages() {
   clearProgressiveMessages();
   progressiveTimers = PROGRESSIVE_MESSAGES.map(({ delay, text }) =>
-    setTimeout(() => { loadingMessage.value = text; }, delay)
+    setTimeout(() => {
+      loadingMessage.value = text;
+    }, delay),
   );
 }
 
@@ -218,7 +265,9 @@ function clearProgressiveMessages() {
 
 // Computed
 const selectedTemporalRange = computed({
-  get() { return datasetStore.temporalRange; },
+  get() {
+    return datasetStore.temporalRange;
+  },
   set(range: [number, number]) {
     datasetStore.setTemporalRange(range);
     emit("selected-temporal-range", datasetStore.temporalRange);
@@ -227,40 +276,66 @@ const selectedTemporalRange = computed({
 
 const temporalRangeMin = computed(() => datasetStore.temporalRangeMin);
 const temporalRangeMax = computed(() => datasetStore.temporalRangeMax);
-const timeSeriesRequestStatus = computed(() => datasetStore.timeSeriesRequestStatus);
-const selectedAreaInSquareKm = computed(() => datasetStore.selectedAreaInSquareKm);
+const timeSeriesRequestStatus = computed(
+  () => datasetStore.timeSeriesRequestStatus,
+);
+const selectedAreaInSquareKm = computed(
+  () => datasetStore.selectedAreaInSquareKm,
+);
 const minStep = computed(() => datasetStore.minYear);
 const maxStep = computed(() => datasetStore.maxYear);
 const variable = computed(() => datasetStore.variable as any);
 const totalCellArea = computed(() => datasetStore.totalCellAreaInSquareKm);
 const numberOfCells = computed(() => datasetStore.numberOfCells);
 const timeSeriesData = computed(() => props.traces);
-const hasMultipleTimeSeries = computed(() => props.traces != null && props.traces.length > 1);
-const hasTimeSeries = computed(() => props.traces != null && props.traces[0]?.x?.length > 0);
-const canHandleTimeSeriesRequest = computed(() => datasetStore.canHandleTimeSeriesRequest);
+const hasMultipleTimeSeries = computed(
+  () => props.traces != null && props.traces.length > 1,
+);
+const hasTimeSeries = computed(
+  () => props.traces != null && props.traces[0]?.x?.length > 0,
+);
+const canHandleTimeSeriesRequest = computed(
+  () => datasetStore.canHandleTimeSeriesRequest,
+);
 
 const formTemporalRangeMin = computed({
-  get() { return isTemporalRangeEditable.value ? localTemporalRangeMin.value : selectedTemporalRange.value[0]; },
-  set(value: number) { localTemporalRangeMin.value = value; },
+  get() {
+    return isTemporalRangeEditable.value
+      ? localTemporalRangeMin.value
+      : selectedTemporalRange.value[0];
+  },
+  set(value: number) {
+    localTemporalRangeMin.value = value;
+  },
 });
 
 const formTemporalRangeMax = computed({
-  get() { return isTemporalRangeEditable.value ? localTemporalRangeMax.value : selectedTemporalRange.value[1]; },
-  set(value: number) { localTemporalRangeMax.value = value; },
+  get() {
+    return isTemporalRangeEditable.value
+      ? localTemporalRangeMax.value
+      : selectedTemporalRange.value[1];
+  },
+  set(value: number) {
+    localTemporalRangeMax.value = value;
+  },
 });
 
-const hasTemporalRangeChanges = computed(() =>
-  localTemporalRangeMin.value !== selectedTemporalRange.value[0] ||
-  localTemporalRangeMax.value !== selectedTemporalRange.value[1]
+const hasTemporalRangeChanges = computed(
+  () =>
+    localTemporalRangeMin.value !== selectedTemporalRange.value[0] ||
+    localTemporalRangeMax.value !== selectedTemporalRange.value[1],
 );
 
 const timeStepsLabel = computed(() => {
-  const steps = selectedTemporalRange.value[1] - selectedTemporalRange.value[0] + 1;
+  const steps =
+    selectedTemporalRange.value[1] - selectedTemporalRange.value[0] + 1;
   return `${steps} time steps`;
 });
 
 const xAxisTitle = computed(() =>
-  props.stepSelected == null ? "Timestep" : `<b>Timestep ${props.stepSelected}</b>`
+  props.stepSelected == null
+    ? "Timestep"
+    : `<b>Timestep ${props.stepSelected}</b>`,
 );
 
 const yAxisTitle = computed(() => {
@@ -270,15 +345,17 @@ const yAxisTitle = computed(() => {
 
 const shapes = computed(() => {
   if (!_.isNull(props.stepSelected ?? null)) {
-    return [{
-      type: "line",
-      x0: props.stepSelected,
-      x1: props.stepSelected,
-      yref: "paper",
-      y0: 0,
-      y1: 1,
-      line: { color: "rgb(255, 140, 0)", width: 3 },
-    }];
+    return [
+      {
+        type: "line",
+        x0: props.stepSelected,
+        x1: props.stepSelected,
+        yref: "paper",
+        y0: 0,
+        y1: 1,
+        line: { color: "rgb(255, 140, 0)", width: 3 },
+      },
+    ];
   }
   return [];
 });
@@ -288,8 +365,18 @@ const layoutMetadata = computed(() => ({
   margin: { b: 60, t: 10, pad: 2 },
   showlegend: hasMultipleTimeSeries.value,
   legend: { x: 1, y: 0.5 },
-  xaxis: { title: xAxisTitle.value, linewidth: 3, gridwidth: 3, automargin: true },
-  yaxis: { title: yAxisTitle.value, linewidth: 3, gridwidth: 3, automargin: true },
+  xaxis: {
+    title: xAxisTitle.value,
+    linewidth: 3,
+    gridwidth: 3,
+    automargin: true,
+  },
+  yaxis: {
+    title: yAxisTitle.value,
+    linewidth: 3,
+    gridwidth: 3,
+    automargin: true,
+  },
   font: { size: 14 },
   shapes: shapes.value,
 }));
@@ -301,7 +388,7 @@ const options = computed(() => ({
 }));
 
 const playIcon = computed(() =>
-  isAnimationPlaying.value ? "mdi-pause-circle" : "mdi-play-circle"
+  isAnimationPlaying.value ? "mdi-pause-circle" : "mdi-play-circle",
 );
 
 const selectAreaLocation = computed(() => ({
@@ -315,7 +402,10 @@ function getPlotlyApi() {
     return null;
   }
 
-  if (typeof plotlyInstance.toImage === "function" || typeof plotlyInstance.update === "function") {
+  if (
+    typeof plotlyInstance.toImage === "function" ||
+    typeof plotlyInstance.update === "function"
+  ) {
     return plotlyInstance;
   }
 
@@ -339,14 +429,18 @@ function enableTemporalRangeEdit() {
 }
 
 function validateMinStep(value: number) {
-  if (value < minStep.value) return `Please enter a min step >= ${minStep.value}`;
-  if (value >= maxStep.value) return `Please enter a min step < ${maxStep.value}`;
+  if (value < minStep.value)
+    return `Please enter a min step >= ${minStep.value}`;
+  if (value >= maxStep.value)
+    return `Please enter a min step < ${maxStep.value}`;
   return true;
 }
 
 function validateMaxStep(value: number) {
-  if (value <= minStep.value) return `Please enter a max step > ${minStep.value}`;
-  if (value > maxStep.value) return `Please enter a max step <= ${maxStep.value}`;
+  if (value <= minStep.value)
+    return `Please enter a max step > ${minStep.value}`;
+  if (value > maxStep.value)
+    return `Please enter a max step <= ${maxStep.value}`;
   return true;
 }
 
@@ -360,11 +454,16 @@ function setStep(step: number) {
 
 function setTemporalRange() {
   if (!hasTemporalRangeChanges.value || !isTemporalRangeValid.value) return;
-  selectedTemporalRange.value = [localTemporalRangeMin.value, localTemporalRangeMax.value];
+  selectedTemporalRange.value = [
+    localTemporalRangeMin.value,
+    localTemporalRangeMax.value,
+  ];
   isTemporalRangeEditable.value = false;
   if (props.stepSelected == null) return;
-  if (props.stepSelected < temporalRangeMin.value) setStep(temporalRangeMin.value);
-  else if (props.stepSelected > temporalRangeMax.value) setStep(temporalRangeMax.value);
+  if (props.stepSelected < temporalRangeMin.value)
+    setStep(temporalRangeMin.value);
+  else if (props.stepSelected > temporalRangeMax.value)
+    setStep(temporalRangeMax.value);
 }
 
 function resetTemporalRange() {
@@ -385,12 +484,24 @@ function gotoLastStep() {
 
 function nextStep() {
   if (variable.value === null) return;
-  setStep(_.clamp(parseInt(String(props.stepSelected)) + 1, temporalRangeMin.value, temporalRangeMax.value));
+  setStep(
+    _.clamp(
+      parseInt(String(props.stepSelected)) + 1,
+      temporalRangeMin.value,
+      temporalRangeMax.value,
+    ),
+  );
 }
 
 function previousStep() {
   if (variable.value === null) return;
-  setStep(_.clamp((props.stepSelected ?? 0) - 1, temporalRangeMin.value, temporalRangeMax.value));
+  setStep(
+    _.clamp(
+      (props.stepSelected ?? 0) - 1,
+      temporalRangeMin.value,
+      temporalRangeMax.value,
+    ),
+  );
 }
 
 function advanceAnimation() {
@@ -405,14 +516,22 @@ function advanceAnimation() {
 function togglePlay() {
   isAnimationPlaying.value = !isAnimationPlaying.value;
   if (isAnimationPlaying.value) {
-    advanceAnimation();  // kick off first step; map drives the rest via advanceAnimation()
+    advanceAnimation(); // kick off first step; map drives the rest via advanceAnimation()
   }
 }
 
 async function getTimeSeriesPlotImage() {
   const plotlyApi = getPlotlyApi();
-  const svg = await plotlyApi?.toImage({ format: "svg", height: 600, width: 1200 });
-  const png = await plotlyApi?.toImage({ format: "png", height: 600, width: 1200 });
+  const svg = await plotlyApi?.toImage({
+    format: "svg",
+    height: 600,
+    width: 1200,
+  });
+  const png = await plotlyApi?.toImage({
+    format: "png",
+    height: 600,
+    width: 1200,
+  });
   return { png, svg };
 }
 
@@ -421,10 +540,12 @@ watch(
   (status) => {
     if (status === "loading") startProgressiveMessages();
     else clearProgressiveMessages();
-  }
+  },
 );
 
-onUnmounted(() => { clearProgressiveMessages(); });
+onUnmounted(() => {
+  clearProgressiveMessages();
+});
 
 defineExpose({ getTimeSeriesPlotImage, advanceAnimation });
 
@@ -434,10 +555,19 @@ onMounted(() => {
 });
 
 watch(
-  () => [minStep.value, maxStep.value, selectedTemporalRange.value[0], selectedTemporalRange.value[1]],
+  () => [
+    minStep.value,
+    maxStep.value,
+    selectedTemporalRange.value[0],
+    selectedTemporalRange.value[1],
+  ],
   ([nextMin, nextMax, selectedMin, selectedMax]) => {
     // Keep the selected range within metadata bounds when datasets/routes change.
-    if (selectedMin < nextMin || selectedMax > nextMax || selectedMin > selectedMax) {
+    if (
+      selectedMin < nextMin ||
+      selectedMax > nextMax ||
+      selectedMin > selectedMax
+    ) {
       selectedTemporalRange.value = [nextMin, nextMax];
     }
 
@@ -447,7 +577,7 @@ watch(
       localTemporalRangeMax.value = selectedTemporalRange.value[1];
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(timeSeriesData, (data) => {
@@ -539,7 +669,7 @@ watch(layoutMetadata, (layout) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.80);
+  background: rgba(255, 255, 255, 0.8);
   pointer-events: none;
 }
 

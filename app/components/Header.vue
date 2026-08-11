@@ -1,7 +1,7 @@
 <template>
   <v-app-bar src="/header.png">
     <template #img="{ props }">
-      <v-img v-bind="props" cover></v-img>
+      <v-img v-bind="props" cover />
     </template>
     <v-app-bar-nav-icon @click.stop="toggleNavigationDrawer()">
       <v-icon color="primary" x-large>mdi-menu</v-icon>
@@ -38,7 +38,7 @@ const display = useDisplay();
 const stepNames = computed(() => appStore.stepNames);
 const steps = computed(() => appStore.steps);
 const currentStepIndex = computed(() =>
-  stepNames.value.findIndex((x) => x === (route.name as string))
+  stepNames.value.findIndex((x) => x === (route.name as string)),
 );
 
 function toggleNavigationDrawer() {

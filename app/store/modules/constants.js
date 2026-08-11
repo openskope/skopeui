@@ -1,8 +1,5 @@
 import { find } from "lodash";
-import {
-  API_HOST_URL,
-  BUILD_ID,
-} from "@/store/modules/_constants";
+import { API_HOST_URL, BUILD_ID } from "@/store/modules/_constants";
 import { toISODate } from "@/store/stats";
 
 export const DEFAULT_CENTERED_SMOOTHING_WIDTH = 11;
@@ -23,24 +20,21 @@ export const LEAFLET_PROVIDERS = [
   },
   {
     name: "Stamen.TonerLite",
-    url:
-      "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
+    url: "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
     visible: false,
     attribution:
       'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>',
   },
   {
     name: "Esri.WorldTerrain",
-    url:
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
     visible: false,
     attribution:
       "Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS",
   },
   {
     name: "Esri.WorldTopoMap",
-    url:
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri et al",
     visible: 1,
   },

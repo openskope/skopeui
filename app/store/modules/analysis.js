@@ -51,7 +51,7 @@ class Analysis extends VuexModule {
     return this.response.series.map((s) => ({
       x: _.range(
         extractYear(s.time_range.gte),
-        extractYear(s.time_range.lte) + 1
+        extractYear(s.time_range.lte) + 1,
       ),
       y: s.values,
       name: s.options.name,

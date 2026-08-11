@@ -23,14 +23,18 @@ export const useAnalysisStore = defineStore("analysis", {
     derivedTimeseries: (state) => {
       return (state.response?.series || []).map((s: any) => ({
         x: Array.from(
-          { length: extractYear(s.time_range.lte) - extractYear(s.time_range.gte) + 1 },
-          (_, i) => extractYear(s.time_range.gte) + i
+          {
+            length:
+              extractYear(s.time_range.lte) - extractYear(s.time_range.gte) + 1,
+          },
+          (_, i) => extractYear(s.time_range.gte) + i,
         ),
         y: s.values,
         name: s.options?.name,
       }));
     },
-    derivedSummaryStatistics: (state) => formatStats(state.response?.summary_stats || []),
+    derivedSummaryStatistics: (state) =>
+      formatStats(state.response?.summary_stats || []),
   },
   actions: {
     setDefaultRequestData(requestData: Record<string, unknown>) {

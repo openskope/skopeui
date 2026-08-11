@@ -149,7 +149,11 @@ describe("migrated pinia stores", () => {
     store.setVariable("ppt");
     store.setTemporalRange([100, 102]);
     store.setTimeSeries({
-      timeSeries: { x: [100, 101, 102], y: [4, 5, 6], options: { name: "Original" } },
+      timeSeries: {
+        x: [100, 101, 102],
+        y: [4, 5, 6],
+        options: { name: "Original" },
+      },
       numberOfCells: 2,
       totalCellArea: 2000000,
     });
@@ -187,7 +191,9 @@ describe("migrated pinia stores", () => {
         title: "PaleoCAR",
         description: "rain-fed maize",
         timespan: { period: { gte: "1", lte: "2000" } },
-        variables: [{ class: "Precipitation", name: "ppt", description: "precip" }],
+        variables: [
+          { class: "Precipitation", name: "ppt", description: "precip" },
+        ],
       },
       {
         id: "lbda",

@@ -30,8 +30,7 @@
             readonly
             no-resize
             @click="copyToClipboard"
-          >
-          </v-textarea>
+          />
           <h2>BibTeX (click text to copy)</h2>
           <v-textarea
             v-model="citationBibTex"
@@ -39,8 +38,7 @@
             readonly
             no-resize
             @click="copyToClipboard"
-          >
-          </v-textarea>
+          />
 
           <h2>Contact us</h2>
           <p class="text-body-1 px-2">

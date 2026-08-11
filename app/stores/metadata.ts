@@ -11,7 +11,10 @@ function matchesYearFilter(minYear: number, maxYear: number, dataset: any) {
   return dMinYear <= maxYear;
 }
 
-function matchesVariableFilter(selectedVariableClasses: string[], dataset: any) {
+function matchesVariableFilter(
+  selectedVariableClasses: string[],
+  dataset: any,
+) {
   if (selectedVariableClasses.length === 0) {
     return true;
   }
@@ -55,18 +58,26 @@ export const useMetadataStore = defineStore("metadata", {
   getters: {
     shouldRefresh: (state) => {
       const maxRefreshTime = 3600000;
-      return state.lastRefreshed == null || new Date().getTime() - state.lastRefreshed.getTime() > maxRefreshTime;
+      return (
+        state.lastRefreshed == null ||
+        new Date().getTime() - state.lastRefreshed.getTime() > maxRefreshTime
+      );
     },
   },
   actions: {
     find(metadataId: string) {
-      return this.allDatasetMetadata.find((dataset) => dataset.id === metadataId) || null;
+      return (
+        this.allDatasetMetadata.find((dataset) => dataset.id === metadataId) ||
+        null
+      );
     },
     setLastRefreshed() {
       this.lastRefreshed = new Date();
     },
     setAllDatasetMetadata(datasets: MetadataItem[]) {
-      const sorted = [...datasets].sort((a: any, b: any) => (a.ordering || 0) - (b.ordering || 0));
+      const sorted = [...datasets].sort(
+        (a: any, b: any) => (a.ordering || 0) - (b.ordering || 0),
+      );
       this.allDatasetMetadata = sorted;
       this.filteredDatasets = sorted;
     },
@@ -84,7 +95,8 @@ export const useMetadataStore = defineStore("metadata", {
         query: filterCriteria.query || "",
       };
       this.filteredDatasets = this.allDatasetMetadata.filter((dataset) => {
-        const selectedVariableClasses = this.filterCriteria.selectedVariableClasses;
+        const selectedVariableClasses =
+          this.filterCriteria.selectedVariableClasses;
         const minYear = this.filterCriteria.yearStart;
         const maxYear = this.filterCriteria.yearEnd;
         const query = this.filterCriteria.query || "";

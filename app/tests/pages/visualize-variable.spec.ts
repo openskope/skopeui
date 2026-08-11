@@ -13,7 +13,9 @@ import {
   resetNuxtTestGlobals,
 } from "@/tests/fixtures/nuxt-test-helpers";
 
-let routeParams = { id: "paleocar", variable: "tasmax" };
+import VisualizePage from "@/pages/dataset/[id]/visualize/[variable].vue";
+
+const routeParams = { id: "paleocar", variable: "tasmax" };
 let datasetStore: any;
 let appStore: any;
 let legacyActions: any;
@@ -29,7 +31,8 @@ vi.mock("@/components/dataset/Map.client.vue", () => ({
   default: {
     name: "MapStub",
     props: ["mapEngine", "displayRaster"],
-    template: '<div data-test="map" :data-map-engine="mapEngine" :data-display-raster="String(displayRaster)">map</div>',
+    template:
+      '<div data-test="map" :data-map-engine="mapEngine" :data-display-raster="String(displayRaster)">map</div>',
   },
 }));
 
@@ -62,18 +65,25 @@ vi.mock("@/stores/app", () => ({
   useAppStore: () => appStore,
 }));
 
+vi.mock("@/stores/messages", () => ({
+  useMessagesStore: () => ({
+    error: vi.fn(),
+    info: vi.fn(),
+    dismiss: vi.fn(),
+    clearMessages: vi.fn(),
+  }),
+}));
+
 vi.mock("@/composables/useLegacyStoreActions", () => ({
   useLegacyStoreActions: () => legacyActions,
 }));
 
-import VisualizePage from "@/pages/dataset/[id]/visualize/[variable].vue";
-
 const layoutStubs = {
-  "v-container": { template: '<div><slot /></div>' },
-  "v-row": { template: '<div><slot /></div>' },
-  "v-col": { template: '<div><slot /></div>' },
-  "v-btn": { template: '<button><slot /></button>' },
-  "v-icon": { template: '<i><slot /></i>' },
+  "v-container": { template: "<div><slot /></div>" },
+  "v-row": { template: "<div><slot /></div>" },
+  "v-col": { template: "<div><slot /></div>" },
+  "v-btn": { template: "<button><slot /></button>" },
+  "v-icon": { template: "<i><slot /></i>" },
 };
 
 describe("route /dataset/:id/visualize/:variable", () => {
@@ -85,6 +95,12 @@ describe("route /dataset/:id/visualize/:variable", () => {
     legacyActions = {
       initializeDataset: vi.fn(async () => true),
       initializeDatasetGeoJson: vi.fn(),
+      resolveTimeSeries: vi.fn(
+        async (_jobId: string | undefined, _data: any) => ({
+          newJobId: "test-job-id",
+          response: timeSeriesResponseFixture,
+        }),
+      ),
     };
 
     vi.stubGlobal(
@@ -92,7 +108,7 @@ describe("route /dataset/:id/visualize/:variable", () => {
       vi.fn(async () => ({
         ok: true,
         json: async () => timeSeriesResponseFixture,
-      }))
+      })),
     );
   });
 
@@ -102,7 +118,9 @@ describe("route /dataset/:id/visualize/:variable", () => {
   });
 
   it("[smoke] renders map and timeseries panel", async () => {
-    const wrapper = await mountWithSuspense(VisualizePage, { global: { stubs: layoutStubs } });
+    const wrapper = await mountWithSuspense(VisualizePage, {
+      global: { stubs: layoutStubs },
+    });
 
     await flushPromises();
     const page = wrapper.findComponent(VisualizePage);
@@ -111,7 +129,9 @@ describe("route /dataset/:id/visualize/:variable", () => {
     expect(page.findComponent({ name: "MapStub" }).exists()).toBe(true);
     expect(map.attributes("data-map-engine")).toBe("maplibre");
     expect(map.attributes("data-display-raster")).toBe("true");
-    expect(page.findComponent({ name: "TimeSeriesPlotStub" }).exists()).toBe(true);
+    expect(page.findComponent({ name: "TimeSeriesPlotStub" }).exists()).toBe(
+      true,
+    );
   });
 
   it("[behavior] loads time-series data on mount", async () => {
@@ -122,7 +142,7 @@ describe("route /dataset/:id/visualize/:variable", () => {
     expect(datasetStore.setTimeSeriesLoading).toHaveBeenCalled();
     expect(datasetStore.setTimeSeries).toHaveBeenCalled();
     expect(datasetStore.setTimeSeriesLoaded).toHaveBeenCalled();
-    expect(global.fetch).toHaveBeenCalled();
+    expect(legacyActions.resolveTimeSeries).toHaveBeenCalled();
     expect(appStore.setVisited).toHaveBeenCalled();
   });
 
@@ -130,7 +150,6 @@ describe("route /dataset/:id/visualize/:variable", () => {
     await mountWithSuspense(VisualizePage, { global: { stubs: layoutStubs } });
 
     await flushPromises();
-    const initialFetchCalls = (global.fetch as any).mock.calls.length;
 
     datasetStore.timeSeriesRequestData = {
       dataset_id: "paleocar",
@@ -139,12 +158,14 @@ describe("route /dataset/:id/visualize/:variable", () => {
       time_range: { gte: "0002-01-01", lte: "0003-01-01" },
       zonal_statistic: "mean",
       transform: { type: "NoTransform" },
-      requested_series_options: [{ name: "Original", smoother: { type: "NoSmoother" } }],
+      requested_series_options: [
+        { name: "Original", smoother: { type: "NoSmoother" } },
+      ],
     };
 
     await nextTick();
     await flushPromises();
 
-    expect((global.fetch as any).mock.calls.length).toBeGreaterThan(initialFetchCalls);
+    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(2);
   });
 });

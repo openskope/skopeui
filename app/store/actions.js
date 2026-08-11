@@ -27,7 +27,7 @@ async function updateTimeSeries(api, data) {
     const timeSeries = {
       x: _.range(
         extractYear(originalSeries.time_range.gte),
-        extractYear(originalSeries.time_range.lte) + 1
+        extractYear(originalSeries.time_range.lte) + 1,
       ),
       y: originalSeries.values,
       options: originalSeries.options,
@@ -82,7 +82,7 @@ export const loadTimeSeries = _.debounce(async function (api) {
 const updateAnalysis = _.debounce(async function (api, data) {
   try {
     api.analysis.setResponse(
-      await api.store.$axios.$post(TIMESERIES_ENDPOINT, data)
+      await api.store.$axios.$post(TIMESERIES_ENDPOINT, data),
     );
   } catch (e) {
     api.analysis.setResponseError(e);
@@ -93,7 +93,7 @@ export async function retrieveAnalysis(api, data) {
   if (!isValidRequestData(data)) {
     console.log(
       "Unable to retrieve analysis with invalid request data: ",
-      data
+      data,
     );
     return;
   }
@@ -125,14 +125,14 @@ export async function loadAllDatasetMetadata(api) {
     } catch (e) {
       console.error(e);
       // should start to use the messages component to display user messages
-      if (process.client) {
+      if (import.meta.client) {
         alert("Unable to access skope api metadata at: " + METADATA_ENDPOINT);
       }
     }
   } else {
     console.log(
       "Not loading all metadata, already queried at ",
-      api.metadata.lastRefreshed
+      api.metadata.lastRefreshed,
     );
   }
 }
@@ -162,7 +162,7 @@ export async function initializeDataset(
   warehouse,
   api,
   metadataId,
-  variableId
+  variableId,
 ) {
   console.log("initializeDataset ", { metadataId, variableId });
   await loadAllDatasetMetadata(api);
@@ -171,16 +171,16 @@ export async function initializeDataset(
       "Already initialized dataset metadata, ignoring request: ",
       metadataId,
       " existing: ",
-      api.dataset.metadata.id
+      api.dataset.metadata.id,
     );
     return;
   }
   const datasetMetadata = await api.metadata.find(metadataId);
   if (datasetMetadata === null) {
-    if (process.client) {
+    if (import.meta.client) {
       alert(
         "Please try again later, we were unable to locate dataset metadata for " +
-          metadataId
+          metadataId,
       );
     }
     return;
@@ -192,7 +192,7 @@ export async function initializeDataset(
     console.log("set default variable on dataset: ", variableId);
   }
   api.dataset.setVariable(variableId);
-  if (process.client) {
+  if (import.meta.client) {
     initializeDatasetGeoJson(warehouse, api);
   }
 }
@@ -200,7 +200,7 @@ export async function initializeDataset(
 export function initializeDatasetGeoJson(warehouse, api) {
   if (api.dataset.hasGeoJson) {
     console.log(
-      "dataset store already has geojson, no need to restore from warehouse"
+      "dataset store already has geojson, no need to restore from warehouse",
     );
     return;
   }
@@ -226,7 +226,7 @@ export async function initializeRequestData(api) {
   const incomingRequestData = api.dataset.defaultApiRequestData;
   console.log(
     "Setting transform, zonal_statistic and requested_series_options for request data to ",
-    { analysisRequestData }
+    { analysisRequestData },
   );
   if (analysisRequestData?.transform) {
     incomingRequestData.transform = analysisRequestData.transform;

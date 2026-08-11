@@ -2,7 +2,7 @@
   <v-card-text>
     <div v-for="(label, attr) in metadataAttributes" :key="attr" class="py-0">
       <span class="text-h5">{{ label }}</span>
-      <span v-html="$md.render(renderableMetadata(attr))"></span>
+      <span v-html="$md.render(renderableMetadata(attr))" />
     </div>
     <VariableList :variables="metadata.variables" />
   </v-card-text>

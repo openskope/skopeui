@@ -83,7 +83,7 @@ The SKOPE UI then uses maplibre-cog-protocol with those server-provided settings
 | **Low-end device support** | Degraded — decode cost is real for large float COGs | Uniform — PNG tiles are light |
 | **Observability / throttling** | Harder — traffic bypasses the API | Easy — standard API logging, rate limiting, circuit breakers |
 | **Future non-public data** | Requires signed URLs per request | Transparent — auth at the API boundary only |
-| **Time to implement (frontend)** | Fast — add protocol, wire source/layer in `MapLibrePoc.client.vue` | Moderate — wire TileJSON fetch + dynamic source update on year change |
+| **Time to implement (frontend)** | Fast — add protocol, wire source/layer in `MapLibre.client.vue` | Moderate — wire TileJSON fetch + dynamic source update on year change |
 | **Time to implement (backend)** | None required in skope-api | Requires PR-04 metadata contract + PR-05 tile endpoints in skope-api |
 
 ---
@@ -162,7 +162,7 @@ If any box is unchecked, route the variable through the server-side tile gateway
 | PR | Approach | Notes |
 |---|---|---|
 | PR-04 | Add `cog_path_template`, `default_render` fields to variable metadata (frontend stores + API contract) | Required by both paths to locate the COG and set render params |
-| PR-05 | Wire `cogProtocol` in `MapLibrePoc.client.vue`; add/update raster source on `year` change | Pure client rendering path |
+| PR-05 | Wire `cogProtocol` in `MapLibre.client.vue`; add/update raster source on `year` change | Pure client rendering path |
 | PR-05.5 | Add lightweight `/v2/map/cog-config/...` endpoint in skope-api | Centralized render defaults and policy, no tile rendering |
 | PR-05 alt | Add `/v2/map/tilejson/` + `/v2/map/tiles/` to skope-api; fetch TileJSON and drive raster source | Full dynamic tiling fallback for non-conforming datasets |
 | PR-06 | Workflow parity (year slider drives raster update, visualize → analyze handoff) | Same regardless of rendering path |

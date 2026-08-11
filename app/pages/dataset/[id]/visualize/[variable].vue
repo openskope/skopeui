@@ -2,50 +2,55 @@
   <v-container fluid class="fill-height align-start">
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
-    <v-row no-gutters>
-      <v-col class="pa-0 ma-0">
-        <SubHeader :select-variable="true">
-          <v-btn
-            :disabled="!hasValidStudyArea"
-            :to="analyzeLocation"
-            color="accent"
-            variant="flat"
-          >
-            Analyze Data
-            <v-icon class="ml-2" size="small"> mdi-chevron-right </v-icon>
-          </v-btn>
-        </SubHeader>
-      </v-col>
-    </v-row>
-    <v-row class="pa-0 mb-6" no-gutters>
-      <!-- 2 column layout with map and time series-->
-      <v-col
-        class="d-flex map-flex pa-0 mb-3"
-        lg="6"
-        md="12"
-        sm="12"
-        align-self="stretch"
-      >
-        <Map :step="stepSelected" :display-raster="true" map-engine="maplibre" @step-ready="onStepReady" />
-      </v-col>
-      <!-- time series plot -->
-      <v-col
-        class="d-flex map-flex pa-0"
-        lg="6"
-        md="12"
-        sm="12"
-        align-self="stretch"
-      >
-        <TimeSeriesPlot
-          ref="timeSeriesPlotRef"
-          :show-area="true"
-          :show-step-controls="true"
-          :traces="traces"
-          :step-selected="stepSelected"
-          @step-selected="setStep"
-        />
-      </v-col>
-    </v-row>
+      <v-row no-gutters>
+        <v-col class="pa-0 ma-0">
+          <SubHeader :select-variable="true">
+            <v-btn
+              :disabled="!hasValidStudyArea"
+              :to="analyzeLocation"
+              color="accent"
+              variant="flat"
+            >
+              Analyze Data
+              <v-icon class="ml-2" size="small"> mdi-chevron-right </v-icon>
+            </v-btn>
+          </SubHeader>
+        </v-col>
+      </v-row>
+      <v-row class="pa-0 mb-6" no-gutters>
+        <!-- 2 column layout with map and time series-->
+        <v-col
+          class="d-flex map-flex pa-0 mb-3"
+          lg="6"
+          md="12"
+          sm="12"
+          align-self="stretch"
+        >
+          <Map
+            :step="stepSelected"
+            :display-raster="true"
+            map-engine="maplibre"
+            @step-ready="onStepReady"
+          />
+        </v-col>
+        <!-- time series plot -->
+        <v-col
+          class="d-flex map-flex pa-0"
+          lg="6"
+          md="12"
+          sm="12"
+          align-self="stretch"
+        >
+          <TimeSeriesPlot
+            ref="timeSeriesPlotRef"
+            :show-area="true"
+            :show-step-controls="true"
+            :traces="traces"
+            :step-selected="stepSelected"
+            @step-selected="setStep"
+          />
+        </v-col>
+      </v-row>
     </template>
   </v-container>
 </template>
@@ -108,13 +113,16 @@ async function updateTimeSeries(data: any) {
   try {
     const varId = route.params.variable as string;
     const jobId = datasetStore.jobIds?.[varId];
-    const {newJobId, response} = await legacyActions.resolveTimeSeries(jobId, data);
+    const { newJobId, response } = await legacyActions.resolveTimeSeries(
+      jobId,
+      data,
+    );
     datasetStore.setJobId(varId, newJobId);
     const originalSeries = response.series[0];
     const timeSeries = {
       x: _.range(
         extractYear(originalSeries.time_range.gte),
-        extractYear(originalSeries.time_range.lte) + 1
+        extractYear(originalSeries.time_range.lte) + 1,
       ),
       y: originalSeries.values,
       options: originalSeries.options,
@@ -130,20 +138,29 @@ async function updateTimeSeries(data: any) {
     if (e.response) {
       const { status, data: responseData } = e.response;
       const detail = Array.isArray(responseData.detail)
-      ? responseData.detail
-      : [{ msg: responseData.detail }];
+        ? responseData.detail
+        : [{ msg: responseData.detail }];
       if (status === 504) {
         datasetStore.setTimeSeriesTimeout();
-        messageStore.error("Request timed out. Try a smaller area or shorter date range.");
+        messageStore.error(
+          "Request timed out. Try a smaller area or shorter date range.",
+        );
       } else if (status >= 500) {
         datasetStore.setTimeSeriesServerError(detail);
-        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Server error. Please try again.");
+        messageStore.error(
+          detail.map((d: any) => d.msg).join(" ") ||
+            "Server error. Please try again.",
+        );
       } else if (status >= 400) {
         datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Bad request.");
+        messageStore.error(
+          detail.map((d: any) => d.msg).join(" ") || "Bad request.",
+        );
       }
     } else {
-      const msg = e.message || "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
+      const msg =
+        e.message ||
+        "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
       datasetStore.setTimeSeriesServerError([{ msg }]);
       messageStore.error(msg);
     }
@@ -161,12 +178,12 @@ await useAsyncData(
   async () => {
     await legacyActions.initializeDataset(
       route.params.id as string,
-      route.params.variable as string
+      route.params.variable as string,
     );
     stepSelected.value = datasetStore.temporalRangeMin;
     return true;
   },
-  { server: false }
+  { server: false },
 );
 
 onMounted(() => {
@@ -180,7 +197,7 @@ onMounted(() => {
         await loadTimeSeries();
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
   appStore.setVisited();
 });

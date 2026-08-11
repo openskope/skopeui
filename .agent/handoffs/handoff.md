@@ -22,7 +22,7 @@ Status: implemented and validated
   - Retained the earlier async Plotly ref hardening for `update` and `toImage` calls.
 
 3. Previously completed in this branch
-  - `app/components/dataset/MapLibrePoc.client.vue`, `app/components/dataset/LeafletMap.client.vue`, `app/store/modules/constants.js`, `app/store/modules/_constants.js`, `app/store/modules/_constants.js.template`, `app/store/modules/metadata.js`, `config.mk.template`, `README.md`
+  - `app/components/dataset/MapLibre.client.vue`, `app/components/dataset/LeafletMap.client.vue`, `app/store/modules/constants.js`, `app/store/modules/_constants.js`, `app/store/modules/_constants.js.template`, `app/store/modules/metadata.js`, `config.mk.template`, `README.md`
   - These changes removed active GeoServer/WMS frontend code and synced the repo/docs to the rasterless-until-COG state.
 
 ## Validation Commands

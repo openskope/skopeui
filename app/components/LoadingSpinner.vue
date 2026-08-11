@@ -11,10 +11,7 @@
         :width="5"
         color="secondary"
         indeterminate
-      >
-      </v-progress-circular>
+      />
     </v-col>
   </v-row>
 </template>
-
-
