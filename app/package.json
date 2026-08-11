@@ -13,6 +13,7 @@
     "generate": "nuxt generate",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
+    "format": "prettier --write \"/repo/**/*.{js,mjs,ts,vue,scss,json,md,yml,yaml}\" --ignore-path /repo/.prettierignore && npm run lintfix",
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
     "test:components": "vitest run tests/components",

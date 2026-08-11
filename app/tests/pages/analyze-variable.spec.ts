@@ -12,7 +12,9 @@ import {
   resetNuxtTestGlobals,
 } from "@/tests/fixtures/nuxt-test-helpers";
 
-let routeParams = { id: "paleocar", variable: "tasmax" };
+import AnalyzePage from "@/pages/dataset/[id]/analyze/[variable].vue";
+
+const routeParams = { id: "paleocar", variable: "tasmax" };
 let analysisStore: any;
 let datasetStore: any;
 let legacyActions: any;
@@ -32,7 +34,10 @@ vi.mock("@/components/dataset/TimeSeriesPlot.vue", () => ({
     name: "TimeSeriesPlotStub",
     template: '<div data-test="timeseries">timeseries</div>',
     methods: {
-      getTimeSeriesPlotImage: async () => ({ png: "data:image/png", svg: "data:image/svg+xml" }),
+      getTimeSeriesPlotImage: async () => ({
+        png: "data:image/png",
+        svg: "data:image/svg+xml",
+      }),
     },
   },
 }));
@@ -59,16 +64,23 @@ vi.mock("@/stores/dataset", () => ({
   useDatasetStore: () => datasetStore,
 }));
 
+vi.mock("@/stores/messages", () => ({
+  useMessagesStore: () => ({
+    error: vi.fn(),
+    info: vi.fn(),
+    dismiss: vi.fn(),
+    clearMessages: vi.fn(),
+  }),
+}));
+
 vi.mock("@/composables/useLegacyStoreActions", () => ({
   useLegacyStoreActions: () => legacyActions,
 }));
 
-import AnalyzePage from "@/pages/dataset/[id]/analyze/[variable].vue";
-
 const layoutStubs = {
-  "v-container": { template: '<div><slot /></div>' },
-  "v-row": { template: '<div><slot /></div>' },
-  "v-col": { template: '<div><slot /></div>' },
+  "v-container": { template: "<div><slot /></div>" },
+  "v-row": { template: "<div><slot /></div>" },
+  "v-col": { template: "<div><slot /></div>" },
   "v-form": {
     props: ["modelValue"],
     emits: ["update:modelValue"],
@@ -77,9 +89,10 @@ const layoutStubs = {
   "v-data-table": { template: '<div data-test="stats-table"></div>' },
   "v-select": { template: '<div data-test="select"></div>' },
   "v-text-field": { template: '<input data-test="input" />' },
-  "v-icon": { template: '<i><slot /></i>' },
+  "v-icon": { template: "<i><slot /></i>" },
   "v-btn": {
-    template: '<button data-test="action-btn" @click="$emit(\'click\')"><slot /></button>',
+    template:
+      '<button data-test="action-btn" @click="$emit(\'click\')"><slot /></button>',
   },
 };
 
@@ -101,6 +114,12 @@ describe("route /dataset/:id/analyze/:variable", () => {
     legacyActions = {
       initializeDataset: vi.fn(async () => true),
       initializeDatasetGeoJson: vi.fn(),
+      resolveTimeSeries: vi.fn(
+        async (_jobId: string | undefined, _data: any) => ({
+          newJobId: "test-job-id",
+          response: timeSeriesResponseFixture,
+        }),
+      ),
     };
 
     vi.stubGlobal(
@@ -108,7 +127,7 @@ describe("route /dataset/:id/analyze/:variable", () => {
       vi.fn(async () => ({
         ok: true,
         json: async () => timeSeriesResponseFixture,
-      }))
+      })),
     );
   });
 
@@ -118,17 +137,23 @@ describe("route /dataset/:id/analyze/:variable", () => {
   });
 
   it("[smoke] renders analysis form and timeseries plot", async () => {
-    const wrapper = await mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
+    const wrapper = await mountWithSuspense(AnalyzePage, {
+      global: { stubs: layoutStubs },
+    });
 
     await flushPromises();
     const page = wrapper.findComponent(AnalyzePage);
 
     expect(page.find('[data-test="analysis-form"]').exists()).toBe(true);
-    expect(page.findComponent({ name: "TimeSeriesPlotStub" }).exists()).toBe(true);
+    expect(page.findComponent({ name: "TimeSeriesPlotStub" }).exists()).toBe(
+      true,
+    );
   });
 
   it("[behavior] submits updated request data when Update is clicked", async () => {
-    const wrapper = await mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
+    const wrapper = await mountWithSuspense(AnalyzePage, {
+      global: { stubs: layoutStubs },
+    });
     const page = wrapper.findComponent(AnalyzePage);
 
     await flushPromises();
@@ -142,6 +167,6 @@ describe("route /dataset/:id/analyze/:variable", () => {
     await flushPromises();
 
     expect(analysisStore.setRequestData).toHaveBeenCalled();
-    expect(global.fetch).toHaveBeenCalled();
+    expect(legacyActions.resolveTimeSeries).toHaveBeenCalled();
   });
 });

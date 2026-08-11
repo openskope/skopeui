@@ -19,7 +19,7 @@ Status: completed
 - `AGENTS.md`
 - `app/components/Navigation.vue`
 - `app/components/dataset/Map.client.vue`
-- `app/components/dataset/MapLibrePoc.client.vue`
+- `app/components/dataset/MapLibre.client.vue`
 - `app/package-lock.json`
 - `app/package.json`
 - `app/pages/dataset/[id]/analyze/[variable].vue`
@@ -54,6 +54,6 @@ Status: completed
 	- Run full `npm run test` once before merge.
 
 ## Rollback Notes (Optional)
-- Revert `app/components/dataset/MapLibrePoc.client.vue` to previous map-draw and basemap behavior.
+- Revert `app/components/dataset/MapLibre.client.vue` to previous map-draw and basemap behavior.
 - Remove `app/tests/components/maplibre-baselayer.spec.ts` and `test:components` script from `app/package.json`.
 - Revert AGENTS/copilot instruction updates if roadmap/status text needs to be restored.

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="fill-height align-start">
-    <LoadingSpinner v-if="isLoadingMetadata"></LoadingSpinner>
+    <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
       <v-row no-gutters>
         <v-col>
@@ -185,7 +185,10 @@ const yAxisLabel = ref<string | null>(null);
 const smoothingOption = ref("none");
 const smoothingTimeStep = ref(DEFAULT_CENTERED_SMOOTHING_WIDTH);
 const transformOption = ref("none");
-const timeRange = ref({ lb: { year: 1500, month: 1 }, ub: { year: 1800, month: 1 } });
+const timeRange = ref({
+  lb: { year: 1500, month: 1 },
+  ub: { year: 1800, month: 1 },
+});
 
 const zonalStatisticOptions = [
   { label: "Mean of its pixels", id: "mean" },
@@ -204,19 +207,43 @@ const smoothingOptions = SMOOTHING_OPTIONS;
 // compatible with the analyzeVue interface expected by SMOOTHING_OPTIONS /
 // TRANSFORM_OPTIONS toRequestData / fromRequestData functions.
 const analyzeVue: any = {
-  get smoothingOption() { return smoothingOption.value; },
-  set smoothingOption(v) { smoothingOption.value = v; },
-  get smoothingTimeStep() { return smoothingTimeStep.value; },
-  set smoothingTimeStep(v) { smoothingTimeStep.value = v; },
-  get transformOption() { return transformOption.value; },
-  set transformOption(v) { transformOption.value = v; },
-  get timeRange() { return timeRange.value; },
-  set timeRange(v) { timeRange.value = v; },
+  get smoothingOption() {
+    return smoothingOption.value;
+  },
+  set smoothingOption(v) {
+    smoothingOption.value = v;
+  },
+  get smoothingTimeStep() {
+    return smoothingTimeStep.value;
+  },
+  set smoothingTimeStep(v) {
+    smoothingTimeStep.value = v;
+  },
+  get transformOption() {
+    return transformOption.value;
+  },
+  set transformOption(v) {
+    transformOption.value = v;
+  },
+  get timeRange() {
+    return timeRange.value;
+  },
+  set timeRange(v) {
+    timeRange.value = v;
+  },
   // snake_case alias used in some fromRequestData implementations
-  get time_range() { return timeRange.value; },
-  set time_range(v) { timeRange.value = v; },
-  get zScoreMovingIntervalTimeSteps() { return zScoreMovingIntervalTimeSteps.value; },
-  set zScoreMovingIntervalTimeSteps(v) { zScoreMovingIntervalTimeSteps.value = v; },
+  get time_range() {
+    return timeRange.value;
+  },
+  set time_range(v) {
+    timeRange.value = v;
+  },
+  get zScoreMovingIntervalTimeSteps() {
+    return zScoreMovingIntervalTimeSteps.value;
+  },
+  set zScoreMovingIntervalTimeSteps(v) {
+    zScoreMovingIntervalTimeSteps.value = v;
+  },
 };
 
 const metadata = computed(() => datasetStore.metadata);
@@ -256,19 +283,28 @@ const traces = computed(() => {
   const timeseries = analysisStore.timeseries;
   const transformed = timeseries.map((ts: any) => ({ ...ts, type: "scatter" }));
   if (transformed.length > 0) return transformed;
-  return [{ ...datasetStore.filteredTimeSeries(), type: "scatter", name: "Original" }];
+  return [
+    { ...datasetStore.filteredTimeSeries(), type: "scatter", name: "Original" },
+  ];
 });
 const smoothingFunction = computed(() => {
-  const option = smoothingOptions.find((x: any) => x.id === smoothingOption.value) as any;
+  const option = smoothingOptions.find(
+    (x: any) => x.id === smoothingOption.value,
+  ) as any;
   return option?.toRequestData(analyzeVue);
 });
 const transformRequestData = computed(() => {
-  const option = transformOptions.find((x: any) => x.id === transformOption.value) as any;
+  const option = transformOptions.find(
+    (x: any) => x.id === transformOption.value,
+  ) as any;
   return option?.toRequestData(analyzeVue);
 });
 const requestedSeriesOptions = computed(() => {
   const series: any[] = [
-    { name: hasTransformOption.value ? "Transformed" : "Original", smoother: { type: "NoSmoother" } },
+    {
+      name: hasTransformOption.value ? "Transformed" : "Original",
+      smoother: { type: "NoSmoother" },
+    },
   ];
   if (hasSmoothingOption.value) {
     series.push({ name: "Smoothed", smoother: smoothingFunction.value });
@@ -278,18 +314,25 @@ const requestedSeriesOptions = computed(() => {
 
 function transformHint(transform: string) {
   switch (transform) {
-    case "zscoreFixed":   return "Displays Z-score transformed values relative to a fixed interval selected by the user";
-    case "zscoreMoving":  return "Displays Z-score transformed values relative to a moving window of a size (N time steps) selected by the user";
-    case "zscoreSelected": return "Displays Z-score transformed values using the selected interval";
-    default:              return "Modeled values are graphed without any transformation";
+    case "zscoreFixed":
+      return "Displays Z-score transformed values relative to a fixed interval selected by the user";
+    case "zscoreMoving":
+      return "Displays Z-score transformed values relative to a moving window of a size (N time steps) selected by the user";
+    case "zscoreSelected":
+      return "Displays Z-score transformed values using the selected interval";
+    default:
+      return "Modeled values are graphed without any transformation";
   }
 }
 
 function smoothingHint(smooth: string) {
   switch (smooth) {
-    case "centeredAverage": return `Plots the ${zonalStatistic.value} of the current years and the previous and successive (N-1)/2 years where N = odd window width`;
-    case "trailingAverage": return `Plots the ${zonalStatistic.value} of the current year and the N-1 preceding years where N = window width`;
-    default: return "No smoothing the summary values for a given year are graphed";
+    case "centeredAverage":
+      return `Plots the ${zonalStatistic.value} of the current years and the previous and successive (N-1)/2 years where N = odd window width`;
+    case "trailingAverage":
+      return `Plots the ${zonalStatistic.value} of the current year and the N-1 preceding years where N = window width`;
+    default:
+      return "No smoothing the summary values for a given year are graphed";
   }
 }
 
@@ -304,7 +347,10 @@ async function retrieveAnalysis(data: any) {
   try {
     const varId = route.params.variable as string;
     const jobId = datasetStore.jobIds?.[varId];
-    const {newJobId, response} = await legacyActions.resolveTimeSeries(jobId, data);
+    const { newJobId, response } = await legacyActions.resolveTimeSeries(
+      jobId,
+      data,
+    );
     datasetStore.setJobId(varId, newJobId);
     analysisStore.setResponse(response);
     datasetStore.setTimeSeriesLoaded();
@@ -312,20 +358,29 @@ async function retrieveAnalysis(data: any) {
     if (e.response) {
       const { status, data: responseData } = e.response;
       const detail = Array.isArray(responseData.detail)
-      ? responseData.detail
-      : [{ msg: responseData.detail }];
+        ? responseData.detail
+        : [{ msg: responseData.detail }];
       if (status === 504) {
         datasetStore.setTimeSeriesTimeout();
-        messageStore.error("Request timed out. Try a smaller area or shorter date range.");
+        messageStore.error(
+          "Request timed out. Try a smaller area or shorter date range.",
+        );
       } else if (status >= 500) {
         datasetStore.setTimeSeriesServerError(detail);
-        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Server error. Please try again.");
+        messageStore.error(
+          detail.map((d: any) => d.msg).join(" ") ||
+            "Server error. Please try again.",
+        );
       } else if (status >= 400) {
         datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.error(detail.map((d: any) => d.msg).join(" ") || "Bad request.");
+        messageStore.error(
+          detail.map((d: any) => d.msg).join(" ") || "Bad request.",
+        );
       }
     } else {
-      const msg = e.message || "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
+      const msg =
+        e.message ||
+        "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
       datasetStore.setTimeSeriesServerError([{ msg }]);
       messageStore.error(msg);
     }
@@ -336,22 +391,30 @@ function initializeRequestData() {
   const incoming: any = { ...datasetStore.defaultApiRequestData };
   const existing = analysisStore.requestData as any;
   if (existing?.transform) incoming.transform = existing.transform;
-  if (existing?.zonal_statistic) incoming.zonal_statistic = existing.zonal_statistic;
-  if (existing?.requested_series_options) incoming.requested_series_options = existing.requested_series_options;
+  if (existing?.zonal_statistic)
+    incoming.zonal_statistic = existing.zonal_statistic;
+  if (existing?.requested_series_options)
+    incoming.requested_series_options = existing.requested_series_options;
   analysisStore.setDefaultRequestData(incoming);
   return incoming;
 }
 
 function loadTransformOption(transform: any) {
   if (!transform) return;
-  const option = transformOptions.find((x: any) => x.type === transform.type) as any;
+  const option = transformOptions.find(
+    (x: any) => x.type === transform.type,
+  ) as any;
   if (option) option.fromRequestData(analyzeVue, transform);
 }
 
 function loadSmoothingOption(requestedSeriesOptions: any[]) {
-  const smoothed = requestedSeriesOptions?.find((x: any) => x.name === "Smoothed");
+  const smoothed = requestedSeriesOptions?.find(
+    (x: any) => x.name === "Smoothed",
+  );
   if (smoothed) {
-    const option = smoothingOptions.find((x: any) => x.method === smoothed.smoother.method) as any;
+    const option = smoothingOptions.find(
+      (x: any) => x.method === smoothed.smoother.method,
+    ) as any;
     if (option) option.fromRequestData(analyzeVue, smoothed.smoother);
   }
 }
@@ -381,7 +444,10 @@ function tracesAsArrayOfObjects() {
 
 async function exportData() {
   const stats = summaryStatistics.value.map((s: any) =>
-    _.mapValues(s, (v: any) => { const f = parseFloat(v); return _.isNaN(f) ? v : f; })
+    _.mapValues(s, (v: any) => {
+      const f = parseFloat(v);
+      return _.isNaN(f) ? v : f;
+    }),
   );
   const plotImages = await plot.value?.getTimeSeriesPlotImage();
   const png = await fetch(plotImages.png);
@@ -398,11 +464,18 @@ async function exportData() {
   zip.file("study-area.geojson", JSON.stringify(geoJson));
   zip.file("README.md", buildReadme(requestData));
   const content = await zip.generateAsync({ type: "blob" });
-  $download.saveAs(content, `${requestData.dataset_id}_${requestData.variable_id}.zip`);
+  $download.saveAs(
+    content,
+    `${requestData.dataset_id}_${requestData.variable_id}.zip`,
+  );
 }
 
 async function updateTimeSeries() {
-  if (!analysisFormValid.value || datasetStore.timeSeriesRequestStatus.status === "loading") return;
+  if (
+    !analysisFormValid.value ||
+    datasetStore.timeSeriesRequestStatus.status === "loading"
+  )
+    return;
   const requestData = {
     ...datasetStore.defaultApiRequestData,
     zonal_statistic: zonalStatistic.value,
@@ -418,13 +491,15 @@ async function updateTimeSeries() {
 
 function validateMinYear(year: number) {
   if (year < minYear.value) return `Please enter a min year > ${minYear.value}`;
-  if (year > maxYear.value) return `Please enter a min year <= ${maxYear.value}`;
+  if (year > maxYear.value)
+    return `Please enter a min year <= ${maxYear.value}`;
   return true;
 }
 
 function validateMaxYear(year: number) {
   if (year < minYear.value) return `Please enter a max year > ${minYear.value}`;
-  if (year > maxYear.value) return `Please enter a max year <= ${maxYear.value}`;
+  if (year > maxYear.value)
+    return `Please enter a max year <= ${maxYear.value}`;
   return true;
 }
 
@@ -434,29 +509,37 @@ function validateSmoothingWidth(windowSize: number) {
   return true;
 }
 
-watch(() => analysisStore.requestData, async (data) => {
-  if (!data) return;
-  await initializeFormData(data);
-  await retrieveAnalysis(data as any);
-  if (hasTransformOption.value) {
-    yAxisLabel.value = (transformOptions.find((x: any) => x.id === transformOption.value) as any)?.label ?? null;
-  } else {
-    yAxisLabel.value = "";
-  }
-});
+watch(
+  () => analysisStore.requestData,
+  async (data) => {
+    if (!data) return;
+    await initializeFormData(data);
+    await retrieveAnalysis(data as any);
+    if (hasTransformOption.value) {
+      yAxisLabel.value =
+        (
+          transformOptions.find(
+            (x: any) => x.id === transformOption.value,
+          ) as any
+        )?.label ?? null;
+    } else {
+      yAxisLabel.value = "";
+    }
+  },
+);
 
 await useAsyncData(
   `analyze-${route.params.id}-${route.params.variable}`,
   async () => {
     await legacyActions.initializeDataset(
       route.params.id as string,
-      route.params.variable as string
+      route.params.variable as string,
     );
     timeRange.value.lb.year = datasetStore.minYear;
     timeRange.value.ub.year = datasetStore.maxYear;
     return true;
   },
-  { server: false }
+  { server: false },
 );
 
 onMounted(async () => {

@@ -150,7 +150,10 @@ export const useDatasetStore = defineStore("dataset", {
       const m = metadata as any;
       if (m?.timespan?.period) {
         this.minYear = parseInt(m.timespan.period.gte || "1", 10);
-        this.maxYear = parseInt(m.timespan.period.lte || `${new Date().getFullYear()}`, 10);
+        this.maxYear = parseInt(
+          m.timespan.period.lte || `${new Date().getFullYear()}`,
+          10,
+        );
         this.temporalRange = [this.minYear, this.maxYear];
         this.temporalRangeMin = this.minYear;
         this.temporalRangeMax = this.maxYear;
@@ -161,7 +164,8 @@ export const useDatasetStore = defineStore("dataset", {
       this.geoJson = geoJson;
       this.hasGeoJson = geoJson != null;
       this.selectedAreaInSquareKm = selectedAreaInSquareKmFromGeoJson(geoJson);
-      this.canHandleTimeSeriesRequest = !!this.metadata && this.hasGeoJson && !!this.variable?.id;
+      this.canHandleTimeSeriesRequest =
+        !!this.metadata && this.hasGeoJson && !!this.variable?.id;
       this.timeSeriesRequestData = this.defaultApiRequestData;
     },
     clearGeoJson() {
@@ -190,21 +194,31 @@ export const useDatasetStore = defineStore("dataset", {
       this.timeSeriesRequestStatus = {
         status: "badrequest",
         type: "error",
-        messages: errorDetails.map((detail) => ({ type: "error", value: detail.msg })),
+        messages: errorDetails.map((detail) => ({
+          type: "error",
+          value: detail.msg,
+        })),
       } as any;
     },
     setTimeSeriesServerError(errorDetails: Array<{ msg: string }>) {
       this.timeSeriesRequestStatus = {
         status: "servererror",
         type: "error",
-        messages: errorDetails.map((detail) => ({ type: "error", value: detail.msg })),
+        messages: errorDetails.map((detail) => ({
+          type: "error",
+          value: detail.msg,
+        })),
       } as any;
     },
     setTimeSeriesNoArea() {
       this.timeSeriesRequestStatus = { ...NO_STUDY_AREA_STATUS };
     },
     setTimeSeries(payload: {
-      timeSeries: { x: number[]; y: Array<number | null>; options?: { name?: string } };
+      timeSeries: {
+        x: number[];
+        y: Array<number | null>;
+        options?: { name?: string };
+      };
       numberOfCells: number;
       totalCellArea: number;
     }) {

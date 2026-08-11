@@ -9,7 +9,7 @@
         Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State
         University.
       </v-card-text>
-      <v-divider></v-divider>
+      <v-divider />
       <span class="text-subtitle-1 text-white">
         &copy; 2016-{{ new Date().getFullYear() }} Synthesizing Knowledge of
         Past Environments (SKOPE)

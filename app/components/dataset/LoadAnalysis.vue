@@ -12,7 +12,7 @@
       accept=".json"
       style="display: none"
       @change="handleLoadRequestDataFile"
-    />
+    >
     <v-icon left dark>mdi-upload</v-icon>
     Load skope-request.json file (experimental)
   </v-btn>
@@ -32,16 +32,27 @@ function handleLoadRequestDataFile(event: Event) {
   file.text().then((text) => {
     try {
       const requestData = JSON.parse(text);
-      console.log("going to", requestData.dataset_id, "/", requestData.variable_id);
+      console.log(
+        "going to",
+        requestData.dataset_id,
+        "/",
+        requestData.variable_id,
+      );
       const legacyActions = useLegacyStoreActions();
       router
         .push({
           name: "dataset-id-analyze-variable",
-          params: { id: requestData.dataset_id, variable: requestData.variable_id },
+          params: {
+            id: requestData.dataset_id,
+            variable: requestData.variable_id,
+          },
         })
         .finally(async () => {
           console.log("router push settled", requestData);
-          await legacyActions.initializeDataset(requestData.dataset_id, requestData.variable_id);
+          await legacyActions.initializeDataset(
+            requestData.dataset_id,
+            requestData.variable_id,
+          );
           legacyActions.loadRequestData(requestData);
         });
     } catch (error) {

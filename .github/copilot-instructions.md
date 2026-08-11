@@ -15,21 +15,21 @@ Nuxt 3 SPA for spatiotemporal paleoclimate dataset discovery, visualization, and
 
 ### Key files
 
-| Path | Purpose |
-|---|---|
-| `app/components/dataset/Map.client.vue` | Adapter: renders Leaflet or MapLibre by engine flag |
-| `app/components/dataset/LeafletMap.client.vue` | Legacy map (keep as fallback) |
-| `app/components/dataset/MapLibrePoc.client.vue` | Active migration target |
-| `app/composables/useLegacyStoreActions.ts` | Bridge legacy actions → Pinia |
-| `app/composables/usePersistenceStorage.ts` | localStorage with SSR safety |
-| `app/stores/` | Pinia stores (authoritative) |
-| `app/store/` | Legacy Vuex-style (phase out) |
-| `app/nuxt.config.ts` | `runtimeConfig.public.mapEngine` defaults to `"leaflet"` |
+| Path                                           | Purpose                                                  |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| `app/components/dataset/Map.client.vue`        | Adapter: renders Leaflet or MapLibre by engine flag      |
+| `app/components/dataset/LeafletMap.client.vue` | Legacy map (keep as fallback)                            |
+| `app/components/dataset/MapLibre.client.vue`   | Active migration target                                  |
+| `app/composables/useLegacyStoreActions.ts`     | Bridge legacy actions → Pinia                            |
+| `app/composables/usePersistenceStorage.ts`     | localStorage with SSR safety                             |
+| `app/stores/`                                  | Pinia stores (authoritative)                             |
+| `app/store/`                                   | Legacy Vuex-style (phase out)                            |
+| `app/nuxt.config.ts`                           | `runtimeConfig.public.mapEngine` defaults to `"leaflet"` |
 
 ### Map engine flag
 
 URL param `?map_engine=maplibre` or `nuxt.config.ts` `public.mapEngine` switches the adapter.
-**Current state:** MapLibrePoc renders, geoman draw/edit/remove is wired, persisted geometry is imported into geoman for editability, MapLibre supports base-layer selection parity (CartoDB/Esri providers), and frontend raster rendering is intentionally absent until the COG tile flow lands.
+**Current state:** MapLibre renders, geoman draw/edit/remove is wired, persisted geometry is imported into geoman for editability, MapLibre supports base-layer selection parity (CartoDB/Esri providers), and frontend raster rendering is intentionally absent until the COG tile flow lands.
 
 ### Dev commands (all inside Docker container — npm not on host)
 

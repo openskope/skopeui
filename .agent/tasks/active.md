@@ -4,7 +4,7 @@
 - (mapping) MapLibre migration continuation
   - Scope: complete the Leaflet → MapLibre cutover while keeping the Leaflet fallback available until MapLibre workflow parity is validated.
   - Current state: basemap selection parity is in place, Geoman draw/edit/remove is wired, visualize mode is intentionally rasterless until the COG tile flow lands.
-  - Related files: `app/components/dataset/Map.client.vue`, `app/components/dataset/MapLibrePoc.client.vue`, `app/components/dataset/LeafletMap.client.vue`, `app/tests/components/maplibre-baselayer.spec.ts`.
+  - Related files: `app/components/dataset/Map.client.vue`, `app/components/dataset/MapLibre.client.vue`, `app/components/dataset/LeafletMap.client.vue`, `app/tests/components/maplibre-baselayer.spec.ts`.
   - Next roadmap item: PR-03 circle normalization.
 
 - (visualization) Plotly time-series hardening
@@ -25,7 +25,7 @@
 
 ## Latest Progress (2026-03-16)
 - Removed active frontend GeoServer/WMS code from:
-  - `app/components/dataset/MapLibrePoc.client.vue`
+  - `app/components/dataset/MapLibre.client.vue`
   - `app/components/dataset/LeafletMap.client.vue`
   - `app/plugins/leaflet.client.ts`
   - `app/store/modules/constants.js`, `app/store/modules/_constants.js.template`, `app/store/modules/metadata.js`

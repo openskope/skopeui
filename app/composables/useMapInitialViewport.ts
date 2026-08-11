@@ -3,17 +3,22 @@ type MapRegion = {
   zoom?: unknown;
 };
 
-type DatasetMetadataLike = {
-  region?: MapRegion;
-} | null | undefined;
+type DatasetMetadataLike =
+  | {
+      region?: MapRegion;
+    }
+  | null
+  | undefined;
 
 const DEFAULT_MAP_CENTER: [number, number] = [0, 0];
 const DEFAULT_MAP_ZOOM = 2;
 
 function isLatLngCenter(value: unknown): value is [number, number] {
-  return Array.isArray(value)
-    && value.length === 2
-    && value.every((coord) => typeof coord === "number" && Number.isFinite(coord));
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((coord) => typeof coord === "number" && Number.isFinite(coord))
+  );
 }
 
 /**
@@ -28,9 +33,11 @@ export function getInitialMapViewport(metadata: DatasetMetadataLike): {
     ? metadata.region.center
     : DEFAULT_MAP_CENTER;
 
-  const zoom = typeof metadata?.region?.zoom === "number" && Number.isFinite(metadata.region.zoom)
-    ? metadata.region.zoom
-    : DEFAULT_MAP_ZOOM;
+  const zoom =
+    typeof metadata?.region?.zoom === "number" &&
+    Number.isFinite(metadata.region.zoom)
+      ? metadata.region.zoom
+      : DEFAULT_MAP_ZOOM;
 
   return { center, zoom };
 }

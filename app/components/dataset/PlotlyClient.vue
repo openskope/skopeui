@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="plotly-client"></div>
+  <div ref="container" class="plotly-client" />
 </template>
 
 <script setup lang="ts">
@@ -23,7 +23,11 @@ const container = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
 let resizeFrame: number | null = null;
 
-function renderPlot(data = props.data, layout = props.layout, options = props.options) {
+function renderPlot(
+  data = props.data,
+  layout = props.layout,
+  options = props.options,
+) {
   if (container.value == null) {
     return;
   }
@@ -46,7 +50,10 @@ function scheduleResize() {
       return;
     }
 
-    if (container.value.clientWidth === 0 || container.value.clientHeight === 0) {
+    if (
+      container.value.clientWidth === 0 ||
+      container.value.clientHeight === 0
+    ) {
       return;
     }
 
@@ -104,7 +111,7 @@ watch(
     renderPlot();
     scheduleResize();
   },
-  { deep: true }
+  { deep: true },
 );
 
 onBeforeUnmount(() => {

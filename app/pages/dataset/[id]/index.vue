@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="fill-height">
-    <LoadingSpinner v-if="isLoadingMetadata"></LoadingSpinner>
+    <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
       <SubHeader>
         <v-btn
@@ -15,11 +15,7 @@
       </SubHeader>
       <v-row>
         <v-col cols="12" class="d-flex map-flex">
-          <Map
-            :display-raster="false"
-            class="mx-auto"
-            @mapReady="mapLoaded"
-          ></Map>
+          <Map :display-raster="false" class="mx-auto" @map-ready="mapLoaded" />
         </v-col>
         <client-only>
           <v-dialog
@@ -62,7 +58,8 @@ import { useDatasetStore } from "@/stores/dataset";
 
 definePageMeta({
   layout: "default",
-  validate: ({ params }: { params: Record<string, string> }) => /^\w+$/.test(params.id),
+  validate: ({ params }: { params: Record<string, string> }) =>
+    /^\w+$/.test(params.id),
 });
 
 const route = useRoute();
@@ -77,8 +74,13 @@ const metadata = computed(() => datasetStore.metadata);
 const hasValidStudyArea = computed(() => datasetStore.hasGeoJson);
 const isFirstVisit = computed(() => appStore.isFirstVisit);
 const confirmGeometry = computed({
-  get: () => hasValidStudyArea.value && shouldConfirmGeometry.value && isFirstVisit.value,
-  set: (value: boolean) => { shouldConfirmGeometry.value = value; },
+  get: () =>
+    hasValidStudyArea.value &&
+    shouldConfirmGeometry.value &&
+    isFirstVisit.value,
+  set: (value: boolean) => {
+    shouldConfirmGeometry.value = value;
+  },
 });
 const visualizeLocation = computed(() => {
   const id = route.params.id;
@@ -86,10 +88,14 @@ const visualizeLocation = computed(() => {
   return { name: "dataset-id-visualize-variable", params: { id, variable } };
 });
 
-await useAsyncData(`dataset-${route.params.id}`, async () => {
-  await legacyActions.initializeDataset(route.params.id as string);
-  return true;
-},{ server: false });
+await useAsyncData(
+  `dataset-${route.params.id}`,
+  async () => {
+    await legacyActions.initializeDataset(route.params.id as string);
+    return true;
+  },
+  { server: false },
+);
 
 useHead(() => ({
   title: (metadata.value as any)?.title || "SKOPE",

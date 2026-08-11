@@ -11,6 +11,8 @@ import {
   resetNuxtTestGlobals,
 } from "@/tests/fixtures/nuxt-test-helpers";
 
+import IndexPage from "@/pages/index.vue";
+
 let datasetStore: any;
 let metadataStore: any;
 let messagesStore: any;
@@ -47,17 +49,17 @@ vi.mock("@/composables/useLegacyStoreActions", () => ({
   useLegacyStoreActions: () => legacyActions,
 }));
 
-import IndexPage from "@/pages/index.vue";
-
 const layoutStubs = {
-  "v-container": { template: '<div><slot /></div>' },
-  "v-row": { template: '<div><slot /></div>' },
-  "v-col": { template: '<div><slot /></div>' },
-  "v-tooltip": { template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-  "v-btn": { template: '<button><slot /></button>' },
-  "v-icon": { template: '<i><slot /></i>' },
-  "v-card": { template: '<div><slot /></div>' },
-  "v-alert": { template: '<div><slot /></div>' },
+  "v-container": { template: "<div><slot /></div>" },
+  "v-row": { template: "<div><slot /></div>" },
+  "v-col": { template: "<div><slot /></div>" },
+  "v-tooltip": {
+    template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+  },
+  "v-btn": { template: "<button><slot /></button>" },
+  "v-icon": { template: "<i><slot /></i>" },
+  "v-card": { template: "<div><slot /></div>" },
+  "v-alert": { template: "<div><slot /></div>" },
 };
 
 describe("route /", () => {
@@ -66,7 +68,9 @@ describe("route /", () => {
 
     datasetStore = createDatasetStore();
     metadataStore = reactive({
-      filteredDatasets: [{ ...datasetMetadataFixture, absoluteUrl: "/dataset/paleocar" }],
+      filteredDatasets: [
+        { ...datasetMetadataFixture, absoluteUrl: "/dataset/paleocar" },
+      ],
     });
     messagesStore = {
       error: vi.fn(),
@@ -82,7 +86,9 @@ describe("route /", () => {
   });
 
   it("[smoke] renders page header and dataset list", async () => {
-    const wrapper = await mountWithSuspense(IndexPage, { global: { stubs: layoutStubs } });
+    const wrapper = await mountWithSuspense(IndexPage, {
+      global: { stubs: layoutStubs },
+    });
 
     await nextTick();
     const page = wrapper.findComponent(IndexPage);
@@ -94,7 +100,9 @@ describe("route /", () => {
   });
 
   it("[behavior] shows empty state when filter removes all datasets", async () => {
-    const wrapper = await mountWithSuspense(IndexPage, { global: { stubs: layoutStubs } });
+    const wrapper = await mountWithSuspense(IndexPage, {
+      global: { stubs: layoutStubs },
+    });
 
     metadataStore.filteredDatasets = [];
     await nextTick();

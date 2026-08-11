@@ -4,7 +4,10 @@
       <v-col class="ma-0">
         <h1>
           Select a Dataset
-          <v-tooltip location="bottom" text="View the SKOPE user guide (opens in a new tab)">
+          <v-tooltip
+            location="bottom"
+            text="View the SKOPE user guide (opens in a new tab)"
+          >
             <template #activator="{ props }">
               <v-btn
                 icon
@@ -23,12 +26,13 @@
     <Search />
     <v-row class="ma-0 pa-0">
       <v-col class="ma-0">
-        <template v-for="dataset in datasets" :key="dataset.absoluteUrl" router exact>
-          <v-card
-            class="pa-4 my-3"
-            elevation="0"
-            variant="outlined"
-          >
+        <template
+          v-for="dataset in datasets"
+          :key="dataset.absoluteUrl"
+          router
+          exact
+        >
+          <v-card class="pa-4 my-3" elevation="0" variant="outlined">
             <ListItem v-bind="dataset" />
           </v-card>
         </template>
@@ -72,10 +76,12 @@ const { error: metadataLoadError } = await useAsyncData(
       return false;
     }
   },
-  { server: false }
+  { server: false },
 );
 
 if (metadataLoadError.value != null) {
-  messagesStore.error("Unable to load dataset metadata. Please try again shortly.");
+  messagesStore.error(
+    "Unable to load dataset metadata. Please try again shortly.",
+  );
 }
 </script>

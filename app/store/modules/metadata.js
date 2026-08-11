@@ -236,8 +236,8 @@ class Metadata extends VuexModule {
 
   get filteredDatasets() {
     return this.allDatasetMetadata.filter((dataset) => {
-      const selectedVariableClasses = this.filterCriteria
-        .selectedVariableClasses;
+      const selectedVariableClasses =
+        this.filterCriteria.selectedVariableClasses;
       const minYear = this.filterCriteria.yearStart;
       const maxYear = this.filterCriteria.yearEnd;
       const query = this.filterCriteria.query || "";

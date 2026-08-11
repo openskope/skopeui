@@ -10,7 +10,7 @@ Status: completed
 
 ## Files Touched
 - `app/components/dataset/Map.client.vue`
-- `app/components/dataset/MapLibrePoc.client.vue`
+- `app/components/dataset/MapLibre.client.vue`
 - `app/components/dataset/LeafletMap.client.vue`
 - `app/components/dataset/PlotlyClient.vue`
 - `app/components/dataset/TimeSeriesPlot.vue`

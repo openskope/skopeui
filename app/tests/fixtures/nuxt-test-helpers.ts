@@ -6,20 +6,22 @@ export function installNuxtTestGlobals(options?: {
   asyncDataError?: unknown;
   nuxtApp?: Record<string, unknown>;
 }) {
-  const asyncDataMock = vi.fn(async (_key: unknown, handler?: () => unknown) => {
-    const dataValue = typeof handler === "function" ? await handler() : null;
-    return {
-      data: { value: dataValue },
-      error: { value: options?.asyncDataError ?? null },
-    };
-  });
+  const asyncDataMock = vi.fn(
+    async (_key: unknown, handler?: () => unknown) => {
+      const dataValue = typeof handler === "function" ? await handler() : null;
+      return {
+        data: { value: dataValue },
+        error: { value: options?.asyncDataError ?? null },
+      };
+    },
+  );
 
   vi.stubGlobal("definePageMeta", vi.fn());
   vi.stubGlobal("useHead", vi.fn());
   vi.stubGlobal("useAsyncData", asyncDataMock);
   vi.stubGlobal(
     "useNuxtApp",
-    vi.fn(() => options?.nuxtApp ?? { $download: { saveAs: vi.fn() } })
+    vi.fn(() => options?.nuxtApp ?? { $download: { saveAs: vi.fn() } }),
   );
 
   return { asyncDataMock };
@@ -31,7 +33,7 @@ export function resetNuxtTestGlobals() {
 
 export async function mountWithSuspense(
   component: Component,
-  options: MountingOptions<any> = {}
+  options: MountingOptions<any> = {},
 ) {
   const Root = defineComponent({
     name: "SuspenseTestRoot",

@@ -5,7 +5,7 @@
 
 This codebase provides a frontend only user interface for the [NSF supported](https://www.openskope.org/skope-nsf-proposal) [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) project.
 
-The current UI uses [Nuxt 2](https://nuxtjs.org/), [VueJS](https://vuejs.org/), [Leaflet](https://leafletjs.com/), and [Plotly JS](https://plotly.com/javascript/). 
+The current UI uses [Nuxt 2](https://nuxtjs.org/), [VueJS](https://vuejs.org/), [Leaflet](https://leafletjs.com/), and [Plotly JS](https://plotly.com/javascript/).
 
 The application has a basic [Makefile](https://www.gnu.org/software/make/) for configuration and deployment. A recent version of [Docker](https://docs.docker.com/get-docker/) and [docker compose](https://docs.docker.com/compose/install/) is recommended to set up a local development environment.
 
@@ -18,7 +18,6 @@ Running `make` for the first time will generate a default `config.mk` file that 
 Run `make deploy` to redeploy the application with whatever settings are currently defined in `config.mk`
 
 With `DEPLOY_ENVIRONMENT=dev` a hot-reloading development server should spin up at http://localhost:3000
-
 
 ## Contributors
 

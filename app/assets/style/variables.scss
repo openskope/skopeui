@@ -3,11 +3,11 @@
 // SKOPE title color and font
 $skope-title-color: rgb(128, 0, 0);
 $skope-title-font: "Bitter", Georgia, serif;
-$skope-dark-blue: #001E6B;
+$skope-dark-blue: #001e6b;
 
 // Globals
-$header-font-family: 'Roboto', serif;
-$body-font-family: 'Roboto', serif;
+$header-font-family: "Roboto", serif;
+$body-font-family: "Roboto", serif;
 $border-radius-root: 6px;
 $font-size-root: 14px;
 
@@ -18,21 +18,20 @@ $list-item-title-font-size: 0.929rem;
 $list-item-dense-title-font-size: 0.929rem;
 $list-item-dense-title-font-weight: initial;
 $fab-icon-sizes: (
-  'small': 20
+  "small": 20,
 );
 $btn-sizes: (
-  'default': 41,
-  'large': 54
+  "default": 41,
+  "large": 54,
 );
 
 $headings: (
-  'h1': (
-    'size': 3.3125rem,
-    'line-height': 1.15em
+  "h1": (
+    "size": 3.3125rem,
+    "line-height": 1.15em,
   ),
-  'h2': (
-    'size': 2.25rem,
-    'line-height': 1.5em
-  )
+  "h2": (
+    "size": 2.25rem,
+    "line-height": 1.5em,
+  ),
 );
-

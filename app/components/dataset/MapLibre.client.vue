@@ -1,5 +1,11 @@
 <template>
-  <v-card class="pb-2" height="100%" width="100%" elevation="1" variant="outlined">
+  <v-card
+    class="pb-2"
+    height="100%"
+    width="100%"
+    elevation="1"
+    variant="outlined"
+  >
     <v-toolbar variant="flat" class="ma-0 pa-0">
       <v-row class="mx-0" align="baseline">
         <v-tooltip location="bottom" text="Area of the selected geometry">
@@ -13,7 +19,7 @@
             </h3>
           </template>
         </v-tooltip>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-alert
           v-if="isSelectArea"
           density="compact"
@@ -35,7 +41,7 @@
           hide-details
           class="mx-2 my-auto basemap-select"
         />
-        <v-spacer></v-spacer>
+        <v-spacer />
         <input
           v-if="isSelectArea"
           id="loadGeoJsonFile"
@@ -43,8 +49,12 @@
           accept=".geojson"
           style="display: none"
           @change="loadGeoJson"
-        />
-        <v-tooltip v-if="isSelectArea" location="bottom" text="Upload study area from GeoJSON">
+        >
+        <v-tooltip
+          v-if="isSelectArea"
+          location="bottom"
+          text="Upload study area from GeoJSON"
+        >
           <template #activator="{ props }">
             <v-btn
               size="small"
@@ -58,7 +68,11 @@
             </v-btn>
           </template>
         </v-tooltip>
-        <v-tooltip v-if="isSelectArea" location="bottom" text="Download selected area as GeoJSON">
+        <v-tooltip
+          v-if="isSelectArea"
+          location="bottom"
+          text="Download selected area as GeoJSON"
+        >
           <template #activator="{ props }">
             <v-btn
               size="small"
@@ -77,9 +91,14 @@
       </v-row>
     </v-toolbar>
     <v-card-text class="map">
-      <div ref="mapContainer" class="maplibre-map"></div>
+      <div ref="mapContainer" class="maplibre-map" />
       <div v-if="isStepLoading" class="map-step-loading">
-        <v-progress-circular indeterminate color="primary" size="48" width="4" />
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="48"
+          width="4"
+        />
       </div>
     </v-card-text>
   </v-card>
@@ -96,14 +115,12 @@ import circleToPolygon from "circle-to-polygon";
 import { bbox as turfBbox } from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@geoman-io/maplibre-geoman-free/dist/maplibre-geoman.css";
-import {
-  LEAFLET_PROVIDERS,
-  TILES_ENDPOINT,
-} from "@/store/modules/constants";
+import { LEAFLET_PROVIDERS, TILES_ENDPOINT } from "@/store/modules/constants";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 import { getInitialMapViewport } from "@/composables/useMapInitialViewport";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
+import { useMessagesStore } from "@/stores/messages";
 
 const COLOR_MAX_PCT = 0.5;
 
@@ -119,6 +136,7 @@ const emit = defineEmits(["mapReady", "stepReady"]);
 const route = useRoute();
 const appStore = useAppStore();
 const datasetStore = useDatasetStore();
+const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -127,9 +145,13 @@ const isStepLoading = ref(false);
 const stepNames = computed(() => appStore.stepNames);
 const metadata = computed(() => datasetStore.metadata as any);
 const selectedArea = computed(() => datasetStore.selectedAreaInSquareKm);
-const currentStep = computed(() => stepNames.value.findIndex((x: unknown) => x === route.name));
+const currentStep = computed(() =>
+  stepNames.value.findIndex((x: unknown) => x === route.name),
+);
 const isSelectArea = computed(() => currentStep.value === 1);
-const initialMapViewport = computed(() => getInitialMapViewport(metadata.value));
+const initialMapViewport = computed(() =>
+  getInitialMapViewport(metadata.value),
+);
 const initialMapZoom = computed(() => initialMapViewport.value.zoom);
 const initialMapCenter = computed(() => initialMapViewport.value.center);
 
@@ -155,7 +177,10 @@ function resolveSubdomains(provider: any): string[] {
   if (Array.isArray(provider?.subdomains) && provider.subdomains.length > 0) {
     return provider.subdomains;
   }
-  if (typeof provider?.subdomains === "string" && provider.subdomains.length > 0) {
+  if (
+    typeof provider?.subdomains === "string" &&
+    provider.subdomains.length > 0
+  ) {
     return provider.subdomains.split("");
   }
   return ["a", "b", "c", "d"];
@@ -170,26 +195,33 @@ function providerToMapLibreTiles(provider: any): string[] {
   }
 
   return resolveSubdomains(provider).map((subdomain) =>
-    urlTemplate.replace(/\{s\}/g, subdomain)
+    urlTemplate.replace(/\{s\}/g, subdomain),
   );
 }
 
-const mapBaseLayers: MapLibreBaseLayer[] = LEAFLET_PROVIDERS.map((provider: any) => ({
-  id: providerNameToId(provider.name),
-  name: provider.name,
-  tiles: providerToMapLibreTiles(provider),
-  attribution: provider.attribution,
-  visible: provider.visible,
-})).filter((provider: MapLibreBaseLayer) => provider.tiles.length > 0);
+const mapBaseLayers: MapLibreBaseLayer[] = LEAFLET_PROVIDERS.map(
+  (provider: any) => ({
+    id: providerNameToId(provider.name),
+    name: provider.name,
+    tiles: providerToMapLibreTiles(provider),
+    attribution: provider.attribution,
+    visible: provider.visible,
+  }),
+).filter((provider: MapLibreBaseLayer) => provider.tiles.length > 0);
 
 function getDefaultBaseLayerId(step: number) {
-  const matchedByStep = mapBaseLayers.find((provider) => provider.visible === step);
+  const matchedByStep = mapBaseLayers.find(
+    (provider) => provider.visible === step,
+  );
   return (matchedByStep || mapBaseLayers[0])?.id || "";
 }
 
 const selectedBaseLayerId = ref(getDefaultBaseLayerId(currentStep.value));
 const baseLayerOptions = computed(() =>
-  mapBaseLayers.map((provider) => ({ title: provider.name, value: provider.id }))
+  mapBaseLayers.map((provider) => ({
+    title: provider.name,
+    value: provider.id,
+  })),
 );
 
 const STEP_DISPLAY_DURATION_MS = 1000;
@@ -204,8 +236,8 @@ let stepDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const COG_A = { sourceId: "cog-source-a", layerId: "cog-layer-a" };
 const COG_B = { sourceId: "cog-source-b", layerId: "cog-layer-b" };
-let cogFront = COG_A;  // currently visible slot
-let cogBack  = COG_B;  // currently loading / empty slot
+let cogFront = COG_A; // currently visible slot
+let cogBack = COG_B; // currently loading / empty slot
 let pendingIdleSwap: (() => void) | null = null;
 const FILL_LAYER_ID = "dataset-region-fill";
 const STUDY_AREA_SOURCE_ID = "study-area-display";
@@ -232,7 +264,7 @@ function applyBaseLayerSelection(baseLayerIdValue: string) {
     map.setLayoutProperty(
       rasterLayerId,
       "visibility",
-      provider.id === baseLayerIdValue ? "visible" : "none"
+      provider.id === baseLayerIdValue ? "visible" : "none",
     );
   }
 }
@@ -242,20 +274,25 @@ function baseStyle(): maplibregl.StyleSpecification {
 
   return {
     version: 8,
-    sources: mapBaseLayers.reduce((sources: Record<string, maplibregl.SourceSpecification>, provider) => {
-      sources[baseSourceId(provider.id)] = {
-        type: "raster",
-        tiles: provider.tiles,
-        tileSize: 256,
-        attribution: provider.attribution,
-      };
-      return sources;
-    }, {}),
+    sources: mapBaseLayers.reduce(
+      (sources: Record<string, maplibregl.SourceSpecification>, provider) => {
+        sources[baseSourceId(provider.id)] = {
+          type: "raster",
+          tiles: provider.tiles,
+          tileSize: 256,
+          attribution: provider.attribution,
+        };
+        return sources;
+      },
+      {},
+    ),
     layers: mapBaseLayers.map((provider) => ({
       id: baseLayerId(provider.id),
       type: "raster",
       source: baseSourceId(provider.id),
-      layout: { visibility: provider.id === activeBaseLayerId ? "visible" : "none" },
+      layout: {
+        visibility: provider.id === activeBaseLayerId ? "visible" : "none",
+      },
     })),
   } as maplibregl.StyleSpecification;
 }
@@ -268,13 +305,16 @@ function getCogBaseUrl(): string | null {
 }
 
 function getCogFullUrl(baseUrl, step) {
-  if (datasetStore.variable.min == null || datasetStore.variable.max == null){
-    console.warn(`Variable ${datasetStore.variable?.id} is missing min/max — falling back to rescale 0,100`)
-  } 
-  const min = datasetStore.variable?.min ?? 0;
-  const max = (datasetStore.variable?.max ?? 100) * COLOR_MAX_PCT;
+  const variable = datasetStore.variable;
+  if (variable?.min == null || variable?.max == null) {
+    console.warn(
+      `Variable ${variable?.id} is missing min/max — falling back to rescale 0,100`,
+    );
+  }
+  const min = variable?.min ?? 0;
+  const max = (variable?.max ?? 100) * COLOR_MAX_PCT;
   const urlStep = step.toString().padStart(4, "0"); // TODO: Add flexibility for different time resolutions
-  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?colormap=${datasetStore.variable.colormap}&rescale=${min},${max}`;
+  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?colormap=${variable?.colormap}&rescale=${min},${max}`;
 }
 
 function getCogBounds(): number[] | undefined {
@@ -300,15 +340,19 @@ function addCogSlot(slot: typeof COG_A, step: number, opacity: number) {
     ...(bounds && { bounds }),
   });
   map.addLayer(
-    { id: slot.layerId, type: "raster", source: slot.sourceId,
-      paint: { "raster-opacity": opacity } },
+    {
+      id: slot.layerId,
+      type: "raster",
+      source: slot.sourceId,
+      paint: { "raster-opacity": opacity },
+    },
     FILL_LAYER_ID,
   );
 }
 
 function removeCogSlot(slot: typeof COG_A) {
   if (!map) return;
-  if (map.getLayer(slot.layerId))   map.removeLayer(slot.layerId);
+  if (map.getLayer(slot.layerId)) map.removeLayer(slot.layerId);
   if (map.getSource(slot.sourceId)) map.removeSource(slot.sourceId);
 }
 
@@ -320,7 +364,7 @@ function cancelPendingSwap() {
   if (pendingIdleSwap) {
     map?.off("idle", pendingIdleSwap);
     pendingIdleSwap = null;
-    removeCogSlot(cogBack);  // discard the back buffer that was loading
+    removeCogSlot(cogBack); // discard the back buffer that was loading
   }
 }
 
@@ -330,7 +374,7 @@ function addCogRasterLayer(step: number) {
   removeCogSlot(cogFront);
   removeCogSlot(cogBack);
   cogFront = COG_A;
-  cogBack  = COG_B;
+  cogBack = COG_B;
   addCogSlot(cogFront, step, 0.7);
 }
 
@@ -350,15 +394,15 @@ function updateRasterLayer(step: number) {
   }
 
   cancelPendingSwap();
-  addCogSlot(cogBack, step, 0);  // load invisibly
+  addCogSlot(cogBack, step, 0); // load invisibly
   isStepLoading.value = true;
 
   pendingIdleSwap = () => {
     if (!map || !isMapLoaded) return;
-    if (!map.getSource(cogBack.sourceId)) return;  // guard: swap was cancelled
+    if (!map.getSource(cogBack.sourceId)) return; // guard: swap was cancelled
     map.setPaintProperty(cogBack.layerId, "raster-opacity", 0.7);
     removeCogSlot(cogFront);
-    [cogFront, cogBack] = [cogBack, cogFront];      // swap references
+    [cogFront, cogBack] = [cogBack, cogFront]; // swap references
     pendingIdleSwap = null;
     isStepLoading.value = false;
     stepDisplayTimeout = setTimeout(() => {
@@ -403,7 +447,8 @@ function mapExtentPolygon(extents: any): any {
 function normalizeGeoJson(geoJson: any): any {
   if (!geoJson) return null;
   if (geoJson.type === "FeatureCollection") return geoJson;
-  if (geoJson.type === "Feature") return { type: "FeatureCollection", features: [geoJson] };
+  if (geoJson.type === "Feature")
+    return { type: "FeatureCollection", features: [geoJson] };
   if (geoJson.type && geoJson.coordinates) {
     return {
       type: "FeatureCollection",
@@ -425,7 +470,9 @@ function normalizeGeoJsonForImport(geoJson: any): any {
 
   return {
     ...featureCollection,
-    features: featureCollection.features.map((feature: any) => convertCircleToPolygon(feature)),
+    features: featureCollection.features.map((feature: any) =>
+      convertCircleToPolygon(feature),
+    ),
   };
 }
 
@@ -461,7 +508,7 @@ function fitToGeoJson(geoJson: any) {
         [minX, minY],
         [maxX, maxY],
       ],
-      { padding: 30, duration: 0 }
+      { padding: 30, duration: 0 },
     );
   } catch {
     // Ignore invalid geometries during exploratory migration.
@@ -508,7 +555,10 @@ function bringStudyAreaDisplayToFront() {
     return;
   }
 
-  if (!map.getLayer(STUDY_AREA_LINE_LAYER_ID) || !map.getLayer(STUDY_AREA_FILL_LAYER_ID)) {
+  if (
+    !map.getLayer(STUDY_AREA_LINE_LAYER_ID) ||
+    !map.getLayer(STUDY_AREA_FILL_LAYER_ID)
+  ) {
     return;
   }
 
@@ -523,10 +573,13 @@ function updateStudyAreaDisplay(geoJson: any) {
   }
 
   ensureStudyAreaDisplayLayer();
-  const source = map.getSource(STUDY_AREA_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+  const source = map.getSource(STUDY_AREA_SOURCE_ID) as
+    | maplibregl.GeoJSONSource
+    | undefined;
   if (!source) return;
 
-  const featureCollection = normalizeGeoJsonForImport(geoJson) || emptyFeatureCollection();
+  const featureCollection =
+    normalizeGeoJsonForImport(geoJson) || emptyFeatureCollection();
   source.setData(featureCollection as any);
   bringStudyAreaDisplayToFront();
 
@@ -638,7 +691,8 @@ function exportSelectedGeometry() {
   const gJ = datasetStore.geoJson as any;
   if (!gJ) return;
 
-  const convertedArea = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gJ));
+  const convertedArea =
+    "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gJ));
   const button = document.getElementById("exportSelectedGeometry");
   if (!button) return;
 
@@ -683,12 +737,15 @@ onMounted(() => {
     }
 
     if (props.displayRaster) {
-      const colormapStops = datasetStore.variable.colormap_stops;
+      const variable = datasetStore.variable;
+      const colormapStops = variable?.colormap_stops;
       if (!Array.isArray(colormapStops) || colormapStops.length < 2) {
         console.error(
-          `Variable '${datasetStore.variable.id}' has invalid colormap_stops (got ${JSON.stringify(colormapStops)}). Colorbar will not be shown.`
+          `Variable '${variable?.id}' has invalid colormap_stops (got ${JSON.stringify(colormapStops)}). Colorbar will not be shown.`,
         );
-        messageStore.error("Colormap data is missing or invalid for this variable. The legend cannot be displayed.");
+        messageStore.error(
+          "Colormap data is missing or invalid for this variable. The legend cannot be displayed.",
+        );
       } else {
         colorbar = new SkopeColorbar({
           colors: colormapStops,
@@ -715,35 +772,35 @@ watch(
     }
     updateStudyAreaDisplay(geoJson);
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
   () => metadata.value?.region?.extents,
   () => {
     addMetadataExtentLayer();
-  }
+  },
 );
 
 watch(
   () => currentStep.value,
   (step: number) => {
     selectedBaseLayerId.value = getDefaultBaseLayerId(step);
-  }
+  },
 );
 
 watch(
   () => selectedBaseLayerId.value,
   (baseLayerIdValue: string) => {
     applyBaseLayerSelection(baseLayerIdValue);
-  }
+  },
 );
 
 watch(
   () => props.step,
   (step: number) => {
     updateRasterLayer(step);
-  }
+  },
 );
 
 watch([minVal, maxVal, variableUnit], () => {
@@ -755,18 +812,19 @@ watch([minVal, maxVal, variableUnit], () => {
 });
 
 watch(legendVisible, (visible) => {
-  visible ? colorbar?.show() : colorbar?.hide();
+  if (visible) {
+    colorbar?.show();
+  } else {
+    colorbar?.hide();
+  }
 });
 
-watch(
-  cogBaseUrl,
-  (url) => {
-    removeCogRasterLayer();
-    if (url) {
-      addCogRasterLayer(props.step);
-    }
+watch(cogBaseUrl, (url) => {
+  removeCogRasterLayer();
+  if (url) {
+    addCogRasterLayer(props.step);
   }
-);
+});
 
 onUnmounted(() => {
   isMapLoaded = false;
@@ -851,6 +909,4 @@ onUnmounted(() => {
   margin-bottom: 2px;
   font-size: 11px;
 }
-
-
 </style>

@@ -18,7 +18,7 @@ server
     consola.ready({
       message: `Server running at: ${server.info.uri}`,
       badge: true,
-    })
+    }),
   )
   .catch((err) => {
     consola.error(err);

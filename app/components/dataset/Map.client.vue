@@ -4,8 +4,8 @@
     :step="step"
     :display-raster="displayRaster"
     :circle-to-polygon-edges="circleToPolygonEdges"
-    @mapReady="emit('mapReady', $event)"
-    @stepReady="emit('stepReady')"
+    @map-ready="emit('mapReady', $event)"
+    @step-ready="emit('stepReady')"
   />
 </template>
 
@@ -13,7 +13,7 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import LeafletMap from "@/components/dataset/LeafletMap.client.vue";
-import MapLibrePoc from "@/components/dataset/MapLibrePoc.client.vue";
+import MapLibre from "@/components/dataset/MapLibre.client.vue";
 
 const props = defineProps({
   step: { type: Number, default: 2000 },
@@ -42,7 +42,7 @@ const mapEngine = computed(() => {
 
 const mapComponent = computed(() => {
   if (mapEngine.value === "maplibre") {
-    return MapLibrePoc;
+    return MapLibre;
   }
   return LeafletMap;
 });

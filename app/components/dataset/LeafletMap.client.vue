@@ -1,5 +1,11 @@
 <template>
-  <v-card class="pb-2" height="100%" width="100%" elevation="1" variant="outlined">
+  <v-card
+    class="pb-2"
+    height="100%"
+    width="100%"
+    elevation="1"
+    variant="outlined"
+  >
     <v-toolbar variant="flat" class="ma-0 pa-0">
       <v-row class="mx-0" align="baseline">
         <!-- selected area -->
@@ -14,7 +20,7 @@
             </h3>
           </template>
         </v-tooltip>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-alert
           v-if="isSelectArea"
           density="compact"
@@ -25,7 +31,7 @@
         >
           Use the draw toolbar on the left to select an area of study.
         </v-alert>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <!-- upload geojson -->
         <input
           id="loadGeoJsonFile"
@@ -33,7 +39,7 @@
           accept=".geojson"
           style="display: none"
           @change="loadGeoJson"
-        />
+        >
         <v-tooltip location="bottom" text="Upload study area from GeoJSON">
           <template #activator="{ props }">
             <v-btn
@@ -147,9 +153,13 @@ let stopGeoJsonWatch: (() => void) | null = null;
 const stepNames = computed(() => appStore.stepNames);
 const metadata = computed(() => datasetStore.metadata);
 const selectedArea = computed(() => datasetStore.selectedAreaInSquareKm);
-const currentStep = computed(() => stepNames.value.findIndex((x: unknown) => x === route.name));
+const currentStep = computed(() =>
+  stepNames.value.findIndex((x: unknown) => x === route.name),
+);
 const showMapControls = computed(() => currentStep.value >= 1);
-const initialMapViewport = computed(() => getInitialMapViewport(metadata.value as any));
+const initialMapViewport = computed(() =>
+  getInitialMapViewport(metadata.value as any),
+);
 const initialMapZoom = computed(() => initialMapViewport.value.zoom);
 const initialMapCenter = computed(() => initialMapViewport.value.center);
 const leafletProviders = LEAFLET_PROVIDERS;
@@ -248,7 +258,7 @@ function saveGeometry(layer: any) {
     geoJsonData.geometry = circleToPolygon(
       geoJsonData.geometry.coordinates,
       layer.getRadius(),
-      props.circleToPolygonEdges
+      props.circleToPolygonEdges,
     );
   }
   legacyActions.saveGeoJson(geoJsonData);
@@ -287,7 +297,7 @@ function mapReady(map: any) {
         renderSelectedArea(gJ, map);
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
   emit("mapReady", true);
 }
@@ -313,7 +323,8 @@ function selectGeoJsonFile() {
 function exportSelectedGeometry() {
   const gJ = datasetStore.geoJson as any;
   if (gJ) {
-    const convertedArea = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gJ));
+    const convertedArea =
+      "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gJ));
     const button = document.getElementById("exportSelectedGeometry");
     if (button) {
       button.setAttribute("href", "data:" + convertedArea);

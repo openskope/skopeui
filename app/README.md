@@ -4,7 +4,7 @@
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 $ npm install
 
@@ -22,6 +22,7 @@ $ npm run generate
 ## Generated Output
 
 Nuxt/Nitro generated artifacts are written to:
+
 - `app/.nuxt`
 - `app/.output`
 

@@ -56,6 +56,10 @@ buildprod: build
 lint: build
 	docker compose run --rm web npm run lintfix
 
+.PHONY: format
+format: build
+	docker compose run --rm -v $(PWD):/repo web npm run format
+
 .PHONY: test
 test: build
 	docker compose run --rm web npm exec vitest run

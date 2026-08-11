@@ -36,12 +36,12 @@ function clampTemporalRange(candidateTemporalRange, datasetTemporalRange) {
   const start = _.clamp(
     candidateTemporalRange[0],
     datasetTemporalRange[0],
-    datasetTemporalRange[1]
+    datasetTemporalRange[1],
   );
   const end = _.clamp(
     candidateTemporalRange[1],
     datasetTemporalRange[0],
-    datasetTemporalRange[1]
+    datasetTemporalRange[1],
   );
   return [start, end];
 }
@@ -246,12 +246,12 @@ class Dataset extends VuexModule {
       const defaultTemporalRange = toTemporalRange(metadata);
       console.log(
         "finding intersection of existing temporal range and dataset default",
-        { currentTemporalRange: this.temporalRange, defaultTemporalRange }
+        { currentTemporalRange: this.temporalRange, defaultTemporalRange },
       );
       this.temporalRange.splice(
         0,
         this.temporalRange.length,
-        ...clampTemporalRange(this.temporalRange, defaultTemporalRange)
+        ...clampTemporalRange(this.temporalRange, defaultTemporalRange),
       );
     }
   }

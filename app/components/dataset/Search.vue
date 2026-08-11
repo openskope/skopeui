@@ -11,16 +11,11 @@
           multiple
           chips
           variant="outlined"
-          @update:modelValue="filterDatasets"
+          @update:model-value="filterDatasets"
           @blur="filterDatasets"
         >
           <template #chip="{ item: variableClass, props: chipProps }">
-            <v-chip
-              v-bind="chipProps"
-              color="primary"
-              label
-              size="small"
-            >
+            <v-chip v-bind="chipProps" color="primary" label size="small">
               {{ variableClass.title ?? variableClass }}
             </v-chip>
           </template>
@@ -46,7 +41,7 @@
           data-toggle="hideseek"
           label="Keyword search"
           append-inner-icon="mdi-magnify"
-          @update:modelValue="filterDatasets"
+          @update:model-value="filterDatasets"
           @click:clear="clearSearchQuery"
           @click:append-inner="filterDatasets"
         />
@@ -58,7 +53,7 @@
           label="Start Year"
           :rules="startYearRules"
           type="number"
-          @update:modelValue="filterDatasets"
+          @update:model-value="filterDatasets"
           @blur="filterDatasets"
         />
       </v-col>
@@ -69,7 +64,7 @@
           :rules="endYearRules"
           label="End Year"
           type="number"
-          @update:modelValue="filterDatasets"
+          @update:model-value="filterDatasets"
         />
       </v-col>
     </v-row>
@@ -93,19 +88,25 @@ const maxYear = currentYear;
 const datasets = computed(() => metadataStore.filteredDatasets);
 
 const startYearRules = computed(() => [
-  (v: number) => v >= minYear || `Please enter a valid start year after ${minYear}`,
-  (v: number) => v <= endYear.value || `Please enter a valid start year before ${endYear.value}`,
+  (v: number) =>
+    v >= minYear || `Please enter a valid start year after ${minYear}`,
+  (v: number) =>
+    v <= endYear.value ||
+    `Please enter a valid start year before ${endYear.value}`,
 ]);
 
 const endYearRules = computed(() => [
-  (v: number) => v >= startYear.value || `Please enter a valid end year after ${startYear.value}`,
-  (v: number) => v <= maxYear || `Please enter a valid end year before ${maxYear}`,
+  (v: number) =>
+    v >= startYear.value ||
+    `Please enter a valid end year after ${startYear.value}`,
+  (v: number) =>
+    v <= maxYear || `Please enter a valid end year before ${maxYear}`,
 ]);
 
 const variableClasses = computed(() => {
   const variableClassSet = new Set<string>();
   for (const dataset of metadataStore.allDatasetMetadata as any[]) {
-    for (const variable of (dataset.variables || [])) {
+    for (const variable of dataset.variables || []) {
       variableClassSet.add(variable.class);
     }
   }
