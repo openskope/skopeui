@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: convert CITATION.cff into citation text file for build constants
-        uses: citation-file-format/cffconvert-github-action@2.0.0
-        with:
-          args: "-f apalike -o _citation.txt"
+      - name: Generate citation files for build constants
+        run: make citations
       - name: Build nuxt site for production deployment
         run: make buildprod
