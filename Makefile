@@ -19,7 +19,7 @@ BUILD_CONSTANTS_PATH := app/store/modules/_constants.js
 BUILD_ID := $(shell git describe --tags --always --dirty)
 CITATION_TXT_FILE := _citation.txt
 CITATION_BIB_FILE := _citation.bib
-CFFCONVERT_IMAGE := ghcr.io/scicodes/cffconvert:v2026.08
+CFFCONVERT_IMAGE := ghcr.io/scicodes/cffconvert:v2026.09
 
 .DEFAULT_GOAL := help
 
@@ -41,8 +41,8 @@ check-environment:
 
 $(CITATION_TXT_FILE) $(CITATION_BIB_FILE) &: CITATION.cff
 	rm -f $(CITATION_TXT_FILE) $(CITATION_BIB_FILE)
-	docker run --rm --user $(shell id -u):$(shell id -g) -v $(PWD):/workspace -w /workspace $(CFFCONVERT_IMAGE) -f apalike -o $(CITATION_TXT_FILE)
-	docker run --rm --user $(shell id -u):$(shell id -g) -v $(PWD):/workspace -w /workspace $(CFFCONVERT_IMAGE) -f bibtex -o $(CITATION_BIB_FILE)
+	docker run --rm -v "$(PWD):/work:ro" $(CFFCONVERT_IMAGE) -f apalike > $(CITATION_TXT_FILE)
+	docker run --rm -v "$(PWD):/work:ro" $(CFFCONVERT_IMAGE) -f bibtex > $(CITATION_BIB_FILE)
 
 citations: $(CITATION_TXT_FILE) $(CITATION_BIB_FILE) ##- Generate citation text used by the application
 
