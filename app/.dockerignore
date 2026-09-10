@@ -1,6 +1,9 @@
 node_modules
 generated
+.nuxt
 .output
 .agent_build_status
 .landing_body.html
 .landing_headers.txt
+coverage
+npm-debug.log*

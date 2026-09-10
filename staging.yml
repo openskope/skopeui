@@ -1,8 +1,7 @@
 services:
   web:
-    environment:
-      NODE_ENV: "production"
-    command: >-
-      sh -c "npm run build && npm run preview"
+    build:
+      target: production
+    image: openskope/skopeui:staging
     ports:
       - "3000:3000"

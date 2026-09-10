@@ -207,4 +207,3 @@ dmypy.json
 tags
 
 # Agent cached context
-.agent/context/cached_docs/

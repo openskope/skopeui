@@ -1,7 +1,0 @@
-# set to (dev | staging | prod)
-export DEPLOY_ENVIRONMENT=${SKOPE_DEPLOY_ENVIRONMENT}
-# for local usage
-# export SKOPE_API_HOST_URL="http://localhost:8001"
-#
-# for remote usage
-export SKOPE_API_HOST_URL="https://api.openskope.org"

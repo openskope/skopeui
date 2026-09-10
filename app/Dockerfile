@@ -1,26 +1,45 @@
 # syntax=docker/dockerfile:1
 
-FROM node:lts-bookworm
+FROM node:lts-bookworm AS dependencies
 
 ENV NODE_OPTIONS="--openssl-legacy-provider"
 
-LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
+WORKDIR /code
+
+COPY package.json package-lock.json ./
+RUN npm ci && npm cache clean --force
+
+FROM dependencies AS development
+
+ENV NODE_ENV=development
+
+COPY . .
 
 EXPOSE 3000
 
+CMD ["npm", "run", "dev"]
+
+FROM dependencies AS build
+
+ENV NODE_ENV=production
+
+COPY . .
+RUN npm run build
+
+FROM node:lts-bookworm-slim AS production
+
+ENV HOST=0.0.0.0 \
+    NODE_ENV=production \
+    PORT=3000
+
+LABEL maintainer="Allen Lee <allen.lee@asu.edu>"
+
 WORKDIR /code
 
-COPY package.json package-lock.json /code/
-RUN set -ex; \
-    if [ "$NODE_ENV" = "production" ]; then \
-        npm ci --omit=dev; \
-    elif [ "$NODE_ENV" = "test" ]; then \
-        npm ci; \
-    else \
-        npm install; \
-    fi; \
-    npm cache clean --force;
+COPY --from=build --chown=node:node /code/.output ./.output
 
-COPY . /code
+USER node
 
-CMD ["npm", "run", "dev"]
+EXPOSE 3000
+
+CMD ["node", ".output/server/index.mjs"]

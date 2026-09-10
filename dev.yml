@@ -1,9 +1,11 @@
 services:
   web:
+    build:
+      target: development
+    image: openskope/skopeui:dev
     volumes:
       - ./app:/code
       - /code/node_modules
     ports:
       - "127.0.0.1:3000:3000"
-    command: >-
-      sh -c "npm install && npm run dev"
+    command: npm run dev
