@@ -259,6 +259,7 @@ describe("MapLibre basemap selector", () => {
     mocks.routeState.params = { id: "paleocar" };
     mocks.datasetStore.geoJson = null;
     mocks.datasetStore.metadata = { id: "paleocar", variables: [] } as any;
+    mocks.datasetStore.variable = null;
 
     mocks.mapInstances.length = 0;
     vi.clearAllMocks();
@@ -357,5 +358,43 @@ describe("MapLibre basemap selector", () => {
     expect(map.getSource("study-area-display")).toBeDefined();
     expect(map.getLayer("study-area-display-fill")).toBeDefined();
     expect(map.getLayer("study-area-display-outline")).toBeDefined();
+  });
+
+  it("[behavior] omits an absent colormap from tile requests", async () => {
+    mocks.routeState.name = "dataset-id-visualize-variable";
+    mocks.routeState.params = { id: "paleocar", variable: "tasmax" };
+    mocks.datasetStore.variable = {
+      id: "tasmax",
+      min: 0,
+      max: 100,
+      colormap_stops: ["#000000", "#ffffff"],
+    };
+
+    await mount(MapLibre, { global: { stubs: uiStubs } });
+    await flushPromises();
+    await nextTick();
+
+    const source = mocks.mapInstances[0].getStyle().sources["cog-source-a"];
+    expect(source.tiles[0]).toContain("rescale=0%2C50");
+    expect(source.tiles[0]).not.toContain("colormap=");
+  });
+
+  it("[behavior] sends the colormap advertised by API metadata", async () => {
+    mocks.routeState.name = "dataset-id-visualize-variable";
+    mocks.routeState.params = { id: "paleocar", variable: "tasmax" };
+    mocks.datasetStore.variable = {
+      id: "tasmax",
+      min: 0,
+      max: 100,
+      colormap: "viridis",
+      colormap_stops: ["#000000", "#ffffff"],
+    };
+
+    await mount(MapLibre, { global: { stubs: uiStubs } });
+    await flushPromises();
+    await nextTick();
+
+    const source = mocks.mapInstances[0].getStyle().sources["cog-source-a"];
+    expect(source.tiles[0]).toContain("colormap=viridis");
   });
 });

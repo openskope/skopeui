@@ -314,7 +314,9 @@ function getCogFullUrl(baseUrl, step) {
   const min = variable?.min ?? 0;
   const max = (variable?.max ?? 100) * COLOR_MAX_PCT;
   const urlStep = step.toString().padStart(4, "0"); // TODO: Add flexibility for different time resolutions
-  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?colormap=${variable?.colormap}&rescale=${min},${max}`;
+  const params = new URLSearchParams({ rescale: `${min},${max}` });
+  if (variable?.colormap) params.set("colormap", variable.colormap);
+  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?${params.toString()}`;
 }
 
 function getCogBounds(): number[] | undefined {
