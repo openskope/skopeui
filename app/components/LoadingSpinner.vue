@@ -11,18 +11,7 @@
         :width="5"
         color="secondary"
         indeterminate
-      >
-      </v-progress-circular>
+      />
     </v-col>
   </v-row>
 </template>
-
-<script>
-import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
-
-@Component({})
-class LoadingSpinner extends Vue {}
-
-export default LoadingSpinner;
-</script>

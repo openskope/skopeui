@@ -1,33 +1,19 @@
 <template>
-  <v-navigation-drawer v-model="navigationVisible" app temporary light>
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="text-h6 skope-title">
-          SKOPE Workflow
-        </v-list-item-title>
-      </v-list-item-content>
-    </v-list-item>
+  <v-navigation-drawer v-model="navigationVisible" temporary>
+    <v-list-item title="SKOPE Workflow" class="text-h6 skope-title" />
     <v-divider />
-    <v-list shaped nav>
+    <v-list nav>
       <v-list-item
         v-for="(step, index) in steps"
         :key="index"
-        :exact-path="true"
-        nuxt
+        :prepend-icon="step.icon"
+        :title="step.label"
         :to="locations[index]"
-        :inactive="isDisabled(index)"
         :disabled="isDisabled(index)"
-      >
-        <v-list-item-icon>
-          <v-icon>{{ step.icon }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          {{ step.label }}
-        </v-list-item-content>
-        <v-list-item-icon v-if="isStepComplete(index)">
-          <v-icon color="green darken-1">far fa-check-square</v-icon>
-        </v-list-item-icon>
-      </v-list-item>
+        :append-icon="
+          isStepComplete(index) ? 'mdi-check-circle-outline' : undefined
+        "
+      />
       <v-divider />
       <v-list-item>
         <LoadAnalysis />
@@ -36,141 +22,78 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
-import _ from "lodash";
+import { useAppStore } from "@/stores/app";
+import { useDatasetStore } from "@/stores/dataset";
 
-@Component({
-  components: {
-    LoadAnalysis,
+const route = useRoute();
+const appStore = useAppStore();
+const datasetStore = useDatasetStore();
+
+const navigationVisible = computed({
+  get() {
+    return appStore.isNavigationVisible;
   },
-})
-class Navigation extends Vue {
-  stepNames = _.clone(this.$api().app.stepNames);
-  steps = _.clone(this.$api().app.steps);
+  set(value: boolean) {
+    appStore.setNavigationVisible(value);
+  },
+});
 
-  // --------- GETTERS ---------
-  get navigationVisible() {
-    return this.$api().app.isNavigationVisible;
-  }
+const steps = computed(() => appStore.steps);
+const stepNames = computed(() => appStore.stepNames);
+const variableId = computed(() => datasetStore.variable.id);
+const hasMetadata = computed(() => route.params.id != null);
+const hasValidStudyArea = computed(
+  () => hasMetadata.value && datasetStore.hasGeoJson,
+);
+const canAnalyze = computed(() => hasValidStudyArea.value);
+const currentStepIndex = computed(() =>
+  stepNames.value.findIndex((x) => x === (route.name as string)),
+);
 
-  set navigationVisible(navigationVisible) {
-    return this.$api().app.setNavigationVisible(navigationVisible);
-  }
-
-  get locations() {
-    return [
-      this.selectDatasetLocation,
-      this.selectAreaLocation,
-      this.visualizeLocation,
-      this.analyzeLocation,
-    ];
-  }
-
-  get selectDatasetLocation() {
-    return { name: "index" };
-  }
-
-  get selectAreaLocation() {
-    if (this.hasMetadata) {
-      const id = this.$route.params.id;
-      return { name: "dataset-id", params: { id } };
-    }
-    return {};
-  }
-
-  get visualizeLocation() {
-    if (this.hasValidStudyArea) {
-      const id = this.$route.params.id;
-      const variable = this.variableId;
-      return {
+const locations = computed(() => [
+  { name: "index" },
+  hasMetadata.value
+    ? { name: "dataset-id", params: { id: route.params.id as string } }
+    : undefined,
+  hasValidStudyArea.value
+    ? {
         name: "dataset-id-visualize-variable",
-        params: { id, variable },
-      };
-    }
-    return {};
-  }
-
-  get analyzeLocation() {
-    if (this.canAnalyze) {
-      const id = this.$route.params.id;
-      const variable = this.variableId;
-      return {
+        params: { id: route.params.id as string, variable: variableId.value },
+      }
+    : undefined,
+  canAnalyze.value
+    ? {
         name: "dataset-id-analyze-variable",
-        params: { id, variable },
-      };
-    } else {
-      return {};
-    }
-  }
+        params: { id: route.params.id as string, variable: variableId.value },
+      }
+    : undefined,
+]);
 
-  get hasMetadata() {
-    return this.$route.params.id != null;
-  }
-
-  get hasValidStudyArea() {
-    // return whether study area geometry has been defined
-    return this.hasMetadata && this.$api().dataset.hasGeoJson;
-  }
-
-  get canAnalyze() {
-    return this.hasValidStudyArea;
-  }
-
-  get currentStepName() {
-    return this.steps[this.currentStepIndex].label;
-  }
-
-  get currentStepIndex() {
-    return this.stepNames.findIndex((x) => x === this.$route.name);
-  }
-
-  get variableId() {
-    return this.$api().dataset.variable.id;
-  }
-
-  get isMdAndDown() {
-    return this.$vuetify.breakpoint.mdAndDown;
-  }
-
-  // --------- METHODS ---------
-
-  isDisabled(stepId) {
-    switch (this.currentStepIndex) {
-      case 0:
-        switch (stepId) {
-          case 1:
-            return !this.hasMetadata;
-          case 2:
-            return !this.hasValidStudyArea;
-          case 3:
-            return !this.canAnalyze;
-          default:
-            return false;
-        }
-      case 1:
-        if ([2, 3].includes(stepId)) {
-          return !this.hasValidStudyArea;
-        }
-        return false;
-      case 2:
-        if (stepId === 3) {
-          return !this.canAnalyze;
-        }
-        return false;
-      default:
-        return false;
-    }
-  }
-
-  isStepComplete(index) {
-    return this.currentStepIndex > index;
+function isDisabled(stepId: number) {
+  switch (currentStepIndex.value) {
+    case 0:
+      if (stepId === 1) return !hasMetadata.value;
+      if (stepId === 2) return !hasValidStudyArea.value;
+      if (stepId === 3) return !canAnalyze.value;
+      return false;
+    case 1:
+      if ([2, 3].includes(stepId)) return !hasValidStudyArea.value;
+      return false;
+    case 2:
+      if (stepId === 3) return !canAnalyze.value;
+      return false;
+    default:
+      return false;
   }
 }
 
-export default Navigation;
+function isStepComplete(index: number) {
+  return currentStepIndex.value > index;
+}
 </script>
 
 <style scoped></style>

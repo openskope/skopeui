@@ -4,19 +4,28 @@
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
-$ yarn install
+$ npm install
 
 # serve with hot reload at localhost:3000
-$ yarn run dev
+$ npm run dev
 
 # build for production and launch server
-$ yarn run build
-$ yarn start
+$ npm run build
+$ npm run preview
 
 # generate static project
-$ yarn run generate
+$ npm run generate
 ```
+
+## Generated Output
+
+Nuxt/Nitro generated artifacts are written to:
+
+- `app/.nuxt`
+- `app/.output`
+
+These directories are intentionally ignored by git and Docker build contexts.
 
 For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).

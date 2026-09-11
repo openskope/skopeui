@@ -1,0 +1,13 @@
+.git
+.agent
+.agents
+.codex
+app/.nuxt
+app/.output
+app/dist
+app/node_modules
+docker
+docker-compose.yml
+secrets
+_citation.bib
+_citation.txt

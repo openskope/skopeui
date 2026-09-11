@@ -1,17 +1,14 @@
 import { find } from "lodash";
-import {
-  API_HOST_URL,
-  GEOSERVER_HOST_URL,
-  BUILD_ID,
-} from "@/store/modules/_constants";
+import { API_HOST_URL, BUILD_ID } from "@/store/modules/_constants";
 import { toISODate } from "@/store/stats";
 
-export const WMS_SERVER_URI = "geoserver/SKOPE/wms?";
 export const DEFAULT_CENTERED_SMOOTHING_WIDTH = 11;
 export const DEFAULT_MAX_PROCESSING_TIME = 10000; // in ms
-export const SKOPE_WMS_ENDPOINT = `${GEOSERVER_HOST_URL}/${WMS_SERVER_URI}`;
-export const TIMESERIES_ENDPOINT = `${API_HOST_URL}/timeseries`;
 export const METADATA_ENDPOINT = `${API_HOST_URL}/metadata`;
+export const TILES_ENDPOINT = `${API_HOST_URL}/tiles`;
+export const TIMESERIES_SUBMIT_ENDPOINT = `${API_HOST_URL}/timeseries/extract`;
+export const TIMESERIES_STATUS_ENDPOINT = `${API_HOST_URL}/timeseries/status`;
+export const TIMESERIES_REFINE_ENDPOINT = `${API_HOST_URL}/timeseries/analyze`;
 export const LEAFLET_PROVIDERS = [
   {
     name: "CartoDB.Positron",
@@ -23,24 +20,21 @@ export const LEAFLET_PROVIDERS = [
   },
   {
     name: "Stamen.TonerLite",
-    url:
-      "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
+    url: "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
     visible: false,
     attribution:
       'Tiles &copy; <a href="//stamen.com">Stamen Design</a> <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>',
   },
   {
     name: "Esri.WorldTerrain",
-    url:
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
     visible: false,
     attribution:
       "Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS",
   },
   {
     name: "Esri.WorldTopoMap",
-    url:
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri et al",
     visible: 1,
   },
