@@ -41,8 +41,8 @@ check-environment:
 
 $(CITATION_TXT_FILE) $(CITATION_BIB_FILE) &: CITATION.cff
 	rm -f $(CITATION_TXT_FILE) $(CITATION_BIB_FILE)
-	docker run --rm -v "$(PWD):/work:ro" $(CFFCONVERT_IMAGE) -f apalike > $(CITATION_TXT_FILE)
-	docker run --rm -v "$(PWD):/work:ro" $(CFFCONVERT_IMAGE) -f bibtex > $(CITATION_BIB_FILE)
+	docker run --rm -i $(CFFCONVERT_IMAGE) -i /dev/stdin -f apalike < CITATION.cff > $(CITATION_TXT_FILE)
+	docker run --rm -i $(CFFCONVERT_IMAGE) -i /dev/stdin -f bibtex < CITATION.cff > $(CITATION_BIB_FILE)
 
 citations: $(CITATION_TXT_FILE) $(CITATION_BIB_FILE) ##- Generate citation text used by the application
 
