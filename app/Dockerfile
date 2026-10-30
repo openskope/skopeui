@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:lts-bookworm AS dependencies
+FROM node:24-bookworm AS dependencies
 
 ENV NODE_OPTIONS="--openssl-legacy-provider"
 
@@ -26,7 +26,7 @@ ENV NODE_ENV=production
 COPY . .
 RUN npm run build
 
-FROM node:lts-bookworm-slim AS production
+FROM node:24-bookworm-slim AS production
 
 ENV HOST=0.0.0.0 \
     NODE_ENV=production \
