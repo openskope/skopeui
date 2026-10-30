@@ -89,6 +89,29 @@ describe("resolveTimeSeries", () => {
     expect(fetchMock.mock.calls[2][0]).toMatch(/\/timeseries\/extract$/);
   });
 
+  it("reports a timed-out extraction without extracting again", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(
+        respond(200, {
+          status: "TIMED_OUT",
+          error: "Processing exceeded 20000 ms.",
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("old-job", {}),
+    ).rejects.toMatchObject({
+      response: {
+        status: 504,
+        data: { detail: [{ msg: "Processing exceeded 20000 ms." }] },
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("records a new extraction's job as soon as it's submitted", async () => {
     let jobIdWhilePolling: string | undefined;
     const store = useDatasetStore();

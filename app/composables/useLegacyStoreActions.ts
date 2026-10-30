@@ -187,6 +187,7 @@ export function useLegacyStoreActions() {
     while (
       result.status !== "SUCCESS" &&
       result.status !== "FAILED" &&
+      result.status !== "TIMED_OUT" &&
       Date.now() < deadline
     ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -210,7 +211,8 @@ export function useLegacyStoreActions() {
       };
       throw error;
     }
-    // implicit else: deadline exceeded
+    // The API stopped the job at its deadline, or we stopped waiting. Either
+    // way it's a timeout (504), which the pages report and never resubmit.
     const error = new Error("Request timed out") as Error & {
       response?: { status: number; data: unknown };
     };
@@ -220,9 +222,10 @@ export function useLegacyStoreActions() {
         detail: [
           {
             msg:
+              result.error ??
               "Request timed out after waiting for " +
-              timeoutSeconds +
-              " seconds",
+                timeoutSeconds +
+                " seconds",
           },
         ],
       },
