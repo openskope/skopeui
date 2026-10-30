@@ -2,25 +2,21 @@
   <v-container fluid class="fill-height align-start">
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
-      <v-row no-gutters>
-        <v-col class="pa-0 ma-0">
-          <SubHeader :select-variable="true">
-            <v-btn
-              :disabled="!hasValidStudyArea"
-              :to="analyzeLocation"
-              color="accent"
-              variant="flat"
-            >
-              Analyze Data
-              <v-icon class="ml-2" size="small"> mdi-chevron-right </v-icon>
-            </v-btn>
-          </SubHeader>
-        </v-col>
-      </v-row>
-      <v-row class="pa-0 mb-6" no-gutters>
+      <SubHeader :select-variable="true">
+        <v-btn
+          :disabled="!hasValidStudyArea"
+          :to="analyzeLocation"
+          color="accent"
+          variant="flat"
+        >
+          Analyze Data
+          <v-icon class="ml-2" size="small"> mdi-chevron-right </v-icon>
+        </v-btn>
+      </SubHeader>
+      <v-row class="pa-0 mb-6">
         <!-- 2 column layout with map and time series-->
         <v-col
-          class="d-flex map-flex pa-0 mb-3"
+          class="d-flex map-flex pa-0"
           lg="6"
           md="12"
           sm="12"

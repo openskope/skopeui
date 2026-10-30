@@ -2,16 +2,12 @@
   <v-container fluid class="fill-height align-start">
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
-      <v-row no-gutters>
-        <v-col>
-          <SubHeader :select-variable="true">
-            <v-btn color="accent" variant="flat" @click="exportData">
-              Download
-              <v-icon class="ml-2" size="small">mdi-download</v-icon>
-            </v-btn>
-          </SubHeader>
-        </v-col>
-      </v-row>
+      <SubHeader :select-variable="true">
+        <v-btn color="accent" variant="flat" @click="exportData">
+          Download
+          <v-icon class="ml-2" size="small">mdi-download</v-icon>
+        </v-btn>
+      </SubHeader>
       <v-row>
         <!-- time series -->
         <v-col class="timeseries-flex" cols="12" lg="8">

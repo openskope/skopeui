@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col class="ma-0">
-        <h1>
+        <h1 class="text-h5 d-flex align-center ga-2">
           Select a Dataset
           <v-tooltip
             location="bottom"
@@ -11,12 +11,13 @@
             <template #activator="{ props }">
               <v-btn
                 icon
-                class="mt-n1 ml-n1"
+                size="small"
+                variant="text"
                 href="https://www.openskope.org/skope-users-guide/"
                 target="_blank"
                 v-bind="props"
               >
-                <v-icon>mdi-help-circle-outline</v-icon>
+                <v-icon size="20">mdi-help-circle-outline</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
