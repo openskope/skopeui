@@ -127,15 +127,26 @@
           </v-btn>
         </template>
       </v-tooltip>
-      <!-- Changes with these buttons, or by clicking the plot. -->
-      <span
+      <!-- Changes with these buttons, by clicking the plot, or by typing a
+           timestep and pressing Enter. -->
+      <input
+        v-model="stepDraft"
         class="time-series-current-step"
-        :style="{ minWidth: currentStepWidth }"
-        title="Current timestep"
+        :class="{ 'time-series-current-step--invalid': isStepDraftInvalid }"
+        :style="{ width: currentStepWidth }"
+        type="text"
+        inputmode="numeric"
+        title="Type a timestep and press Enter"
+        aria-label="Current timestep"
+        :aria-invalid="isStepDraftInvalid"
+        :aria-describedby="stepMessageId"
         data-test="current-step"
+        @focus="($event.target as HTMLInputElement).select()"
+        @input="hideStepMessage"
+        @keydown.enter="applyStepDraft"
+        @keydown.esc="resetStepDraft"
+        @blur="applyStepDraftOnBlur"
       >
-        {{ stepSelected }}
-      </span>
       <v-tooltip location="top" text="Next timestep">
         <template #activator="{ props }">
           <v-btn
@@ -165,6 +176,19 @@
           </v-btn>
         </template>
       </v-tooltip>
+      <!-- In the controls' bottom padding, so nothing moves when it shows. -->
+      <Transition name="time-series-step-message">
+        <span
+          v-if="isStepMessageVisible"
+          :id="stepMessageId"
+          class="time-series-step-message"
+          role="status"
+          data-test="step-message"
+        >
+          Choose a timestep from {{ temporalRangeMin }} to
+          {{ temporalRangeMax }}
+        </span>
+      </Transition>
     </div>
   </v-card>
 </template>
@@ -177,12 +201,14 @@ import {
   onMounted,
   onUnmounted,
   defineAsyncComponent,
+  useId,
 } from "vue";
 import _ from "lodash";
 import AreaReadout from "@/components/dataset/AreaReadout.vue";
 import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { useDatasetStore } from "@/stores/dataset";
-import { axisYears, stepAlongAxis } from "@/utils/timeAxis";
+import { wrapPlotTitle } from "@/utils/plotTitle";
+import { axisYears, stepAlongAxis, stepFromText } from "@/utils/timeAxis";
 
 const props = defineProps<{
   stepSelected?: number | null;
@@ -336,25 +362,53 @@ const shapes = computed(() => {
   return [];
 });
 
+// The left margin is a fixed budget for the y tick labels and a title of up
+// to two lines, so the plot doesn't move when the variable or transform
+// changes. Tick labels wider than 5 characters (-1000) would run into the
+// title.
+const Y_TICK_LABELS_WIDTH = 58;
+const AXIS_TITLE_SIZE = 14;
+const Y_TITLE_LINE_HEIGHT = 20;
+const MARGIN_LEFT = Y_TICK_LABELS_WIDTH + 2 * Y_TITLE_LINE_HEIGHT + 4;
+// The longest title kept on one line. It fits the plot's minimum height
+// (.time-series), and longer titles wrap in two halves that do too.
+const Y_TITLE_MAX_LINE_LENGTH = 44;
+
+// An annotation, not the axis title: Plotly places an axis title from its tick
+// labels, so it would move with their width. A one-line title sits on the
+// line next to the axis.
+const yAxisTitleAnnotation = computed(() => ({
+  text: wrapPlotTitle(yAxisTitle.value ?? "", Y_TITLE_MAX_LINE_LENGTH),
+  font: { size: AXIS_TITLE_SIZE },
+  textangle: -90,
+  xref: "paper",
+  yref: "paper",
+  x: 0,
+  y: 0.5,
+  xanchor: "right",
+  yanchor: "middle",
+  xshift: -Y_TICK_LABELS_WIDTH,
+  showarrow: false,
+}));
+
 const layoutMetadata = computed(() => ({
   autosize: true,
-  margin: { b: 60, t: 10, pad: 2 },
+  margin: { l: MARGIN_LEFT, b: 60, t: 10, pad: 2 },
   showlegend: hasMultipleTimeSeries.value,
   legend: { x: 1, y: 0.5 },
   xaxis: {
-    title: "Timestep",
+    title: { text: "Timestep", font: { size: AXIS_TITLE_SIZE } },
     linewidth: 3,
     gridwidth: 3,
     automargin: true,
   },
   yaxis: {
-    title: yAxisTitle.value,
     linewidth: 3,
     gridwidth: 3,
-    automargin: true,
   },
   font: { size: 14 },
   shapes: shapes.value,
+  annotations: [yAxisTitleAnnotation.value],
 }));
 
 const options = computed(() => ({
@@ -467,6 +521,69 @@ function previousStep() {
   stepBy(-1);
 }
 
+// The timestep typed between the step buttons, applied on Enter or when the
+// field loses focus. A timestep outside the range on screen is rejected, with
+// a message that says which ones are allowed.
+const STEP_MESSAGE_LINGER = 4_000;
+const stepDraft = ref("");
+const isStepDraftInvalid = ref(false);
+const isStepMessageVisible = ref(false);
+const stepMessageId = useId();
+let stepMessageTimer: ReturnType<typeof setTimeout> | null = null;
+
+function currentStepText() {
+  return props.stepSelected == null ? "" : String(props.stepSelected);
+}
+
+function clearStepMessageTimer() {
+  if (stepMessageTimer != null) clearTimeout(stepMessageTimer);
+  stepMessageTimer = null;
+}
+
+function hideStepMessage() {
+  clearStepMessageTimer();
+  isStepDraftInvalid.value = false;
+  isStepMessageVisible.value = false;
+}
+
+function resetStepDraft() {
+  hideStepMessage();
+  stepDraft.value = currentStepText();
+}
+
+/** Selects the timestep the draft names; false if it names none in range. */
+function commitStepDraft() {
+  const step = stepFromText(axis.value, stepDraft.value, [
+    temporalRangeMin.value,
+    temporalRangeMax.value,
+  ]);
+  if (step === null) return false;
+  hideStepMessage();
+  stepDraft.value = String(step);
+  if (step !== props.stepSelected) setStep(step);
+  return true;
+}
+
+function applyStepDraft() {
+  if (commitStepDraft()) return;
+  clearStepMessageTimer();
+  isStepDraftInvalid.value = true;
+  isStepMessageVisible.value = true;
+}
+
+// Leaving the field puts the current timestep back, so it never shows one the
+// plot isn't on; the message stays a moment to say why.
+function applyStepDraftOnBlur() {
+  if (stepDraft.value === currentStepText() || commitStepDraft()) return;
+  stepDraft.value = currentStepText();
+  isStepDraftInvalid.value = false;
+  isStepMessageVisible.value = true;
+  clearStepMessageTimer();
+  stepMessageTimer = setTimeout(hideStepMessage, STEP_MESSAGE_LINGER);
+}
+
+watch(() => props.stepSelected, resetStepDraft, { immediate: true });
+
 async function getTimeSeriesPlotImage() {
   const plotlyApi = getPlotlyApi();
   const svg = await plotlyApi?.toImage({
@@ -495,6 +612,7 @@ watch(
 
 onUnmounted(() => {
   clearProgressiveMessages();
+  clearStepMessageTimer();
 });
 
 defineExpose({ getTimeSeriesPlotImage });
@@ -539,11 +657,13 @@ watch(layoutMetadata, (layout) => {
 });
 </script>
 <style>
+/* Fills its column, which grows instead when the plot's minimum height and
+   the controls don't fit, so neither overlaps the other. */
 .time-series-card {
+  --plot-min-height: 410px;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   min-width: 0;
 }
 
@@ -567,16 +687,19 @@ watch(layoutMetadata, (layout) => {
   white-space: nowrap;
 }
 
+/* Sized from the plot's minimum, not its rendered height, so the card can
+   shrink again when the window does. */
 .time-series-plot-shell {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   flex-direction: column;
-  min-height: 0;
+  min-height: calc(var(--plot-min-height) + 16px);
   padding: 16px 16px 0;
 }
 
 .time-series-plot-shell--last {
+  min-height: calc(var(--plot-min-height) + 32px);
   padding-bottom: 16px;
 }
 
@@ -587,15 +710,56 @@ watch(layoutMetadata, (layout) => {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  position: relative;
   gap: 4px;
   padding: 8px 16px 16px;
 }
 
 .time-series-current-step {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  outline: none;
+  background: transparent;
+  color: inherit;
   font-size: 1.125rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+.time-series-current-step:hover {
+  border-bottom-color: rgba(var(--v-theme-on-surface), 0.4);
+}
+
+.time-series-current-step:focus {
+  border-bottom-color: rgb(var(--v-theme-primary));
+}
+
+.time-series-current-step--invalid,
+.time-series-current-step--invalid:hover,
+.time-series-current-step--invalid:focus {
+  border-bottom-color: rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-error));
+}
+
+.time-series-step-message {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  font-size: 0.75rem;
+  line-height: 16px;
+  color: rgb(var(--v-theme-error));
+  text-align: center;
+}
+
+.time-series-step-message-leave-active {
+  transition: opacity 0.3s;
+}
+
+.time-series-step-message-leave-to {
+  opacity: 0;
 }
 
 .timeseries-loading-overlay {
@@ -615,9 +779,10 @@ watch(layoutMetadata, (layout) => {
   color: #596d7b;
 }
 
+/* Tall enough for a one-line y-axis title of Y_TITLE_MAX_LINE_LENGTH. */
 .time-series {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   width: 100%;
-  min-height: 320px;
+  min-height: var(--plot-min-height);
 }
 </style>

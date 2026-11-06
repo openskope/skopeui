@@ -11,7 +11,11 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/components/dataset/PlotlyClient.vue", () => ({
   __esModule: true,
-  default: { name: "PlotlyStub", template: "<div />" },
+  default: {
+    name: "PlotlyStub",
+    props: ["data", "layout", "options"],
+    template: "<div />",
+  },
 }));
 
 const passThrough = { template: "<div><slot /></div>" };
@@ -85,7 +89,8 @@ describe("TimeSeriesPlot step controls", () => {
   it("shows the current timestep between the step buttons", async () => {
     const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
     await flushPromises();
-    expect(wrapper.find('[data-test="current-step"]').text()).toBe("1500");
+    const field = wrapper.find('[data-test="current-step"]');
+    expect((field.element as HTMLInputElement).value).toBe("1500");
   });
 
   it("sizes the current timestep to the longest one on the axis", async () => {
@@ -97,6 +102,91 @@ describe("TimeSeriesPlot step controls", () => {
     await flushPromises();
     expect(
       wrapper.find('[data-test="current-step"]').attributes("style"),
-    ).toContain("min-width: 4.5ch");
+    ).toContain("width: 4.5ch");
+  });
+});
+
+describe("TimeSeriesPlot typed timestep", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    const store = useDatasetStore();
+    store.metadata = {
+      time: { kind: "regular", origin: "1001", end: "2000", step: "P1Y" },
+    } as any;
+    store.setTemporalRange([1500, 1600]);
+  });
+
+  async function typeStep(text: string) {
+    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1550 });
+    await flushPromises();
+    const field = wrapper.find('[data-test="current-step"]');
+    await field.setValue(text);
+    return { wrapper, field };
+  }
+
+  it("selects a typed timestep on Enter", async () => {
+    const { wrapper, field } = await typeStep("1575");
+    await field.trigger("keydown", { key: "Enter" });
+    expect(wrapper.emitted("step-selected")).toEqual([[1575]]);
+  });
+
+  it("rejects a timestep outside the range and says which are allowed", async () => {
+    const { wrapper, field } = await typeStep("1700");
+    await field.trigger("keydown", { key: "Enter" });
+    expect(wrapper.emitted("step-selected")).toBeUndefined();
+    expect(field.attributes("aria-invalid")).toBe("true");
+    expect((field.element as HTMLInputElement).value).toBe("1700");
+    expect(wrapper.find('[data-test="step-message"]').text()).toBe(
+      "Choose a timestep from 1500 to 1600",
+    );
+  });
+
+  it("puts the current timestep back when left with a rejected one", async () => {
+    vi.useFakeTimers();
+    const { wrapper, field } = await typeStep("abc");
+    await field.trigger("blur");
+    expect((field.element as HTMLInputElement).value).toBe("1550");
+    expect(wrapper.find('[data-test="step-message"]').exists()).toBe(true);
+    vi.advanceTimersByTime(4_000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="step-message"]').exists()).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it("puts the current timestep back on Escape", async () => {
+    const { wrapper, field } = await typeStep("1575");
+    await field.trigger("keydown", { key: "Escape" });
+    expect((field.element as HTMLInputElement).value).toBe("1550");
+    expect(wrapper.emitted("step-selected")).toBeUndefined();
+  });
+});
+
+describe("TimeSeriesPlot y-axis title", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  async function layoutFor(title: string, unit: string) {
+    const store = useDatasetStore();
+    store.variable = { id: "v", title, unit } as any;
+    const wrapper = mountPlot();
+    await flushPromises();
+    return wrapper.findComponent({ name: "PlotlyStub" }).props("layout");
+  }
+
+  it("keeps the plot's left edge put for short and long titles", async () => {
+    const short = await layoutFor("Annual (Jan–Dec) Precipitation", "mm");
+    const long = await layoutFor(
+      "Water-year (Oct–Sept) Cotton Growing Degree Days",
+      "°C GDD",
+    );
+    expect(short.margin.l).toBe(long.margin.l);
+    expect(short.yaxis.automargin).toBeFalsy();
+    expect(short.annotations[0].text).toBe(
+      "Annual (Jan–Dec) Precipitation (mm)",
+    );
+    expect(long.annotations[0].text).toBe(
+      "Water-year (Oct–Sept) Cotton<br>Growing Degree Days (°C GDD)",
+    );
   });
 });

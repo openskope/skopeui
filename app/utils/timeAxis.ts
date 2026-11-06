@@ -53,3 +53,20 @@ export function stepAlongAxis(
   const index = Math.min(Math.max(before + delta, 0), inRange.length - 1);
   return inRange[index];
 }
+
+/**
+ * The timestep a typed year names within [lower, upper], or null when the
+ * text isn't a year or falls outside the range. A year missing from the axis
+ * moves to the nearest one before it.
+ */
+export function stepFromText(
+  years: number[],
+  text: string,
+  [lower, upper]: [number, number],
+): number | null {
+  const trimmed = text.trim();
+  if (!/^\d{1,4}$/.test(trimmed)) return null;
+  const year = Number(trimmed);
+  if (year < lower || year > upper) return null;
+  return stepAlongAxis(years, year, 0, [lower, upper]);
+}

@@ -10,7 +10,7 @@
       </SubHeader>
       <v-row>
         <!-- time series -->
-        <v-col class="timeseries-flex" cols="12" lg="8">
+        <v-col class="d-flex timeseries-flex" cols="12" lg="8">
           <TimeSeriesPlot
             ref="plot"
             :show-area="true"
@@ -378,7 +378,7 @@ async function retrieveAnalysis(data: any) {
       if (status === 504) {
         datasetStore.setTimeSeriesTimeout();
         messageStore.error(
-          "Request timed out. Try a smaller area or shorter date range.",
+          "This area took too long to process. Try a smaller one on the Select Area step.",
         );
       } else if (status >= 500) {
         datasetStore.setTimeSeriesServerError(detail);
@@ -575,9 +575,9 @@ whenever(
 
 <style scoped>
 /* The viewport less the app bar, step bar and page title, so the panels fit
-   a laptop screen. */
+   a laptop screen. A minimum, so the column can grow to fit the plot. */
 .timeseries-flex {
-  height: calc(100vh - 250px);
+  min-height: calc(100vh - 250px);
 }
 
 .subtitle {

@@ -135,7 +135,7 @@ async function updateTimeSeries(data: any) {
       if (status === 504) {
         datasetStore.setTimeSeriesTimeout();
         messageStore.error(
-          "Request timed out. Try a smaller area or shorter date range.",
+          "This area took too long to process. Try a smaller one on the Select Area step.",
         );
       } else if (status >= 500) {
         datasetStore.setTimeSeriesServerError(detail);
@@ -202,20 +202,20 @@ onUnmounted(() => {
 
 <style scoped>
 /* The viewport less the app bar, step bar and page title, so the panels fit
-   a laptop screen. */
+   a laptop screen. A minimum, so the plot's column can grow to fit it. */
 .map-flex {
-  height: calc(100vh - 250px);
+  min-height: calc(100vh - 250px);
 }
 
 @media all and (max-width: 960px) {
   .map-flex {
-    height: 450px;
+    min-height: 450px;
   }
 }
 
 @media all and (max-width: 600px) {
   .map-flex {
-    height: 450px;
+    min-height: 450px;
   }
 }
 </style>

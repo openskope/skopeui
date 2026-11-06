@@ -4,6 +4,7 @@ import type { Time } from "@/types/metadata";
 import {
   axisYears,
   stepAlongAxis,
+  stepFromText,
   timeCoverageLabel,
   timeSpan,
   timestepKey,
@@ -68,5 +69,23 @@ describe("time axis steps", () => {
     expect(stepAlongAxis(years, 1950, -1, [1900, 2050])).toBe(1900);
     expect(stepAlongAxis(years, 2000, 1, [1900, 2000])).toBe(2000);
     expect(stepAlongAxis(years, 1960, 1, [1900, 2050])).toBe(2000);
+  });
+
+  it("reads a typed year within the selected range", () => {
+    const years = [1900, 1950, 2000, 2050];
+    expect(stepFromText(years, " 1950 ", [1900, 2050])).toBe(1950);
+    expect(stepFromText([590, 591], "0590", [590, 591])).toBe(590);
+  });
+
+  it("moves a typed year missing from the axis to the one before it", () => {
+    expect(stepFromText([1900, 1950, 2000], "1960", [1900, 2000])).toBe(1950);
+  });
+
+  it("rejects text that isn't a year in the selected range", () => {
+    const years = [1900, 1950, 2000];
+    expect(stepFromText(years, "2050", [1900, 2000])).toBeNull();
+    expect(stepFromText(years, "1850", [1900, 2000])).toBeNull();
+    expect(stepFromText(years, "abc", [1900, 2000])).toBeNull();
+    expect(stepFromText(years, "", [1900, 2000])).toBeNull();
   });
 });
