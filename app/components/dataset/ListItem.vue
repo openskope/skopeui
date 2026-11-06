@@ -1,12 +1,13 @@
 <template>
   <v-row align-content-start justify-space-around>
-    <v-col xs4>
+    <v-col cols="12" md="4" class="list-item-map-col">
       <client-only>
         <NuxtLink :to="absoluteUrl">
           <l-map
             :min-zoom="2"
             :zoom="initialCenter.zoom"
             :center="initialCenter.center"
+            :options="{ zoomSnap: 0.25 }"
             class="list-item-map"
             @ready="fitToViewport"
           >
@@ -15,13 +16,18 @@
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
               attribution="Tiles &copy; Esri"
             />
-            <l-rectangle :bounds="leafletBounds(bbox)" />
+            <l-rectangle
+              :bounds="leafletBounds(bbox)"
+              color="#3d5a80"
+              :weight="2"
+              :fill-opacity="0.12"
+            />
           </l-map>
         </NuxtLink>
       </client-only>
     </v-col>
-    <v-col xs8>
-      <v-card elevation="0">
+    <v-col cols="12" md="8" class="list-item-info-col d-flex">
+      <v-card elevation="0" class="list-item-info">
         <v-card-title class="ma-0 pa-0">
           <div class="text-h6">
             <NuxtLink :to="absoluteUrl" class="dataset-title">
@@ -29,16 +35,16 @@
             </NuxtLink>
             <MetadataModal :metadata-id="id" />
           </div>
-          <div class="text-subtitle-2 pa-0 ma-0">
+          <div class="list-item-coverage">
             {{ spatialCoverage }} | {{ temporalCoverage }}
           </div>
         </v-card-title>
-        <v-card-text class="mt-3 pa-0">
+        <v-card-text class="list-item-description mt-3 pa-0">
           <span v-html="$md.render(safeDescription)" />
         </v-card-text>
         <VariableList :variables="safeVariables" />
-        <v-card-text v-if="sourceLink" class="ma-0 pa-0">
-          <b class="text-subtitle-1">Source:</b>
+        <v-card-text v-if="sourceLink" class="list-item-source">
+          <b class="text-subtitle-1">Source:</b>{{ " " }}
           <a target="_blank" :href="sourceLink.href">
             {{ sourceLink.title ?? sourceLink.href }}
           </a>
@@ -49,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onBeforeUnmount } from "vue";
 import { BaseMapProvider } from "@/store/modules/constants";
 import MetadataModal from "@/components/dataset/MetadataModal.vue";
 import VariableList from "@/components/dataset/VariableList.vue";
@@ -77,10 +83,18 @@ const props = defineProps<{
 const viewport = computed(() => getInitialMapViewport(props));
 const initialCenter = computed(() => leafletStartView(viewport.value));
 
+// Leaflet reads its size once, so it would leave the rest gray when the row
+// grows, as when a variable category is expanded.
+let resizeObserver: ResizeObserver | null = null;
+
 function fitToViewport(map: any) {
   if ("bbox" in viewport.value)
     map.fitBounds(leafletBounds(viewport.value.bbox));
+  resizeObserver = new ResizeObserver(() => map.invalidateSize());
+  resizeObserver.observe(map.getContainer());
 }
+
+onBeforeUnmount(() => resizeObserver?.disconnect());
 
 const safeDescription = computed(() => props.description ?? "");
 const safeVariables = computed(() => props.variables ?? []);
@@ -96,26 +110,80 @@ const sourceLink = computed(() =>
 const absoluteUrl = computed(() => `/dataset/${props.id}`);
 </script>
 <style scoped>
+/* An underline that becomes a highlight on hover, in a muted version of the
+   theme's accent orange. */
 .dataset-title {
+  padding: 0 6px;
+  margin: 0 -6px;
   text-decoration: none;
-  box-shadow:
-    inset 0 -2px 0 #ee6c4d,
-    0 2px 0 #ee6c4d;
+  box-shadow: inset 0 -2px 0 #c97b5b;
   transition: box-shadow 0.3s;
   color: inherit;
-  overflow: hidden;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .dataset-title:hover {
-  box-shadow:
-    inset 0 -30px 0 #ee6c4d,
-    0 2px 0 #ee6c4d;
+  box-shadow: inset 0 -1.6em 0 #c97b5b;
   color: white;
 }
 
+.list-item-coverage {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #596d7b;
+}
+
+/* A little wider than Vuetify's 4 of 12 columns for the map. */
+@media (min-width: 960px) {
+  .list-item-map-col {
+    flex: 0 0 38%;
+    max-width: 38%;
+  }
+
+  .list-item-info-col {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+/* The source line sits at the bottom of the row, however long the rest is. */
+/* Visible overflow, so the title's highlight isn't cut off on the left. */
+.list-item-info,
+.list-item-info :deep(.v-card-title) {
+  overflow: visible;
+}
+
+.list-item-info {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  width: 100%;
+}
+
+.list-item-description {
+  flex: 0 0 auto;
+}
+
+.list-item-source {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 8px 0 0;
+}
+
+.list-item-source a {
+  color: #3d5a80;
+}
+
+/* Fills the column beside the text. The minimum keeps a dataset with few
+   variable categories about as tall as the others, and gives the map a height
+   when it's stacked above the text. */
 .list-item-map {
   position: relative;
   z-index: 1;
+  min-height: 300px;
   cursor: pointer;
 }
 </style>

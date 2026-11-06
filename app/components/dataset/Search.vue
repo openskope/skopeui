@@ -7,9 +7,10 @@
           v-model="selectedCategories"
           no-filter
           :items="categories"
-          label="Filter by variable"
+          label="Filter by variable category"
           multiple
           chips
+          closable-chips
           variant="outlined"
           @update:model-value="filterDatasets"
           @blur="filterDatasets"
