@@ -96,6 +96,7 @@
                 class="mt-2"
                 suffix="time steps"
                 type="number"
+                :rules="[validateZScoreWidth]"
               />
             </template>
             <v-select
@@ -500,10 +501,13 @@ async function updateTimeSeries() {
   analysisStore.setRequestData(requestData);
 }
 
+// A z-score needs at least two values to have a spread to divide by.
 function validateMinYear(year: number) {
   if (year < minYear.value) return `Please enter a min year > ${minYear.value}`;
   if (year > maxYear.value)
     return `Please enter a min year <= ${maxYear.value}`;
+  if (Number(year) >= Number(timeRange.value.ub.year))
+    return "Please enter a min year before the max year";
   return true;
 }
 
@@ -511,12 +515,39 @@ function validateMaxYear(year: number) {
   if (year < minYear.value) return `Please enter a max year > ${minYear.value}`;
   if (year > maxYear.value)
     return `Please enter a max year <= ${maxYear.value}`;
+  if (Number(year) <= Number(timeRange.value.lb.year))
+    return "Please enter a max year after the min year";
   return true;
 }
 
+// The dataset's number of time steps bounds every moving window.
+const timestepCount = computed(
+  () => (datasetStore.metadata as any)?.time?.count ?? Infinity,
+);
+
+function validateZScoreWidth(width: number) {
+  // Only the last time step has count - 1 steps before it.
+  const steps = Number(width);
+  const max = timestepCount.value - 1;
+  if (!Number.isInteger(steps) || steps < 2 || steps > max)
+    return `Please enter a whole number from 2 to ${max}`;
+  return true;
+}
+
+// Each year's rule compares it with the other year: check both when either
+// changes, so fixing one clears the other's message.
+const analysisRequestForm = ref<any>(null);
+watch(
+  () => [timeRange.value.lb.year, timeRange.value.ub.year],
+  () => analysisRequestForm.value?.validate(),
+);
+
 function validateSmoothingWidth(windowSize: number) {
+  const steps = Number(windowSize);
+  if (!Number.isInteger(steps) || steps < 1 || steps > timestepCount.value)
+    return `Please enter a whole number from 1 to ${timestepCount.value}`;
   if (smoothingOption.value === "trailingAverage") return true;
-  if (windowSize % 2 === 0) return "Please enter an odd window size";
+  if (steps % 2 === 0) return "Please enter an odd window size";
   return true;
 }
 
