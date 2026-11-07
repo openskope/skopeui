@@ -21,8 +21,8 @@
       </v-tooltip>
     </template>
     <v-card>
-      <v-card-title class="d-flex align-center bg-tint">
-        <h3 class="font-weight-light text-wrap text-primary">
+      <v-card-title class="d-flex align-center bg-secondary">
+        <h3 class="font-weight-light text-wrap text-white">
           {{ metadata?.title ?? "Dataset metadata" }}
         </h3>
         <v-spacer />
@@ -32,7 +32,7 @@
           aria-label="Close"
           @click="showMetadata = false"
         >
-          <v-icon color="primary">mdi-close</v-icon>
+          <v-icon color="white">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
       <MetadataDetail v-if="metadata" :metadata="metadata" />

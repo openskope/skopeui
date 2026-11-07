@@ -19,7 +19,7 @@
         <template #prepend>
           <v-icon
             v-if="isStepComplete(index)"
-            color="success"
+            color="primary"
             data-test="step-complete"
           >
             mdi-check-circle

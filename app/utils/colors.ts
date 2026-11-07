@@ -4,20 +4,24 @@
 
 /** The palette: navy and maroon are the logo's. */
 export const PALETTE = {
-  navy: "#001E6B",
+  navy: "#193479",
   maroon: "#800000",
-  coral: "#EE6C4D",
+  terracotta: "#A85A43",
+  teal: "#00546B",
+  mutedTeal: "#527E7E",
   lightTeal: "#6DB1BF",
+  mustard: "#B8860B",
 };
 
-/** The Vuetify theme. */
+/** The Vuetify theme. White text passes 4.5:1 on primary, secondary, accent,
+ *  brand and footer (4.52:1, just); tint is too light for it (2.4:1). */
 export const THEME_COLORS = {
   primary: PALETTE.navy,
-  secondary: PALETTE.lightTeal,
-  accent: PALETTE.coral,
+  secondary: PALETTE.teal,
+  accent: PALETTE.terracotta,
   brand: PALETTE.maroon,
   tint: PALETTE.lightTeal,
-  footer: PALETTE.lightTeal,
+  footer: PALETTE.mutedTeal,
   /** Secondary text; panel backs the area readout. */
   muted: "#596D7B",
   panel: "#E4E7EF",
@@ -32,10 +36,10 @@ export const MAP_COLORS = {
   datasetExtent: PALETTE.navy,
   /** The user's study area, drawn with a white halo so it shows over any
    *  data layer. */
-  studyArea: PALETTE.coral,
+  studyArea: PALETTE.teal,
   studyAreaHalo: "#FFFFFF",
   /** The outline of a shape still being drawn, apart from a finished one. */
-  drawing: PALETTE.lightTeal,
+  drawing: PALETTE.mustard,
 };
 
 /** How much the study area's fill covers the map: while drawing it, and over
@@ -47,7 +51,8 @@ export const MAP_OPACITIES = {
 
 export const PLOT_COLORS = {
   /** The first series: Original or Transformed. */
-  main: PALETTE.navy,
-  /** What the plot marks: the Smoothed series and the selected year. */
-  plotAccent: PALETTE.coral,
+  main: PALETTE.teal,
+  /** What the plot marks: the Smoothed series and the selected year. 3.25:1
+   *  on white, and apart from main for every kind of color blindness. */
+  plotAccent: PALETTE.mustard,
 };
