@@ -19,7 +19,7 @@ describe("resolveTimeSeries", () => {
     vi.unstubAllGlobals();
   });
 
-  it.each([404, 422])(
+  it.each([404, 410])(
     "extracts again when /analyze answers %i for the cached job",
     async (status) => {
       const fetchMock = vi
@@ -39,6 +39,20 @@ describe("resolveTimeSeries", () => {
       expect(fetchMock.mock.calls[1][0]).toMatch(/\/timeseries\/extract$/);
     },
   );
+
+  it("reports a 422 instead of extracting again", async () => {
+    // The request itself can't be computed, e.g. a z-score reference period
+    // without values: a new extraction would fail the same way.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(422, { detail: "needs at least 2" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("job", {}),
+    ).rejects.toMatchObject({ response: { status: 422 } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 
   it("waits for a running extraction instead of starting a second one", async () => {
     // Analyze opened while visualize's extraction runs: /analyze answers 409,

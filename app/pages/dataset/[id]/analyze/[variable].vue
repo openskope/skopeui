@@ -383,6 +383,14 @@ async function retrieveAnalysis(data: any) {
           detail.map((d: any) => d.msg).join(" ") ||
             "Server error. Please try again.",
         );
+      } else if (status === 422) {
+        // The API can't compute these options and says why: the user can
+        // choose others.
+        datasetStore.setTimeSeriesBadRequest(detail);
+        messageStore.warning(
+          detail.map((d: any) => d.msg).join(" ") ||
+            "These options can't be computed. Please choose others.",
+        );
       } else if (status >= 400) {
         datasetStore.setTimeSeriesBadRequest(detail);
         messageStore.error(

@@ -18,6 +18,9 @@ export const useMessagesStore = defineStore("messages", {
     info(message: string, options: { keepOnNavigation?: boolean } = {}) {
       this.messages.push({ type: "info", message, ...options });
     },
+    warning(message: string) {
+      this.messages.push({ type: "warning", message });
+    },
     error(message: string) {
       this.messages.push({ type: "error", message });
     },

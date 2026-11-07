@@ -30,6 +30,7 @@ import { useMessagesStore } from "@/stores/messages";
 // button next to the alert's own.
 const ALERT_ICONS: Record<string, string | undefined> = {
   error: "mdi-alert-circle",
+  warning: "mdi-alert",
 };
 
 const messagesStore = useMessagesStore();

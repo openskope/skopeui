@@ -50,8 +50,9 @@ async function requestJson(url: string, options: RequestInit = {}) {
 const CAPACITY_RETRY_SECONDS = 5;
 const CAPACITY_WAIT_LIMIT_MS = 60_000;
 
-// /analyze statuses that mean the cached extraction can't be used.
-const RESUBMIT_STATUSES = [404, 409, 422];
+// /analyze statuses that mean the cached extraction can't be used. A 422 is
+// about the request itself, so a new extraction wouldn't help.
+const RESUBMIT_STATUSES = [404, 409, 410];
 
 export function useLegacyStoreActions() {
   const metadataStore = useMetadataStore();
@@ -284,7 +285,7 @@ export function useLegacyStoreActions() {
       }
     }
     // No usable extraction: none yet, expired (404), failed (409) or
-    // unusable (422). Clients may resubmit stale jobs (skope-api ADR 0005).
+    // unusable (410). Clients may resubmit stale jobs (skope-api ADR 0005).
     const newJobId = await submitTimeSeriesRequest(requestData);
     // Known from submission on, so another page can wait for this extraction
     // instead of starting its own.
