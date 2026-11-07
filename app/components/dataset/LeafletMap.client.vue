@@ -105,6 +105,7 @@ import { useRoute } from "vue-router";
 import { DEFAULT_BASEMAP, LEAFLET_PROVIDERS } from "@/store/modules/constants";
 import circleToPolygon from "circle-to-polygon";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
+import { MAP_COLORS } from "@/utils/colors";
 import {
   getInitialMapViewport,
   leafletBounds,
@@ -162,12 +163,12 @@ const isSelectArea = computed(() => currentStep.value === 1);
 const isVisualize = computed(() => currentStep.value === 2);
 const areaStyle = computed(() => ({
   fill: !isVisualize.value,
-  fillColor: "yellow",
+  fillColor: MAP_COLORS.studyArea,
   fillOpacity: 0.1,
   stroke: true,
   weight: 3,
   opacity: 1,
-  color: isVisualize.value ? "black" : "yellow",
+  color: MAP_COLORS.studyArea,
 }));
 
 function isVisible(provider: any) {
@@ -182,10 +183,10 @@ function addDrawToolbar(map: any) {
     draw: {
       polyline: false,
       circlemarker: false,
-      rectangle: { shapeOptions: { color: "yellow" }, metric: ["km"] },
-      circle: { shapeOptions: { color: "yellow" }, metric: ["km"] },
+      rectangle: { shapeOptions: { color: MAP_COLORS.studyArea }, metric: ["km"] },
+      circle: { shapeOptions: { color: MAP_COLORS.studyArea }, metric: ["km"] },
       polygon: {
-        shapeOptions: { color: "yellow" },
+        shapeOptions: { color: MAP_COLORS.studyArea },
         metric: ["km"],
         showArea: true,
         showLength: true,

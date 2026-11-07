@@ -42,7 +42,7 @@ function toggleNavigationDrawer() {
 <style lang="scss" scoped>
 .skope-title {
   text-decoration: none;
-  color: $skope-title-color;
+  color: rgb(var(--v-theme-brand));
   font-family: $skope-title-font;
   font-weight: bold;
   font-size: 2.3em;
@@ -50,7 +50,7 @@ function toggleNavigationDrawer() {
 }
 
 .skope-subtitle {
-  color: $skope-dark-blue;
+  color: rgb(var(--v-theme-primary));
   font-family: $skope-title-font;
   font-weight: bolder;
   font-size: 1.2rem;

@@ -9,7 +9,7 @@
       <v-progress-circular
         :size="100"
         :width="5"
-        color="secondary"
+        color="tint"
         indeterminate
       />
     </v-col>

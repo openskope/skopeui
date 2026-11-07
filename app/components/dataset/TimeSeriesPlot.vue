@@ -208,6 +208,7 @@ import AreaReadout from "@/components/dataset/AreaReadout.vue";
 import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { useDatasetStore } from "@/stores/dataset";
 import { wrapPlotTitle } from "@/utils/plotTitle";
+import { PLOT_COLORS } from "@/utils/colors";
 import { axisYears, stepAlongAxis, stepFromText } from "@/utils/timeAxis";
 
 const props = defineProps<{
@@ -355,7 +356,7 @@ const shapes = computed(() => {
         yref: "paper",
         y0: 0,
         y1: 1,
-        line: { color: "rgb(255, 140, 0)", width: 3 },
+        line: { color: PLOT_COLORS.plotAccent, width: 3 },
       },
     ];
   }
@@ -407,6 +408,8 @@ const layoutMetadata = computed(() => ({
     gridwidth: 3,
   },
   font: { size: 14 },
+  // In trace order: the first series, then Smoothed.
+  colorway: [PLOT_COLORS.main, PLOT_COLORS.plotAccent],
   shapes: shapes.value,
   annotations: [yAxisTitleAnnotation.value],
 }));
@@ -683,7 +686,7 @@ watch(layoutMetadata, (layout) => {
 
 .time-series-range-steps {
   font-size: 0.875rem;
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
   white-space: nowrap;
 }
 
@@ -776,7 +779,7 @@ watch(layoutMetadata, (layout) => {
 
 .loading-message {
   font-size: 13px;
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
 }
 
 /* Tall enough for a one-line y-axis title of Y_TITLE_MAX_LINE_LENGTH. */

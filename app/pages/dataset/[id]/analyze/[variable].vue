@@ -618,7 +618,7 @@ whenever(
 }
 
 .subtitle {
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
   font-size: 1.5rem;
 }
 

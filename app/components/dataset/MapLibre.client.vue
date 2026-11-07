@@ -105,6 +105,7 @@ import maplibregl from "maplibre-gl";
 import AreaReadout from "@/components/dataset/AreaReadout.vue";
 import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { SkopeColorbar, type ColorbarOptions } from "@/utils/SkopeColorbar";
+import { MAP_COLORS, MAP_OPACITIES } from "@/utils/colors";
 import { timestepKey } from "@/utils/timeAxis";
 import type { Geoman } from "@geoman-io/maplibre-geoman-free";
 import { createGeomanInstance } from "@geoman-io/maplibre-geoman-free";
@@ -279,7 +280,34 @@ const GEOMAN_OPTIONS = {
       zoom_to_features: { title: "Zoom to shape" },
     },
   },
+  layerStyles: geomanStudyAreaStyles(),
 };
+
+// geoman draws the shape being drawn or edited itself, in its own blue and
+// orange; give it the study area's colors, with the outline of a shape still
+// being drawn in its own. Each entry replaces those values of geoman's layer
+// of that type and keeps the rest.
+function geomanStudyAreaStyles() {
+  const shape = (outline: string) => [
+    {
+      type: "fill",
+      paint: {
+        "fill-color": MAP_COLORS.studyArea,
+        "fill-opacity": MAP_OPACITIES.studyAreaDrawing,
+      },
+    },
+    { type: "line", paint: { "line-color": outline } },
+  ];
+  return Object.fromEntries(
+    ["polygon", "rectangle", "circle"].map((name) => [
+      name,
+      {
+        gm_main: shape(MAP_COLORS.studyArea),
+        gm_temporary: shape(MAP_COLORS.drawing),
+      },
+    ]),
+  );
+}
 
 let map: maplibregl.Map | null = null;
 let gm: Geoman | null = null;
@@ -296,6 +324,7 @@ let pendingIdleSwap: (() => void) | null = null;
 const FILL_LAYER_ID = "dataset-region-fill";
 const STUDY_AREA_SOURCE_ID = "study-area-display";
 const STUDY_AREA_FILL_LAYER_ID = "study-area-display-fill";
+const STUDY_AREA_HALO_LAYER_ID = "study-area-display-halo";
 const STUDY_AREA_LINE_LAYER_ID = "study-area-display-outline";
 const STUDY_AREA_POINT_LAYER_ID = "study-area-display-point";
 // Fitting a point's zero-size bbox would zoom all the way in; at zoom 10 one of
@@ -525,8 +554,21 @@ function ensureStudyAreaDisplayLayer() {
       type: "fill",
       source: STUDY_AREA_SOURCE_ID,
       paint: {
-        "fill-color": "#facc15",
-        "fill-opacity": 0.08,
+        "fill-color": MAP_COLORS.studyArea,
+        "fill-opacity": MAP_OPACITIES.studyAreaOverData,
+      },
+    });
+  }
+
+  // A wider white line under the outline, so it shows over any data layer.
+  if (!map.getLayer(STUDY_AREA_HALO_LAYER_ID)) {
+    map.addLayer({
+      id: STUDY_AREA_HALO_LAYER_ID,
+      type: "line",
+      source: STUDY_AREA_SOURCE_ID,
+      paint: {
+        "line-color": MAP_COLORS.studyAreaHalo,
+        "line-width": 5,
       },
     });
   }
@@ -537,8 +579,8 @@ function ensureStudyAreaDisplayLayer() {
       type: "line",
       source: STUDY_AREA_SOURCE_ID,
       paint: {
-        "line-color": "#111827",
-        "line-width": 2,
+        "line-color": MAP_COLORS.studyArea,
+        "line-width": 2.5,
       },
     });
   }
@@ -552,8 +594,8 @@ function ensureStudyAreaDisplayLayer() {
       filter: ["==", ["geometry-type"], "Point"],
       paint: {
         "circle-radius": 6,
-        "circle-color": "#facc15",
-        "circle-stroke-color": "#111827",
+        "circle-color": MAP_COLORS.studyArea,
+        "circle-stroke-color": MAP_COLORS.studyAreaHalo,
         "circle-stroke-width": 2,
       },
     });
@@ -573,6 +615,9 @@ function bringStudyAreaDisplayToFront() {
   }
 
   map.moveLayer(STUDY_AREA_FILL_LAYER_ID);
+  if (map.getLayer(STUDY_AREA_HALO_LAYER_ID)) {
+    map.moveLayer(STUDY_AREA_HALO_LAYER_ID);
+  }
   map.moveLayer(STUDY_AREA_LINE_LAYER_ID);
   if (map.getLayer(STUDY_AREA_POINT_LAYER_ID)) {
     map.moveLayer(STUDY_AREA_POINT_LAYER_ID);
@@ -685,14 +730,14 @@ function addMetadataExtentLayer() {
     id: FILL_LAYER_ID,
     type: "fill",
     source: sourceId,
-    paint: { "fill-color": "#f0f4ff", "fill-opacity": 0.05 },
+    paint: { "fill-color": MAP_COLORS.datasetExtent, "fill-opacity": 0.05 },
   });
 
   map.addLayer({
     id: lineLayerId,
     type: "line",
     source: sourceId,
-    paint: { "line-color": "#4c6ef5", "line-width": 2 },
+    paint: { "line-color": MAP_COLORS.datasetExtent, "line-width": 2 },
   });
 }
 

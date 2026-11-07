@@ -1,7 +1,7 @@
 <template>
   <!-- footer -->
-  <v-footer color="secondary">
-    <v-card variant="flat" color="secondary" class="text-center">
+  <v-footer color="footer">
+    <v-card variant="flat" color="footer" class="text-center">
       <v-card-text class="text-white text-subtitle-1">
         This material is based upon work supported by the National Science
         Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State

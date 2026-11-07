@@ -18,7 +18,7 @@
             />
             <l-rectangle
               :bounds="leafletBounds(bbox)"
-              color="#3d5a80"
+              :color="MAP_COLORS.datasetExtent"
               :weight="2"
               :fill-opacity="0.12"
             />
@@ -66,6 +66,7 @@ import {
 } from "@/composables/useMapInitialViewport";
 import type { MapView, OverviewLink, Time, Variable } from "@/types/metadata";
 import { timeCoverageLabel } from "@/utils/timeAxis";
+import { MAP_COLORS } from "@/utils/colors";
 
 const props = defineProps<{
   title: string;
@@ -110,13 +111,12 @@ const sourceLink = computed(() =>
 const absoluteUrl = computed(() => `/dataset/${props.id}`);
 </script>
 <style scoped>
-/* An underline that becomes a highlight on hover, in a muted version of the
-   theme's accent orange. */
+/* An underline that becomes a highlight on hover, in the theme's accent. */
 .dataset-title {
   padding: 0 6px;
   margin: 0 -6px;
   text-decoration: none;
-  box-shadow: inset 0 -2px 0 #c97b5b;
+  box-shadow: inset 0 -2px 0 rgb(var(--v-theme-accent));
   transition: box-shadow 0.3s;
   color: inherit;
   -webkit-box-decoration-break: clone;
@@ -124,7 +124,7 @@ const absoluteUrl = computed(() => `/dataset/${props.id}`);
 }
 
 .dataset-title:hover {
-  box-shadow: inset 0 -1.6em 0 #c97b5b;
+  box-shadow: inset 0 -1.6em 0 rgb(var(--v-theme-accent));
   color: white;
 }
 
@@ -132,7 +132,7 @@ const absoluteUrl = computed(() => `/dataset/${props.id}`);
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
 }
 
 /* A little wider than Vuetify's 4 of 12 columns for the map. */
@@ -174,7 +174,7 @@ const absoluteUrl = computed(() => `/dataset/${props.id}`);
 }
 
 .list-item-source a {
-  color: #3d5a80;
+  color: rgb(var(--v-theme-primary));
 }
 
 /* Fills the column beside the text. The minimum keeps a dataset with few

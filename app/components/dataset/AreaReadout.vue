@@ -37,7 +37,7 @@ const label = computed(() => {
 
 <style scoped>
 .area-readout {
-  background-color: #e4e7ef;
+  background-color: rgb(var(--v-theme-panel));
   border-radius: 4px;
   font-size: 1rem;
   font-weight: 300;
