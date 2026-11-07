@@ -282,12 +282,8 @@ const isStudyAreaPolygon = computed(() => {
       return false;
   }
 });
-const summaryStatistics = computed(() => {
-  if (analysisStore.summaryStatistics.length === 0) {
-    return [datasetStore.summaryStatistics];
-  }
-  return analysisStore.summaryStatistics;
-});
+// The API's statistics only: until /analyze answers, the table is empty.
+const summaryStatistics = computed(() => analysisStore.summaryStatistics);
 const traces = computed(() => {
   const timeseries = analysisStore.timeseries;
   const transformed = timeseries.map((ts: any) => ({ ...ts, type: "scatter" }));

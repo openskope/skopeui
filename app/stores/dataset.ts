@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { summarize, toISODate } from "@/store/stats";
+import { toISODate } from "@/store/stats";
 import type { Dataset, Variable } from "@/types/metadata";
 import { timeSpan } from "@/utils/timeAxis";
 
@@ -63,12 +63,6 @@ export const useDatasetStore = defineStore("dataset", {
     areaInSquareKm: 0,
     numberOfCells: 0,
     timeSeriesRequestData: {} as Record<string, unknown>,
-    summaryStatistics: {
-      name: "Original",
-      stdev: "N/A",
-      mean: "N/A",
-      median: "N/A",
-    } as Record<string, unknown>,
     jobIds: {} as Record<string, string>,
   }),
   getters: {
@@ -205,8 +199,6 @@ export const useDatasetStore = defineStore("dataset", {
         options: payload.timeSeries.options || { name: "Original" },
       };
       this.setAreaSummary(payload.numberOfCells, payload.area);
-      const filtered = this.filteredTimeSeries();
-      this.summaryStatistics = { ...summarize(filtered), name: "Original" };
     },
     /** The response's cell count and area, in square metres. */
     setAreaSummary(numberOfCells: number, areaInSquareMeters: number) {
@@ -219,12 +211,6 @@ export const useDatasetStore = defineStore("dataset", {
       this.timeSeriesRequestStatus = { ...LOADING_STATUS };
       this.timeSeries = { x: [], y: [], options: { name: "Original" } };
       this.setAreaSummary(0, 0);
-      this.summaryStatistics = {
-        name: "Original",
-        stdev: "N/A",
-        mean: "N/A",
-        median: "N/A",
-      };
     },
     // The points whose timestep falls in the selected range. Each x comes from
     // the response's timesteps, so this holds on any axis.
