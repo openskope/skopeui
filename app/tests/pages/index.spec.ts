@@ -1,4 +1,5 @@
 import { reactive, nextTick } from "vue";
+import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -29,6 +30,13 @@ vi.mock("@/components/dataset/ListItem.vue", () => ({
     name: "ListItemStub",
     props: ["title"],
     template: '<div data-test="dataset-item">{{ title }}</div>',
+  },
+}));
+
+vi.mock("@/components/LoadingSpinner.vue", () => ({
+  default: {
+    name: "LoadingSpinnerStub",
+    template: '<div data-test="loading">loading</div>',
   },
 }));
 
@@ -100,6 +108,36 @@ describe("route /", () => {
     await nextTick();
     const page = wrapper.findComponent(IndexPage);
 
+    expect(page.text()).toContain("No datasets found");
+  });
+
+  it("[behavior] shows a spinner, not the empty state, while the datasets load", async () => {
+    // As on a first page load: the page renders before the request answers.
+    let finish: () => void = () => undefined;
+    legacyActions.loadAllDatasetMetadata = vi.fn(
+      () => new Promise<void>((resolve) => (finish = resolve)),
+    );
+    vi.stubGlobal(
+      "useAsyncData",
+      vi.fn((_key: unknown, handler: () => unknown) => {
+        handler();
+        return { data: { value: null }, error: { value: null } };
+      }),
+    );
+    metadataStore.filteredDatasets = [];
+
+    const wrapper = await mountWithSuspense(IndexPage, {
+      global: { stubs: layoutStubs },
+    });
+    const page = wrapper.findComponent(IndexPage);
+
+    expect(page.find('[data-test="loading"]').exists()).toBe(true);
+    expect(page.text()).not.toContain("No datasets found");
+
+    finish();
+    await flushPromises();
+
+    expect(page.find('[data-test="loading"]').exists()).toBe(false);
     expect(page.text()).toContain("No datasets found");
   });
 

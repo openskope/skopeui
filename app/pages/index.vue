@@ -37,7 +37,8 @@
             <ListItem v-bind="dataset" />
           </v-card>
         </template>
-        <v-alert v-if="loadFailed" type="error">
+        <LoadingSpinner v-if="loading" />
+        <v-alert v-else-if="loadFailed" type="error">
           Unable to load the datasets. Please try again shortly.
         </v-alert>
         <v-alert v-else-if="datasets.length === 0" type="warning">
@@ -51,6 +52,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import ListItem from "@/components/dataset/ListItem.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import Search from "@/components/dataset/Search.vue";
 import { useDatasetStore } from "@/stores/dataset";
 import { useMetadataStore } from "@/stores/metadata";
@@ -64,6 +66,8 @@ const metadataStore = useMetadataStore();
 
 const datasets = computed(() => metadataStore.filteredDatasets);
 const loadFailed = ref(false);
+// No "no datasets found" before the list has had a chance to arrive.
+const loading = ref(true);
 
 datasetStore.clearTimeSeries();
 datasetStore.setMetadata(null);
@@ -79,6 +83,8 @@ await useAsyncData(
       console.error("Failed to load dataset metadata", error);
       loadFailed.value = true;
       return false;
+    } finally {
+      loading.value = false;
     }
   },
   { server: false },

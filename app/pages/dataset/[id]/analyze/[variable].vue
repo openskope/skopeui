@@ -30,6 +30,7 @@
           >
             <span class="subtitle">Statistics for the Temporal Interval</span>
             <v-data-table
+              class="stats-table"
               density="compact"
               :items-per-page="-1"
               :headers="statisticsHeaders"
@@ -192,11 +193,12 @@ const zonalStatisticOptions = [
   { label: "Mean of its pixels", id: "mean" },
   { label: "Median of its pixels", id: "median" },
 ];
+// Fixed column widths, so the table keeps its size whatever the values.
 const statisticsHeaders = [
-  { title: "Series", align: "start", key: "name" },
-  { title: "Mean", key: "mean" },
-  { title: "Median", key: "median" },
-  { title: "Standard Deviation", key: "stdev" },
+  { title: "Series", align: "start", key: "name", width: "31%" },
+  { title: "Mean", align: "end", key: "mean", width: "23%" },
+  { title: "Median", align: "end", key: "median", width: "23%" },
+  { title: "Std. dev.", align: "end", key: "stdev", width: "23%" },
 ];
 const transformOptions = TRANSFORM_OPTIONS;
 const smoothingOptions = SMOOTHING_OPTIONS;
@@ -618,5 +620,20 @@ whenever(
 .subtitle {
   color: #596d7b;
   font-size: 1.5rem;
+}
+
+/* Columns sized by the headers, not by the values, and digits of equal
+   width: the table no longer grows or scrolls as the options change. */
+.stats-table :deep(table) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.stats-table :deep(td),
+.stats-table :deep(th) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 </style>
