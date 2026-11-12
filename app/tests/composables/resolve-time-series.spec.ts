@@ -103,6 +103,56 @@ describe("resolveTimeSeries", () => {
     expect(fetchMock.mock.calls[2][0]).toMatch(/\/timeseries\/extract$/);
   });
 
+  it.each([404, 410])(
+    "extracts again when /analyze answers %i after waiting for a running job",
+    async (status) => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+        .mockResolvedValueOnce(
+          respond(200, { status: "SUCCESS", result: RESULT }),
+        )
+        .mockResolvedValueOnce(
+          respond(status, { detail: "stale or too narrow" }),
+        )
+        .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+        .mockResolvedValueOnce(
+          respond(200, { status: "SUCCESS", result: RESULT }),
+        );
+      vi.stubGlobal("fetch", fetchMock);
+      const request = {
+        variable_id: "ppt_annual",
+        time_range: { gte: "0103", lte: "2000" },
+      };
+
+      const result = await useLegacyStoreActions().resolveTimeSeries(
+        "running-job",
+        request,
+      );
+
+      expect(result).toEqual({ newJobId: "new-job", response: RESULT });
+      const [url, options] = fetchMock.mock.calls[3];
+      expect(url).toMatch(/\/timeseries\/extract$/);
+      expect(JSON.parse(options.body)).toEqual(request);
+    },
+  );
+
+  it("reports a 422 after waiting without extracting again", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(
+        respond(200, { status: "SUCCESS", result: RESULT }),
+      )
+      .mockResolvedValueOnce(respond(422, { detail: "needs at least 2" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("running-job", {}),
+    ).rejects.toMatchObject({ response: { status: 422 } });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
   it("reports a timed-out extraction without extracting again", async () => {
     const fetchMock = vi
       .fn()

@@ -278,8 +278,12 @@ export function useLegacyStoreActions() {
             );
             return { newJobId: existingJobId, response: response };
           } catch (pollError: any) {
-            // Only a failed extraction is worth submitting again.
-            if (pollError.response?.status !== 500) throw pollError;
+            // A failed extraction or a completed one that expired or doesn't
+            // cover this request needs a fresh extraction. Request errors and
+            // timeouts still propagate without resubmitting.
+            if (![404, 410, 500].includes(pollError.response?.status)) {
+              throw pollError;
+            }
           }
         }
       }
