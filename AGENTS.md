@@ -21,4 +21,8 @@ Use `make test` for the full Vitest suite. Use `make build ENVIRONMENT=staging` 
 
 - Use Conventional Commit messages.
 - Do not create commits unless the user explicitly asks.
+- Use scopes only for established repository areas.
+- For non-trivial changes, use concise lowercase `-` bullets in the body to explain the rationale and operationally relevant details.
+- Keep each bullet concrete and independently legible; omit a body when the subject already explains the complete change.
+- Prefer branch-wide issue references in the pull request description. Do not repeat the same issue footer across every commit in a branch. Add a lowercase commit footer only when standalone traceability matters, such as for a direct fix, backport, or independently cherry-picked change.
 - Architectural decisions live in `.agents/decisions/`. Add an ADR only for durable, cross-cutting choices; preserve accepted ADRs and supersede them with a new ADR when a decision changes.
