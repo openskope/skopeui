@@ -70,6 +70,7 @@ const mocks = vi.hoisted(() => {
     eventHandlers: Record<string, Function[]> = {};
 
     addControl = vi.fn((control: any) => control?.onAdd?.(this));
+    removeControl = vi.fn((control: any) => control?.onRemove?.());
     fitBounds = vi.fn();
     remove = vi.fn();
     setLayoutProperty = vi.fn((id: string, property: string, value: string) => {
@@ -369,6 +370,36 @@ describe("MapLibre", () => {
       "https://test.example.com/tiles/paleocar/ppt_annual/0590/{z}/{x}/{y}",
     );
   });
+
+  it.each([
+    ["paleocar_v3", "ppt_annual", 103, "0103"],
+    ["lbda_v2", "pdsi", 1000, "1000"],
+  ])(
+    "[behavior] shows %s's first raster while drawing an area",
+    async (id, variableId, step, key) => {
+      mocks.routeState.name = "dataset-id";
+      mocks.routeState.params = { id };
+      mocks.datasetStore.variable = { ...ppt, id: variableId };
+
+      const wrapper = mount(MapLibre, {
+        global: { stubs: uiStubs },
+        props: { displayRaster: true, step },
+      });
+      await flushPromises();
+
+      const map = mocks.mapInstances[0];
+      expect(map.getStyle().sources["cog-source-a"].tiles).toEqual([
+        `https://test.example.com/tiles/${id}/${variableId}/${key}/{z}/{x}/{y}`,
+      ]);
+      expect(createGeomanInstance).toHaveBeenCalled();
+      expect(
+        map.addControl.mock.calls.some(
+          ([control]: any[]) => control instanceof SkopeColorbar,
+        ),
+      ).toBe(true);
+      wrapper.unmount();
+    },
+  );
 
   it("[behavior] draws the legend from the display entry unchanged", async () => {
     mocks.routeState.name = "dataset-id-visualize-variable";

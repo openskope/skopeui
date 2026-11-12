@@ -15,7 +15,12 @@
       </SubHeader>
       <v-row>
         <v-col cols="12" class="d-flex map-flex">
-          <Map :display-raster="false" class="mx-auto" @map-ready="mapLoaded" />
+          <Map
+            :display-raster="true"
+            :step="datasetStore.minYear"
+            class="mx-auto"
+            @map-ready="mapLoaded"
+          />
         </v-col>
         <client-only>
           <v-dialog

@@ -385,9 +385,12 @@ function baseStyle(): maplibregl.StyleSpecification {
 }
 
 function getCogBaseUrl(): string | null {
-  if (!props.displayRaster || !route.params.variable) return null;
+  if (!props.displayRaster) return null;
   const datasetId = route.params.id;
-  const varId = route.params.variable;
+  // Select Area has no variable route param; initialization selects the
+  // dataset's default variable (or its first variable).
+  const varId = route.params.variable ?? datasetStore.variable?.id;
+  if (!datasetId || !varId) return null;
   return `${TILES_ENDPOINT}/${datasetId}/${varId}`;
 }
 
