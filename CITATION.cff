@@ -1,4 +1,4 @@
-# This CITATION.cff file was generated with cffinit.
+# This CITATION.cff file was initialized with cffinit.
 # Visit https://bit.ly/cffinit to generate yours today!
 cff-version: 1.2.0
 message: "If you use the SKOPE application, please cite it as below."
@@ -25,6 +25,9 @@ authors:
   orcid: "https://orcid.org/0000-0001-9140-936X"
 - family-names: "McPhillips"
   given-names: "Timothy"
+- family-names: "Vanegas Ferro"
+  given-names: "Manuela"
+  orcid: "https://orcid.org/0000-0002-9165-0783"
 title: "Synthesizing Knowledge of Past Environments (SKOPE) Web Application"
 doi: "10.5281/zenodo.8415956"
 abstract: >
