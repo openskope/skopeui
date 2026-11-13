@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Time } from "@/types/metadata";
 import {
   axisYears,
+  resolveTemporalLabels,
   stepAlongAxis,
   stepFromText,
   timeCoverageLabel,
@@ -22,6 +23,58 @@ const annual: Time = {
 };
 
 describe("time axis labels", () => {
+  it("defaults annual presentation to Year and Current year", () => {
+    expect(resolveTemporalLabels(annual)).toEqual({
+      axis: "Year",
+      current: "Current year",
+    });
+  });
+
+  it.each([undefined, null, { precision: "month" }, { precision: "unknown" }])(
+    "uses neutral presentation labels without a supported precision: %j",
+    (time) => {
+      expect(resolveTemporalLabels(time)).toEqual({
+        axis: "Time",
+        current: "Current time",
+      });
+    },
+  );
+
+  it("accepts explicit presentation labels without changing the time axis", () => {
+    const before = structuredClone(annual);
+    expect(
+      resolveTemporalLabels(annual, {
+        axis_label: " Year (CE) ",
+        current_label: " Displayed year ",
+      }),
+    ).toEqual({ axis: "Year (CE)", current: "Displayed year" });
+    expect(annual).toEqual(before);
+  });
+
+  it("falls back independently for missing, null, or blank labels", () => {
+    expect(
+      resolveTemporalLabels(annual, { axis_label: "Calendar year" }),
+    ).toEqual({
+      axis: "Calendar year",
+      current: "Current year",
+    });
+    expect(
+      resolveTemporalLabels(annual, { axis_label: null, current_label: "  " }),
+    ).toEqual({
+      axis: "Year",
+      current: "Current year",
+    });
+    expect(
+      resolveTemporalLabels(annual, {
+        axis_label: "",
+        current_label: "Map year",
+      }),
+    ).toEqual({
+      axis: "Year",
+      current: "Map year",
+    });
+  });
+
   it("reads the year of a key or an ISO date", () => {
     expect(yearOfTimestep("0103")).toBe(103);
     expect(yearOfTimestep("0590-01-01")).toBe(590);

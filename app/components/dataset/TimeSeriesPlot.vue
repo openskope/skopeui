@@ -61,7 +61,7 @@
         v-model="stepDraft"
         class="time-series-current-year"
         :style="{ '--current-year-accent': PLOT_COLORS.plotAccent }"
-        label="Current year"
+        :label="temporalLabels.current"
         density="compact"
         variant="outlined"
         base-color="primary"
@@ -78,7 +78,7 @@
         type="text"
         inputmode="numeric"
         title="Displayed year: type a year and press Enter"
-        aria-label="Current year"
+        :aria-label="temporalLabels.current"
         :aria-invalid="isStepDraftInvalid"
         data-test="current-step"
         @focus="focusStepDraft"
@@ -249,6 +249,7 @@ import { wrapPlotTitle } from "@/utils/plotTitle";
 import { PLOT_COLORS } from "@/utils/colors";
 import {
   axisYears,
+  resolveTemporalLabels,
   stepAlongAxis,
   stepFromText,
 } from "@/utils/timeAxis";
@@ -388,6 +389,12 @@ const yAxisTitle = computed(() => {
   return unit ? `${title} (${unit})` : title;
 });
 
+// Metadata 1.0.0 has no presentation labels: use the shared defaults. A future
+// contract can provide overrides here without changing the plot or field.
+const temporalLabels = computed(() =>
+  resolveTemporalLabels(datasetStore.metadata?.time),
+);
+
 const shapes = computed(() => {
   if (!_.isNull(props.stepSelected ?? null)) {
     return [
@@ -441,7 +448,7 @@ const layoutMetadata = computed(() => ({
   showlegend: hasMultipleTimeSeries.value,
   legend: { x: 1, y: 0.5 },
   xaxis: {
-    title: { text: "Timestep", font: { size: AXIS_TITLE_SIZE } },
+    title: { text: temporalLabels.value.axis, font: { size: AXIS_TITLE_SIZE } },
     linewidth: 3,
     gridwidth: 3,
     automargin: true,

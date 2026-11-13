@@ -218,9 +218,28 @@ describe("TimeSeriesPlot typed timestep", () => {
   });
 });
 
-describe("TimeSeriesPlot y-axis title", () => {
+describe("TimeSeriesPlot axis labels", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  it("labels an annual axis Year and uses Time for unsupported precisions", async () => {
+    const store = useDatasetStore();
+    store.setMetadata(metadataFixture.datasets[0] as any);
+    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
+    await flushPromises();
+    const layout = () =>
+      wrapper.findComponent({ name: "PlotlyStub" }).props("layout");
+    expect(layout().xaxis.title.text).toBe("Year");
+    expect(
+      wrapper.find('[data-test="current-step"]').attributes("aria-label"),
+    ).toBe("Current year");
+    store.metadata!.time.precision = "month";
+    await flushPromises();
+    expect(layout().xaxis.title.text).toBe("Time");
+    expect(
+      wrapper.find('[data-test="current-step"]').attributes("aria-label"),
+    ).toBe("Current time");
   });
 
   async function layoutFor(title: string, unit: string) {

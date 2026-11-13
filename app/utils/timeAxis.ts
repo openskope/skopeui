@@ -2,6 +2,31 @@ import type { Time } from "@/types/metadata";
 
 const STEP_LABELS: Record<string, string> = { P1Y: "annual" };
 
+/** Presentation inputs, separate from the generated /metadata 1.0.0 types. */
+export interface TemporalPresentationLabels {
+  axis_label?: string | null;
+  current_label?: string | null;
+}
+
+/**
+ * Resolve wording independently of timestamp parsing and calendar semantics.
+ * The UI currently plots annual axes; other precisions get neutral labels.
+ * Callers use defaults until a versioned API contract supplies presentation
+ * labels, which can then be passed as the second argument.
+ */
+export function resolveTemporalLabels(
+  time: Pick<Time, "precision"> | null | undefined,
+  presentation: TemporalPresentationLabels = {},
+) {
+  const annual = time?.precision === "year";
+  return {
+    axis: presentation.axis_label?.trim() || (annual ? "Year" : "Time"),
+    current:
+      presentation.current_label?.trim() ||
+      (annual ? "Current year" : "Current time"),
+  };
+}
+
 /** The year of a timestep key or ISO date: "0103" and "0103-01-01" are 103. */
 export function yearOfTimestep(key: string): number {
   return Number(key.slice(0, 4));
