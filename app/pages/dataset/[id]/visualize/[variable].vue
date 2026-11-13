@@ -23,9 +23,11 @@
           align-self="stretch"
         >
           <Map
-            :step="stepSelected"
+            :step="requestedStep"
             :display-raster="true"
             map-engine="maplibre"
+            @step-ready="frameReady"
+            @step-error="frameFailed"
           />
         </v-col>
         <!-- time series plot -->
@@ -38,9 +40,15 @@
         >
           <TimeSeriesPlot
             :show-step-controls="true"
+            :show-playback-control="true"
+            :is-playing="isPlaying"
+            :can-play="canPlay"
+            :is-step-loading="isStepLoading"
             :traces="traces"
             :step-selected="stepSelected"
             @step-selected="setStep"
+            @toggle-playback="togglePlay"
+            @pause-playback="pause"
           />
         </v-col>
       </v-row>
@@ -49,13 +57,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { computed, watch, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import Map from "@/components/dataset/Map.client.vue";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { yearOfTimestep } from "@/utils/timeAxis";
+import { axisYears, yearOfTimestep } from "@/utils/timeAxis";
+import { useRasterPlayback } from "@/composables/useRasterPlayback";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
 import { useMessagesStore } from "@/stores/messages";
@@ -73,7 +82,48 @@ const datasetStore = useDatasetStore();
 const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
 
-const stepSelected = ref(1500);
+const playbackYears = computed(() =>
+  datasetStore.metadata?.time ? axisYears(datasetStore.metadata.time) : [],
+);
+const playbackRange = computed(
+  () => datasetStore.temporalRange as [number, number],
+);
+const {
+  requestedStep,
+  displayedStep: stepSelected,
+  isPlaying,
+  isLoading: isStepLoading,
+  canPlay,
+  frameReady,
+  selectStep,
+  togglePlay,
+  pause,
+} = useRasterPlayback(
+  playbackYears,
+  playbackRange,
+  datasetStore.temporalRangeMin,
+);
+let frameTimeout: ReturnType<typeof setTimeout> | undefined;
+watch(
+  [requestedStep, isStepLoading],
+  () => {
+    clearTimeout(frameTimeout);
+    if (isStepLoading.value) {
+      const step = requestedStep.value;
+      frameTimeout = setTimeout(() => frameFailed(step), 30_000);
+    }
+  },
+  { immediate: true },
+);
+
+function frameFailed(step: number) {
+  if (step !== requestedStep.value) return;
+  clearTimeout(frameTimeout);
+  selectStep(stepSelected.value);
+  messageStore.error(
+    `Unable to load the map for ${step}. Playback paused. Try another year.`,
+  );
+}
 let stopTimeSeriesWatch: (() => void) | null = null;
 let isUnmounted = false;
 
@@ -93,7 +143,7 @@ const traces = computed(() => {
 });
 
 function setStep(step: number) {
-  stepSelected.value = step;
+  selectStep(step);
 }
 
 async function updateTimeSeries(data: any) {
@@ -172,13 +222,14 @@ await useAsyncData(
       route.params.id as string,
       route.params.variable as string,
     );
-    stepSelected.value = datasetStore.temporalRangeMin;
+    selectStep(datasetStore.temporalRangeMin);
     return true;
   },
   { server: false },
 );
 
 onMounted(() => {
+  document.addEventListener("visibilitychange", pauseWhenHidden);
   legacyActions.initializeDatasetGeoJson();
   stopTimeSeriesWatch = watch(
     () => datasetStore.timeSeriesRequestData,
@@ -195,9 +246,15 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  clearTimeout(frameTimeout);
+  document.removeEventListener("visibilitychange", pauseWhenHidden);
   isUnmounted = true;
   stopTimeSeriesWatch?.();
 });
+
+function pauseWhenHidden() {
+  if (document.hidden) pause();
+}
 </script>
 
 <style scoped>

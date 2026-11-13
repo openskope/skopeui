@@ -143,23 +143,23 @@ describe("TimeSeriesPlot step controls", () => {
     setActivePinia(createPinia());
   });
 
-  it("shows the current timestep between the step buttons", async () => {
+  it("shows the current timestep in the header, outside the range form", async () => {
     const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
     await flushPromises();
     const field = wrapper.find('[data-test="current-step"]');
     expect((field.element as HTMLInputElement).value).toBe("1500");
+    expect(field.element.closest(".panel-header")).not.toBeNull();
+    expect(field.element.closest(".time-series-range")).toBeNull();
+    expect(wrapper.find(".time-series-step-controls input").exists()).toBe(
+      false,
+    );
   });
 
-  it("sizes the current timestep to the longest one on the axis", async () => {
-    const store = useDatasetStore();
-    store.metadata = {
-      time: { kind: "regular", origin: "0001", end: "2000", step: "P1Y" },
-    } as any;
-    const wrapper = mountPlot({ showStepControls: true, stepSelected: 7 });
+  it("pauses playback when editing the current year", async () => {
+    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
     await flushPromises();
-    expect(
-      wrapper.find('[data-test="current-step"]').attributes("style"),
-    ).toContain("width: 4.5ch");
+    await wrapper.find('[data-test="current-step"]').trigger("focus");
+    expect(wrapper.emitted("pause-playback")).toHaveLength(1);
   });
 });
 
@@ -194,7 +194,7 @@ describe("TimeSeriesPlot typed timestep", () => {
     expect(field.attributes("aria-invalid")).toBe("true");
     expect((field.element as HTMLInputElement).value).toBe("1700");
     expect(wrapper.find('[data-test="step-message"]').text()).toBe(
-      "Choose a timestep from 1500 to 1600",
+      "Use 1500–1600.",
     );
   });
 

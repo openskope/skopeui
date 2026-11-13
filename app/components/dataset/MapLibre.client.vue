@@ -132,7 +132,7 @@ const props = defineProps({
   step: { type: Number, default: 2000 },
   displayRaster: { type: Boolean, default: true },
 });
-const emit = defineEmits(["mapReady"]);
+const emit = defineEmits(["mapReady", "stepReady", "stepError"]);
 
 const route = useRoute();
 const appStore = useAppStore();
@@ -320,7 +320,9 @@ const COG_A = { sourceId: "cog-source-a", layerId: "cog-layer-a" };
 const COG_B = { sourceId: "cog-source-b", layerId: "cog-layer-b" };
 let cogFront = COG_A; // currently visible slot
 let cogBack = COG_B; // currently loading / empty slot
-let pendingIdleSwap: (() => void) | null = null;
+let pendingFrameCheck: (() => void) | null = null;
+let pendingFrameSource: string | null = null;
+let pendingFrameStep: number | null = null;
 const FILL_LAYER_ID = "dataset-region-fill";
 const STUDY_AREA_SOURCE_ID = "study-area-display";
 const STUDY_AREA_FILL_LAYER_ID = "study-area-display-fill";
@@ -420,7 +422,11 @@ function addCogSlot(slot: typeof COG_A, step: number, opacity: number) {
       id: slot.layerId,
       type: "raster",
       source: slot.sourceId,
-      paint: { "raster-opacity": opacity },
+      paint: {
+        "raster-opacity": opacity,
+        "raster-opacity-transition": { duration: 0 },
+        "raster-fade-duration": 0,
+      },
     },
     FILL_LAYER_ID,
   );
@@ -433,11 +439,51 @@ function removeCogSlot(slot: typeof COG_A) {
 }
 
 function cancelPendingSwap() {
-  if (pendingIdleSwap) {
-    map?.off("idle", pendingIdleSwap);
-    pendingIdleSwap = null;
+  if (pendingFrameCheck) {
+    map?.off("render", pendingFrameCheck);
+    pendingFrameCheck = null;
+    pendingFrameSource = null;
+    pendingFrameStep = null;
     removeCogSlot(cogBack); // discard the back buffer that was loading
   }
+}
+
+// Readiness belongs to the requested raster, not to unrelated basemap loads.
+// A second render confirms the opacity swap before the plot advances.
+function waitForFrame(slot: typeof COG_A, step: number, swap: boolean) {
+  if (!map) return;
+  pendingFrameSource = slot.sourceId;
+  pendingFrameStep = step;
+  isStepLoading.value = true;
+  const check = () => {
+    if (
+      !map ||
+      pendingFrameCheck !== check ||
+      !map.isSourceLoaded(slot.sourceId)
+    )
+      return;
+    map.off("render", check);
+    if (swap) {
+      map.setPaintProperty(slot.layerId, "raster-opacity", 0.7);
+      removeCogSlot(cogFront);
+      [cogFront, cogBack] = [cogBack, cogFront];
+    }
+    const displayed = () => {
+      if (!map || pendingFrameCheck !== displayed) return;
+      map.off("render", displayed);
+      pendingFrameCheck = null;
+      pendingFrameSource = null;
+      pendingFrameStep = null;
+      isStepLoading.value = false;
+      emit("stepReady", step);
+    };
+    pendingFrameCheck = displayed;
+    map.on("render", displayed);
+    map.triggerRepaint();
+  };
+  pendingFrameCheck = check;
+  map.on("render", check);
+  map.triggerRepaint();
 }
 
 function addCogRasterLayer(step: number) {
@@ -448,6 +494,7 @@ function addCogRasterLayer(step: number) {
   cogFront = COG_A;
   cogBack = COG_B;
   addCogSlot(cogFront, step, 0.7);
+  waitForFrame(cogFront, step, false);
 }
 
 function removeCogRasterLayer() {
@@ -467,18 +514,7 @@ function updateRasterLayer(step: number) {
 
   cancelPendingSwap();
   addCogSlot(cogBack, step, 0); // load invisibly
-  isStepLoading.value = true;
-
-  pendingIdleSwap = () => {
-    if (!map || !isMapLoaded) return;
-    if (!map.getSource(cogBack.sourceId)) return; // guard: swap was cancelled
-    map.setPaintProperty(cogBack.layerId, "raster-opacity", 0.7);
-    removeCogSlot(cogFront);
-    [cogFront, cogBack] = [cogBack, cogFront]; // swap references
-    pendingIdleSwap = null;
-    isStepLoading.value = false;
-  };
-  map.once("idle", pendingIdleSwap);
+  waitForFrame(cogBack, step, true);
 }
 
 function mapExtentPolygon([west, south, east, north]: Bbox): any {
@@ -811,6 +847,13 @@ onMounted(() => {
     "top-right",
   );
   map.addControl(new maplibregl.ScaleControl(), "bottom-right");
+  map.on("error", (event: any) => {
+    if (!pendingFrameSource || event.sourceId !== pendingFrameSource) return;
+    const step = pendingFrameStep;
+    cancelPendingSwap();
+    isStepLoading.value = false;
+    if (step != null) emit("stepError", step);
+  });
 
   map.on("load", async () => {
     if (!map) return;
@@ -931,9 +974,9 @@ watch(cogBaseUrl, (url) => {
 onUnmounted(() => {
   isMapLoaded = false;
   pendingStudyAreaGeoJson = null;
-  if (pendingIdleSwap && map) {
-    map.off("idle", pendingIdleSwap);
-    pendingIdleSwap = null;
+  if (pendingFrameCheck && map) {
+    map.off("render", pendingFrameCheck);
+    pendingFrameCheck = null;
   }
   if (gm) {
     gm.destroy();

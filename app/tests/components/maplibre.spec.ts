@@ -71,6 +71,14 @@ const mocks = vi.hoisted(() => {
 
     addControl = vi.fn((control: any) => control?.onAdd?.(this));
     removeControl = vi.fn((control: any) => control?.onRemove?.());
+    isSourceLoaded = vi.fn(() => true);
+    triggerRepaint = vi.fn();
+    setPaintProperty = vi.fn();
+    off = vi.fn((event: string, callback: Function) => {
+      this.eventHandlers[event] = (this.eventHandlers[event] || []).filter(
+        (fn) => fn !== callback,
+      );
+    });
     fitBounds = vi.fn();
     remove = vi.fn();
     setLayoutProperty = vi.fn((id: string, property: string, value: string) => {
@@ -400,6 +408,56 @@ describe("MapLibre", () => {
       wrapper.unmount();
     },
   );
+
+  it("[behavior] acknowledges a year only after its raster swap renders", async () => {
+    mocks.routeState.name = "dataset-id-visualize-variable";
+    mocks.routeState.params = { id: "paleocar", variable: "ppt_annual" };
+    mocks.datasetStore.variable = ppt;
+    const wrapper = mount(MapLibre, {
+      global: { stubs: uiStubs },
+      props: { step: 103 },
+    });
+    await flushPromises();
+    const map = mocks.mapInstances[0];
+    const render = () =>
+      [...(map.eventHandlers.render || [])].forEach((fn: Function) => fn());
+    map.isSourceLoaded.mockReturnValue(false);
+    render();
+    expect(wrapper.emitted("stepReady")).toBeUndefined();
+    map.isSourceLoaded.mockReturnValue(true);
+    render();
+    expect(wrapper.emitted("stepReady")).toBeUndefined();
+    render();
+    expect(wrapper.emitted("stepReady")).toEqual([[103]]);
+    await wrapper.setProps({ step: 104 });
+    render();
+    expect(map.setPaintProperty).toHaveBeenCalledWith(
+      "cog-layer-b",
+      "raster-opacity",
+      0.7,
+    );
+    expect(wrapper.emitted("stepReady")).toEqual([[103]]);
+    render();
+    expect(wrapper.emitted("stepReady")).toEqual([[103], [104]]);
+    wrapper.unmount();
+  });
+
+  it("[behavior] reports raster failures without acknowledging the frame", async () => {
+    mocks.routeState.params = { id: "paleocar", variable: "ppt_annual" };
+    const wrapper = mount(MapLibre, {
+      global: { stubs: uiStubs },
+      props: { step: 103 },
+    });
+    await flushPromises();
+    const map = mocks.mapInstances[0];
+    map.eventHandlers.error.forEach((fn: Function) =>
+      fn({ sourceId: "cog-source-a" }),
+    );
+    expect(wrapper.emitted("stepError")).toEqual([[103]]);
+    expect(wrapper.emitted("stepReady")).toBeUndefined();
+    expect(map.eventHandlers.render).toEqual([]);
+    wrapper.unmount();
+  });
 
   it("[behavior] draws the legend from the display entry unchanged", async () => {
     mocks.routeState.name = "dataset-id-visualize-variable";
