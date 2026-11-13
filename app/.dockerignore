@@ -7,3 +7,7 @@ generated
 .landing_headers.txt
 coverage
 npm-debug.log*
+.env
+.env.*
+!.env.example
+.git

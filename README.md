@@ -53,9 +53,11 @@ make down ENVIRONMENT=staging
 
 The API URL is compiled into the Nuxt client bundle. Rebuild the image after changing `SKOPE_API_HOST_URL`.
 
-The GitHub Actions workflow currently builds the production image for pushes and pull requests against `main`. It does not run the test suite or check the staging API URL; run `make test` and `make build ENVIRONMENT=staging` locally before merging an upgrade.
+The GitHub Actions workflow runs the test suite and builds the production image for pushes and pull requests against `main`. It does not check the staging API URL; run `make build ENVIRONMENT=staging` locally before merging an upgrade.
 
 ## Maintenance
+
+The Docker build follows the active Node LTS image and enforces the supported engine ranges in `app/package.json`. When LTS moves outside those ranges, CI fails until the new runtime and dependencies are reviewed. Rebuild regularly to receive base-image updates. Production contains only the Node runtime, required system packages, and Nuxt's built output; npm is available in the development image.
 
 When changing dependencies, regenerate `app/package-lock.json` in Docker, rebuild the image, and recreate the development container as described above. Check compatibility with the framework and build tools, and select stable releases explicitly: a package's `latest` tag can point to a prerelease. Keep exact versions in the Dockerfile, package manifest, and lockfile rather than duplicating them in documentation.
 

@@ -64,7 +64,7 @@ Purpose: verify integrated browser behavior with real backend data.
 ## Execution Cadence
 
 - Before merging: run `make test` from the repository root. It includes route smoke and page behavior tests.
-- Current CI builds the production image only; PR test execution and a nightly behavior job are not configured.
+- PR CI runs `make test` and builds the production image. A nightly behavior job is not configured.
 - Release: run manual journey check once on staging.
 
 ## Definition of Done
