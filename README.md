@@ -3,24 +3,46 @@
 [![DOI](https://zenodo.org/badge/159711888.svg)](https://zenodo.org/badge/latestdoi/159711888)
 [![Build/Test Docker Image CI](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml)
 
-This codebase provides a frontend only user interface for the [NSF supported](https://www.openskope.org/skope-nsf-proposal) [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) project.
+SkopeUI is the Nuxt 3 frontend for the [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) platform. It provides dataset discovery, interactive MapLibre visualization, study-area selection, and time-series analysis backed by [skope-api](https://github.com/openskope/skope-api).
 
-The current UI uses [Nuxt 2](https://nuxtjs.org/), [VueJS](https://vuejs.org/), [Leaflet](https://leafletjs.com/), and [Plotly JS](https://plotly.com/javascript/). 
+Docker and Docker Compose are the only host dependencies. Node and npm commands run inside the application container.
 
-The application has a basic [Makefile](https://www.gnu.org/software/make/) for configuration and deployment. A recent version of [Docker](https://docs.docker.com/get-docker/) and [docker compose](https://docs.docker.com/compose/install/) is recommended to set up a local development environment.
+## Local development
 
-Running `make` for the first time will generate a default `config.mk` file that can be further customized:
+Start the development server at <http://localhost:3000>:
 
-- `DEPLOY_ENVIRONMENT` can be set to `dev`, `staging`, or `prod` (use `dev` for local development)
-- `SKOPE_API_HOST_URL` should point at a SKOPE backend API to serve metadata and timeseries data (e.g., a deployed
-  instance of https://github.com/openskope/skope-api/)
-- `SKOPE_GEOSERVER_HOST_URL` should point at a GeoServer instance with SKOPE datasets and geotiff layers preloaded
-  (see https://github.com/openskope/skope-datasets for more details)
+```bash
+make deploy-dev
+```
 
-Run `make deploy` to redeploy the application with whatever settings are currently defined in `config.mk`
+The development build uses `http://localhost:8001` for the API by default. Override it for a single command when needed:
 
-With `DEPLOY_ENVIRONMENT=dev` a hot-reloading development server should spin up at http://localhost:3000
+```bash
+make deploy-dev SKOPE_API_HOST_URL=http://example.test:8001
+```
 
+Run the test suite and lint checks with `make test` and `make lint`.
+
+## Deployment
+
+Each deployment target selects its API endpoint explicitly:
+
+| Target | UI image | API endpoint |
+| --- | --- | --- |
+| `make deploy-dev` | `openskope/skopeui:dev` | `http://localhost:8001` |
+| `make deploy-staging` | `openskope/skopeui:staging` | `https://staging-api.openskope.org` |
+| `make deploy-production` | `openskope/skopeui:prod` | `https://api.openskope.org` |
+
+Deployments build the selected image, replace the running Compose service, and wait for its health check. Use `make config ENVIRONMENT=staging` to inspect the resolved Compose configuration before deploying. Operational commands accept the same environment selection, for example:
+
+```bash
+make ps ENVIRONMENT=staging
+make logs ENVIRONMENT=staging
+make restart ENVIRONMENT=staging
+make down ENVIRONMENT=staging
+```
+
+The API URL is compiled into the Nuxt client bundle. Rebuild the image after changing `SKOPE_API_HOST_URL`.
 
 ## Contributors
 
@@ -28,12 +50,3 @@ With `DEPLOY_ENVIRONMENT=dev` a hot-reloading development server should spin up 
 - Kyle Bocinsky @bocinsky
 - Calvin Pritchard @cpritcha
 - Christine Nguyễn @chrstngyn
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->

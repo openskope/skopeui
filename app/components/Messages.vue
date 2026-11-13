@@ -1,40 +1,51 @@
 <template>
-  <v-row>
+  <!-- Takes no space without messages. -->
+  <v-row v-if="messages.length > 0">
     <v-col>
+      <!-- The store decides which alerts show, so each stays open until it's
+           dismissed from the store. -->
       <v-alert
         v-for="(alert, index) in messages"
         :key="index"
+        :model-value="true"
         prominent
+        closable
+        close-label="Dismiss"
         :type="alert.type"
-        color="warning"
+        :icon="ALERT_ICONS[alert.type]"
+        class="mb-2"
+        @click:close="dismiss(index)"
       >
         {{ alert.message }}
-        <v-btn icon class="float-right" @click="dismiss(index)"
-          ><v-icon>fas fa-times-circle</v-icon></v-btn
-        >
       </v-alert>
     </v-col>
   </v-row>
 </template>
 
-<script>
-import { Component } from "nuxt-property-decorator";
-import Vue from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
+import { useMessagesStore } from "@/stores/messages";
 
-@Component()
-class Messages extends Vue {
-  // --------- GETTERS ---------
+// Vuetify's default error icon is a circled X, which reads like a second close
+// button next to the alert's own.
+const ALERT_ICONS: Record<string, string | undefined> = {
+  error: "mdi-alert-circle",
+  warning: "mdi-alert",
+};
 
-  get messages() {
-    return this.$api().messages.messages;
-  }
+const messagesStore = useMessagesStore();
+const messages = computed(() => messagesStore.messages);
 
-  // --------- METHODS ---------
-
-  dismiss(index) {
-    this.$api().messages.dismiss(index);
-  }
+function dismiss(index: number) {
+  messagesStore.dismiss(index);
 }
-
-export default Messages;
 </script>
+
+<style scoped>
+/* Vuetify places the close button in the first of the alert's two grid rows.
+   Span both and centre it, level with the icon and the text. */
+.v-alert :deep(.v-alert__close) {
+  grid-row: 1 / -1;
+  align-self: center;
+}
+</style>

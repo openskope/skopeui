@@ -1,33 +1,6 @@
-import { format, std, mean, median, filter } from "mathjs";
-
-const EMPTY_SUMMARY_STATISTICS = {
-  stdDev: "N/A",
-  mean: "N/A",
-  median: "N/A",
-};
+import { format } from "mathjs";
 
 const DEFAULT_PRECISION = 2;
-
-/**
- * Returns an object structure with { stdDev, mean, median } statistics for
- * the given time series.
- * @param {*} timeSeries
- * @returns  {stdDev, mean, median} over the given timeSeries
- */
-export function summarize(timeSeries) {
-  const values = filter(timeSeries.y, (x) => x !== null);
-  if (values.length === 0) {
-    return EMPTY_SUMMARY_STATISTICS;
-  }
-  const precision = timeSeries.precision ?? DEFAULT_PRECISION;
-  // may need to make lowerExp and upperExp explicit, check with science team
-  // https://mathjs.org/docs/reference/functions/format.html
-  return {
-    stdev: format(std(values), { notation: "fixed", precision }),
-    mean: format(mean(values), { notation: "fixed", precision }),
-    median: format(median(values), { notation: "fixed", precision }),
-  };
-}
 
 export function formatStats(summaryStats, precision = DEFAULT_PRECISION) {
   return summaryStats.map((s) => ({

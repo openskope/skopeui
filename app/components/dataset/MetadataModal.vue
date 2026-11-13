@@ -1,51 +1,51 @@
 <template>
   <v-dialog v-model="showMetadata" max-width="800px">
-    <template #activator="{ on, attrs }">
-      <v-btn icon depressed x-small fab rounded v-bind="attrs" v-on="on">
-        <v-tooltip bottom>
-          <template #activator="{ on, attrs }">
-            <v-icon v-bind="attrs" color="red accent-4" v-on="on">
-              fas fa-exclamation-triangle
-            </v-icon>
-          </template>
-          <span>
-            View dataset metadata with <strong>important details</strong> on
-            <strong>uncertainty</strong> and <strong>provenance</strong>
-          </span>
-        </v-tooltip>
-      </v-btn>
+    <template #activator="{ props }">
+      <v-tooltip
+        location="bottom"
+        text="View dataset metadata with important details on uncertainty and provenance"
+      >
+        <template #activator="{ props: tooltipProps }">
+          <v-btn
+            icon
+            size="x-small"
+            rounded
+            variant="text"
+            class="ml-2"
+            aria-label="Dataset details"
+            v-bind="{ ...props, ...tooltipProps }"
+          >
+            <v-icon color="primary">mdi-information-outline</v-icon>
+          </v-btn>
+        </template>
+      </v-tooltip>
     </template>
     <v-card>
-      <v-card-title style="background-color: #6db1bf">
-        <h3 class="font-weight-light" style="color: white">
-          {{ metadata.title }}
+      <v-card-title class="d-flex align-center bg-secondary">
+        <h3 class="font-weight-light text-wrap text-white">
+          {{ metadata?.title ?? "Dataset metadata" }}
         </h3>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="showMetadata = false">
-          <v-icon color="white">fas fa-times</v-icon>
+        <v-spacer />
+        <v-btn
+          icon
+          variant="text"
+          aria-label="Close"
+          @click="showMetadata = false"
+        >
+          <v-icon color="white">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
-      <MetadataDetail :metadata="metadata" />
+      <MetadataDetail v-if="metadata" :metadata="metadata" />
     </v-card>
   </v-dialog>
 </template>
-<script>
-import Vue from "vue";
-import { Component, Prop } from "nuxt-property-decorator";
+<script setup lang="ts">
+import { ref, computed } from "vue";
 import MetadataDetail from "@/components/dataset/MetadataDetail.vue";
+import { useMetadataStore } from "@/stores/metadata";
 
-@Component({
-  components: { MetadataDetail },
-})
-class MetadataModal extends Vue {
-  showMetadata = false;
-
-  @Prop({})
-  metadataId;
-
-  get metadata() {
-    return this.$api().metadata.find(this.metadataId);
-  }
-}
-export default MetadataModal;
+const props = defineProps<{ metadataId: string }>();
+const showMetadata = ref(false);
+const metadataStore = useMetadataStore();
+const metadata = computed(() => metadataStore.find(props.metadataId));
 </script>

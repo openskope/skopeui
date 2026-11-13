@@ -1,10 +1,12 @@
 <template>
-  <v-app-bar src="/header.png" dense light shrink-on-scroll app>
+  <!-- Tall enough for the title and subtitle; at 64px the title was cut. -->
+  <v-app-bar src="/header.png" height="80">
     <template #img="{ props }">
-      <v-img v-bind="props" cover></v-img>
+      <v-img v-bind="props" cover />
     </template>
-    <v-app-bar-nav-icon light @click.stop="toggleNavigationDrawer()">
-      <v-icon color="primary" x-large>fas fa-bars</v-icon>
+    <!-- Wider screens show the steps in the step bar instead. -->
+    <v-app-bar-nav-icon v-if="!mdAndUp" @click.stop="toggleNavigationDrawer()">
+      <v-icon color="primary" x-large>mdi-menu</v-icon>
     </v-app-bar-nav-icon>
     <v-app-bar-title>
       <a
@@ -18,61 +20,40 @@
         Synthesizing Knowledge of Past Environments
       </div>
     </v-app-bar-title>
-    <template v-if="$vuetify.breakpoint.mdAndUp">
+    <template v-if="mdAndUp">
       <v-spacer />
       <LoadAnalysis />
     </template>
   </v-app-bar>
 </template>
-<script>
-import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
+<script setup lang="ts">
+import { useDisplay } from "vuetify";
 import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
-import _ from "lodash";
+import { useAppStore } from "@/stores/app";
 
-@Component({
-  components: {
-    LoadAnalysis,
-  },
-})
-class Header extends Vue {
-  stepNames = _.clone(this.$api().app.stepNames);
-  steps = _.clone(this.$api().app.steps);
+const appStore = useAppStore();
+// Destructured: a ref read through the object stays truthy in the template.
+const { mdAndUp } = useDisplay();
 
-  // --------- GETTERS ---------
-  get drawer() {
-    return this.$api().app.isVisible;
-  }
-
-  get currentStepName() {
-    return this.steps[this.currentStepIndex].label;
-  }
-
-  get currentStepIndex() {
-    return this.stepNames.findIndex((x) => x === this.$route.name);
-  }
-
-  // --------- METHODS ---------
-
-  toggleNavigationDrawer() {
-    this.$api().app.toggleNavigationDrawer();
-  }
+function toggleNavigationDrawer() {
+  appStore.toggleNavigationDrawer();
 }
-export default Header;
 </script>
 <style lang="scss" scoped>
 .skope-title {
   text-decoration: none;
-  color: $skope-title-color;
+  color: rgb(var(--v-theme-brand));
   font-family: $skope-title-font;
   font-weight: bold;
   font-size: 2.3em;
+  line-height: 1.1;
 }
 
 .skope-subtitle {
-  color: $skope-dark-blue;
+  color: rgb(var(--v-theme-primary));
   font-family: $skope-title-font;
   font-weight: bolder;
   font-size: 1.2rem;
+  line-height: 1.2;
 }
 </style>

@@ -1,6 +1,6 @@
 import area from "@turf/area";
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
+import { filterTimeSeries, toISODate } from "@/store/stats";
 import { DEFAULT_MAX_PROCESSING_TIME } from "@/store/modules/constants";
 
 import _ from "lodash";
@@ -36,12 +36,12 @@ function clampTemporalRange(candidateTemporalRange, datasetTemporalRange) {
   const start = _.clamp(
     candidateTemporalRange[0],
     datasetTemporalRange[0],
-    datasetTemporalRange[1]
+    datasetTemporalRange[1],
   );
   const end = _.clamp(
     candidateTemporalRange[1],
     datasetTemporalRange[0],
-    datasetTemporalRange[1]
+    datasetTemporalRange[1],
   );
   return [start, end];
 }
@@ -116,10 +116,6 @@ class Dataset extends VuexModule {
 
   get totalCellAreaInSquareKm() {
     return (this.totalCellArea / 1e6).toFixed(2);
-  }
-
-  get summaryStatistics() {
-    return { ...summarize(this.filteredTimeSeries), name: "Original" };
   }
 
   get minYear() {
@@ -246,12 +242,12 @@ class Dataset extends VuexModule {
       const defaultTemporalRange = toTemporalRange(metadata);
       console.log(
         "finding intersection of existing temporal range and dataset default",
-        { currentTemporalRange: this.temporalRange, defaultTemporalRange }
+        { currentTemporalRange: this.temporalRange, defaultTemporalRange },
       );
       this.temporalRange.splice(
         0,
         this.temporalRange.length,
-        ...clampTemporalRange(this.temporalRange, defaultTemporalRange)
+        ...clampTemporalRange(this.temporalRange, defaultTemporalRange),
       );
     }
   }

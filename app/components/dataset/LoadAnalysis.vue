@@ -1,94 +1,64 @@
 <template>
-  <!-- load analysis button / component -->
-  <v-btn
-    color="primary"
-    tile
-    rounded
-    class="mt-1"
-    @click="selectLoadRequestDataFile"
+  <!-- Short enough for the navigation drawer; the tooltip names the file. -->
+  <v-tooltip
+    location="bottom"
+    text="Load the skope-request.json from a downloaded analysis (experimental)"
   >
-    <input
-      id="loadRequestDataFile"
-      type="file"
-      accept=".json"
-      style="display: none"
-      @change="handleLoadRequestDataFile"
-    />
-    <v-icon left dark>fas fa-upload</v-icon>
-    Load skope-request.json file (experimental)
-  </v-btn>
+    <template #activator="{ props }">
+      <v-btn
+        v-bind="props"
+        color="primary"
+        rounded
+        prepend-icon="mdi-upload"
+        class="mt-1"
+        @click="selectLoadRequestDataFile"
+      >
+        <input
+          id="loadRequestDataFile"
+          type="file"
+          accept=".json"
+          style="display: none"
+          @change="handleLoadRequestDataFile"
+        />
+        Load saved analysis
+      </v-btn>
+    </template>
+  </v-tooltip>
 </template>
-<script>
-import Vue from "vue";
-import { Component } from "nuxt-property-decorator";
-import { initializeDataset, loadRequestData } from "@/store/actions";
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 
-@Component({})
-class LoadAnalysis extends Vue {
-  /**
-   * Returns the id loadRequestFile to trigger a select file
-   * window on click.
-   */
-  selectLoadRequestDataFile() {
-    document.getElementById("loadRequestDataFile").click();
-  }
+const router = useRouter();
+const legacyActions = useLegacyStoreActions();
 
-  /**
-   * When a click event is triggered, open a window for the user
-   * to select a file
-   * @param event A click event
-   */
-  handleLoadRequestDataFile(event) {
-    const file = event.target.files[0];
-    file.text().then((text) => {
-      try {
-        const requestData = JSON.parse(text);
-        console.log(
-          "going to ",
-          requestData.dataset_id,
-          "/",
-          requestData.variable_id
-        );
-        const api = this.$api();
-        const warehouse = this.$warehouse;
-        this.$router.push(
-          {
-            name: "dataset-id-analyze-variable",
-            params: {
-              id: requestData.dataset_id,
-              variable: requestData.variable_id,
-            },
-          },
-          async function () {
-            console.log("router push completed", requestData);
-            await initializeDataset(
-              warehouse,
-              api,
-              requestData.dataset_id,
-              requestData.variable_id
-            );
-            await loadRequestData(api, requestData);
-          },
-          async function () {
-            console.log("router push aborted", requestData);
-            await initializeDataset(
-              warehouse,
-              api,
-              requestData.dataset_id,
-              requestData.variable_id
-            );
-            await loadRequestData(api, requestData);
-          }
-        );
-      } catch (error) {
-        console.error(error);
-        alert("Unable to import the request file.");
-      }
-    });
-  }
+function selectLoadRequestDataFile() {
+  document.getElementById("loadRequestDataFile")!.click();
 }
 
-export default LoadAnalysis;
+async function handleLoadRequestDataFile(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  try {
+    const requestData = JSON.parse(await file.text());
+    await legacyActions.initializeDataset(
+      requestData.dataset_id,
+      requestData.variable_id,
+    );
+    // The analysis route guard needs the imported area before navigation.
+    legacyActions.loadRequestData(requestData);
+    await router.push({
+      name: "dataset-id-analyze-variable",
+      params: {
+        id: requestData.dataset_id,
+        variable: requestData.variable_id,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    alert("Unable to import the request file.");
+  }
+}
 </script>
 
 <style scoped></style>

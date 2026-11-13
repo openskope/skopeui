@@ -1,5 +1,6 @@
 # backups
 *~
+.DS_Store
 # docker generated things
 _citation.*
 config.mk
@@ -44,6 +45,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+app/.nuxt/
+app/.output/
 
 # TypeScript v1 declaration files
 typings/
@@ -202,3 +205,6 @@ dmypy.json
 
 # ctags generated files
 tags
+
+# Agent cached context
+.agent

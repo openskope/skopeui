@@ -1,10 +1,11 @@
-version: '3.8'
 services:
   web:
+    build:
+      target: development
+    image: openskope/skopeui:dev
     volumes:
       - ./app:/code
       - /code/node_modules
     ports:
       - "127.0.0.1:3000:3000"
-    command: >-
-      sh -c "yarn install && yarn dev"
+    command: npm run dev

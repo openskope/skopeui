@@ -1,43 +1,47 @@
 <template>
   <v-container fluid>
-    <v-row dense>
+    <v-row>
       <v-col class="ma-0">
-        <h1>
+        <h1 class="text-h5 d-flex align-center ga-2">
           Select a Dataset
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
+          <v-tooltip
+            location="bottom"
+            text="View the SKOPE user guide (opens in a new tab)"
+          >
+            <template #activator="{ props }">
               <v-btn
                 icon
-                link
-                fab
-                class="mt-n1 ml-n1"
+                size="small"
+                variant="text"
                 href="https://www.openskope.org/skope-users-guide/"
                 target="_blank"
-                v-bind="attrs"
-                v-on="on"
+                v-bind="props"
               >
-                <v-icon>fas fa-question-circle</v-icon>
+                <v-icon size="20">mdi-help-circle-outline</v-icon>
               </v-btn>
             </template>
-            <span>View the SKOPE user guide (opens in a new tab)</span>
           </v-tooltip>
         </h1>
       </v-col>
     </v-row>
     <Search />
-    <v-row dense class="ma-0 pa-0">
+    <v-row class="ma-0 pa-0">
       <v-col class="ma-0">
-        <template v-for="dataset in datasets" router exact>
-          <v-card
-            :key="dataset.absoluteUrl"
-            class="pa-4 my-3"
-            elevation="0"
-            outlined
-          >
-            <ListItem :key="dataset.absolute_url" v-bind="dataset" />
+        <template
+          v-for="dataset in datasets"
+          :key="dataset.absoluteUrl"
+          router
+          exact
+        >
+          <v-card class="pa-4 my-3" elevation="0" variant="outlined">
+            <ListItem v-bind="dataset" />
           </v-card>
         </template>
-        <v-alert v-if="datasets.length === 0" type="warning">
+        <LoadingSpinner v-if="loading" />
+        <v-alert v-else-if="loadFailed" type="error">
+          Unable to load the datasets. Please try again shortly.
+        </v-alert>
+        <v-alert v-else-if="datasets.length === 0" type="warning">
           No datasets found, please refine your filter criteria.
         </v-alert>
       </v-col>
@@ -45,35 +49,44 @@
   </v-container>
 </template>
 
-<script>
-import { Component } from "nuxt-property-decorator";
-import Vue from "vue";
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import ListItem from "@/components/dataset/ListItem.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import Search from "@/components/dataset/Search.vue";
-import { loadAllDatasetMetadata } from "@/store/actions";
+import { useDatasetStore } from "@/stores/dataset";
+import { useMetadataStore } from "@/stores/metadata";
+import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 
-@Component({
-  layout: "DefaultLayout",
-  components: {
-    ListItem,
-    Search,
+definePageMeta({ layout: "default" });
+
+const legacyActions = useLegacyStoreActions();
+const datasetStore = useDatasetStore();
+const metadataStore = useMetadataStore();
+
+const datasets = computed(() => metadataStore.filteredDatasets);
+const loadFailed = ref(false);
+// No "no datasets found" before the list has had a chance to arrive.
+const loading = ref(true);
+
+datasetStore.clearTimeSeries();
+datasetStore.setMetadata(null);
+
+await useAsyncData(
+  "landingPageMetadata",
+  async () => {
+    try {
+      await legacyActions.loadAllDatasetMetadata();
+      loadFailed.value = false;
+      return true;
+    } catch (error) {
+      console.error("Failed to load dataset metadata", error);
+      loadFailed.value = true;
+      return false;
+    } finally {
+      loading.value = false;
+    }
   },
-})
-class LandingPage extends Vue {
-  get datasets() {
-    return this.$api().metadata.filteredDatasets;
-  }
-
-  async fetch() {
-    console.log("Landing page: loading all dataset metadata");
-    await loadAllDatasetMetadata(this.$api());
-  }
-
-  created() {
-    const api = this.$api();
-    api.dataset.clearTimeSeries();
-    api.dataset.setMetadata(null);
-  }
-}
-export default LandingPage;
+  { server: false },
+);
 </script>
