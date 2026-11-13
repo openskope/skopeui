@@ -1,11 +1,13 @@
 <template>
+  <!-- Only Leaflet converts circles itself; geoman already emits polygons. -->
   <component
     :is="mapComponent"
     :step="step"
     :display-raster="displayRaster"
-    :circle-to-polygon-edges="circleToPolygonEdges"
+    v-bind="mapComponent === LeafletMap ? { circleToPolygonEdges } : {}"
     @map-ready="emit('mapReady', $event)"
-    @step-ready="emit('stepReady')"
+    @step-ready="emit('stepReady', $event)"
+    @step-error="emit('stepError', $event)"
   />
 </template>
 
@@ -21,7 +23,7 @@ const props = defineProps({
   circleToPolygonEdges: { type: Number, default: 32 },
   mapEngine: { type: String, default: null },
 });
-const emit = defineEmits(["mapReady", "stepReady"]);
+const emit = defineEmits(["mapReady", "stepReady", "stepError"]);
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();

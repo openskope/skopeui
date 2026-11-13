@@ -82,7 +82,10 @@ const layoutStubs = {
   "v-container": { template: "<div><slot /></div>" },
   "v-row": { template: "<div><slot /></div>" },
   "v-col": { template: "<div><slot /></div>" },
-  "v-btn": { template: "<button><slot /></button>" },
+  "v-btn": {
+    props: ["to"],
+    template: '<button :data-to="to && JSON.stringify(to)"><slot /></button>',
+  },
   "v-icon": { template: "<i><slot /></i>" },
 };
 
@@ -102,14 +105,6 @@ describe("route /dataset/:id/visualize/:variable", () => {
         }),
       ),
     };
-
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => ({
-        ok: true,
-        json: async () => timeSeriesResponseFixture,
-      })),
-    );
   });
 
   afterEach(() => {
@@ -134,13 +129,44 @@ describe("route /dataset/:id/visualize/:variable", () => {
     );
   });
 
+  it("[behavior] drops the analyze link instead of throwing while leaving", async () => {
+    // Mid-navigation the route can lack the variable; a link built from it
+    // made the router throw during render.
+    const wrapper = await mountWithSuspense(VisualizePage, {
+      global: { stubs: layoutStubs },
+    });
+    await flushPromises();
+    const analyze = () =>
+      wrapper.findAll("button").find((b) => b.text().includes("Analyze Data"))!;
+    expect(analyze().attributes("data-to")).toBeDefined();
+
+    const variable = routeParams.variable;
+    delete (routeParams as any).variable;
+    try {
+      const fresh = await mountWithSuspense(VisualizePage, {
+        global: { stubs: layoutStubs },
+      });
+      await flushPromises();
+      const link = fresh
+        .findAll("button")
+        .find((b) => b.text().includes("Analyze Data"))!;
+      expect(link.attributes("data-to")).toBeUndefined();
+    } finally {
+      routeParams.variable = variable;
+    }
+  });
+
   it("[behavior] loads time-series data on mount", async () => {
     await mountWithSuspense(VisualizePage, { global: { stubs: layoutStubs } });
 
     await flushPromises();
 
     expect(datasetStore.setTimeSeriesLoading).toHaveBeenCalled();
-    expect(datasetStore.setTimeSeries).toHaveBeenCalled();
+    expect(datasetStore.setTimeSeries).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeSeries: expect.objectContaining({ x: [1, 2, 3], y: [10, 20, 30] }),
+      }),
+    );
     expect(datasetStore.setTimeSeriesLoaded).toHaveBeenCalled();
     expect(legacyActions.resolveTimeSeries).toHaveBeenCalled();
     expect(appStore.setVisited).toHaveBeenCalled();

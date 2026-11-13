@@ -1,0 +1,246 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+
+import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
+import { useDatasetStore } from "@/stores/dataset";
+
+const RESULT = { series: [], summary_stats: [], n_cells: 1, area: 0 };
+
+function respond(status: number, body: unknown) {
+  return new Response(JSON.stringify(body), { status });
+}
+
+describe("resolveTimeSeries", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it.each([404, 410])(
+    "extracts again when /analyze answers %i for the cached job",
+    async (status) => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(respond(status, { detail: "stale" }))
+        .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+        .mockResolvedValueOnce(
+          respond(200, { status: "SUCCESS", result: RESULT }),
+        );
+      vi.stubGlobal("fetch", fetchMock);
+
+      const { newJobId, response } =
+        await useLegacyStoreActions().resolveTimeSeries("old-job", {});
+
+      expect(newJobId).toBe("new-job");
+      expect(response).toEqual(RESULT);
+      expect(fetchMock.mock.calls[1][0]).toMatch(/\/timeseries\/extract$/);
+    },
+  );
+
+  it("reports a 422 instead of extracting again", async () => {
+    // The request itself can't be computed, e.g. a z-score reference period
+    // without values: a new extraction would fail the same way.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(422, { detail: "needs at least 2" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("job", {}),
+    ).rejects.toMatchObject({ response: { status: 422 } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("waits for a running extraction instead of starting a second one", async () => {
+    // Analyze opened while visualize's extraction runs: /analyze answers 409,
+    // and a new /extract would be refused at capacity.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(respond(200, { status: "RUNNING" }))
+      .mockResolvedValueOnce(
+        respond(200, { status: "SUCCESS", result: RESULT }),
+      )
+      .mockResolvedValueOnce(respond(200, RESULT));
+    vi.stubGlobal("fetch", fetchMock);
+    vi.useFakeTimers();
+
+    const pending = useLegacyStoreActions().resolveTimeSeries(
+      "running-job",
+      {},
+    );
+    await vi.runAllTimersAsync();
+    const { newJobId, response } = await pending;
+    vi.useRealTimers();
+
+    expect(newJobId).toBe("running-job");
+    expect(response).toEqual(RESULT);
+    const urls = fetchMock.mock.calls.map(([url]) => String(url));
+    expect(urls.some((url) => url.endsWith("/timeseries/extract"))).toBe(false);
+    expect(urls.at(-1)).toMatch(/\/timeseries\/analyze$/);
+  });
+
+  it("extracts again when the cached job's extraction failed", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(respond(200, { status: "FAILED" }))
+      .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+      .mockResolvedValueOnce(
+        respond(200, { status: "SUCCESS", result: RESULT }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { newJobId } = await useLegacyStoreActions().resolveTimeSeries(
+      "old-job",
+      {},
+    );
+
+    expect(newJobId).toBe("new-job");
+    expect(fetchMock.mock.calls[2][0]).toMatch(/\/timeseries\/extract$/);
+  });
+
+  it.each([404, 410])(
+    "extracts again when /analyze answers %i after waiting for a running job",
+    async (status) => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+        .mockResolvedValueOnce(
+          respond(200, { status: "SUCCESS", result: RESULT }),
+        )
+        .mockResolvedValueOnce(
+          respond(status, { detail: "stale or too narrow" }),
+        )
+        .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+        .mockResolvedValueOnce(
+          respond(200, { status: "SUCCESS", result: RESULT }),
+        );
+      vi.stubGlobal("fetch", fetchMock);
+      const request = {
+        variable_id: "ppt_annual",
+        time_range: { gte: "0103", lte: "2000" },
+      };
+
+      const result = await useLegacyStoreActions().resolveTimeSeries(
+        "running-job",
+        request,
+      );
+
+      expect(result).toEqual({ newJobId: "new-job", response: RESULT });
+      const [url, options] = fetchMock.mock.calls[3];
+      expect(url).toMatch(/\/timeseries\/extract$/);
+      expect(JSON.parse(options.body)).toEqual(request);
+    },
+  );
+
+  it("reports a 422 after waiting without extracting again", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(
+        respond(200, { status: "SUCCESS", result: RESULT }),
+      )
+      .mockResolvedValueOnce(respond(422, { detail: "needs at least 2" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("running-job", {}),
+    ).rejects.toMatchObject({ response: { status: 422 } });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("reports a timed-out extraction without extracting again", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(409, { detail: "not complete" }))
+      .mockResolvedValueOnce(
+        respond(200, {
+          status: "TIMED_OUT",
+          error: "Processing exceeded 20000 ms.",
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("old-job", {}),
+    ).rejects.toMatchObject({
+      response: {
+        status: 504,
+        data: { detail: [{ msg: "Processing exceeded 20000 ms." }] },
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("records a new extraction's job as soon as it's submitted", async () => {
+    let jobIdWhilePolling: string | undefined;
+    const store = useDatasetStore();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+      .mockImplementationOnce(async () => {
+        jobIdWhilePolling = store.jobIds?.ppt_annual;
+        return respond(200, { status: "SUCCESS", result: RESULT });
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await useLegacyStoreActions().resolveTimeSeries(undefined, {
+      variable_id: "ppt_annual",
+    });
+
+    expect(jobIdWhilePolling).toBe("new-job");
+  });
+
+  it("retries an extraction the API is at capacity for", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(respond(503, { detail: "at capacity" }))
+      .mockResolvedValueOnce(respond(503, { detail: "at capacity" }))
+      .mockResolvedValueOnce(respond(200, { job_id: "new-job" }))
+      .mockResolvedValueOnce(
+        respond(200, { status: "SUCCESS", result: RESULT }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    vi.useFakeTimers();
+
+    const pending = useLegacyStoreActions().resolveTimeSeries(undefined, {});
+    await vi.advanceTimersByTimeAsync(4_000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(6_000);
+    const { newJobId } = await pending;
+    vi.useRealTimers();
+
+    expect(newJobId).toBe("new-job");
+  });
+
+  it("gives up on capacity after about a minute", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => respond(503, { detail: "at capacity" })),
+    );
+    vi.useFakeTimers();
+
+    const pending = useLegacyStoreActions().resolveTimeSeries(undefined, {});
+    const outcome = expect(pending).rejects.toMatchObject({
+      response: { status: 503 },
+    });
+    await vi.advanceTimersByTimeAsync(65_000);
+    await outcome;
+    vi.useRealTimers();
+  });
+
+  it("passes on other errors from /analyze", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(respond(500, { detail: "boom" })),
+    );
+
+    await expect(
+      useLegacyStoreActions().resolveTimeSeries("old-job", {}),
+    ).rejects.toMatchObject({ response: { status: 500 } });
+  });
+});

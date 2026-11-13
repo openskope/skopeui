@@ -5,6 +5,10 @@ import {
   TIMESERIES_REFINE_ENDPOINT,
 } from "../store/modules/constants";
 import { extractYear } from "../store/stats";
+import {
+  datasetsFromMetadata,
+  UnsupportedMetadataVersionError,
+} from "../utils/metadataResponse";
 import { useAnalysisStore } from "../stores/analysis";
 import { useDatasetStore } from "../stores/dataset";
 import { useMetadataStore } from "../stores/metadata";
@@ -27,11 +31,12 @@ async function requestJson(url: string, options: RequestInit = {}) {
     const error = new Error(
       `Request failed with status ${response.status}`,
     ) as Error & {
-      response?: { status: number; data: unknown };
+      response?: { status: number; data: unknown; retryAfter?: number };
     };
     error.response = {
       status: response.status,
       data: responseData,
+      retryAfter: Number(response.headers.get("Retry-After")) || undefined,
     };
     throw error;
   }
@@ -39,30 +44,51 @@ async function requestJson(url: string, options: RequestInit = {}) {
   return response.json();
 }
 
+// The API runs a limited number of extractions at once and refuses more with
+// 503 and Retry-After. Keep trying for about a minute before giving up. The
+// browser can read Retry-After only if the API exposes it; otherwise 5s.
+const CAPACITY_RETRY_SECONDS = 5;
+const CAPACITY_WAIT_LIMIT_MS = 60_000;
+
+// /analyze statuses that mean the cached extraction can't be used. A 422 is
+// about the request itself, so a new extraction wouldn't help.
+const RESUBMIT_STATUSES = [404, 409, 410];
+
 export function useLegacyStoreActions() {
   const metadataStore = useMetadataStore();
   const datasetStore = useDatasetStore();
   const analysisStore = useAnalysisStore();
   const persistenceStorage = usePersistenceStorage();
 
+  // Fetched on every page change, not cached, so a UI left open across an API
+  // deploy notices a changed schema version on its next navigation (CUT-001).
   async function loadAllDatasetMetadata() {
-    if (!metadataStore.shouldRefresh) {
-      return;
+    const response = await requestJson(METADATA_ENDPOINT);
+    try {
+      metadataStore.setAllDatasetMetadata(datasetsFromMetadata(response));
+    } catch (error) {
+      if (error instanceof UnsupportedMetadataVersionError) {
+        metadataStore.setUpdateRequired();
+      }
+      throw error;
     }
-    const allDatasetMetadata = await requestJson(METADATA_ENDPOINT);
-    metadataStore.setAllDatasetMetadata(allDatasetMetadata as any[]);
-    metadataStore.setLastRefreshed();
   }
 
   async function initializeDataset(
     metadataId: string,
     variableId?: string | null,
   ) {
-    await loadAllDatasetMetadata();
-
+    // Already loaded (moving between its steps): don't wait for the metadata
+    // request, which can sit behind a running extraction and held up the next
+    // page. Still send it, so a changed API is noticed (CUT-001); a version
+    // mismatch flags the update screen, and other failures can wait for the
+    // next page.
     if (metadataId === (datasetStore.metadata as any)?.id) {
+      loadAllDatasetMetadata().catch(() => undefined);
       return;
     }
+
+    await loadAllDatasetMetadata();
 
     const datasetMetadata = metadataStore.find(metadataId);
     if (datasetMetadata == null) {
@@ -77,10 +103,11 @@ export function useLegacyStoreActions() {
 
     datasetStore.setMetadata(datasetMetadata);
 
+    // The variables arrive sorted by `order`, so the first is the fallback.
     const incomingVariableId =
-      variableId == null
-        ? (datasetMetadata as any).variables?.[0]?.id
-        : variableId;
+      variableId ??
+      datasetMetadata.default_variable ??
+      datasetMetadata.variables[0]?.id;
 
     if (incomingVariableId != null) {
       datasetStore.setVariable(incomingVariableId);
@@ -99,16 +126,24 @@ export function useLegacyStoreActions() {
     datasetStore.setGeoJson(geoJson);
   }
 
+  // Results for one study area must not survive a change of area: drop the
+  // plots, the statistics and the cached extractions.
+  function clearResults() {
+    datasetStore.clearJobIds();
+    datasetStore.clearTimeSeries();
+    analysisStore.clear();
+  }
+
   function clearGeoJson() {
     persistenceStorage.remove(datasetStore.geoJsonKey);
     datasetStore.clearGeoJson();
+    clearResults();
   }
 
   function saveGeoJson(geoJson: unknown) {
     persistenceStorage.set(datasetStore.geoJsonKey, geoJson);
     datasetStore.setGeoJson(geoJson);
-    datasetStore.clearJobIds();
-    datasetStore.clearTimeSeries();
+    clearResults();
 
     if (!_.isEmpty(analysisStore.requestData)) {
       analysisStore.setGeoJson(geoJson);
@@ -125,11 +160,23 @@ export function useLegacyStoreActions() {
   }
 
   async function submitTimeSeriesRequest(requestData: Record<string, any>) {
-    const result = await requestJson(TIMESERIES_SUBMIT_ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify(requestData),
-    });
-    return result.job_id as string;
+    const deadline = Date.now() + CAPACITY_WAIT_LIMIT_MS;
+    for (;;) {
+      try {
+        const result = await requestJson(TIMESERIES_SUBMIT_ENDPOINT, {
+          method: "POST",
+          body: JSON.stringify(requestData),
+        });
+        return result.job_id as string;
+      } catch (error: any) {
+        const waitMs =
+          (error.response?.retryAfter ?? CAPACITY_RETRY_SECONDS) * 1000;
+        if (error.response?.status !== 503 || Date.now() + waitMs > deadline) {
+          throw error;
+        }
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+    }
   }
 
   async function pollTimeSeriesStatus(jobId: string) {
@@ -141,6 +188,7 @@ export function useLegacyStoreActions() {
     while (
       result.status !== "SUCCESS" &&
       result.status !== "FAILED" &&
+      result.status !== "TIMED_OUT" &&
       Date.now() < deadline
     ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -164,7 +212,8 @@ export function useLegacyStoreActions() {
       };
       throw error;
     }
-    // implicit else: deadline exceeded
+    // The API stopped the job at its deadline, or we stopped waiting. Either
+    // way it's a timeout (504), which the pages report and never resubmit.
     const error = new Error("Request timed out") as Error & {
       response?: { status: number; data: unknown };
     };
@@ -174,9 +223,10 @@ export function useLegacyStoreActions() {
         detail: [
           {
             msg:
+              result.error ??
               "Request timed out after waiting for " +
-              timeoutSeconds +
-              " seconds",
+                timeoutSeconds +
+                " seconds",
           },
         ],
       },
@@ -213,13 +263,39 @@ export function useLegacyStoreActions() {
         );
         return { newJobId: existingJobId, response: response };
       } catch (error: any) {
-        if (error.response?.status !== 404 && error.response?.status !== 422) {
+        const status = error.response?.status;
+        if (!RESUBMIT_STATUSES.includes(status)) {
           throw error;
+        }
+        // Incomplete: usually still running, started by the page just left.
+        // Wait for it; a second extraction is refused while one runs (503).
+        if (status === 409) {
+          try {
+            await pollTimeSeriesStatus(existingJobId);
+            const response = await refineTimeSeriesAnalysis(
+              existingJobId,
+              requestData,
+            );
+            return { newJobId: existingJobId, response: response };
+          } catch (pollError: any) {
+            // A failed extraction or a completed one that expired or doesn't
+            // cover this request needs a fresh extraction. Request errors and
+            // timeouts still propagate without resubmitting.
+            if (![404, 410, 500].includes(pollError.response?.status)) {
+              throw pollError;
+            }
+          }
         }
       }
     }
-    // if no existing job or error status is 404 or 422 (job if not found or invalid), submit a new request
+    // No usable extraction: none yet, expired (404), failed (409) or
+    // unusable (410). Clients may resubmit stale jobs (skope-api ADR 0005).
     const newJobId = await submitTimeSeriesRequest(requestData);
+    // Known from submission on, so another page can wait for this extraction
+    // instead of starting its own.
+    if (requestData.variable_id) {
+      datasetStore.setJobId(requestData.variable_id, newJobId);
+    }
     const response = await pollTimeSeriesStatus(newJobId);
     const result = response.result;
     return { newJobId, response: result };

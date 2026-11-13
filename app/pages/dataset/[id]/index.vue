@@ -15,7 +15,12 @@
       </SubHeader>
       <v-row>
         <v-col cols="12" class="d-flex map-flex">
-          <Map :display-raster="false" class="mx-auto" @map-ready="mapLoaded" />
+          <Map
+            :display-raster="true"
+            :step="datasetStore.minYear"
+            class="mx-auto"
+            @map-ready="mapLoaded"
+          />
         </v-col>
         <client-only>
           <v-dialog
@@ -82,9 +87,11 @@ const confirmGeometry = computed({
     shouldConfirmGeometry.value = value;
   },
 });
+// No link without both params: the router throws mid-render otherwise.
 const visualizeLocation = computed(() => {
   const id = route.params.id;
   const variable = (datasetStore.variable as any)?.id;
+  if (!id || !variable) return undefined;
   return { name: "dataset-id-visualize-variable", params: { id, variable } };
 });
 
@@ -120,8 +127,10 @@ function keepGeometry() {
 }
 </script>
 <style>
+/* The viewport less the app bar, step bar and page title, so the panels fit
+   a laptop screen. */
 .map-flex {
-  height: calc(85vh - 96px);
+  height: calc(100vh - 250px);
 }
 
 @media all and (max-width: 960px) {

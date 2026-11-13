@@ -8,8 +8,11 @@ import {
 } from "@vue-leaflet/vue-leaflet";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-  // Leaflet Draw expects a global L reference when loaded.
-  (globalThis as any).L = Leaflet;
+  // Leaflet Draw expects a global L reference when loaded, and adds to it
+  // (L.Draw, L.drawLocal, L.drawVersion). A production build's module
+  // namespace is not extensible, so give it a plain copy.
+  const L = { ...Leaflet };
+  (globalThis as any).L = L;
   await import("leaflet-draw");
 
   nuxtApp.vueApp.component("LMap", LMap);
@@ -21,7 +24,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   // Preserve legacy `$L` access pattern during migration.
   return {
     provide: {
-      L: Leaflet,
+      L,
     },
   };
 });

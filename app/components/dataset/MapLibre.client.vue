@@ -1,97 +1,91 @@
 <template>
   <v-card
-    class="pb-2"
+    class="map-card"
     height="100%"
     width="100%"
     elevation="1"
     variant="outlined"
   >
-    <v-toolbar variant="flat" class="ma-0 pa-0">
-      <v-row class="mx-0" align="baseline">
-        <v-tooltip location="bottom" text="Area of the selected geometry">
-          <template #activator="{ props }">
-            <h3
-              class="font-weight-light text-center pa-2 my-auto"
-              style="background-color: #e4e7ef"
-              v-bind="props"
-            >
-              {{ selectedArea }} km<sup>2</sup>
-            </h3>
-          </template>
-        </v-tooltip>
-        <v-spacer />
-        <v-alert
-          v-if="isSelectArea"
-          density="compact"
-          variant="tonal"
-          icon="mdi-pencil"
-          color="secondary"
-          class="my-auto"
-        >
-          Use the draw toolbar on the left to select an area of study.
-        </v-alert>
-        <v-select
-          v-model="selectedBaseLayerId"
-          :items="baseLayerOptions"
-          item-title="title"
-          item-value="value"
-          label="Base map"
-          density="compact"
-          variant="outlined"
-          hide-details
-          class="mx-2 my-auto basemap-select"
-        />
-        <v-spacer />
+    <PanelHeader>
+      <!-- No readout while selecting: the API measures the area on extraction. -->
+      <AreaReadout v-if="!isSelectArea" />
+      <!-- What to do next. Stays put while a tool is active; that tool's own
+           instruction follows the pointer. -->
+      <div v-if="isSelectArea" class="draw-callout" data-test="draw-callout">
+        {{ datasetStore.geoJson ? EDIT_CALLOUT : DRAW_CALLOUT }}
+      </div>
+      <!-- One group, so on a narrow screen both buttons wrap together. -->
+      <div v-if="isSelectArea" class="geojson-actions">
         <input
-          v-if="isSelectArea"
           id="loadGeoJsonFile"
           type="file"
           accept=".geojson"
           style="display: none"
           @change="loadGeoJson"
         >
-        <v-tooltip
-          v-if="isSelectArea"
-          location="bottom"
-          text="Upload study area from GeoJSON"
+        <v-btn
+          size="small"
+          color="secondary"
+          variant="outlined"
+          prepend-icon="mdi-upload"
+          @click="selectGeoJsonFile"
         >
-          <template #activator="{ props }">
-            <v-btn
-              size="small"
-              color="secondary"
-              variant="outlined"
-              v-bind="props"
-              class="my-auto"
-              @click="selectGeoJsonFile"
-            >
-              <v-icon>mdi-upload</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip
-          v-if="isSelectArea"
-          location="bottom"
-          text="Download selected area as GeoJSON"
+          Upload GeoJSON
+        </v-btn>
+        <v-btn
+          size="small"
+          color="secondary"
+          variant="flat"
+          :disabled="!datasetStore.geoJson"
+          prepend-icon="mdi-download"
+          @click="exportSelectedGeometry"
         >
-          <template #activator="{ props }">
-            <v-btn
-              size="small"
-              color="secondary"
-              variant="flat"
-              v-bind="props"
-              class="mx-2 my-auto"
-              @click="exportSelectedGeometry"
-            >
-              <a id="exportSelectedGeometry">
-                <v-icon>mdi-download</v-icon>
-              </a>
-            </v-btn>
-          </template>
-        </v-tooltip>
-      </v-row>
-    </v-toolbar>
+          <a id="exportSelectedGeometry">Download GeoJSON</a>
+        </v-btn>
+      </div>
+    </PanelHeader>
     <v-card-text class="map">
-      <div ref="mapContainer" class="maplibre-map" />
+      <div class="map-frame">
+        <div ref="mapContainer" class="maplibre-map" />
+        <div
+          v-if="cursorHint && drawPointer"
+          class="draw-cursor-hint"
+          :style="{ left: `${drawPointer.x}px`, top: `${drawPointer.y}px` }"
+          data-test="draw-cursor-hint"
+        >
+          {{ cursorHint }}
+        </div>
+      </div>
+      <!-- Sits in MapLibre's top-right control stack, under the zoom buttons. -->
+      <Teleport v-if="basemapControlEl" :to="basemapControlEl">
+        <v-menu location="start top">
+          <template #activator="{ props: menuProps }">
+            <button
+              v-bind="menuProps"
+              type="button"
+              title="Base map"
+              aria-label="Base map"
+              data-test="basemap-button"
+            >
+              <v-icon size="18">
+                mdi-layers-outline
+              </v-icon>
+            </button>
+          </template>
+          <v-list density="compact">
+            <v-list-subheader>Base map</v-list-subheader>
+            <v-list-item
+              v-for="option in baseLayerOptions"
+              :key="option.value"
+              :title="option.title"
+              :active="option.value === selectedBaseLayerId"
+              color="primary"
+              data-test="basemap-option"
+              @click="selectedBaseLayerId = option.value"
+            />
+          </v-list>
+        </v-menu>
+      </Teleport>
       <div v-if="isStepLoading" class="map-step-loading">
         <v-progress-circular
           indeterminate
@@ -108,30 +102,37 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import maplibregl from "maplibre-gl";
-import { SkopeColorbar } from "@/utils/SkopeColorbar";
+import AreaReadout from "@/components/dataset/AreaReadout.vue";
+import PanelHeader from "@/components/dataset/PanelHeader.vue";
+import { SkopeColorbar, type ColorbarOptions } from "@/utils/SkopeColorbar";
+import { MAP_COLORS, MAP_OPACITIES } from "@/utils/colors";
+import { timestepKey } from "@/utils/timeAxis";
 import type { Geoman } from "@geoman-io/maplibre-geoman-free";
 import { createGeomanInstance } from "@geoman-io/maplibre-geoman-free";
-import circleToPolygon from "circle-to-polygon";
 import { bbox as turfBbox } from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@geoman-io/maplibre-geoman-free/dist/maplibre-geoman.css";
-import { LEAFLET_PROVIDERS, TILES_ENDPOINT } from "@/store/modules/constants";
+import {
+  DEFAULT_BASEMAP,
+  LEAFLET_PROVIDERS,
+  TILES_ENDPOINT,
+} from "@/store/modules/constants";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
-import { getInitialMapViewport } from "@/composables/useMapInitialViewport";
+import {
+  getInitialMapViewport,
+  type Bbox,
+} from "@/composables/useMapInitialViewport";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
 import { useMessagesStore } from "@/stores/messages";
-
-const COLOR_MAX_PCT = 0.5;
 
 let colorbar: SkopeColorbar | null = null;
 
 const props = defineProps({
   step: { type: Number, default: 2000 },
   displayRaster: { type: Boolean, default: true },
-  circleToPolygonEdges: { type: Number, default: 32 },
 });
-const emit = defineEmits(["mapReady", "stepReady"]);
+const emit = defineEmits(["mapReady", "stepReady", "stepError"]);
 
 const route = useRoute();
 const appStore = useAppStore();
@@ -143,30 +144,39 @@ const mapContainer = ref<HTMLElement | null>(null);
 const isStepLoading = ref(false);
 
 const stepNames = computed(() => appStore.stepNames);
-const metadata = computed(() => datasetStore.metadata as any);
-const selectedArea = computed(() => datasetStore.selectedAreaInSquareKm);
+const metadata = computed(() => datasetStore.metadata);
 const currentStep = computed(() =>
   stepNames.value.findIndex((x: unknown) => x === route.name),
 );
 const isSelectArea = computed(() => currentStep.value === 1);
-const initialMapViewport = computed(() =>
-  getInitialMapViewport(metadata.value),
+const activeTool = ref<string | null>(null);
+// The active tool's instruction follows the pointer, where the user is looking
+// while drawing or editing.
+const cursorHint = computed(
+  () => activeTool.value && TOOL_INSTRUCTIONS[activeTool.value],
 );
-const initialMapZoom = computed(() => initialMapViewport.value.zoom);
-const initialMapCenter = computed(() => initialMapViewport.value.center);
+const drawPointer = ref<{ x: number; y: number } | null>(null);
 
 const cogBaseUrl = computed(getCogBaseUrl);
 const legendVisible = computed(() => props.displayRaster && !!cogBaseUrl.value);
-const variableUnit = computed(() => datasetStore.variable?.units ?? null);
-// Raw numeric values (used for midpoint arithmetic)
-const minVal = computed(() => datasetStore.variable?.min ?? 0);
-const maxVal = computed(() => datasetStore.variable?.max ?? 100);
+// The legend draws the variable's display entry as served, so it shows the
+// same range and palette the API used for the tiles (DISP-004).
+const legendOptions = computed((): ColorbarOptions | null => {
+  const variable = datasetStore.variable;
+  const display = variable?.display;
+  if (!display?.range || display.colors.length < 2) return null;
+  return {
+    colors: display.colors,
+    range: display.range,
+    ticks: display.ticks,
+    units: variable.unit,
+  };
+});
 type MapLibreBaseLayer = {
   id: string;
   name: string;
   tiles: string[];
   attribution: string;
-  visible: number | boolean | undefined;
 };
 
 function providerNameToId(name: string) {
@@ -205,18 +215,14 @@ const mapBaseLayers: MapLibreBaseLayer[] = LEAFLET_PROVIDERS.map(
     name: provider.name,
     tiles: providerToMapLibreTiles(provider),
     attribution: provider.attribution,
-    visible: provider.visible,
   }),
 ).filter((provider: MapLibreBaseLayer) => provider.tiles.length > 0);
 
-function getDefaultBaseLayerId(step: number) {
-  const matchedByStep = mapBaseLayers.find(
-    (provider) => provider.visible === step,
-  );
-  return (matchedByStep || mapBaseLayers[0])?.id || "";
-}
-
-const selectedBaseLayerId = ref(getDefaultBaseLayerId(currentStep.value));
+const defaultBaseLayer =
+  mapBaseLayers.find((provider) => provider.name === DEFAULT_BASEMAP) ??
+  mapBaseLayers[0];
+const selectedBaseLayerId = ref(defaultBaseLayer?.id ?? "");
+const basemapControlEl = ref<HTMLElement | null>(null);
 const baseLayerOptions = computed(() =>
   mapBaseLayers.map((provider) => ({
     title: provider.name,
@@ -224,7 +230,84 @@ const baseLayerOptions = computed(() =>
   })),
 );
 
-const STEP_DISPLAY_DURATION_MS = 1000;
+// What to do with each tool, keyed by geoman's mode name. Every drawing tool
+// works by clicking, not by dragging. Shown on the tool's tooltip and next to
+// the pointer while the tool is active.
+const DRAW_INSTRUCTIONS: Record<string, string> = {
+  marker: "Click the map to place the point.",
+  circle: "Click the center, then click again to set the radius.",
+  rectangle: "Click one corner, then click the opposite corner.",
+  polygon: "Click each corner, then click the first one again to finish.",
+};
+const EDIT_INSTRUCTIONS: Record<string, string> = {
+  drag: "Drag the shape to move it.",
+  change: "Drag a corner to change the shape.",
+  rotate: "Drag a corner to rotate the shape.",
+  delete: "Click the shape to remove it.",
+};
+const TOOL_INSTRUCTIONS = { ...DRAW_INSTRUCTIONS, ...EDIT_INSTRUCTIONS };
+// Shown in the map's header on select area.
+const DRAW_CALLOUT =
+  "Choose a shape to draw your study area, or upload a GeoJSON file.";
+const EDIT_CALLOUT =
+  "Draw a new shape to replace this one, or use the tools below to drag, change, rotate or delete it.";
+
+// A study area is a polygon, rectangle, circle or point; hide geoman's other
+// drawing tools. Cutting a hole in the one shape isn't useful. Snapping stays
+// on without its button: it lets a polygon close on a click near its first
+// corner.
+const GEOMAN_OPTIONS = {
+  controls: {
+    draw: {
+      marker: { title: `Point: ${DRAW_INSTRUCTIONS.marker}` },
+      circle: { title: `Circle: ${DRAW_INSTRUCTIONS.circle}` },
+      rectangle: { title: `Rectangle: ${DRAW_INSTRUCTIONS.rectangle}` },
+      polygon: { title: `Polygon: ${DRAW_INSTRUCTIONS.polygon}` },
+      circle_marker: { uiEnabled: false },
+      text_marker: { uiEnabled: false },
+      ellipse: { uiEnabled: false },
+      line: { uiEnabled: false },
+    },
+    edit: {
+      drag: { title: `Drag: ${EDIT_INSTRUCTIONS.drag}` },
+      change: { title: `Change: ${EDIT_INSTRUCTIONS.change}` },
+      rotate: { title: `Rotate: ${EDIT_INSTRUCTIONS.rotate}` },
+      delete: { title: `Delete: ${EDIT_INSTRUCTIONS.delete}` },
+      cut: { uiEnabled: false },
+    },
+    helper: {
+      snapping: { uiEnabled: false, active: true },
+      zoom_to_features: { title: "Zoom to shape" },
+    },
+  },
+  layerStyles: geomanStudyAreaStyles(),
+};
+
+// geoman draws the shape being drawn or edited itself, in its own blue and
+// orange; give it the study area's colors, with the outline of a shape still
+// being drawn in its own. Each entry replaces those values of geoman's layer
+// of that type and keeps the rest.
+function geomanStudyAreaStyles() {
+  const shape = (outline: string) => [
+    {
+      type: "fill",
+      paint: {
+        "fill-color": MAP_COLORS.studyArea,
+        "fill-opacity": MAP_OPACITIES.studyAreaDrawing,
+      },
+    },
+    { type: "line", paint: { "line-color": outline } },
+  ];
+  return Object.fromEntries(
+    ["polygon", "rectangle", "circle"].map((name) => [
+      name,
+      {
+        gm_main: shape(MAP_COLORS.studyArea),
+        gm_temporary: shape(MAP_COLORS.drawing),
+      },
+    ]),
+  );
+}
 
 let map: maplibregl.Map | null = null;
 let gm: Geoman | null = null;
@@ -232,17 +315,23 @@ let ignoreStoreWatch = false;
 let syncDrawQueue: Promise<void> = Promise.resolve();
 let isMapLoaded = false;
 let pendingStudyAreaGeoJson: any = null;
-let stepDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const COG_A = { sourceId: "cog-source-a", layerId: "cog-layer-a" };
 const COG_B = { sourceId: "cog-source-b", layerId: "cog-layer-b" };
 let cogFront = COG_A; // currently visible slot
 let cogBack = COG_B; // currently loading / empty slot
-let pendingIdleSwap: (() => void) | null = null;
+let pendingFrameCheck: (() => void) | null = null;
+let pendingFrameSource: string | null = null;
+let pendingFrameStep: number | null = null;
 const FILL_LAYER_ID = "dataset-region-fill";
 const STUDY_AREA_SOURCE_ID = "study-area-display";
 const STUDY_AREA_FILL_LAYER_ID = "study-area-display-fill";
+const STUDY_AREA_HALO_LAYER_ID = "study-area-display-halo";
 const STUDY_AREA_LINE_LAYER_ID = "study-area-display-outline";
+const STUDY_AREA_POINT_LAYER_ID = "study-area-display-point";
+// Fitting a point's zero-size bbox would zoom all the way in; at zoom 10 one of
+// paleocar_v3's 30" cells is a few pixels across.
+const MAX_FIT_ZOOM = 10;
 
 function emptyFeatureCollection() {
   return { type: "FeatureCollection", features: [] as any[] };
@@ -298,37 +387,24 @@ function baseStyle(): maplibregl.StyleSpecification {
 }
 
 function getCogBaseUrl(): string | null {
-  if (!props.displayRaster || !route.params.variable) return null;
+  if (!props.displayRaster) return null;
   const datasetId = route.params.id;
-  const varId = route.params.variable;
+  // Select Area has no variable route param; initialization selects the
+  // dataset's default variable (or its first variable).
+  const varId = route.params.variable ?? datasetStore.variable?.id;
+  if (!datasetId || !varId) return null;
   return `${TILES_ENDPOINT}/${datasetId}/${varId}`;
 }
 
-function getCogFullUrl(baseUrl, step) {
-  const variable = datasetStore.variable;
-  if (variable?.min == null || variable?.max == null) {
-    console.warn(
-      `Variable ${variable?.id} is missing min/max — falling back to rescale 0,100`,
-    );
-  }
-  const min = variable?.min ?? 0;
-  const max = (variable?.max ?? 100) * COLOR_MAX_PCT;
-  const urlStep = step.toString().padStart(4, "0"); // TODO: Add flexibility for different time resolutions
-  const params = new URLSearchParams({ rescale: `${min},${max}` });
-  if (variable?.colormap) params.set("colormap", variable.colormap);
-  return `${baseUrl}/${urlStep}/{z}/{x}/{y}?${params.toString()}`;
+// The API colours tiles from the variable's display entry, so the URL carries
+// no colormap or rescale.
+function getCogFullUrl(baseUrl: string, step: number) {
+  return `${baseUrl}/${timestepKey(step)}/{z}/{x}/{y}`;
 }
 
+// Tiles are only requested inside the dataset's bbox, [west, south, east, north].
 function getCogBounds(): number[] | undefined {
-  const extents = metadata.value?.region?.extents;
-  const nw = extents?.[0];
-  const se = extents?.[1];
-  if (Array.isArray(nw) && Array.isArray(se)) {
-    const [north, west] = nw;
-    const [south, east] = se;
-    return [west, south, east, north];
-  }
-  return undefined;
+  return metadata.value?.bbox;
 }
 
 function addCogSlot(slot: typeof COG_A, step: number, opacity: number) {
@@ -346,7 +422,11 @@ function addCogSlot(slot: typeof COG_A, step: number, opacity: number) {
       id: slot.layerId,
       type: "raster",
       source: slot.sourceId,
-      paint: { "raster-opacity": opacity },
+      paint: {
+        "raster-opacity": opacity,
+        "raster-opacity-transition": { duration: 0 },
+        "raster-fade-duration": 0,
+      },
     },
     FILL_LAYER_ID,
   );
@@ -359,15 +439,51 @@ function removeCogSlot(slot: typeof COG_A) {
 }
 
 function cancelPendingSwap() {
-  if (stepDisplayTimeout) {
-    clearTimeout(stepDisplayTimeout);
-    stepDisplayTimeout = null;
-  }
-  if (pendingIdleSwap) {
-    map?.off("idle", pendingIdleSwap);
-    pendingIdleSwap = null;
+  if (pendingFrameCheck) {
+    map?.off("render", pendingFrameCheck);
+    pendingFrameCheck = null;
+    pendingFrameSource = null;
+    pendingFrameStep = null;
     removeCogSlot(cogBack); // discard the back buffer that was loading
   }
+}
+
+// Readiness belongs to the requested raster, not to unrelated basemap loads.
+// A second render confirms the opacity swap before the plot advances.
+function waitForFrame(slot: typeof COG_A, step: number, swap: boolean) {
+  if (!map) return;
+  pendingFrameSource = slot.sourceId;
+  pendingFrameStep = step;
+  isStepLoading.value = true;
+  const check = () => {
+    if (
+      !map ||
+      pendingFrameCheck !== check ||
+      !map.isSourceLoaded(slot.sourceId)
+    )
+      return;
+    map.off("render", check);
+    if (swap) {
+      map.setPaintProperty(slot.layerId, "raster-opacity", 0.7);
+      removeCogSlot(cogFront);
+      [cogFront, cogBack] = [cogBack, cogFront];
+    }
+    const displayed = () => {
+      if (!map || pendingFrameCheck !== displayed) return;
+      map.off("render", displayed);
+      pendingFrameCheck = null;
+      pendingFrameSource = null;
+      pendingFrameStep = null;
+      isStepLoading.value = false;
+      emit("stepReady", step);
+    };
+    pendingFrameCheck = displayed;
+    map.on("render", displayed);
+    map.triggerRepaint();
+  };
+  pendingFrameCheck = check;
+  map.on("render", check);
+  map.triggerRepaint();
 }
 
 function addCogRasterLayer(step: number) {
@@ -378,6 +494,7 @@ function addCogRasterLayer(step: number) {
   cogFront = COG_A;
   cogBack = COG_B;
   addCogSlot(cogFront, step, 0.7);
+  waitForFrame(cogFront, step, false);
 }
 
 function removeCogRasterLayer() {
@@ -397,32 +514,10 @@ function updateRasterLayer(step: number) {
 
   cancelPendingSwap();
   addCogSlot(cogBack, step, 0); // load invisibly
-  isStepLoading.value = true;
-
-  pendingIdleSwap = () => {
-    if (!map || !isMapLoaded) return;
-    if (!map.getSource(cogBack.sourceId)) return; // guard: swap was cancelled
-    map.setPaintProperty(cogBack.layerId, "raster-opacity", 0.7);
-    removeCogSlot(cogFront);
-    [cogFront, cogBack] = [cogBack, cogFront]; // swap references
-    pendingIdleSwap = null;
-    isStepLoading.value = false;
-    stepDisplayTimeout = setTimeout(() => {
-      stepDisplayTimeout = null;
-      emit("stepReady");
-    }, STEP_DISPLAY_DURATION_MS);
-  };
-  map.once("idle", pendingIdleSwap);
+  waitForFrame(cogBack, step, true);
 }
 
-function mapExtentPolygon(extents: any): any {
-  const sw = extents?.[0];
-  const ne = extents?.[1];
-  if (!Array.isArray(sw) || !Array.isArray(ne)) {
-    return { type: "FeatureCollection", features: [] };
-  }
-  const [south, west] = sw;
-  const [north, east] = ne;
+function mapExtentPolygon([west, south, east, north]: Bbox): any {
   return {
     type: "FeatureCollection",
     features: [
@@ -466,41 +561,6 @@ function normalizeGeoJson(geoJson: any): any {
   return null;
 }
 
-function normalizeGeoJsonForImport(geoJson: any): any {
-  const featureCollection = normalizeGeoJson(geoJson);
-  if (!featureCollection) return null;
-
-  return {
-    ...featureCollection,
-    features: featureCollection.features.map((feature: any) =>
-      convertCircleToPolygon(feature),
-    ),
-  };
-}
-
-function convertCircleToPolygon(feature: any): any {
-  if (!feature?.geometry || feature.geometry.type !== "Circle") return feature;
-
-  const [lon, lat] = feature.geometry.coordinates || [0, 0];
-  const radiusKm = (feature.geometry.radius || 1000) / 1000;
-
-  try {
-    const polygon = circleToPolygon([lon, lat], radiusKm, {
-      numberOfEdges: props.circleToPolygonEdges,
-    });
-    return {
-      ...feature,
-      geometry: polygon.geometry,
-      properties: {
-        ...feature.properties,
-        originalShape: "circle",
-      },
-    };
-  } catch {
-    return feature;
-  }
-}
-
 function fitToGeoJson(geoJson: any) {
   if (!map || !geoJson) return;
   try {
@@ -510,7 +570,7 @@ function fitToGeoJson(geoJson: any) {
         [minX, minY],
         [maxX, maxY],
       ],
-      { padding: 30, duration: 0 },
+      { padding: 30, duration: 0, maxZoom: MAX_FIT_ZOOM },
     );
   } catch {
     // Ignore invalid geometries during exploratory migration.
@@ -533,8 +593,21 @@ function ensureStudyAreaDisplayLayer() {
       type: "fill",
       source: STUDY_AREA_SOURCE_ID,
       paint: {
-        "fill-color": "#facc15",
-        "fill-opacity": 0.08,
+        "fill-color": MAP_COLORS.studyArea,
+        "fill-opacity": MAP_OPACITIES.studyAreaOverData,
+      },
+    });
+  }
+
+  // A wider white line under the outline, so it shows over any data layer.
+  if (!map.getLayer(STUDY_AREA_HALO_LAYER_ID)) {
+    map.addLayer({
+      id: STUDY_AREA_HALO_LAYER_ID,
+      type: "line",
+      source: STUDY_AREA_SOURCE_ID,
+      paint: {
+        "line-color": MAP_COLORS.studyAreaHalo,
+        "line-width": 5,
       },
     });
   }
@@ -545,8 +618,24 @@ function ensureStudyAreaDisplayLayer() {
       type: "line",
       source: STUDY_AREA_SOURCE_ID,
       paint: {
-        "line-color": "#111827",
-        "line-width": 2,
+        "line-color": MAP_COLORS.studyArea,
+        "line-width": 2.5,
+      },
+    });
+  }
+
+  // Fill and line layers draw nothing for a point, so it needs its own.
+  if (!map.getLayer(STUDY_AREA_POINT_LAYER_ID)) {
+    map.addLayer({
+      id: STUDY_AREA_POINT_LAYER_ID,
+      type: "circle",
+      source: STUDY_AREA_SOURCE_ID,
+      filter: ["==", ["geometry-type"], "Point"],
+      paint: {
+        "circle-radius": 6,
+        "circle-color": MAP_COLORS.studyArea,
+        "circle-stroke-color": MAP_COLORS.studyAreaHalo,
+        "circle-stroke-width": 2,
       },
     });
   }
@@ -565,7 +654,13 @@ function bringStudyAreaDisplayToFront() {
   }
 
   map.moveLayer(STUDY_AREA_FILL_LAYER_ID);
+  if (map.getLayer(STUDY_AREA_HALO_LAYER_ID)) {
+    map.moveLayer(STUDY_AREA_HALO_LAYER_ID);
+  }
   map.moveLayer(STUDY_AREA_LINE_LAYER_ID);
+  if (map.getLayer(STUDY_AREA_POINT_LAYER_ID)) {
+    map.moveLayer(STUDY_AREA_POINT_LAYER_ID);
+  }
 }
 
 function updateStudyAreaDisplay(geoJson: any) {
@@ -581,7 +676,7 @@ function updateStudyAreaDisplay(geoJson: any) {
   if (!source) return;
 
   const featureCollection =
-    normalizeGeoJsonForImport(geoJson) || emptyFeatureCollection();
+    normalizeGeoJson(geoJson) || emptyFeatureCollection();
   source.setData(featureCollection as any);
   bringStudyAreaDisplayToFront();
 
@@ -603,7 +698,7 @@ function syncDrawFromStore(geoJson: any) {
       try {
         await gm.features.deleteAll();
 
-        const featureCollection = normalizeGeoJsonForImport(geoJsonToSync);
+        const featureCollection = normalizeGeoJson(geoJsonToSync);
         if (featureCollection && featureCollection.features.length > 0) {
           await gm.features.importGeoJson(featureCollection);
           fitToGeoJson(featureCollection);
@@ -616,15 +711,29 @@ function syncDrawFromStore(geoJson: any) {
   return syncDrawQueue;
 }
 
+const EDIT_EVENT_MODES: Record<string, string> = {
+  drag: "drag",
+  change: "edit",
+  rotate: "rotate",
+  delete: "delete",
+};
+
+// Switching tools can report the new one before the old one ends, so only the
+// active tool's end clears it.
+function setActiveTool(tool: string, enabled: boolean) {
+  if (enabled) activeTool.value = tool;
+  else if (activeTool.value === tool) activeTool.value = null;
+}
+
+// geoman emits every shape as standard GeoJSON; a circle arrives as a Polygon.
 function handleGmCreate(event: any) {
   if (ignoreStoreWatch) return;
 
   const geoJson = event.feature?.getGeoJson?.();
   if (!geoJson) return;
 
-  const normalizedFeature = convertCircleToPolygon(geoJson);
-  legacyActions.saveGeoJson(normalizedFeature);
-  fitToGeoJson(normalizedFeature);
+  legacyActions.saveGeoJson(geoJson);
+  fitToGeoJson(geoJson);
 }
 
 function handleGmEditEnd(event: any) {
@@ -633,8 +742,7 @@ function handleGmEditEnd(event: any) {
   const geoJson = event.feature?.getGeoJson?.();
   if (!geoJson) return;
 
-  const normalizedFeature = convertCircleToPolygon(geoJson);
-  legacyActions.saveGeoJson(normalizedFeature);
+  legacyActions.saveGeoJson(geoJson);
 }
 
 function handleGmRemove() {
@@ -643,7 +751,7 @@ function handleGmRemove() {
 }
 
 function addMetadataExtentLayer() {
-  if (!map || !isMapLoaded || !metadata.value?.region?.extents) return;
+  if (!map || !isMapLoaded || !metadata.value?.bbox) return;
 
   const sourceId = "dataset-region";
   const lineLayerId = "dataset-region-outline";
@@ -654,21 +762,21 @@ function addMetadataExtentLayer() {
 
   map.addSource(sourceId, {
     type: "geojson",
-    data: mapExtentPolygon(metadata.value.region.extents),
+    data: mapExtentPolygon(metadata.value.bbox),
   });
 
   map.addLayer({
     id: FILL_LAYER_ID,
     type: "fill",
     source: sourceId,
-    paint: { "fill-color": "#f0f4ff", "fill-opacity": 0.05 },
+    paint: { "fill-color": MAP_COLORS.datasetExtent, "fill-opacity": 0.05 },
   });
 
   map.addLayer({
     id: lineLayerId,
     type: "line",
     source: sourceId,
-    paint: { "line-color": "#4c6ef5", "line-width": 2 },
+    paint: { "line-color": MAP_COLORS.datasetExtent, "line-width": 2 },
   });
 }
 
@@ -705,16 +813,47 @@ function exportSelectedGeometry() {
 onMounted(() => {
   if (!mapContainer.value) return;
 
+  const viewport = getInitialMapViewport(metadata.value);
   map = new maplibregl.Map({
     container: mapContainer.value,
     style: baseStyle(),
-    center: [initialMapCenter.value[1], initialMapCenter.value[0]],
-    zoom: initialMapZoom.value,
     minZoom: 2,
+    ...("bbox" in viewport
+      ? { bounds: viewport.bbox, fitBoundsOptions: { padding: 20 } }
+      : {
+          center: [viewport.center.lon, viewport.center.lat],
+          zoom: viewport.zoom,
+        }),
   });
 
-  map.addControl(new maplibregl.NavigationControl(), "top-right");
+  // No compass: the map isn't meant to be rotated, so it had nothing to reset.
+  map.addControl(
+    new maplibregl.NavigationControl({ showCompass: false }),
+    "top-right",
+  );
+  map.addControl(
+    {
+      onAdd: () => {
+        const el = document.createElement("div");
+        el.className = "maplibregl-ctrl maplibregl-ctrl-group";
+        basemapControlEl.value = el;
+        return el;
+      },
+      onRemove: () => {
+        basemapControlEl.value?.remove();
+        basemapControlEl.value = null;
+      },
+    },
+    "top-right",
+  );
   map.addControl(new maplibregl.ScaleControl(), "bottom-right");
+  map.on("error", (event: any) => {
+    if (!pendingFrameSource || event.sourceId !== pendingFrameSource) return;
+    const step = pendingFrameStep;
+    cancelPendingSwap();
+    isStepLoading.value = false;
+    if (step != null) emit("stepError", step);
+  });
 
   map.on("load", async () => {
     if (!map) return;
@@ -726,36 +865,51 @@ onMounted(() => {
     addCogRasterLayer(props.step);
 
     if (isSelectArea.value) {
-      gm = await createGeomanInstance(map as any, {});
-      await gm.addControls();
+      // createGeomanInstance adds the controls itself; adding them again only
+      // logs "controls already added".
+      gm = await createGeomanInstance(map as any, GEOMAN_OPTIONS);
       await syncDrawFromStore(datasetStore.geoJson);
 
       (map as any).on("gm:create", handleGmCreate);
       (map as any).on("gm:editend", handleGmEditEnd);
       (map as any).on("gm:remove", handleGmRemove);
+      // geoman's zoom has no maxZoom, so a point zoomed all the way in; zoom
+      // again once its fit has started, capped like every other fit.
+      (map as any).on("gm:globalzoom_to_featuresmodetoggled", (event: any) => {
+        if (event.enabled) {
+          setTimeout(() => fitToGeoJson(datasetStore.geoJson));
+        }
+      });
+      (map as any).on("gm:globaldrawmodetoggled", (event: any) =>
+        setActiveTool(event.shape, event.enabled),
+      );
+      // geoman names the change mode's event "edit".
+      for (const [tool, eventMode] of Object.entries(EDIT_EVENT_MODES)) {
+        (map as any).on(`gm:global${eventMode}modetoggled`, (event: any) =>
+          setActiveTool(tool, event.enabled),
+        );
+      }
+      map.on("mousemove", (event) => {
+        drawPointer.value = { x: event.point.x, y: event.point.y };
+      });
+      map.on("mouseout", () => {
+        drawPointer.value = null;
+      });
     } else {
       updateStudyAreaDisplay(pendingStudyAreaGeoJson ?? datasetStore.geoJson);
       pendingStudyAreaGeoJson = null;
     }
 
     if (props.displayRaster) {
-      const variable = datasetStore.variable;
-      const colormapStops = variable?.colormap_stops;
-      if (!Array.isArray(colormapStops) || colormapStops.length < 2) {
+      if (legendOptions.value == null) {
         console.error(
-          `Variable '${variable?.id}' has invalid colormap_stops (got ${JSON.stringify(colormapStops)}). Colorbar will not be shown.`,
+          `Variable '${datasetStore.variable?.id}' has no continuous display range and colours (got ${JSON.stringify(datasetStore.variable?.display)}). Colorbar will not be shown.`,
         );
         messageStore.error(
-          "Colormap data is missing or invalid for this variable. The legend cannot be displayed.",
+          "The legend for this variable is missing or invalid, so it can't be displayed.",
         );
       } else {
-        colorbar = new SkopeColorbar({
-          colors: colormapStops,
-          vmin: minVal.value,
-          vmax: maxVal.value * COLOR_MAX_PCT,
-          units: variableUnit.value ?? undefined,
-          vmaxPct: COLOR_MAX_PCT,
-        });
+        colorbar = new SkopeColorbar(legendOptions.value);
         map.addControl(colorbar, "bottom-left");
       }
     }
@@ -778,16 +932,9 @@ watch(
 );
 
 watch(
-  () => metadata.value?.region?.extents,
+  () => metadata.value?.bbox,
   () => {
     addMetadataExtentLayer();
-  },
-);
-
-watch(
-  () => currentStep.value,
-  (step: number) => {
-    selectedBaseLayerId.value = getDefaultBaseLayerId(step);
   },
 );
 
@@ -805,12 +952,8 @@ watch(
   },
 );
 
-watch([minVal, maxVal, variableUnit], () => {
-  colorbar?.update({
-    vmin: minVal.value,
-    vmax: maxVal.value * COLOR_MAX_PCT,
-    units: variableUnit.value ?? undefined,
-  });
+watch(legendOptions, (options) => {
+  if (options) colorbar?.update(options);
 });
 
 watch(legendVisible, (visible) => {
@@ -831,13 +974,9 @@ watch(cogBaseUrl, (url) => {
 onUnmounted(() => {
   isMapLoaded = false;
   pendingStudyAreaGeoJson = null;
-  if (stepDisplayTimeout) {
-    clearTimeout(stepDisplayTimeout);
-    stepDisplayTimeout = null;
-  }
-  if (pendingIdleSwap && map) {
-    map.off("idle", pendingIdleSwap);
-    pendingIdleSwap = null;
+  if (pendingFrameCheck && map) {
+    map.off("render", pendingFrameCheck);
+    pendingFrameCheck = null;
   }
   if (gm) {
     gm.destroy();
@@ -860,16 +999,44 @@ onUnmounted(() => {
   color: inherit;
 }
 
+.map-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The map fills the card below the header, so its bottom edge lines up with
+   the bottom of the plot card's step controls. */
 .map {
-  height: calc(95% - 48px);
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
   z-index: 1;
   overflow: visible;
 }
 
+.map-frame {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
 .maplibre-map {
   height: 100%;
   width: 100%;
+}
+
+.draw-cursor-hint {
+  position: absolute;
+  z-index: 5;
+  transform: translate(16px, 16px);
+  max-width: 260px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: none;
 }
 
 .map-step-loading {
@@ -883,9 +1050,22 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-.basemap-select {
-  max-width: 220px;
-  min-width: 180px;
+.draw-callout {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Right-aligned, on its own line too when the header wraps. */
+.geojson-actions {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
 }
 
 :deep(.maplibregl-ctrl-group) {

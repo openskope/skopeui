@@ -1,3 +1,5 @@
+import { THEME_COLORS } from "./utils/colors";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-15",
   devtools: { enabled: process.env.NODE_ENV !== "production" },
@@ -67,7 +69,8 @@ export default defineNuxtConfig({
     },
     public: {
       gtagId: process.env.NUXT_PUBLIC_GTAG_ID || "G-M0NVBT90BT",
-      mapEngine: process.env.NUXT_PUBLIC_MAP_ENGINE || "leaflet",
+      // Leaflet stays reachable with ?map_engine=leaflet until it's removed.
+      mapEngine: process.env.NUXT_PUBLIC_MAP_ENGINE || "maplibre",
     },
   },
 
@@ -90,15 +93,7 @@ export default defineNuxtConfig({
         defaultTheme: "light",
         themes: {
           light: {
-            colors: {
-              primary: "#001E6B",
-              accent: "#EE6C4D",
-              secondary: "#6DB1BF",
-              success: "#008148",
-              error: "#CC0000",
-              info: "#E0FBFC",
-              warning: "#FAB716",
-            },
+            colors: THEME_COLORS,
           },
         },
       },

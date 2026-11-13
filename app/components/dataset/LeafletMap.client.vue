@@ -8,18 +8,6 @@
   >
     <v-toolbar variant="flat" class="ma-0 pa-0">
       <v-row class="mx-0" align="baseline">
-        <!-- selected area -->
-        <v-tooltip location="bottom" text="Area of the selected geometry">
-          <template #activator="{ props }">
-            <h3
-              class="font-weight-light text-center pa-2 my-auto"
-              style="background-color: #e4e7ef"
-              v-bind="props"
-            >
-              {{ selectedArea }} km<sup>2</sup>
-            </h3>
-          </template>
-        </v-tooltip>
         <v-spacer />
         <v-alert
           v-if="isSelectArea"
@@ -61,6 +49,7 @@
               size="small"
               color="secondary"
               variant="flat"
+              :disabled="!datasetStore.geoJson"
               v-bind="props"
               class="mx-2 my-auto"
               @click="exportSelectedGeometry"
@@ -80,8 +69,8 @@
           ref="layerMap"
           class="leaflet-map"
           :min-zoom="2"
-          :zoom="initialMapZoom"
-          :center="initialMapCenter"
+          :zoom="initialCenter.zoom"
+          :center="initialCenter.center"
           @ready="mapReady"
         >
           <l-tile-layer
@@ -94,9 +83,8 @@
             layer-type="base"
           />
           <l-rectangle
-            v-if="metadata?.region"
-            :bounds="metadata.region.extents"
-            :style="metadata.region.style"
+            v-if="datasetBounds"
+            :bounds="datasetBounds"
             :fill-opacity="defaultDatasetOpacity"
           />
           <l-control-layers
@@ -114,10 +102,15 @@
 <script setup lang="ts">
 import { computed, watch, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
-import { LEAFLET_PROVIDERS } from "@/store/modules/constants";
+import { DEFAULT_BASEMAP, LEAFLET_PROVIDERS } from "@/store/modules/constants";
 import circleToPolygon from "circle-to-polygon";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
-import { getInitialMapViewport } from "@/composables/useMapInitialViewport";
+import { MAP_COLORS } from "@/utils/colors";
+import {
+  getInitialMapViewport,
+  leafletBounds,
+  leafletStartView,
+} from "@/composables/useMapInitialViewport";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
 
@@ -152,31 +145,34 @@ let stopGeoJsonWatch: (() => void) | null = null;
 // Computeds
 const stepNames = computed(() => appStore.stepNames);
 const metadata = computed(() => datasetStore.metadata);
-const selectedArea = computed(() => datasetStore.selectedAreaInSquareKm);
 const currentStep = computed(() =>
   stepNames.value.findIndex((x: unknown) => x === route.name),
 );
 const showMapControls = computed(() => currentStep.value >= 1);
 const initialMapViewport = computed(() =>
-  getInitialMapViewport(metadata.value as any),
+  getInitialMapViewport(metadata.value),
 );
-const initialMapZoom = computed(() => initialMapViewport.value.zoom);
-const initialMapCenter = computed(() => initialMapViewport.value.center);
+const initialCenter = computed(() =>
+  leafletStartView(initialMapViewport.value),
+);
+const datasetBounds = computed(() =>
+  metadata.value?.bbox ? leafletBounds(metadata.value.bbox) : null,
+);
 const leafletProviders = LEAFLET_PROVIDERS;
 const isSelectArea = computed(() => currentStep.value === 1);
 const isVisualize = computed(() => currentStep.value === 2);
 const areaStyle = computed(() => ({
   fill: !isVisualize.value,
-  fillColor: "yellow",
+  fillColor: MAP_COLORS.studyArea,
   fillOpacity: 0.1,
   stroke: true,
   weight: 3,
   opacity: 1,
-  color: isVisualize.value ? "black" : "yellow",
+  color: MAP_COLORS.studyArea,
 }));
 
 function isVisible(provider: any) {
-  return currentStep.value === provider.visible;
+  return provider.name === DEFAULT_BASEMAP;
 }
 
 function addDrawToolbar(map: any) {
@@ -187,10 +183,10 @@ function addDrawToolbar(map: any) {
     draw: {
       polyline: false,
       circlemarker: false,
-      rectangle: { shapeOptions: { color: "yellow" }, metric: ["km"] },
-      circle: { shapeOptions: { color: "yellow" }, metric: ["km"] },
+      rectangle: { shapeOptions: { color: MAP_COLORS.studyArea }, metric: ["km"] },
+      circle: { shapeOptions: { color: MAP_COLORS.studyArea }, metric: ["km"] },
       polygon: {
-        shapeOptions: { color: "yellow" },
+        shapeOptions: { color: MAP_COLORS.studyArea },
         metric: ["km"],
         showArea: true,
         showLength: true,
@@ -280,6 +276,8 @@ function registerToolbarHandlers(map: any) {
 
 function mapReady(map: any) {
   leafletMap = map;
+  const viewport = initialMapViewport.value;
+  if ("bbox" in viewport) map.fitBounds(leafletBounds(viewport.bbox));
   // Leaflet can calculate a stale size when mounted in flex/grid layouts; force recalc.
   requestAnimationFrame(() => map.invalidateSize(true));
   addDrawToolbar(map);

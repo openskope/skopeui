@@ -42,9 +42,9 @@ vi.mock("@/components/dataset/SubHeader.vue", () => ({
 vi.mock("@/components/dataset/Map.client.vue", () => ({
   default: {
     name: "MapStub",
-    props: ["displayRaster"],
+    props: ["displayRaster", "step"],
     template:
-      '<div data-test="map" :data-display-raster="String(displayRaster)">map</div>',
+      '<div data-test="map" :data-display-raster="String(displayRaster)" :data-step="step">map</div>',
   },
 }));
 
@@ -94,30 +94,25 @@ describe("route /dataset/:id", () => {
     resetNuxtTestGlobals();
   });
 
-  it("[smoke] renders map once metadata is available", async () => {
-    const wrapper = await mountWithSuspense(DatasetIdPage, {
-      global: { stubs: layoutStubs },
-    });
+  it.each([103, 1000])(
+    "[smoke] shows the selection map at the dataset's first timestep (%i)",
+    async (firstYear) => {
+      datasetStore.minYear = firstYear;
+      datasetStore.setTemporalRange([1500, 1800]);
+      const wrapper = await mountWithSuspense(DatasetIdPage, {
+        global: { stubs: layoutStubs },
+      });
 
-    await flushPromises();
-    const page = wrapper.findComponent(DatasetIdPage);
+      await flushPromises();
+      const map = wrapper
+        .findComponent(DatasetIdPage)
+        .find('[data-test="map"]');
 
-    expect(page.findComponent({ name: "MapStub" }).exists()).toBe(true);
-    expect(legacyActions.initializeDataset).toHaveBeenCalledWith("paleocar");
-  });
-
-  it("[behavior] configures selection map in non-raster mode", async () => {
-    const wrapper = await mountWithSuspense(DatasetIdPage, {
-      global: { stubs: layoutStubs },
-    });
-
-    await flushPromises();
-    const page = wrapper.findComponent(DatasetIdPage);
-    const map = page.find('[data-test="map"]');
-
-    expect(map.exists()).toBe(true);
-    expect(map.attributes("data-display-raster")).toBe("false");
-  });
+      expect(legacyActions.initializeDataset).toHaveBeenCalledWith("paleocar");
+      expect(map.attributes("data-display-raster")).toBe("true");
+      expect(map.attributes("data-step")).toBe(String(firstYear));
+    },
+  );
 
   it("[behavior] enables Visualize button only when study area is valid", async () => {
     const wrapper = await mountWithSuspense(DatasetIdPage, {

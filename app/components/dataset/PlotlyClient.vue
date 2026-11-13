@@ -68,13 +68,8 @@ async function toImage(options?: Record<string, unknown>) {
   return Plotly.toImage(container.value, options || {});
 }
 
-function update(data: unknown[], layout?: Record<string, unknown>) {
-  renderPlot(data, layout, props.options);
-}
-
 defineExpose({
   toImage,
-  update,
 });
 
 onMounted(async () => {
@@ -131,9 +126,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* Its parent sets the height. */
 .plotly-client {
   width: 100%;
-  height: 100%;
-  min-height: 320px;
 }
 </style>

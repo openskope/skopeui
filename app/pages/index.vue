@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col class="ma-0">
-        <h1>
+        <h1 class="text-h5 d-flex align-center ga-2">
           Select a Dataset
           <v-tooltip
             location="bottom"
@@ -11,12 +11,13 @@
             <template #activator="{ props }">
               <v-btn
                 icon
-                class="mt-n1 ml-n1"
+                size="small"
+                variant="text"
                 href="https://www.openskope.org/skope-users-guide/"
                 target="_blank"
                 v-bind="props"
               >
-                <v-icon>mdi-help-circle-outline</v-icon>
+                <v-icon size="20">mdi-help-circle-outline</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
@@ -36,7 +37,11 @@
             <ListItem v-bind="dataset" />
           </v-card>
         </template>
-        <v-alert v-if="datasets.length === 0" type="warning">
+        <LoadingSpinner v-if="loading" />
+        <v-alert v-else-if="loadFailed" type="error">
+          Unable to load the datasets. Please try again shortly.
+        </v-alert>
+        <v-alert v-else-if="datasets.length === 0" type="warning">
           No datasets found, please refine your filter criteria.
         </v-alert>
       </v-col>
@@ -45,11 +50,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import ListItem from "@/components/dataset/ListItem.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import Search from "@/components/dataset/Search.vue";
 import { useDatasetStore } from "@/stores/dataset";
-import { useMessagesStore } from "@/stores/messages";
 import { useMetadataStore } from "@/stores/metadata";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 
@@ -58,30 +63,30 @@ definePageMeta({ layout: "default" });
 const legacyActions = useLegacyStoreActions();
 const datasetStore = useDatasetStore();
 const metadataStore = useMetadataStore();
-const messagesStore = useMessagesStore();
 
 const datasets = computed(() => metadataStore.filteredDatasets);
+const loadFailed = ref(false);
+// No "no datasets found" before the list has had a chance to arrive.
+const loading = ref(true);
 
 datasetStore.clearTimeSeries();
 datasetStore.setMetadata(null);
 
-const { error: metadataLoadError } = await useAsyncData(
+await useAsyncData(
   "landingPageMetadata",
   async () => {
     try {
       await legacyActions.loadAllDatasetMetadata();
+      loadFailed.value = false;
       return true;
     } catch (error) {
       console.error("Failed to load dataset metadata", error);
+      loadFailed.value = true;
       return false;
+    } finally {
+      loading.value = false;
     }
   },
   { server: false },
 );
-
-if (metadataLoadError.value != null) {
-  messagesStore.error(
-    "Unable to load dataset metadata. Please try again shortly.",
-  );
-}
 </script>

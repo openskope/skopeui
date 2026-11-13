@@ -13,7 +13,8 @@ export const timeSeriesResponseFixture = {
   summary_stats: [{ name: "Original", mean: 1, median: 1, stdev: 0 }],
   series: [
     {
-      time_range: { gte: "0001-01-01", lte: "0003-01-01" },
+      time_range: { gte: "0001", lte: "0003" },
+      timesteps: ["0001", "0002", "0003"],
       values: [10, 20, 30],
       options: { name: "Original" },
     },
@@ -41,7 +42,6 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
       selected_area: { type: "FeatureCollection", features: [] },
       time_range: { gte: "0001-01-01", lte: "0003-01-01" },
     },
-    summaryStatistics: { name: "Original", mean: 1, median: 1, stdev: 0 },
     setJobId: vi.fn((varId: string, jobId: string) => {
       (store as any).jobIds[varId] = jobId;
     }),
@@ -62,6 +62,7 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
     setTimeSeriesLoaded: vi.fn(),
     setTimeSeriesNoArea: vi.fn(),
     setTimeSeries: vi.fn(),
+    setAreaSummary: vi.fn(),
     clearTimeSeriesData: vi.fn(),
     setTimeSeriesBadRequest: vi.fn(),
     setTimeSeriesServerError: vi.fn(),
@@ -93,7 +94,6 @@ export function createAnalysisStore(overrides: Record<string, unknown> = {}) {
   const store = reactive({
     requestData: null as unknown,
     response: null as unknown,
-    responseError: null as unknown,
     summaryStatistics: [] as unknown[],
     timeseries: [] as unknown[],
     setGeoJson: vi.fn(),
@@ -113,9 +113,7 @@ export function createAnalysisStore(overrides: Record<string, unknown> = {}) {
           y: series.values,
         })) ?? [];
     }),
-    setResponseError: vi.fn((value: unknown) => {
-      (store as any).responseError = value;
-    }),
+    clear: vi.fn(),
   });
 
   Object.assign(store, overrides);

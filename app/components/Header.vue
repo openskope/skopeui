@@ -1,9 +1,11 @@
 <template>
-  <v-app-bar src="/header.png">
+  <!-- Tall enough for the title and subtitle; at 64px the title was cut. -->
+  <v-app-bar src="/header.png" height="80">
     <template #img="{ props }">
       <v-img v-bind="props" cover />
     </template>
-    <v-app-bar-nav-icon @click.stop="toggleNavigationDrawer()">
+    <!-- Wider screens show the steps in the step bar instead. -->
+    <v-app-bar-nav-icon v-if="!mdAndUp" @click.stop="toggleNavigationDrawer()">
       <v-icon color="primary" x-large>mdi-menu</v-icon>
     </v-app-bar-nav-icon>
     <v-app-bar-title>
@@ -18,28 +20,20 @@
         Synthesizing Knowledge of Past Environments
       </div>
     </v-app-bar-title>
-    <template v-if="display.mdAndUp">
+    <template v-if="mdAndUp">
       <v-spacer />
       <LoadAnalysis />
     </template>
   </v-app-bar>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
 import { useDisplay } from "vuetify";
-import { useRoute } from "vue-router";
 import LoadAnalysis from "@/components/dataset/LoadAnalysis.vue";
 import { useAppStore } from "@/stores/app";
 
-const route = useRoute();
 const appStore = useAppStore();
-const display = useDisplay();
-
-const stepNames = computed(() => appStore.stepNames);
-const steps = computed(() => appStore.steps);
-const currentStepIndex = computed(() =>
-  stepNames.value.findIndex((x) => x === (route.name as string)),
-);
+// Destructured: a ref read through the object stays truthy in the template.
+const { mdAndUp } = useDisplay();
 
 function toggleNavigationDrawer() {
   appStore.toggleNavigationDrawer();
@@ -48,16 +42,18 @@ function toggleNavigationDrawer() {
 <style lang="scss" scoped>
 .skope-title {
   text-decoration: none;
-  color: $skope-title-color;
+  color: rgb(var(--v-theme-brand));
   font-family: $skope-title-font;
   font-weight: bold;
   font-size: 2.3em;
+  line-height: 1.1;
 }
 
 .skope-subtitle {
-  color: $skope-dark-blue;
+  color: rgb(var(--v-theme-primary));
   font-family: $skope-title-font;
   font-weight: bolder;
   font-size: 1.2rem;
+  line-height: 1.2;
 }
 </style>

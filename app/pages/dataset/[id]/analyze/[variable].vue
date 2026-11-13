@@ -2,19 +2,15 @@
   <v-container fluid class="fill-height align-start">
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
-      <v-row no-gutters>
-        <v-col>
-          <SubHeader :select-variable="true">
-            <v-btn color="accent" variant="flat" @click="exportData">
-              Download
-              <v-icon class="ml-2" size="small">mdi-download</v-icon>
-            </v-btn>
-          </SubHeader>
-        </v-col>
-      </v-row>
+      <SubHeader :select-variable="true">
+        <v-btn color="accent" variant="flat" @click="exportData">
+          Download
+          <v-icon class="ml-2" size="small">mdi-download</v-icon>
+        </v-btn>
+      </SubHeader>
       <v-row>
         <!-- time series -->
-        <v-col class="timeseries-flex" cols="12" lg="8">
+        <v-col class="d-flex timeseries-flex" cols="12" lg="8">
           <TimeSeriesPlot
             ref="plot"
             :show-area="true"
@@ -34,6 +30,7 @@
           >
             <span class="subtitle">Statistics for the Temporal Interval</span>
             <v-data-table
+              class="stats-table"
               density="compact"
               :items-per-page="-1"
               :headers="statisticsHeaders"
@@ -54,7 +51,7 @@
             <!-- /////////// TRANSFORMATION OPTIONS /////////// -->
             <v-select
               v-model="transformOption"
-              :items="transformOptions"
+              :items="transformItems"
               color="secondary"
               item-color="secondary"
               item-title="label"
@@ -100,6 +97,7 @@
                 class="mt-2"
                 suffix="time steps"
                 type="number"
+                :rules="[validateZScoreWidth]"
               />
             </template>
             <v-select
@@ -146,7 +144,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
+import { useMounted, whenever } from "@vueuse/core";
 import { useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
@@ -167,7 +166,7 @@ import _ from "lodash";
 import JSZip from "jszip";
 import Papa from "papaparse";
 
-definePageMeta({ layout: "default" });
+definePageMeta({ layout: "default", middleware: ["requires-study-area"] });
 
 const route = useRoute();
 const { mdAndDown } = useDisplay();
@@ -194,11 +193,12 @@ const zonalStatisticOptions = [
   { label: "Mean of its pixels", id: "mean" },
   { label: "Median of its pixels", id: "median" },
 ];
+// Fixed column widths, so the table keeps its size whatever the values.
 const statisticsHeaders = [
-  { title: "Series", align: "start", key: "name" },
-  { title: "Mean", key: "mean" },
-  { title: "Median", key: "median" },
-  { title: "Standard Deviation", key: "stdev" },
+  { title: "Series", align: "start", key: "name", width: "31%" },
+  { title: "Mean", align: "end", key: "mean", width: "23%" },
+  { title: "Median", align: "end", key: "median", width: "23%" },
+  { title: "Std. dev.", align: "end", key: "stdev", width: "23%" },
 ];
 const transformOptions = TRANSFORM_OPTIONS;
 const smoothingOptions = SMOOTHING_OPTIONS;
@@ -207,6 +207,9 @@ const smoothingOptions = SMOOTHING_OPTIONS;
 // compatible with the analyzeVue interface expected by SMOOTHING_OPTIONS /
 // TRANSFORM_OPTIONS toRequestData / fromRequestData functions.
 const analyzeVue: any = {
+  get temporalRange() {
+    return temporalRange.value;
+  },
   get smoothingOption() {
     return smoothingOption.value;
   },
@@ -231,13 +234,6 @@ const analyzeVue: any = {
   set timeRange(v) {
     timeRange.value = v;
   },
-  // snake_case alias used in some fromRequestData implementations
-  get time_range() {
-    return timeRange.value;
-  },
-  set time_range(v) {
-    timeRange.value = v;
-  },
   get zScoreMovingIntervalTimeSteps() {
     return zScoreMovingIntervalTimeSteps.value;
   },
@@ -249,6 +245,22 @@ const analyzeVue: any = {
 const metadata = computed(() => datasetStore.metadata);
 const isLoadingMetadata = computed(() => metadata.value == null);
 const temporalRange = computed(() => datasetStore.temporalRange);
+// The "selected interval" z-score uses the range on screen as its reference,
+// so its label names that range.
+const transformItems = computed(() =>
+  transformOptions.map((option: any) => {
+    if (option.id !== "zscoreSelected") return option;
+    const [start, end] = temporalRange.value;
+    const isFullRecord =
+      start === datasetStore.minYear && end === datasetStore.maxYear;
+    return {
+      ...option,
+      label: isFullRecord
+        ? `Z-Score wrt full record (${start}–${end})`
+        : `Z-Score wrt selected interval (${start}–${end})`,
+    };
+  }),
+);
 const minYear = computed(() => datasetStore.minYear);
 const maxYear = computed(() => datasetStore.maxYear);
 const studyAreaGeoJson = computed(() => datasetStore.geoJson);
@@ -273,12 +285,8 @@ const isStudyAreaPolygon = computed(() => {
       return false;
   }
 });
-const summaryStatistics = computed(() => {
-  if (analysisStore.summaryStatistics.length === 0) {
-    return [datasetStore.summaryStatistics];
-  }
-  return analysisStore.summaryStatistics;
-});
+// The API's statistics only: until /analyze answers, the table is empty.
+const summaryStatistics = computed(() => analysisStore.summaryStatistics);
 const traces = computed(() => {
   const timeseries = analysisStore.timeseries;
   const transformed = timeseries.map((ts: any) => ({ ...ts, type: "scatter" }));
@@ -319,7 +327,7 @@ function transformHint(transform: string) {
     case "zscoreMoving":
       return "Displays Z-score transformed values relative to a moving window of a size (N time steps) selected by the user";
     case "zscoreSelected":
-      return "Displays Z-score transformed values using the selected interval";
+      return "Displays Z-score transformed values relative to the time range shown in the plot";
     default:
       return "Modeled values are graphed without any transformation";
   }
@@ -337,6 +345,11 @@ function smoothingHint(smooth: string) {
 }
 
 async function retrieveAnalysis(data: any) {
+  // Like visualize: say there's no area instead of leaving a blank plot.
+  if (!data.selected_area) {
+    datasetStore.setTimeSeriesNoArea();
+    return;
+  }
   if (Object.values(data).some((v) => v == undefined)) return;
   datasetStore.setGeoJson(data.selected_area);
   datasetStore.setTemporalRange([
@@ -353,6 +366,7 @@ async function retrieveAnalysis(data: any) {
     );
     datasetStore.setJobId(varId, newJobId);
     analysisStore.setResponse(response);
+    datasetStore.setAreaSummary(response.n_cells, response.area);
     datasetStore.setTimeSeriesLoaded();
   } catch (e: any) {
     if (e.response) {
@@ -363,13 +377,21 @@ async function retrieveAnalysis(data: any) {
       if (status === 504) {
         datasetStore.setTimeSeriesTimeout();
         messageStore.error(
-          "Request timed out. Try a smaller area or shorter date range.",
+          "This area took too long to process. Try a smaller one on the Select Area step.",
         );
       } else if (status >= 500) {
         datasetStore.setTimeSeriesServerError(detail);
         messageStore.error(
           detail.map((d: any) => d.msg).join(" ") ||
             "Server error. Please try again.",
+        );
+      } else if (status === 422) {
+        // The API can't compute these options and says why: the user can
+        // choose others.
+        datasetStore.setTimeSeriesBadRequest(detail);
+        messageStore.warning(
+          detail.map((d: any) => d.msg).join(" ") ||
+            "These options can't be computed. Please choose others.",
         );
       } else if (status >= 400) {
         datasetStore.setTimeSeriesBadRequest(detail);
@@ -399,10 +421,10 @@ function initializeRequestData() {
   return incoming;
 }
 
-function loadTransformOption(transform: any) {
+function loadTransformOption(transform: any, timeRange: any) {
   if (!transform) return;
-  const option = transformOptions.find(
-    (x: any) => x.type === transform.type,
+  const option = transformOptions.find((x: any) =>
+    x.matches(transform, timeRange),
   ) as any;
   if (option) option.fromRequestData(analyzeVue, transform);
 }
@@ -423,7 +445,7 @@ async function initializeFormData(requestData: any) {
   if (!requestData) return;
   zonalStatistic.value = requestData.zonal_statistic ?? zonalStatistic.value;
   loadSmoothingOption(requestData.requested_series_options ?? []);
-  loadTransformOption(requestData.transform);
+  loadTransformOption(requestData.transform, requestData.time_range);
 }
 
 function clearTransformedTimeSeries() {
@@ -489,10 +511,13 @@ async function updateTimeSeries() {
   analysisStore.setRequestData(requestData);
 }
 
+// A z-score needs at least two values to have a spread to divide by.
 function validateMinYear(year: number) {
   if (year < minYear.value) return `Please enter a min year > ${minYear.value}`;
   if (year > maxYear.value)
     return `Please enter a min year <= ${maxYear.value}`;
+  if (Number(year) >= Number(timeRange.value.ub.year))
+    return "Please enter a min year before the max year";
   return true;
 }
 
@@ -500,12 +525,39 @@ function validateMaxYear(year: number) {
   if (year < minYear.value) return `Please enter a max year > ${minYear.value}`;
   if (year > maxYear.value)
     return `Please enter a max year <= ${maxYear.value}`;
+  if (Number(year) <= Number(timeRange.value.lb.year))
+    return "Please enter a max year after the min year";
   return true;
 }
 
+// The dataset's number of time steps bounds every moving window.
+const timestepCount = computed(
+  () => (datasetStore.metadata as any)?.time?.count ?? Infinity,
+);
+
+function validateZScoreWidth(width: number) {
+  // Only the last time step has count - 1 steps before it.
+  const steps = Number(width);
+  const max = timestepCount.value - 1;
+  if (!Number.isInteger(steps) || steps < 2 || steps > max)
+    return `Please enter a whole number from 2 to ${max}`;
+  return true;
+}
+
+// Each year's rule compares it with the other year: check both when either
+// changes, so fixing one clears the other's message.
+const analysisRequestForm = ref<any>(null);
+watch(
+  () => [timeRange.value.lb.year, timeRange.value.ub.year],
+  () => analysisRequestForm.value?.validate(),
+);
+
 function validateSmoothingWidth(windowSize: number) {
+  const steps = Number(windowSize);
+  if (!Number.isInteger(steps) || steps < 1 || steps > timestepCount.value)
+    return `Please enter a whole number from 1 to ${timestepCount.value}`;
   if (smoothingOption.value === "trailingAverage") return true;
-  if (windowSize % 2 === 0) return "Please enter an odd window size";
+  if (steps % 2 === 0) return "Please enter an odd window size";
   return true;
 }
 
@@ -518,7 +570,7 @@ watch(
     if (hasTransformOption.value) {
       yAxisLabel.value =
         (
-          transformOptions.find(
+          transformItems.value.find(
             (x: any) => x.id === transformOption.value,
           ) as any
         )?.label ?? null;
@@ -542,21 +594,46 @@ await useAsyncData(
   { server: false },
 );
 
-onMounted(async () => {
-  legacyActions.initializeDatasetGeoJson();
-  analysisStore.setGeoJson(datasetStore.geoJson as any);
-  const requestData = initializeRequestData();
-  await initializeFormData(requestData);
-});
+// The first request needs the dataset's metadata, and the study area that's
+// saved under the dataset's ID. On a fresh page load the metadata arrives
+// after mounting, so start once both have happened.
+const isMounted = useMounted();
+whenever(
+  () => isMounted.value && datasetStore.metadata != null,
+  async () => {
+    legacyActions.initializeDatasetGeoJson();
+    analysisStore.setGeoJson(datasetStore.geoJson as any);
+    const requestData = initializeRequestData();
+    await initializeFormData(requestData);
+  },
+  { once: true },
+);
 </script>
 
 <style scoped>
+/* The viewport less the app bar, step bar and page title, so the panels fit
+   a laptop screen. A minimum, so the column can grow to fit the plot. */
 .timeseries-flex {
-  height: calc(85vh - 96px);
+  min-height: calc(100vh - 250px);
 }
 
 .subtitle {
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
   font-size: 1.5rem;
+}
+
+/* Columns sized by the headers, not by the values, and digits of equal
+   width: the table no longer grows or scrolls as the options change. */
+.stats-table :deep(table) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.stats-table :deep(td),
+.stats-table :deep(th) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 </style>

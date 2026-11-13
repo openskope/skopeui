@@ -1,6 +1,6 @@
 <template>
-  <v-row align="start" justify="space-between">
-    <v-col md="6" sm="9" cols="12">
+  <v-row align="center" justify="space-between" class="sub-header">
+    <v-col md="6" sm="9" cols="12" class="d-flex align-center ga-1">
       <span class="text-h6">
         {{ metadata?.title }}
       </span>
@@ -29,14 +29,15 @@
         item-color="secondary"
         color="secondary"
         density="compact"
+        hide-details
         :items="variables"
-        item-title="name"
+        item-title="title"
         item-value="id"
         variant="outlined"
       />
     </v-col>
-    <v-col cols="3" class="ml-auto" align="end">
-      <!-- slot for next nav button -->
+    <v-col cols="auto" class="ml-auto" align="end">
+      <!-- slot for the next nav button -->
       <slot />
     </v-col>
   </v-row>
@@ -69,3 +70,14 @@ const variable = computed({
   },
 });
 </script>
+
+<style scoped>
+/* Same height with or without the variable select (a compact field is 40px),
+   so the panels below start at the same place on every page. The top margin
+   matches the gap below so the header sits centered between the step bar and
+   the panels. */
+.sub-header {
+  min-height: 40px;
+  margin-top: 8px;
+}
+</style>

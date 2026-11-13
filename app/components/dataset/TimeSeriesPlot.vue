@@ -1,195 +1,233 @@
 <template>
-  <v-card variant="outlined" class="time-series-card">
-    <v-card-text class="time-series-card__content">
-      <div class="time-series-toolbar">
-        <div
-          v-if="showArea"
-          class="time-series-toolbar__group time-series-toolbar__group--metrics"
+  <v-card
+    variant="outlined"
+    class="time-series-card"
+    :style="{ '--plot-center-offset': `${(MARGIN_LEFT - MARGIN_RIGHT) / 2}px` }"
+  >
+    <PanelHeader>
+      <AreaReadout v-if="showArea" />
+      <v-form
+        ref="temporalRangeForm"
+        v-model="isTemporalRangeValid"
+        class="time-series-range"
+        @click="enableTemporalRangeEdit"
+        @submit.prevent="setTemporalRange"
+      >
+        <v-text-field
+          v-model.number="formTemporalRangeMin"
+          class="time-series-range-field"
+          label="From"
+          density="compact"
+          variant="outlined"
+          :hide-details="false"
+          validate-on="blur"
+          :disabled="!isTemporalRangeEditable"
+          :min="minStep"
+          :max="maxStep - 1"
+          type="number"
+          :rules="[validateMinStep]"
+          @keydown.enter.prevent="setTemporalRange"
+        />
+        <v-text-field
+          v-model.number="formTemporalRangeMax"
+          class="time-series-range-field"
+          label="To"
+          density="compact"
+          variant="outlined"
+          :hide-details="false"
+          validate-on="blur"
+          :disabled="!isTemporalRangeEditable"
+          :min="minStep + 1"
+          :max="maxStep"
+          :rules="[validateMaxStep]"
+          type="number"
+          @keydown.enter.prevent="setTemporalRange"
+        />
+        <v-btn
+          :disabled="!hasTemporalRangeChanges || !isTemporalRangeValid"
+          size="small"
+          color="secondary"
+          @click="setTemporalRange"
         >
-          <v-tooltip location="top" text="Selected area in square kilometers">
-            <template #activator="{ props }">
-              <h3
-                v-bind="props"
-                class="font-weight-light text-center pa-2 time-series-metric"
-              >
-                {{ selectedAreaInSquareKm }} km<sup>2</sup>
-              </h3>
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            location="top"
-            text="Total cell area used in this time series calculation"
-          >
-            <template #activator="{ props }">
-              <h3
-                v-bind="props"
-                class="font-weight-light text-center pa-2 time-series-metric"
-              >
-                {{ totalCellArea }} km<sup>2</sup> ({{ numberOfCells }} cells)
-              </h3>
-            </template>
-          </v-tooltip>
-        </div>
+          Apply
+        </v-btn>
+        <v-btn size="small" color="secondary" @click="resetTemporalRange">
+          Reset
+        </v-btn>
+        <span class="time-series-range-steps">{{ timeStepsLabel }}</span>
+      </v-form>
+      <v-text-field
+        v-if="showStepControls"
+        v-model="stepDraft"
+        class="time-series-current-year"
+        :style="{ '--current-year-accent': PLOT_COLORS.plotAccent }"
+        :label="temporalLabels.current"
+        density="compact"
+        variant="outlined"
+        base-color="primary"
+        color="primary"
+        :hint="isStepLoading ? 'Loading map…' : 'Shown on map'"
+        persistent-hint
+        :hide-details="false"
+        :error="isStepDraftInvalid"
+        :error-messages="
+          isStepMessageVisible
+            ? [`Use ${temporalRangeMin}–${temporalRangeMax}.`]
+            : []
+        "
+        type="text"
+        inputmode="numeric"
+        title="Displayed year: type a year and press Enter"
+        :aria-label="temporalLabels.current"
+        :aria-invalid="isStepDraftInvalid"
+        data-test="current-step"
+        @focus="focusStepDraft"
+        @input="hideStepMessage"
+        @keydown.enter.prevent="applyStepDraft"
+        @keydown.esc.prevent="resetStepDraft"
+        @blur="applyStepDraftOnBlur"
+      >
+        <template #prepend-inner>
+          <v-icon :color="PLOT_COLORS.plotAccent" size="12" aria-hidden="true">
+            mdi-circle
+          </v-icon>
+        </template>
+        <template #message="{ message }">
+          <span :data-test="isStepMessageVisible ? 'step-message' : undefined">
+            {{ message }}
+          </span>
+        </template>
+      </v-text-field>
+    </PanelHeader>
 
-        <v-form
-          v-model="isTemporalRangeValid"
-          class="time-series-toolbar__group time-series-toolbar__range"
-          @click="enableTemporalRangeEdit"
-        >
-          <v-text-field
-            v-model.number="formTemporalRangeMin"
-            class="time-series-range-field"
-            label="From"
-            :disabled="!isTemporalRangeEditable"
-            :min="minStep"
-            :max="maxStep - 1"
-            type="number"
-            :rules="[validateMinStep]"
-            @keydown.enter="setTemporalRange"
-          >
-            <template #append-outer>to</template>
-          </v-text-field>
-          <v-text-field
-            v-model.number="formTemporalRangeMax"
-            class="time-series-range-field"
-            label="To"
-            :disabled="!isTemporalRangeEditable"
-            :hint="timeStepsLabel"
-            persistent-hint
-            :min="minStep + 1"
-            :max="maxStep"
-            :rules="[validateMaxStep]"
-            type="number"
-            @keydown.enter="setTemporalRange"
-          />
-          <div class="time-series-range-buttons">
-            <v-btn
-              :disabled="!hasTemporalRangeChanges || !isTemporalRangeValid"
-              size="x-small"
-              color="secondary"
-              @click="setTemporalRange"
-            >
-              Apply
-            </v-btn>
-            <v-btn size="x-small" color="secondary" @click="resetTemporalRange">
-              Reset
-            </v-btn>
-          </div>
-        </v-form>
-
-        <div
-          v-if="showStepControls"
-          class="time-series-toolbar__group time-series-toolbar__group--actions"
-        >
-          <v-tooltip
-            location="top"
-            text="Go to the first timestep of the defined temporal range"
-          >
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="gotoFirstStep">
-                <v-icon>mdi-skip-previous</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-          <v-tooltip location="top" text="Previous timestep">
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="previousStep">
-                <v-icon>mdi-chevron-left</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            location="top"
-            :text="isAnimationPlaying ? 'Pause animation' : 'Animate layers'"
-          >
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" @click="togglePlay">
-                <v-icon color="accent">{{ playIcon }}</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-          <v-tooltip location="top" text="Next timestep">
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="nextStep">
-                <v-icon>mdi-chevron-right</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-          <v-tooltip
-            location="top"
-            text="Go to the last timestep of the defined temporal range"
-          >
-            <template #activator="{ props }">
-              <v-btn icon v-bind="props" color="accent" @click="gotoLastStep">
-                <v-icon>mdi-skip-next</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-        </div>
-
-        <div
-          v-if="showArea"
-          class="time-series-toolbar__group time-series-toolbar__group--actions"
-        >
-          <v-tooltip location="top" text="Return to Select Area">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                :to="selectAreaLocation"
-                color="accent"
-                size="small"
-              >
-                <v-icon size="small">mdi-map-marker</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-        </div>
+    <div
+      class="time-series-plot-shell"
+      :class="{ 'time-series-plot-shell--last': !showStepControls }"
+    >
+      <div
+        v-if="timeSeriesRequestStatus.status === 'loading'"
+        class="timeseries-loading-overlay"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="52"
+          width="4"
+        />
+        <p class="loading-message mt-4">{{ loadingMessage }}</p>
       </div>
+      <client-only placeholder="Loading...">
+        <template
+          v-if="
+            timeSeriesRequestStatus.status !== 'success' &&
+            timeSeriesRequestStatus.status !== 'loading'
+          "
+        >
+          <v-alert
+            v-for="(message, index) in timeSeriesRequestStatus.messages.filter(
+              (m) => m.type !== 'error',
+            )"
+            :key="index"
+            :type="message.type"
+            class="mb-2"
+          >
+            {{ message.value }}
+          </v-alert>
+        </template>
+        <Plotly
+          ref="plotlyRef"
+          class="time-series"
+          :data="timeSeriesData"
+          :layout="layoutMetadata"
+          :options="options"
+          @click="updatePlotlyStep"
+        />
+      </client-only>
+    </div>
 
-      <div class="time-series-plot-shell">
-        <div
-          v-if="timeSeriesRequestStatus.status === 'loading'"
-          class="timeseries-loading-overlay"
+    <!-- Playback stays centered on the plotting area. -->
+    <div v-if="showStepControls" class="time-series-step-controls">
+      <div class="time-series-transport">
+        <v-tooltip
+          location="top"
+          text="Go to the first timestep of the defined temporal range"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              size="small"
+              v-bind="props"
+              color="accent"
+              @click="gotoFirstStep"
+            >
+              <v-icon>mdi-skip-previous</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip location="top" text="Previous timestep">
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              size="small"
+              v-bind="props"
+              color="accent"
+              @click="previousStep"
+            >
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+        <v-btn
+          v-if="showPlaybackControl"
+          icon
+          size="small"
+          color="accent"
+          :disabled="!canPlay"
+          :aria-label="isPlaying ? 'Pause playback' : 'Play years'"
+          :title="isPlaying ? 'Pause playback' : 'Play years'"
+          :aria-pressed="!!isPlaying"
+          data-test="playback"
+          @click="emit('toggle-playback')"
         >
           <v-progress-circular
+            v-if="isStepLoading"
             indeterminate
-            color="primary"
-            size="52"
-            width="4"
+            size="18"
+            width="2"
           />
-          <p class="loading-message mt-4">{{ loadingMessage }}</p>
-        </div>
-        <client-only placeholder="Loading...">
-          <template
-            v-if="
-              timeSeriesRequestStatus.status !== 'success' &&
-              timeSeriesRequestStatus.status !== 'loading'
-            "
-          >
-            <v-alert
-              v-for="(
-                message, index
-              ) in timeSeriesRequestStatus.messages.filter(
-                (m) => m.type !== 'error',
-              )"
-              :key="index"
-              :type="message.type"
-              class="mb-2"
+          <v-icon v-else>{{ isPlaying ? "mdi-pause" : "mdi-play" }}</v-icon>
+        </v-btn>
+        <v-tooltip location="top" text="Next timestep">
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              size="small"
+              v-bind="props"
+              color="accent"
+              @click="nextStep"
             >
-              {{ message.value }}
-            </v-alert>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
           </template>
-          <Plotly
-            ref="plotlyRef"
-            class="time-series"
-            :data="timeSeriesData"
-            :layout="layoutMetadata"
-            :options="options"
-            @click="updatePlotlyStep"
-          />
-        </client-only>
+        </v-tooltip>
+        <v-tooltip
+          location="top"
+          text="Go to the last timestep of the defined temporal range"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              size="small"
+              v-bind="props"
+              color="accent"
+              @click="gotoLastStep"
+            >
+              <v-icon>mdi-skip-next</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </div>
-    </v-card-text>
+    </div>
   </v-card>
 </template>
 
@@ -200,15 +238,29 @@ import {
   watch,
   onMounted,
   onUnmounted,
+  nextTick,
   defineAsyncComponent,
 } from "vue";
-import _ from "lodash";
-import { useRoute } from "vue-router";
+import AreaReadout from "@/components/dataset/AreaReadout.vue";
+import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { useDatasetStore } from "@/stores/dataset";
+import { wrapPlotTitle } from "@/utils/plotTitle";
+import { PLOT_COLORS } from "@/utils/colors";
+import {
+  axisYears,
+  resolveTemporalLabels,
+  stepAlongAxis,
+  stepFromText,
+} from "@/utils/timeAxis";
 
 const props = defineProps<{
   stepSelected?: number | null;
   showStepControls?: boolean;
+  showPlaybackControl?: boolean;
+  isPlaying?: boolean;
+  canPlay?: boolean;
+  isStepLoading?: boolean;
+  /** Show the API's area and cell count (analyze; visualize shows it on the map). */
   showArea?: boolean;
   traces?: any[];
   yAxisLabel?: string | null;
@@ -217,6 +269,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "step-selected", step: number): void;
   (e: "selected-temporal-range", range: [number, number]): void;
+  (e: "toggle-playback"): void;
+  (e: "pause-playback"): void;
 }>();
 
 // Lazy-load PlotlyClient to avoid SSR issues
@@ -225,15 +279,13 @@ const Plotly = defineAsyncComponent(
 );
 
 const datasetStore = useDatasetStore();
-const route = useRoute();
 
 // Local state
-const animationSpeed = ref(2000);
-const isAnimationPlaying = ref(false);
 const localTemporalRangeMin = ref(1);
 const localTemporalRangeMax = ref(new Date().getFullYear());
 const isTemporalRangeEditable = ref(false);
 const isTemporalRangeValid = ref(false);
+const temporalRangeForm = ref<any>(null);
 const plotlyRef = ref<any>(null);
 
 const PROGRESSIVE_MESSAGES = [
@@ -279,14 +331,12 @@ const temporalRangeMax = computed(() => datasetStore.temporalRangeMax);
 const timeSeriesRequestStatus = computed(
   () => datasetStore.timeSeriesRequestStatus,
 );
-const selectedAreaInSquareKm = computed(
-  () => datasetStore.selectedAreaInSquareKm,
+const axis = computed(() =>
+  datasetStore.metadata ? axisYears(datasetStore.metadata.time) : [],
 );
 const minStep = computed(() => datasetStore.minYear);
 const maxStep = computed(() => datasetStore.maxYear);
 const variable = computed(() => datasetStore.variable as any);
-const totalCellArea = computed(() => datasetStore.totalCellAreaInSquareKm);
-const numberOfCells = computed(() => datasetStore.numberOfCells);
 const timeSeriesData = computed(() => props.traces);
 const hasMultipleTimeSeries = computed(
   () => props.traces != null && props.traces.length > 1,
@@ -332,53 +382,96 @@ const timeStepsLabel = computed(() => {
   return `${steps} time steps`;
 });
 
-const xAxisTitle = computed(() =>
-  props.stepSelected == null
-    ? "Timestep"
-    : `<b>Timestep ${props.stepSelected}</b>`,
-);
-
 const yAxisTitle = computed(() => {
-  const variableName = variable.value.name;
-  return !props.yAxisLabel ? variableName : `${props.yAxisLabel}`;
+  if (props.yAxisLabel) return props.yAxisLabel;
+  const { title, unit } = variable.value;
+  return unit ? `${title} (${unit})` : title;
 });
 
+// Metadata 1.0.0 has no presentation labels: use the shared defaults. A future
+// contract can provide overrides here without changing the plot or field.
+const temporalLabels = computed(() =>
+  resolveTemporalLabels(datasetStore.metadata?.time),
+);
+
 const shapes = computed(() => {
-  if (!_.isNull(props.stepSelected ?? null)) {
+  const step = props.stepSelected;
+  // A new range can arrive before its first raster. The old map year's
+  // marker must not stretch the new timeline while that frame loads.
+  if (
+    step != null &&
+    step >= temporalRangeMin.value &&
+    step <= temporalRangeMax.value
+  ) {
     return [
       {
         type: "line",
-        x0: props.stepSelected,
-        x1: props.stepSelected,
+        x0: step,
+        x1: step,
         yref: "paper",
         y0: 0,
         y1: 1,
-        line: { color: "rgb(255, 140, 0)", width: 3 },
+        line: { color: PLOT_COLORS.plotAccent, width: 3 },
       },
     ];
   }
   return [];
 });
 
+// The left margin is a fixed budget for the y tick labels and a title of up
+// to two lines, so the plot doesn't move when the variable or transform
+// changes. Tick labels wider than 5 characters (-1000) would run into the
+// title.
+const Y_TICK_LABELS_WIDTH = 58;
+const AXIS_TITLE_SIZE = 14;
+const Y_TITLE_LINE_HEIGHT = 20;
+const MARGIN_LEFT = Y_TICK_LABELS_WIDTH + 2 * Y_TITLE_LINE_HEIGHT + 4;
+const MARGIN_RIGHT = 80;
+// The longest title kept on one line. It fits the plot's minimum height
+// (.time-series), and longer titles wrap in two halves that do too.
+const Y_TITLE_MAX_LINE_LENGTH = 44;
+
+// An annotation, not the axis title: Plotly places an axis title from its tick
+// labels, so it would move with their width. A one-line title sits on the
+// line next to the axis.
+const yAxisTitleAnnotation = computed(() => ({
+  text: wrapPlotTitle(yAxisTitle.value ?? "", Y_TITLE_MAX_LINE_LENGTH),
+  font: { size: AXIS_TITLE_SIZE },
+  textangle: -90,
+  xref: "paper",
+  yref: "paper",
+  x: 0,
+  y: 0.5,
+  xanchor: "right",
+  yanchor: "middle",
+  xshift: -Y_TICK_LABELS_WIDTH,
+  showarrow: false,
+}));
+
 const layoutMetadata = computed(() => ({
   autosize: true,
-  margin: { b: 60, t: 10, pad: 2 },
+  margin: { l: MARGIN_LEFT, r: MARGIN_RIGHT, b: 60, t: 10, pad: 2 },
   showlegend: hasMultipleTimeSeries.value,
   legend: { x: 1, y: 0.5 },
   xaxis: {
-    title: xAxisTitle.value,
+    title: { text: temporalLabels.value.axis, font: { size: AXIS_TITLE_SIZE } },
+    range: [temporalRangeMin.value, temporalRangeMax.value],
+    autorange: false,
+    // Preserve user zoom during playback, but reset it for a new selection.
+    uirevision: `${datasetStore.metadata?.id}:${variable.value.id}:${temporalRangeMin.value}:${temporalRangeMax.value}`,
     linewidth: 3,
     gridwidth: 3,
     automargin: true,
   },
   yaxis: {
-    title: yAxisTitle.value,
     linewidth: 3,
     gridwidth: 3,
-    automargin: true,
   },
   font: { size: 14 },
+  // In trace order: the first series, then Smoothed.
+  colorway: [PLOT_COLORS.main, PLOT_COLORS.plotAccent],
   shapes: shapes.value,
+  annotations: [yAxisTitleAnnotation.value],
 }));
 
 const options = computed(() => ({
@@ -387,25 +480,13 @@ const options = computed(() => ({
   responsive: true,
 }));
 
-const playIcon = computed(() =>
-  isAnimationPlaying.value ? "mdi-pause-circle" : "mdi-play-circle",
-);
-
-const selectAreaLocation = computed(() => ({
-  name: "dataset-id",
-  params: { id: (route.params.id ?? "") as string },
-}));
-
 function getPlotlyApi() {
   const plotlyInstance = plotlyRef.value as any;
   if (!plotlyInstance) {
     return null;
   }
 
-  if (
-    typeof plotlyInstance.toImage === "function" ||
-    typeof plotlyInstance.update === "function"
-  ) {
+  if (typeof plotlyInstance.toImage === "function") {
     return plotlyInstance;
   }
 
@@ -422,6 +503,7 @@ function getPlotlyApi() {
 
 // Methods
 function enableTemporalRangeEdit() {
+  emit("pause-playback");
   if (isTemporalRangeEditable.value) return;
   localTemporalRangeMin.value = selectedTemporalRange.value[0];
   localTemporalRangeMax.value = selectedTemporalRange.value[1];
@@ -429,18 +511,14 @@ function enableTemporalRangeEdit() {
 }
 
 function validateMinStep(value: number) {
-  if (value < minStep.value)
-    return `Please enter a min step >= ${minStep.value}`;
-  if (value >= maxStep.value)
-    return `Please enter a min step < ${maxStep.value}`;
+  if (value < minStep.value) return `Use ${minStep.value} or later.`;
+  if (value >= maxStep.value) return `Use a year before ${maxStep.value}.`;
   return true;
 }
 
 function validateMaxStep(value: number) {
-  if (value <= minStep.value)
-    return `Please enter a max step > ${minStep.value}`;
-  if (value > maxStep.value)
-    return `Please enter a max step <= ${maxStep.value}`;
+  if (value <= minStep.value) return `Use a year after ${minStep.value}.`;
+  if (value > maxStep.value) return `Use ${maxStep.value} or earlier.`;
   return true;
 }
 
@@ -449,11 +527,17 @@ function updatePlotlyStep(data: any) {
 }
 
 function setStep(step: number) {
+  emit("pause-playback");
   emit("step-selected", step);
 }
 
-function setTemporalRange() {
-  if (!hasTemporalRangeChanges.value || !isTemporalRangeValid.value) return;
+async function setTemporalRange() {
+  // Enter can submit before blur validation runs. Always validate the draft
+  // before changing the selected range or requesting new data. Reset changes
+  // both fields at once, so let their values update before validation.
+  await nextTick();
+  const result = await temporalRangeForm.value?.validate();
+  if (!result?.valid || !hasTemporalRangeChanges.value) return;
   selectedTemporalRange.value = [
     localTemporalRangeMin.value,
     localTemporalRangeMax.value,
@@ -467,6 +551,7 @@ function setTemporalRange() {
 }
 
 function resetTemporalRange() {
+  enableTemporalRangeEdit();
   localTemporalRangeMin.value = datasetStore.minYear;
   localTemporalRangeMax.value = datasetStore.maxYear;
   setTemporalRange();
@@ -482,43 +567,90 @@ function gotoLastStep() {
   setStep(temporalRangeMax.value);
 }
 
-function nextStep() {
-  if (variable.value === null) return;
+function stepBy(delta: number) {
+  if (variable.value === null || props.stepSelected == null) return;
   setStep(
-    _.clamp(
-      parseInt(String(props.stepSelected)) + 1,
+    stepAlongAxis(axis.value, props.stepSelected, delta, [
       temporalRangeMin.value,
       temporalRangeMax.value,
-    ),
+    ]),
   );
+}
+
+function nextStep() {
+  stepBy(1);
 }
 
 function previousStep() {
-  if (variable.value === null) return;
-  setStep(
-    _.clamp(
-      (props.stepSelected ?? 0) - 1,
-      temporalRangeMin.value,
-      temporalRangeMax.value,
-    ),
-  );
+  stepBy(-1);
 }
 
-function advanceAnimation() {
-  if (!isAnimationPlaying.value) return;
-  if ((props.stepSelected ?? 0) >= temporalRangeMax.value) {
-    isAnimationPlaying.value = false;
-    return;
-  }
-  nextStep();
+// The timestep typed in the header, applied on Enter or when the field loses
+// focus. A timestep outside the range on screen is rejected, with
+// a message that says which ones are allowed.
+const STEP_MESSAGE_LINGER = 4_000;
+const stepDraft = ref("");
+const isStepDraftInvalid = ref(false);
+const isStepMessageVisible = ref(false);
+let stepMessageTimer: ReturnType<typeof setTimeout> | null = null;
+
+function focusStepDraft(event: FocusEvent) {
+  emit("pause-playback");
+  (event.target as HTMLInputElement).select();
 }
 
-function togglePlay() {
-  isAnimationPlaying.value = !isAnimationPlaying.value;
-  if (isAnimationPlaying.value) {
-    advanceAnimation(); // kick off first step; map drives the rest via advanceAnimation()
-  }
+function currentStepText() {
+  return props.stepSelected == null ? "" : String(props.stepSelected);
 }
+
+function clearStepMessageTimer() {
+  if (stepMessageTimer != null) clearTimeout(stepMessageTimer);
+  stepMessageTimer = null;
+}
+
+function hideStepMessage() {
+  clearStepMessageTimer();
+  isStepDraftInvalid.value = false;
+  isStepMessageVisible.value = false;
+}
+
+function resetStepDraft() {
+  hideStepMessage();
+  stepDraft.value = currentStepText();
+}
+
+/** Selects the timestep the draft names; false if it names none in range. */
+function commitStepDraft() {
+  const step = stepFromText(axis.value, stepDraft.value, [
+    temporalRangeMin.value,
+    temporalRangeMax.value,
+  ]);
+  if (step === null) return false;
+  hideStepMessage();
+  stepDraft.value = String(step);
+  if (step !== props.stepSelected) setStep(step);
+  return true;
+}
+
+function applyStepDraft() {
+  if (commitStepDraft()) return;
+  clearStepMessageTimer();
+  isStepDraftInvalid.value = true;
+  isStepMessageVisible.value = true;
+}
+
+// Leaving the field puts the current timestep back, so it never shows one the
+// plot isn't on; the message stays a moment to say why.
+function applyStepDraftOnBlur() {
+  if (stepDraft.value === currentStepText() || commitStepDraft()) return;
+  stepDraft.value = currentStepText();
+  isStepDraftInvalid.value = false;
+  isStepMessageVisible.value = true;
+  clearStepMessageTimer();
+  stepMessageTimer = setTimeout(hideStepMessage, STEP_MESSAGE_LINGER);
+}
+
+watch(() => props.stepSelected, resetStepDraft, { immediate: true });
 
 async function getTimeSeriesPlotImage() {
   const plotlyApi = getPlotlyApi();
@@ -535,19 +667,23 @@ async function getTimeSeriesPlotImage() {
   return { png, svg };
 }
 
+// Watch the status object, not its `status` string: every request sets a new
+// object, so a first request (loading -> loading) restarts the messages too.
 watch(
-  () => timeSeriesRequestStatus.value.status,
-  (status) => {
+  timeSeriesRequestStatus,
+  ({ status }) => {
     if (status === "loading") startProgressiveMessages();
     else clearProgressiveMessages();
   },
+  { immediate: true },
 );
 
 onUnmounted(() => {
   clearProgressiveMessages();
+  clearStepMessageTimer();
 });
 
-defineExpose({ getTimeSeriesPlotImage, advanceAnimation });
+defineExpose({ getTimeSeriesPlotImage });
 
 onMounted(() => {
   localTemporalRangeMin.value = selectedTemporalRange.value[0];
@@ -579,86 +715,125 @@ watch(
   },
   { immediate: true },
 );
-
-watch(timeSeriesData, (data) => {
-  getPlotlyApi()?.update(data, layoutMetadata.value);
-});
-
-watch(layoutMetadata, (layout) => {
-  getPlotlyApi()?.update(timeSeriesData.value, layout);
-});
 </script>
 <style>
+/* Fills its column, which grows instead when the plot's minimum height and
+   the controls don't fit, so neither overlaps the other. */
 .time-series-card {
+  --plot-min-height: 410px;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
   min-width: 0;
 }
 
-.time-series-card__content {
+.time-series-range {
+  flex: 1 1 420px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  min-height: 0;
-}
-
-.time-series-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.time-series-toolbar__group {
-  min-width: 0;
-}
-
-.time-series-toolbar__group--metrics {
-  display: flex;
-  flex: 1 1 280px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.time-series-toolbar__range {
-  display: flex;
-  flex: 1 1 340px;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px;
 }
 
-.time-series-toolbar__group--actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
+.time-series-range > .v-btn {
+  margin-top: 6px;
 }
 
-.time-series-metric {
-  background-color: #e4e7ef;
-}
-
+/* A fixed width, so the range's row is sized from its contents and doesn't
+   wrap while there's room. */
 .time-series-range-field {
-  flex: 1 1 140px;
-  min-width: 140px;
-  max-width: 180px;
+  flex: 0 0 120px;
+  width: 120px;
 }
 
-.time-series-range-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 2px;
+/* Always reserve two lines for validation, including while the field is
+   valid. Short messages fit here without moving the toolbar or plot. */
+.time-series-range-field .v-input__details,
+.time-series-current-year .v-input__details {
+  min-height: 36px;
 }
 
+.time-series-range-steps {
+  margin-top: 10px;
+  font-size: 0.875rem;
+  color: rgb(var(--v-theme-muted));
+  white-space: nowrap;
+}
+
+/* Sized from the plot's minimum, not its rendered height, so the card can
+   shrink again when the window does. */
 .time-series-plot-shell {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   flex-direction: column;
-  min-height: 0;
+  min-height: calc(var(--plot-min-height) + 16px);
+  padding: 16px 16px 0;
+}
+
+.time-series-plot-shell--last {
+  min-height: calc(var(--plot-min-height) + 32px);
+  padding-bottom: 16px;
+}
+
+/* Its bottom padding matches the map card's, so the buttons end level with
+   the map. */
+.time-series-step-controls {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 4px;
+  /* Plotly's y-axis margin moves the plotting area's center to the right.
+     Use that same center for the playback controls. */
+  padding: 8px calc(16px - var(--plot-center-offset)) 16px
+    calc(16px + var(--plot-center-offset));
+}
+
+.time-series-current-year {
+  flex: 0 0 120px;
+  width: 120px;
+  margin-left: auto;
+  align-self: flex-start;
+}
+
+/* A distinct current-frame readout, tied to the plot cursor by its marker.
+   Label and helper text explain the meaning independently of color. */
+.time-series-current-year .v-field {
+  background-color: rgb(var(--v-theme-panel));
+  background-color: color-mix(
+    in srgb,
+    var(--current-year-accent) 8%,
+    rgb(var(--v-theme-surface))
+  );
+}
+
+.time-series-current-year input {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-series-current-year .v-field-label,
+.time-series-current-year .v-field__prepend-inner > .v-icon {
+  opacity: 1;
+}
+
+.time-series-current-year .v-field__outline {
+  --v-field-border-opacity: 0.65;
+}
+
+.time-series-current-year:not(.v-input--error) .v-messages {
+  color: rgb(var(--v-theme-muted));
+  opacity: 1;
+}
+
+.time-series-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .timeseries-loading-overlay {
@@ -675,18 +850,13 @@ watch(layoutMetadata, (layout) => {
 
 .loading-message {
   font-size: 13px;
-  color: #596d7b;
+  color: rgb(var(--v-theme-muted));
 }
 
+/* Tall enough for a one-line y-axis title of Y_TITLE_MAX_LINE_LENGTH. */
 .time-series {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   width: 100%;
-  min-height: 320px;
-}
-
-@media all and (max-width: 960px) {
-  .time-series-range-field {
-    max-width: none;
-  }
+  min-height: var(--plot-min-height);
 }
 </style>

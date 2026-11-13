@@ -1,6 +1,6 @@
 import area from "@turf/area";
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { filterTimeSeries, summarize, toISODate } from "@/store/stats";
+import { filterTimeSeries, toISODate } from "@/store/stats";
 import { DEFAULT_MAX_PROCESSING_TIME } from "@/store/modules/constants";
 
 import _ from "lodash";
@@ -116,10 +116,6 @@ class Dataset extends VuexModule {
 
   get totalCellAreaInSquareKm() {
     return (this.totalCellArea / 1e6).toFixed(2);
-  }
-
-  get summaryStatistics() {
-    return { ...summarize(this.filteredTimeSeries), name: "Original" };
   }
 
   get minYear() {
