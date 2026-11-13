@@ -13,7 +13,7 @@ Ensure every Nuxt page loads, renders core UI, and completes its primary user ac
 
 ## Test Layers
 
-### 1) Route Smoke Tests (Required in PR CI)
+### 1) Route Smoke Tests
 
 Purpose: verify each page mounts and critical content appears.
 
@@ -21,7 +21,7 @@ Purpose: verify each page mounts and critical content appears.
 - Mock stores/composables (`useLegacyStoreActions`, Pinia stores) and network calls.
 - Assert no unhandled promise rejection and no Vue error logs.
 
-### 2) Page Behavior Tests (Required in nightly CI)
+### 2) Page Behavior Tests
 
 Purpose: verify each page's core CTA and state transitions.
 
@@ -63,14 +63,14 @@ Purpose: verify integrated browser behavior with real backend data.
 
 ## Execution Cadence
 
-- PR CI: run route smoke tests.
-- Nightly CI: run full page behavior suite.
+- Before merging: run `make test` from the repository root. It includes route smoke and page behavior tests.
+- Current CI builds the production image only; PR test execution and a nightly behavior job are not configured.
 - Release: run manual journey check once on staging.
 
 ## Definition of Done
 
 The app is considered page-functional when:
 
-- All 4 route smoke tests pass.
-- All 4 route behavior tests pass.
+- Smoke tests for all four routes pass.
+- Behavior tests for all four routes pass.
 - Manual release journey passes without blocking defects.
