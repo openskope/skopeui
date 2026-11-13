@@ -218,6 +218,53 @@ describe("TimeSeriesPlot typed timestep", () => {
   });
 });
 
+describe("TimeSeriesPlot timeline bounds", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    useDatasetStore().setMetadata(metadataFixture.datasets[0] as any);
+  });
+
+  it("uses the new range while old data and the previous map year are still displayed", async () => {
+    const store = useDatasetStore();
+    const wrapper = mountPlot({
+      stepSelected: 103,
+      traces: [{ x: [103, 900, 1100, 2000], y: [1, 2, 3, 4] }],
+    });
+    await flushPromises();
+    const layout = () =>
+      wrapper.findComponent({ name: "PlotlyStub" }).props("layout");
+
+    store.setTemporalRange([900, 1100]);
+    await flushPromises();
+    expect(layout().xaxis.range).toEqual([900, 1100]);
+    expect(layout().xaxis.autorange).toBe(false);
+    expect(layout().shapes).toEqual([]);
+
+    await wrapper.setProps({ stepSelected: 900 });
+    expect(layout().xaxis.range).toEqual([900, 1100]);
+    expect(layout().shapes[0]).toMatchObject({ x0: 900, x1: 900 });
+    wrapper.unmount();
+  });
+
+  it("preserves the zoom revision during playback and changes it for a new range", async () => {
+    const store = useDatasetStore();
+    store.setTemporalRange([900, 1100]);
+    const wrapper = mountPlot({ stepSelected: 900 });
+    await flushPromises();
+    const layout = () =>
+      wrapper.findComponent({ name: "PlotlyStub" }).props("layout");
+    const revision = layout().xaxis.uirevision;
+
+    await wrapper.setProps({ stepSelected: 901 });
+    expect(layout().xaxis.uirevision).toBe(revision);
+    store.setTemporalRange([1000, 1050]);
+    await flushPromises();
+    expect(layout().xaxis.range).toEqual([1000, 1050]);
+    expect(layout().xaxis.uirevision).not.toBe(revision);
+    wrapper.unmount();
+  });
+});
+
 describe("TimeSeriesPlot axis labels", () => {
   beforeEach(() => {
     setActivePinia(createPinia());

@@ -241,7 +241,6 @@ import {
   nextTick,
   defineAsyncComponent,
 } from "vue";
-import _ from "lodash";
 import AreaReadout from "@/components/dataset/AreaReadout.vue";
 import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { useDatasetStore } from "@/stores/dataset";
@@ -396,12 +395,19 @@ const temporalLabels = computed(() =>
 );
 
 const shapes = computed(() => {
-  if (!_.isNull(props.stepSelected ?? null)) {
+  const step = props.stepSelected;
+  // A new range can arrive before its first raster. The old map year's
+  // marker must not stretch the new timeline while that frame loads.
+  if (
+    step != null &&
+    step >= temporalRangeMin.value &&
+    step <= temporalRangeMax.value
+  ) {
     return [
       {
         type: "line",
-        x0: props.stepSelected,
-        x1: props.stepSelected,
+        x0: step,
+        x1: step,
         yref: "paper",
         y0: 0,
         y1: 1,
@@ -449,6 +455,10 @@ const layoutMetadata = computed(() => ({
   legend: { x: 1, y: 0.5 },
   xaxis: {
     title: { text: temporalLabels.value.axis, font: { size: AXIS_TITLE_SIZE } },
+    range: [temporalRangeMin.value, temporalRangeMax.value],
+    autorange: false,
+    // Preserve user zoom during playback, but reset it for a new selection.
+    uirevision: `${datasetStore.metadata?.id}:${variable.value.id}:${temporalRangeMin.value}:${temporalRangeMax.value}`,
     linewidth: 3,
     gridwidth: 3,
     automargin: true,
@@ -476,10 +486,7 @@ function getPlotlyApi() {
     return null;
   }
 
-  if (
-    typeof plotlyInstance.toImage === "function" ||
-    typeof plotlyInstance.update === "function"
-  ) {
+  if (typeof plotlyInstance.toImage === "function") {
     return plotlyInstance;
   }
 
@@ -708,14 +715,6 @@ watch(
   },
   { immediate: true },
 );
-
-watch(timeSeriesData, (data) => {
-  getPlotlyApi()?.update(data, layoutMetadata.value);
-});
-
-watch(layoutMetadata, (layout) => {
-  getPlotlyApi()?.update(timeSeriesData.value, layout);
-});
 </script>
 <style>
 /* Fills its column, which grows instead when the plot's minimum height and
