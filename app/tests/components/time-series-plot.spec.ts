@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import { useDatasetStore } from "@/stores/dataset";
+import metadataFixture from "@/tests/fixtures/metadata-1.0.0.json";
 
 vi.mock("vue-router", () => ({
   useRoute: () => ({ params: { id: "paleocar_v3" } }),
@@ -19,6 +20,7 @@ vi.mock("@/components/dataset/PlotlyClient.vue", () => ({
 }));
 
 const passThrough = { template: "<div><slot /></div>" };
+const validateRange = vi.fn(async () => ({ valid: true }));
 
 function mountPlot(props: Record<string, unknown> = {}) {
   return mount(TimeSeriesPlot, {
@@ -28,8 +30,22 @@ function mountPlot(props: Record<string, unknown> = {}) {
         "client-only": passThrough,
         "v-card": passThrough,
         "v-card-text": passThrough,
-        "v-form": passThrough,
-        "v-text-field": true,
+        "v-form": {
+          template: "<form><slot /></form>",
+          methods: { validate: () => validateRange() },
+        },
+        "v-text-field": {
+          inheritAttrs: false,
+          props: ["modelValue", "error", "errorMessages"],
+          emits: ["update:modelValue"],
+          template: `<div>
+            <input v-bind="$attrs" :value="modelValue" :aria-invalid="!!error"
+              @input="$emit('update:modelValue', $event.target.value)" />
+            <template v-for="message in errorMessages || []" :key="message">
+              <slot name="message" :message="message" />
+            </template>
+          </div>`,
+        },
         "v-btn": true,
         "v-icon": true,
         "v-tooltip": true,
@@ -78,6 +94,47 @@ describe("TimeSeriesPlot loading messages", () => {
     vi.advanceTimersByTime(30_000);
     await flushPromises();
     expect(wrapper.find(".loading-message").exists()).toBe(false);
+  });
+});
+
+describe("TimeSeriesPlot range submission", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    validateRange.mockReset().mockResolvedValue({ valid: true });
+    const store = useDatasetStore();
+    store.setMetadata(metadataFixture.datasets[0] as any);
+    store.setTemporalRange([1500, 1800]);
+  });
+
+  it("validates an invalid draft on Enter without applying it", async () => {
+    const store = useDatasetStore();
+    validateRange.mockResolvedValueOnce({ valid: false });
+    const wrapper = mountPlot();
+    await wrapper.find(".time-series-range").trigger("click");
+    const from = wrapper.find(".time-series-range input");
+    await from.setValue("1");
+    await from.trigger("keydown", { key: "Enter" });
+    await flushPromises();
+    expect(validateRange).toHaveBeenCalledOnce();
+    expect(store.temporalRange).toEqual([1500, 1800]);
+    expect(wrapper.emitted("selected-temporal-range")).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it("applies a valid draft on Enter without requiring blur first", async () => {
+    const store = useDatasetStore();
+    const wrapper = mountPlot();
+    await wrapper.find(".time-series-range").trigger("click");
+    const from = wrapper.find(".time-series-range input");
+    await from.setValue("1600");
+    await from.trigger("keydown", { key: "Enter" });
+    await flushPromises();
+    expect(validateRange).toHaveBeenCalledOnce();
+    expect(store.temporalRange).toEqual([1600, 1800]);
+    expect(wrapper.emitted("selected-temporal-range")).toEqual([
+      [[1600, 1800]],
+    ]);
+    wrapper.unmount();
   });
 });
 

@@ -3,9 +3,11 @@
     <PanelHeader>
       <AreaReadout v-if="showArea" />
       <v-form
+        ref="temporalRangeForm"
         v-model="isTemporalRangeValid"
         class="time-series-range"
         @click="enableTemporalRangeEdit"
+        @submit.prevent="setTemporalRange"
       >
         <v-text-field
           v-model.number="formTemporalRangeMin"
@@ -13,13 +15,14 @@
           label="From"
           density="compact"
           variant="outlined"
-          hide-details="auto"
+          :hide-details="false"
+          validate-on="blur"
           :disabled="!isTemporalRangeEditable"
           :min="minStep"
           :max="maxStep - 1"
           type="number"
           :rules="[validateMinStep]"
-          @keydown.enter="setTemporalRange"
+          @keydown.enter.prevent="setTemporalRange"
         />
         <v-text-field
           v-model.number="formTemporalRangeMax"
@@ -27,13 +30,14 @@
           label="To"
           density="compact"
           variant="outlined"
-          hide-details="auto"
+          :hide-details="false"
+          validate-on="blur"
           :disabled="!isTemporalRangeEditable"
           :min="minStep + 1"
           :max="maxStep"
           :rules="[validateMaxStep]"
           type="number"
-          @keydown.enter="setTemporalRange"
+          @keydown.enter.prevent="setTemporalRange"
         />
         <v-btn
           :disabled="!hasTemporalRangeChanges || !isTemporalRangeValid"
@@ -200,6 +204,7 @@ import {
   watch,
   onMounted,
   onUnmounted,
+  nextTick,
   defineAsyncComponent,
   useId,
 } from "vue";
@@ -237,6 +242,7 @@ const localTemporalRangeMin = ref(1);
 const localTemporalRangeMax = ref(new Date().getFullYear());
 const isTemporalRangeEditable = ref(false);
 const isTemporalRangeValid = ref(false);
+const temporalRangeForm = ref<any>(null);
 const plotlyRef = ref<any>(null);
 
 const PROGRESSIVE_MESSAGES = [
@@ -453,18 +459,14 @@ function enableTemporalRangeEdit() {
 }
 
 function validateMinStep(value: number) {
-  if (value < minStep.value)
-    return `Please enter a min step >= ${minStep.value}`;
-  if (value >= maxStep.value)
-    return `Please enter a min step < ${maxStep.value}`;
+  if (value < minStep.value) return `Use ${minStep.value} or later.`;
+  if (value >= maxStep.value) return `Use a year before ${maxStep.value}.`;
   return true;
 }
 
 function validateMaxStep(value: number) {
-  if (value <= minStep.value)
-    return `Please enter a max step > ${minStep.value}`;
-  if (value > maxStep.value)
-    return `Please enter a max step <= ${maxStep.value}`;
+  if (value <= minStep.value) return `Use a year after ${minStep.value}.`;
+  if (value > maxStep.value) return `Use ${maxStep.value} or earlier.`;
   return true;
 }
 
@@ -476,8 +478,13 @@ function setStep(step: number) {
   emit("step-selected", step);
 }
 
-function setTemporalRange() {
-  if (!hasTemporalRangeChanges.value || !isTemporalRangeValid.value) return;
+async function setTemporalRange() {
+  // Enter can submit before blur validation runs. Always validate the draft
+  // before changing the selected range or requesting new data. Reset changes
+  // both fields at once, so let their values update before validation.
+  await nextTick();
+  const result = await temporalRangeForm.value?.validate();
+  if (!result?.valid || !hasTemporalRangeChanges.value) return;
   selectedTemporalRange.value = [
     localTemporalRangeMin.value,
     localTemporalRangeMax.value,
@@ -491,6 +498,7 @@ function setTemporalRange() {
 }
 
 function resetTemporalRange() {
+  enableTemporalRangeEdit();
   localTemporalRangeMin.value = datasetStore.minYear;
   localTemporalRangeMax.value = datasetStore.maxYear;
   setTemporalRange();
@@ -673,8 +681,12 @@ watch(layoutMetadata, (layout) => {
 .time-series-range {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+}
+
+.time-series-range > .v-btn {
+  margin-top: 6px;
 }
 
 /* A fixed width, so the range's row is sized from its contents and doesn't
@@ -684,7 +696,14 @@ watch(layoutMetadata, (layout) => {
   width: 120px;
 }
 
+/* Always reserve two lines for validation, including while the field is
+   valid. Short messages fit here without moving the toolbar or plot. */
+.time-series-range-field .v-input__details {
+  min-height: 36px;
+}
+
 .time-series-range-steps {
+  margin-top: 10px;
   font-size: 0.875rem;
   color: rgb(var(--v-theme-muted));
   white-space: nowrap;
