@@ -160,7 +160,7 @@ import {
 } from "@/store/modules/constants";
 import { useAnalysisStore } from "@/stores/analysis";
 import { useDatasetStore } from "@/stores/dataset";
-import { useMessagesStore } from "@/stores/messages";
+import { useTimeSeriesRequest } from "@/composables/useTimeSeriesRequest";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 import _ from "lodash";
 import JSZip from "jszip";
@@ -172,8 +172,8 @@ const route = useRoute();
 const { mdAndDown } = useDisplay();
 const analysisStore = useAnalysisStore();
 const datasetStore = useDatasetStore();
-const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
+const { run: requestTimeSeries } = useTimeSeriesRequest("analyze");
 const { $download } = useNuxtApp() as any;
 
 const plot = ref<any>(null);
@@ -356,57 +356,7 @@ async function retrieveAnalysis(data: any) {
     extractYear(data.time_range.gte),
     extractYear(data.time_range.lte),
   ]);
-  datasetStore.setTimeSeriesLoading();
-  try {
-    const varId = route.params.variable as string;
-    const jobId = datasetStore.jobIds?.[varId];
-    const { newJobId, response } = await legacyActions.resolveTimeSeries(
-      jobId,
-      data,
-    );
-    datasetStore.setJobId(varId, newJobId);
-    analysisStore.setResponse(response);
-    datasetStore.setAreaSummary(response.n_cells, response.area);
-    datasetStore.setTimeSeriesLoaded();
-  } catch (e: any) {
-    if (e.response) {
-      const { status, data: responseData } = e.response;
-      const detail = Array.isArray(responseData.detail)
-        ? responseData.detail
-        : [{ msg: responseData.detail }];
-      if (status === 504) {
-        datasetStore.setTimeSeriesTimeout();
-        messageStore.error(
-          "This area took too long to process. Try a smaller one on the Select Area step.",
-        );
-      } else if (status >= 500) {
-        datasetStore.setTimeSeriesServerError(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") ||
-            "Server error. Please try again.",
-        );
-      } else if (status === 422) {
-        // The API can't compute these options and says why: the user can
-        // choose others.
-        datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.warning(
-          detail.map((d: any) => d.msg).join(" ") ||
-            "These options can't be computed. Please choose others.",
-        );
-      } else if (status >= 400) {
-        datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") || "Bad request.",
-        );
-      }
-    } else {
-      const msg =
-        e.message ||
-        "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
-      datasetStore.setTimeSeriesServerError([{ msg }]);
-      messageStore.error(msg);
-    }
-  }
+  await requestTimeSeries(data);
 }
 
 function initializeRequestData() {

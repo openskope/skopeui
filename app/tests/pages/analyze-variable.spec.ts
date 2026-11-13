@@ -18,6 +18,7 @@ const routeParams = { id: "paleocar", variable: "tasmax" };
 let analysisStore: any;
 let datasetStore: any;
 let legacyActions: any;
+let extractionStore: any;
 let messagesStore: any;
 
 vi.mock("vue-router", () => ({
@@ -67,6 +68,10 @@ vi.mock("@/stores/dataset", () => ({
 
 vi.mock("@/stores/messages", () => ({
   useMessagesStore: () => messagesStore,
+}));
+
+vi.mock("@/stores/extraction", () => ({
+  useExtractionStore: () => extractionStore,
 }));
 
 vi.mock("@/composables/useLegacyStoreActions", () => ({
@@ -121,12 +126,10 @@ describe("route /dataset/:id/analyze/:variable", () => {
     legacyActions = {
       initializeDataset: vi.fn(async () => true),
       initializeDatasetGeoJson: vi.fn(),
-      resolveTimeSeries: vi.fn(
-        async (_jobId: string | undefined, _data: any) => ({
-          newJobId: "test-job-id",
-          response: timeSeriesResponseFixture,
-        }),
-      ),
+    };
+    extractionStore = {
+      beginRequest: () => () => true,
+      resolveTimeSeries: vi.fn(async () => timeSeriesResponseFixture),
     };
   });
 
@@ -157,7 +160,7 @@ describe("route /dataset/:id/analyze/:variable", () => {
 
     await flushPromises();
     // The first analysis runs on mount; Update must run another.
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(1);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(1);
 
     const updateButton = page
       .findAll('[data-test="action-btn"]')
@@ -173,17 +176,14 @@ describe("route /dataset/:id/analyze/:variable", () => {
       zonal_statistic: "mean",
       time_range: { gte: "0001-01-01", lte: "0003-01-01" },
     });
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(2);
-    expect(legacyActions.resolveTimeSeries).toHaveBeenLastCalledWith(
-      "test-job-id",
-      request,
-    );
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(2);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenLastCalledWith(request);
   });
 
   it("[behavior] shows the API's reason for a 422 as a warning", async () => {
     const reason =
       "The z-score's reference period [0450, 0500] has 0 time steps with values; it needs at least 2. Choose other years.";
-    legacyActions.resolveTimeSeries.mockRejectedValueOnce(
+    extractionStore.resolveTimeSeries.mockRejectedValueOnce(
       Object.assign(new Error("Request failed with status 422"), {
         response: { status: 422, data: { detail: reason } },
       }),
@@ -204,14 +204,14 @@ describe("route /dataset/:id/analyze/:variable", () => {
     await mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
     await flushPromises();
     expect(analysisStore.setDefaultRequestData).not.toHaveBeenCalled();
-    expect(legacyActions.resolveTimeSeries).not.toHaveBeenCalled();
+    expect(extractionStore.resolveTimeSeries).not.toHaveBeenCalled();
 
     datasetStore.metadata = metadata;
     await flushPromises();
 
     expect(legacyActions.initializeDatasetGeoJson).toHaveBeenCalled();
     expect(analysisStore.setDefaultRequestData).toHaveBeenCalledTimes(1);
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(1);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(1);
     expect(datasetStore.setAreaSummary).toHaveBeenCalledWith(
       timeSeriesResponseFixture.n_cells,
       timeSeriesResponseFixture.area,

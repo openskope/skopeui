@@ -19,6 +19,7 @@ const routeParams = { id: "paleocar", variable: "tasmax" };
 let datasetStore: any;
 let appStore: any;
 let legacyActions: any;
+let extractionStore: any;
 
 vi.mock("vue-router", () => ({
   useRoute: () => ({
@@ -61,6 +62,10 @@ vi.mock("@/stores/dataset", () => ({
   useDatasetStore: () => datasetStore,
 }));
 
+vi.mock("@/stores/analysis", () => ({
+  useAnalysisStore: () => ({}),
+}));
+
 vi.mock("@/stores/app", () => ({
   useAppStore: () => appStore,
 }));
@@ -72,6 +77,10 @@ vi.mock("@/stores/messages", () => ({
     dismiss: vi.fn(),
     clearMessages: vi.fn(),
   }),
+}));
+
+vi.mock("@/stores/extraction", () => ({
+  useExtractionStore: () => extractionStore,
 }));
 
 vi.mock("@/composables/useLegacyStoreActions", () => ({
@@ -98,12 +107,10 @@ describe("route /dataset/:id/visualize/:variable", () => {
     legacyActions = {
       initializeDataset: vi.fn(async () => true),
       initializeDatasetGeoJson: vi.fn(),
-      resolveTimeSeries: vi.fn(
-        async (_jobId: string | undefined, _data: any) => ({
-          newJobId: "test-job-id",
-          response: timeSeriesResponseFixture,
-        }),
-      ),
+    };
+    extractionStore = {
+      beginRequest: () => () => true,
+      resolveTimeSeries: vi.fn(async () => timeSeriesResponseFixture),
     };
   });
 
@@ -168,7 +175,7 @@ describe("route /dataset/:id/visualize/:variable", () => {
       }),
     );
     expect(datasetStore.setTimeSeriesLoaded).toHaveBeenCalled();
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalled();
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalled();
     expect(appStore.setVisited).toHaveBeenCalled();
   });
 
@@ -192,6 +199,6 @@ describe("route /dataset/:id/visualize/:variable", () => {
     await nextTick();
     await flushPromises();
 
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(2);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(2);
   });
 });
