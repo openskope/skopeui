@@ -1,4 +1,4 @@
-// ESLint 9 flat config for SkopeUI
+// ESLint flat config for SkopeUI
 // Replaces legacy .eslintrc.js — uses @nuxt/eslint-config for Nuxt-aware Vue/TS linting.
 // Prettier formatting is handled separately via `make format` (npx prettier --write).
 import { createConfigForNuxt } from "@nuxt/eslint-config/flat";

@@ -1,6 +1,6 @@
 # SkopeUI Agent Guide
 
-SkopeUI is a Nuxt 3 frontend for paleoclimate dataset discovery, study-area selection, raster visualization, and time-series analysis. Application code lives under `app/`.
+SkopeUI is a Nuxt 4 frontend for paleoclimate dataset discovery, study-area selection, raster visualization, and time-series analysis. Application code lives under `app/`.
 
 ## Working Conventions
 
@@ -19,10 +19,11 @@ Use `make test` for the full Vitest suite. Use `make build ENVIRONMENT=staging` 
 
 ## Git And Decisions
 
-- Use Conventional Commit messages.
+- Use Conventional Commit messages and keep commits logically scoped. Treat the diff as the record of what changed; commit bodies should capture why and any non-obvious decisions.
 - Do not create commits unless the user explicitly asks.
 - Use scopes only for established repository areas.
-- For non-trivial changes, use concise lowercase `-` bullets in the body to explain the rationale and operationally relevant details.
-- Keep each bullet concrete and independently legible; omit a body when the subject already explains the complete change.
+- For non-trivial changes, use concise lowercase `-` bullets for rationale, tradeoffs, or operationally relevant details that are not evident from the diff.
+- Omit a body when it would only restate the subject or diff.
 - Prefer branch-wide issue references in the pull request description. Do not repeat the same issue footer across every commit in a branch. Add a lowercase commit footer only when standalone traceability matters, such as for a direct fix, backport, or independently cherry-picked change.
 - Architectural decisions live in `.agents/decisions/`. Add an ADR only for durable, cross-cutting choices; preserve accepted ADRs and supersede them with a new ADR when a decision changes.
+- Consider whether a frontend feature or change would be significantly simpler with coordinating backend changes in `openskope/skope-api`.
