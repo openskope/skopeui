@@ -34,14 +34,17 @@ export const useExtractionStore = defineStore("extraction", () => {
   }
 
   function contextKey() {
-    return extractionIdentity(
-      {
-        dataset_id: dataset.metadata?.id,
-        variable_id: dataset.variable?.id,
-        selected_area: dataset.geoJson,
-      },
-      dataset.metadata,
-    );
+    return stableJson([
+      extractionIdentity(
+        {
+          dataset_id: dataset.metadata?.id,
+          variable_id: dataset.variable?.id,
+          selected_area: dataset.geoJson,
+        },
+        dataset.metadata,
+      ),
+      dataset.temporalRange,
+    ]);
   }
 
   // Invalidate consumers synchronously, including an area changing away and

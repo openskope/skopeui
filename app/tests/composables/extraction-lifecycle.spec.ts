@@ -7,6 +7,7 @@ import { useDatasetStore } from "@/stores/dataset";
 import { useAnalysisStore } from "@/stores/analysis";
 import { useMessagesStore } from "@/stores/messages";
 import { useTimeSeriesRequest } from "@/composables/useTimeSeriesRequest";
+import metadataFixture from "@/tests/fixtures/metadata-1.0.0.json";
 import { extractionIdentity } from "@/utils/extractionIdentity";
 import { timeSeriesResponseFixture as RESULT } from "@/tests/fixtures/page-fixtures";
 
@@ -43,12 +44,15 @@ function consumer(mode: "visualize" | "analyze") {
 beforeEach(() => {
   setActivePinia(createPinia());
   const dataset = useDatasetStore();
-  dataset.metadata = {
+  dataset.setMetadata({
+    ...metadataFixture.datasets[0],
     id: "paleocar",
     release_id: "r1",
     declaration_digest: "d1",
-  } as any;
-  dataset.variable = { id: "ppt" };
+    default_variable: "ppt",
+    variables: [{ ...metadataFixture.datasets[0].variables[0], id: "ppt" }],
+  } as any);
+  dataset.setVariable("ppt");
   dataset.setGeoJson(area);
 });
 afterEach(() => {
@@ -275,6 +279,19 @@ describe("response ownership", () => {
       if (mode === "analyze") expect(useAnalysisStore().response.area).toBe(99);
     },
   );
+
+  it("ignores a response when its selected range has already changed", async () => {
+    const old = deferred<Response>();
+    const store = useExtractionStore();
+    store.jobIds[extractionIdentity(request, useDatasetStore().metadata)] =
+      "job";
+    vi.stubGlobal("fetch", vi.fn().mockReturnValueOnce(old.promise));
+    const pending = consumer("visualize").run(request);
+    useDatasetStore().setTemporalRange([1700, 1800]);
+    old.resolve(respond(RESULT));
+    await pending;
+    expect(useDatasetStore().hasData).toBe(false);
+  });
 
   it.each([200, 500])(
     "ignores an old response (%i) after changing the area away and back",

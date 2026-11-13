@@ -24,6 +24,7 @@ export function useTimeSeriesRequest(mode: "visualize" | "analyze") {
       dataset.setTimeSeriesNoArea();
       return;
     }
+    if (!dataset.canHandleTimeSeriesRequest) return;
     dataset.setTimeSeriesLoading();
     try {
       const response = await extraction.resolveTimeSeries(data);

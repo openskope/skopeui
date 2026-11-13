@@ -15,6 +15,7 @@ const area = {
 function withResults() {
   const dataset = useDatasetStore();
   const analysis = useAnalysisStore();
+  dataset.setGeoJson({ type: "Point", coordinates: [0, 0] });
   useExtractionStore().jobIds["old-area"] = "old-job";
   dataset.setTimeSeries({
     timeSeries: { x: [103], y: [1] },

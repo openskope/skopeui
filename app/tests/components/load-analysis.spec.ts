@@ -71,7 +71,10 @@ describe("LoadAnalysis", () => {
     let destination: any;
     router.push.mockImplementation(async (location: any) => {
       expect(useDatasetStore().geoJson).toEqual(request.selected_area);
-      expect(useAnalysisStore().requestData).toEqual(request);
+      expect(useAnalysisStore().requestData).toMatchObject({
+        ...request,
+        time_range: { gte: "0103-01-01", lte: "2000-01-01" },
+      });
       destination = (requiresStudyArea as any)(location) ?? location;
     });
 

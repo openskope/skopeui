@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useDatasetStore } from "@/stores/dataset";
 import { formatStats } from "@/store/stats";
 import { yearOfTimestep } from "@/utils/timeAxis";
 
@@ -15,10 +16,19 @@ const EMPTY_RESPONSE = {
 export const useAnalysisStore = defineStore("analysis", {
   state: () => ({
     response: { ...EMPTY_RESPONSE } as any,
-    requestData: {} as Record<string, unknown>,
+    // Only analysis choices are stored here; dataset, geometry and range
+    // always come from the active dataset selection.
+    requestOptions: null as Record<string, unknown> | null,
   }),
-  // Derived from the response, so they can't outlive it.
+  // Requests follow the selection; plots and summaries follow the response.
   getters: {
+    requestData(state): Record<string, any> {
+      if (!state.requestOptions) return {};
+      return {
+        ...useDatasetStore().defaultApiRequestData,
+        ...state.requestOptions,
+      };
+    },
     timeseries: (state) => {
       return (state.response?.series || []).map((s: any) => ({
         x: s.timesteps.map(yearOfTimestep),
@@ -31,7 +41,7 @@ export const useAnalysisStore = defineStore("analysis", {
   },
   actions: {
     setDefaultRequestData(requestData: Record<string, unknown>) {
-      this.requestData = requestData;
+      this.setRequestData(requestData);
       this.response = { ...EMPTY_RESPONSE };
     },
     setResponse(response: Record<string, unknown>) {
@@ -42,13 +52,20 @@ export const useAnalysisStore = defineStore("analysis", {
       this.response = { ...EMPTY_RESPONSE };
     },
     setRequestData(requestData: Record<string, unknown>) {
-      this.requestData = requestData;
-    },
-    setGeoJson(geoJson: unknown) {
-      this.requestData = {
-        ...this.requestData,
-        selected_area: geoJson,
-      };
+      const {
+        zonal_statistic,
+        transform,
+        requested_series_options,
+        max_processing_time,
+      } = requestData;
+      this.requestOptions = Object.fromEntries(
+        Object.entries({
+          zonal_statistic,
+          transform,
+          requested_series_options,
+          max_processing_time,
+        }).filter(([, value]) => value !== undefined),
+      );
     },
   },
 });

@@ -96,7 +96,6 @@ export function createAnalysisStore(overrides: Record<string, unknown> = {}) {
     response: null as unknown,
     summaryStatistics: [] as unknown[],
     timeseries: [] as unknown[],
-    setGeoJson: vi.fn(),
     setDefaultRequestData: vi.fn((value: unknown) => {
       (store as any).requestData = value;
     }),

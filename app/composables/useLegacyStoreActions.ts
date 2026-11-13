@@ -1,6 +1,5 @@
 import { METADATA_ENDPOINT } from "../store/modules/constants";
 import { requestJson } from "../utils/requestJson";
-import { useExtractionStore } from "../stores/extraction";
 import { extractYear } from "../store/stats";
 import {
   datasetsFromMetadata,
@@ -10,7 +9,6 @@ import { useAnalysisStore } from "../stores/analysis";
 import { useDatasetStore } from "../stores/dataset";
 import { useMetadataStore } from "../stores/metadata";
 import { usePersistenceStorage } from "./usePersistenceStorage";
-import _ from "lodash";
 
 export function useLegacyStoreActions() {
   const metadataStore = useMetadataStore();
@@ -24,6 +22,8 @@ export function useLegacyStoreActions() {
     const response = await requestJson(METADATA_ENDPOINT);
     try {
       metadataStore.setAllDatasetMetadata(datasetsFromMetadata(response));
+      const activeId = datasetStore.metadata?.id;
+      if (activeId) datasetStore.setMetadata(metadataStore.find(activeId));
     } catch (error) {
       if (error instanceof UnsupportedMetadataVersionError) {
         metadataStore.setUpdateRequired();
@@ -41,15 +41,23 @@ export function useLegacyStoreActions() {
     // page. Still send it, so a changed API is noticed (CUT-001); a version
     // mismatch flags the update screen, and other failures can wait for the
     // next page.
-    if (metadataId === (datasetStore.metadata as any)?.id) {
+    if (metadataId === datasetStore.metadata?.id) {
+      datasetStore.beginInitialization();
+      if (variableId != null) datasetStore.setVariable(variableId);
       loadAllDatasetMetadata().catch(() => undefined);
       return;
     }
 
+    // A different dataset must not display or submit the previous selection
+    // while its metadata is loading.
+    datasetStore.setMetadata(null);
+    const isCurrent = datasetStore.beginInitialization();
     await loadAllDatasetMetadata();
+    if (!isCurrent()) return;
 
     const datasetMetadata = metadataStore.find(metadataId);
     if (datasetMetadata == null) {
+      datasetStore.setMetadata(null);
       if (typeof window !== "undefined") {
         alert(
           "Please try again later, we were unable to locate dataset metadata for " +
@@ -61,15 +69,7 @@ export function useLegacyStoreActions() {
 
     datasetStore.setMetadata(datasetMetadata);
 
-    // The variables arrive sorted by `order`, so the first is the fallback.
-    const incomingVariableId =
-      variableId ??
-      datasetMetadata.default_variable ??
-      datasetMetadata.variables[0]?.id;
-
-    if (incomingVariableId != null) {
-      datasetStore.setVariable(incomingVariableId);
-    }
+    if (variableId != null) datasetStore.setVariable(variableId);
 
     if (typeof window !== "undefined") {
       initializeDatasetGeoJson();
@@ -84,28 +84,14 @@ export function useLegacyStoreActions() {
     datasetStore.setGeoJson(geoJson);
   }
 
-  // Results for one study area must not survive a change of area: drop the
-  // plots, the statistics and the cached extractions.
-  function clearResults() {
-    useExtractionStore().clear();
-    datasetStore.clearTimeSeries();
-    analysisStore.clear();
-  }
-
   function clearGeoJson() {
     persistenceStorage.remove(datasetStore.geoJsonKey);
     datasetStore.clearGeoJson();
-    clearResults();
   }
 
   function saveGeoJson(geoJson: unknown) {
     persistenceStorage.set(datasetStore.geoJsonKey, geoJson);
     datasetStore.setGeoJson(geoJson);
-    clearResults();
-
-    if (!_.isEmpty(analysisStore.requestData)) {
-      analysisStore.setGeoJson(geoJson);
-    }
   }
 
   function loadRequestData(requestData: Record<string, any>) {

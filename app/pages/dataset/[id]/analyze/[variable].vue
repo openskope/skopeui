@@ -151,7 +151,7 @@ import { useDisplay } from "vuetify";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { toISODate, extractYear } from "@/store/stats";
+import { toISODate } from "@/store/stats";
 import {
   buildReadme,
   DEFAULT_CENTERED_SMOOTHING_WIDTH,
@@ -351,11 +351,6 @@ async function retrieveAnalysis(data: any) {
     return;
   }
   if (Object.values(data).some((v) => v == undefined)) return;
-  datasetStore.setGeoJson(data.selected_area);
-  datasetStore.setTemporalRange([
-    extractYear(data.time_range.gte),
-    extractYear(data.time_range.lte),
-  ]);
   await requestTimeSeries(data);
 }
 
@@ -552,7 +547,6 @@ whenever(
   () => isMounted.value && datasetStore.metadata != null,
   async () => {
     legacyActions.initializeDatasetGeoJson();
-    analysisStore.setGeoJson(datasetStore.geoJson as any);
     const requestData = initializeRequestData();
     await initializeFormData(requestData);
   },
