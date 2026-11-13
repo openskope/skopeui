@@ -3,7 +3,9 @@ import { THEME_COLORS } from "./utils/colors";
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-15",
   devtools: { enabled: process.env.NODE_ENV !== "production" },
-  // Use Nuxt 3 conventional output directories.
+  // Keep the existing source layout when using Nuxt 4.
+  srcDir: ".",
+  dir: { app: "app" },
   buildDir: ".nuxt",
 
   nitro: {
@@ -35,7 +37,7 @@ export default defineNuxtConfig({
         {
           name: "description",
           content:
-            "Nuxt 3 migration target for SkopeUI dataset discovery and analysis UI.",
+            "Skope dataset discovery, visualization, and analysis.",
         },
       ],
       link: [

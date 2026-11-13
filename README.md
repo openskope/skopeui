@@ -3,9 +3,9 @@
 [![DOI](https://zenodo.org/badge/159711888.svg)](https://zenodo.org/badge/latestdoi/159711888)
 [![Build/Test Docker Image CI](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/openskope/skopeui/actions/workflows/docker-ci.yml)
 
-SkopeUI is the Nuxt 3 frontend for the [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) platform. It provides dataset discovery, interactive MapLibre visualization, study-area selection, and time-series analysis backed by [skope-api](https://github.com/openskope/skope-api).
+SkopeUI is the Nuxt 4 frontend for the [Synthesizing Knowledge of Past Environments](https://www.openskope.org/) platform. It provides dataset discovery, interactive MapLibre visualization, study-area selection, and time-series analysis backed by [skope-api](https://github.com/openskope/skope-api).
 
-Docker and Docker Compose are the only host dependencies. Node and npm commands run inside the application container.
+Docker and Docker Compose are the only host dependencies. Node and npm commands run inside the application container. The build pins Node 26.13.1 LTS and npm 12.2.2; dependencies are installed reproducibly with `npm ci` from `app/package-lock.json`.
 
 ## Local development
 

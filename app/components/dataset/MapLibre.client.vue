@@ -101,7 +101,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
+import mapWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import AreaReadout from "@/components/dataset/AreaReadout.vue";
 import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { SkopeColorbar, type ColorbarOptions } from "@/utils/SkopeColorbar";
@@ -813,6 +814,7 @@ function exportSelectedGeometry() {
 onMounted(() => {
   if (!mapContainer.value) return;
 
+  maplibregl.setWorkerUrl(mapWorkerUrl);
   const viewport = getInitialMapViewport(metadata.value);
   map = new maplibregl.Map({
     container: mapContainer.value,

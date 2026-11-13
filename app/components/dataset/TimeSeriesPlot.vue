@@ -269,8 +269,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "step-selected", step: number): void;
   (e: "selected-temporal-range", range: [number, number]): void;
-  (e: "toggle-playback"): void;
-  (e: "pause-playback"): void;
+  (e: "toggle-playback" | "pause-playback"): void;
 }>();
 
 // Lazy-load PlotlyClient to avoid SSR issues

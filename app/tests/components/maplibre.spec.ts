@@ -206,11 +206,10 @@ vi.mock("@/store/modules/constants", () => ({
 }));
 
 vi.mock("maplibre-gl", () => ({
-  default: {
-    Map: mocks.MockMap,
-    NavigationControl: class MockNavigationControl {},
-    ScaleControl: class MockScaleControl {},
-  },
+  Map: mocks.MockMap,
+  NavigationControl: class MockNavigationControl {},
+  ScaleControl: class MockScaleControl {},
+  setWorkerUrl: vi.fn(),
 }));
 
 vi.mock("@geoman-io/maplibre-geoman-free", () => ({

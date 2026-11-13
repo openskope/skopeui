@@ -1,6 +1,6 @@
 # SkopeUI Agent Guide
 
-SkopeUI is a Nuxt 3 frontend for paleoclimate dataset discovery, study-area selection, raster visualization, and time-series analysis. Application code lives under `app/`.
+SkopeUI is a Nuxt 4 frontend for paleoclimate dataset discovery, study-area selection, raster visualization, and time-series analysis. Application code lives under `app/`.
 
 ## Working Conventions
 
