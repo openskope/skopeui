@@ -858,4 +858,12 @@ watch(
   width: 100%;
   min-height: var(--plot-min-height);
 }
+
+@media (max-width: 599px) {
+  .time-series-range > .v-btn,
+  .time-series-transport > .v-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 </style>

@@ -9,6 +9,7 @@
       <template #activator="{ props: activator }">
         <v-list-item
           v-bind="activator"
+          class="variable-group"
           :title="variableCount(group.variables.length)"
         >
           <template #prepend>
@@ -62,3 +63,30 @@ function variableCount(count: number) {
   return count === 1 ? "1 variable" : `${count} variables`;
 }
 </script>
+
+<style scoped>
+@media (max-width: 599px) {
+  .variable-group {
+    grid-template-areas:
+      "prepend append"
+      "content content";
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 4px;
+    padding-block: 8px;
+  }
+
+  .variable-group :deep(.v-list-item__spacer) {
+    display: none;
+  }
+
+  .variable-group :deep(.v-chip) {
+    height: auto;
+    min-height: 24px;
+  }
+
+  .variable-group :deep(.v-chip__content) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+</style>

@@ -56,7 +56,7 @@
             </a>
           </p>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="terms-actions">
           <v-btn
             href="https://www.openskope.org"
             variant="outlined"
@@ -110,3 +110,18 @@ function copyToClipboard(evt: MouseEvent) {
 </script>
 
 <style></style>
+
+<style scoped>
+@media (max-width: 599px) {
+  .terms-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .terms-actions > .v-btn {
+    height: auto;
+    min-height: 44px;
+    white-space: normal;
+  }
+}
+</style>

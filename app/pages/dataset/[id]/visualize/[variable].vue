@@ -17,9 +17,8 @@
         <!-- 2 column layout with map and time series-->
         <v-col
           class="d-flex map-flex pa-0"
+          cols="12"
           lg="6"
-          md="12"
-          sm="12"
           align-self="stretch"
         >
           <Map
@@ -33,9 +32,8 @@
         <!-- time series plot -->
         <v-col
           class="d-flex map-flex pa-0"
+          cols="12"
           lg="6"
-          md="12"
-          sm="12"
           align-self="stretch"
         >
           <TimeSeriesPlot

@@ -35,7 +35,7 @@
                   area?
                 </h3>
               </v-card-text>
-              <v-card-actions class="justify-space-between">
+              <v-card-actions class="study-area-actions justify-space-between">
                 <v-btn variant="outlined" color="accent" @click="clearGeometry">
                   Clear selected area
                 </v-btn>
@@ -126,7 +126,7 @@ function keepGeometry() {
   appStore.setVisited();
 }
 </script>
-<style>
+<style scoped>
 /* The viewport less the app bar, step bar and page title, so the panels fit
    a laptop screen. */
 .map-flex {
@@ -141,7 +141,17 @@ function keepGeometry() {
 
 @media all and (max-width: 600px) {
   .map-flex {
-    height: 350px;
+    height: auto;
+  }
+
+  .study-area-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .study-area-actions > .v-btn {
+    min-height: 44px;
   }
 }
 </style>

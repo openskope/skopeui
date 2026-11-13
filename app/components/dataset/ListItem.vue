@@ -161,6 +161,12 @@ const absoluteUrl = computed(() => `/dataset/${props.id}`);
   flex-direction: column;
   align-self: stretch;
   width: 100%;
+  min-width: 0;
+}
+
+.list-item-info :deep(.v-card-title) {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .list-item-description {

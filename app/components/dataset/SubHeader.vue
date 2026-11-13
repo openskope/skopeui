@@ -22,7 +22,7 @@
         </template>
       </v-tooltip>
     </v-col>
-    <v-col v-if="selectVariable">
+    <v-col v-if="selectVariable" cols="12" sm="6" md="3">
       <v-select
         v-model="variable"
         label="Select a variable"

@@ -636,4 +636,12 @@ whenever(
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+
+@media (max-width: 599px) {
+  /* Let the table scroll within its wrapper rather than hide numeric values. */
+  .stats-table :deep(table) {
+    table-layout: auto;
+    min-width: 420px;
+  }
+}
 </style>

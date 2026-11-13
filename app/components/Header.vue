@@ -5,7 +5,11 @@
       <v-img v-bind="props" cover />
     </template>
     <!-- Wider screens show the steps in the step bar instead. -->
-    <v-app-bar-nav-icon v-if="!mdAndUp" @click.stop="toggleNavigationDrawer()">
+    <v-app-bar-nav-icon
+      v-if="!mdAndUp"
+      aria-label="Open workflow navigation"
+      @click.stop="toggleNavigationDrawer()"
+    >
       <v-icon color="primary" x-large>mdi-menu</v-icon>
     </v-app-bar-nav-icon>
     <v-app-bar-title>
@@ -55,5 +59,12 @@ function toggleNavigationDrawer() {
   font-weight: bolder;
   font-size: 1.2rem;
   line-height: 1.2;
+  white-space: normal;
+}
+
+@media (max-width: 599px) {
+  .skope-subtitle {
+    font-size: 0.875rem;
+  }
 }
 </style>

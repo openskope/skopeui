@@ -14,7 +14,7 @@
       <div v-if="isSelectArea" class="draw-callout" data-test="draw-callout">
         {{ datasetStore.geoJson ? EDIT_CALLOUT : DRAW_CALLOUT }}
       </div>
-      <!-- One group, so on a narrow screen both buttons wrap together. -->
+      <!-- Keep both actions reachable when the header is narrow. -->
       <div v-if="isSelectArea" class="geojson-actions">
         <input
           id="loadGeoJsonFile"
@@ -912,7 +912,11 @@ onMounted(() => {
         );
       } else {
         colorbar = new SkopeColorbar(legendOptions.value);
-        map.addControl(colorbar, "bottom-left");
+        // Keep the legend clear of the drawing tools on the selection map.
+        map.addControl(
+          colorbar,
+          isSelectArea.value ? "bottom-right" : "bottom-left",
+        );
       }
     }
 
@@ -1066,8 +1070,24 @@ onUnmounted(() => {
 /* Right-aligned, on its own line too when the header wraps. */
 .geojson-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-left: auto;
+}
+
+@media (max-width: 599px) {
+  .geojson-actions {
+    width: 100%;
+  }
+
+  .geojson-actions > .v-btn {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+
+  .map-frame {
+    min-height: 380px;
+  }
 }
 
 :deep(.maplibregl-ctrl-group) {
