@@ -3,6 +3,22 @@
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
       <SubHeader :select-variable="true">
+        <v-btn
+          :to="visualizeLocation"
+          variant="outlined"
+          color="secondary"
+          prepend-icon="mdi-chevron-left"
+        >
+          Back to visualize
+        </v-btn>
+        <v-btn
+          :to="editAreaLocation"
+          variant="outlined"
+          color="secondary"
+          prepend-icon="mdi-vector-polygon"
+        >
+          Edit study area
+        </v-btn>
         <v-btn color="accent" variant="flat" @click="exportData">
           Download
           <v-icon class="ml-2" size="small">mdi-download</v-icon>
@@ -144,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onBeforeUnmount } from "vue";
 import { useMounted, whenever } from "@vueuse/core";
 import { useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
@@ -169,6 +185,23 @@ import Papa from "papaparse";
 definePageMeta({ layout: "default", middleware: ["requires-study-area"] });
 
 const route = useRoute();
+// Capture the route key before navigation changes the reactive route object.
+const draftKey = `${route.params.id}:${route.params.variable}`;
+const visualizeLocation = computed(() => {
+  const { id, variable } = route.params;
+  return id && variable
+    ? { name: "dataset-id-visualize-variable", params: { id, variable } }
+    : undefined;
+});
+const editAreaLocation = computed(() =>
+  route.params.id
+    ? {
+        name: "dataset-id",
+        params: { id: route.params.id },
+        query: { returnTo: "analyze" },
+      }
+    : undefined,
+);
 const { mdAndDown } = useDisplay();
 const analysisStore = useAnalysisStore();
 const datasetStore = useDatasetStore();
@@ -512,16 +545,18 @@ watch(
     if (!data) return;
     await initializeFormData(data);
     await retrieveAnalysis(data as any);
-    if (hasTransformOption.value) {
-      yAxisLabel.value =
-        (
-          transformItems.value.find(
-            (x: any) => x.id === transformOption.value,
-          ) as any
-        )?.label ?? null;
-    } else {
-      yAxisLabel.value = "";
-    }
+    // Label the requested result independently of unsubmitted form edits.
+    const appliedTransform = data.transform
+      ? transformOptions.find((option: any) =>
+          option.matches(data.transform, data.time_range),
+        )
+      : undefined;
+    yAxisLabel.value =
+      appliedTransform && appliedTransform.id !== "none"
+        ? (transformItems.value.find(
+            (option: any) => option.id === appliedTransform.id,
+          )?.label ?? null)
+        : "";
   },
 );
 
@@ -549,9 +584,36 @@ whenever(
     legacyActions.initializeDatasetGeoJson();
     const requestData = initializeRequestData();
     await initializeFormData(requestData);
+    const draft = analysisStore.formDrafts?.[draftKey];
+    if (draft) {
+      zonalStatistic.value = draft.zonalStatistic;
+      smoothingOption.value = draft.smoothingOption;
+      smoothingTimeStep.value = draft.smoothingTimeStep;
+      transformOption.value = draft.transformOption;
+      zScoreMovingIntervalTimeSteps.value = draft.zScoreMovingIntervalTimeSteps;
+      timeRange.value = {
+        lb: { ...draft.timeRange.lb },
+        ub: { ...draft.timeRange.ub },
+      };
+    }
   },
   { once: true },
 );
+// Keep raw form input, including inactive windows and unsubmitted edits,
+// separate from the validated options used to request analysis.
+onBeforeUnmount(() => {
+  analysisStore.formDrafts[draftKey] = {
+    zonalStatistic: zonalStatistic.value,
+    smoothingOption: smoothingOption.value,
+    smoothingTimeStep: smoothingTimeStep.value,
+    transformOption: transformOption.value,
+    zScoreMovingIntervalTimeSteps: zScoreMovingIntervalTimeSteps.value,
+    timeRange: {
+      lb: { ...timeRange.value.lb },
+      ub: { ...timeRange.value.ub },
+    },
+  };
+});
 </script>
 
 <style scoped>

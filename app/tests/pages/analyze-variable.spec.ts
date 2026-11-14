@@ -83,13 +83,26 @@ const layoutStubs = {
   "v-row": { template: "<div><slot /></div>" },
   "v-col": { template: "<div><slot /></div>" },
   "v-form": {
+    methods: { validate: async () => ({ valid: true }) },
     props: ["modelValue"],
     emits: ["update:modelValue"],
     template: '<form data-test="analysis-form"><slot /></form>',
   },
   "v-data-table": { template: '<div data-test="stats-table"></div>' },
-  "v-select": { template: '<div data-test="select"></div>' },
-  "v-text-field": { template: '<input data-test="input" />' },
+  "v-select": {
+    props: ["modelValue", "items", "label"],
+    emits: ["update:modelValue"],
+    template: `<select data-test="select" :aria-label="label" :value="modelValue"
+      @change="$emit('update:modelValue', $event.target.value)">
+      <option v-for="item in items" :key="item.id" :value="item.id">{{ item.label }}</option>
+    </select>`,
+  },
+  "v-text-field": {
+    props: ["modelValue", "label"],
+    emits: ["update:modelValue"],
+    template: `<input data-test="input" :aria-label="label" :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)" />`,
+  },
   "v-icon": { template: "<i><slot /></i>" },
   "v-btn": {
     props: ["to"],
@@ -178,6 +191,49 @@ describe("route /dataset/:id/analyze/:variable", () => {
     });
     expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(2);
     expect(extractionStore.resolveTimeSeries).toHaveBeenLastCalledWith(request);
+  });
+
+  it("[behavior] restores unsubmitted analysis edits after leaving and returning", async () => {
+    const mountPage = () =>
+      mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
+    const first = await mountPage();
+    await flushPromises();
+    await first
+      .find('[aria-label="Select a smoothing option"]')
+      .setValue("centeredAverage");
+    await first.find('[aria-label="Smoothing window"]').setValue("19");
+    await first
+      .find('[aria-label="Select a transformation option"]')
+      .setValue("zscoreMoving");
+    await first.find('[aria-label="Transform window"]').setValue("37");
+    expect(analysisStore.setRequestData).not.toHaveBeenCalled();
+    first.unmount();
+    expect(analysisStore.formDrafts["paleocar:tasmax"].smoothingOption).toBe(
+      "centeredAverage",
+    );
+
+    const second = await mountPage();
+    await flushPromises();
+    expect(
+      (
+        second.find('[aria-label="Select a smoothing option"]')
+          .element as HTMLSelectElement
+      ).value,
+    ).toBe("centeredAverage");
+    expect(
+      (
+        second.find('[aria-label="Smoothing window"]')
+          .element as HTMLInputElement
+      ).value,
+    ).toBe("19");
+    expect(
+      (
+        second.find('[aria-label="Transform window"]')
+          .element as HTMLInputElement
+      ).value,
+    ).toBe("37");
+    expect(analysisStore.setRequestData).not.toHaveBeenCalled();
+    second.unmount();
   });
 
   it("[behavior] shows the API's reason for a 422 as a warning", async () => {

@@ -95,6 +95,7 @@
         />
       </div>
     </v-card-text>
+    <slot name="footer" />
   </v-card>
 </template>
 
@@ -693,15 +694,17 @@ function syncDrawFromStore(geoJson: any) {
   syncDrawQueue = syncDrawQueue
     .catch(() => undefined)
     .then(async () => {
-      if (!gm) return;
+      const geoman = gm;
+      if (!geoman) return;
 
       ignoreStoreWatch = true;
       try {
-        await gm.features.deleteAll();
+        await geoman.features.deleteAll();
+        if (gm !== geoman) return;
 
         const featureCollection = normalizeGeoJson(geoJsonToSync);
         if (featureCollection && featureCollection.features.length > 0) {
-          await gm.features.importGeoJson(featureCollection);
+          await geoman.features.importGeoJson(featureCollection);
           fitToGeoJson(featureCollection);
         }
       } finally {
@@ -869,8 +872,15 @@ onMounted(() => {
     if (isSelectArea.value) {
       // createGeomanInstance adds the controls itself; adding them again only
       // logs "controls already added".
-      gm = await createGeomanInstance(map as any, GEOMAN_OPTIONS);
+      const geoman = await createGeomanInstance(map as any, GEOMAN_OPTIONS);
+      // A quick return to visualize can remove this map while tools load.
+      if (!map) {
+        geoman.destroy();
+        return;
+      }
+      gm = geoman;
       await syncDrawFromStore(datasetStore.geoJson);
+      if (!map) return;
 
       (map as any).on("gm:create", handleGmCreate);
       (map as any).on("gm:editend", handleGmEditEnd);
@@ -1010,8 +1020,7 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* The map fills the card below the header, so its bottom edge lines up with
-   the bottom of the plot card's step controls. */
+/* Fill the space between the header and optional playback controls. */
 .map {
   flex: 1 1 auto;
   min-height: 0;

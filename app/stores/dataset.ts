@@ -52,6 +52,12 @@ export const useDatasetStore = defineStore("dataset", {
     metadata: null as Dataset | null,
     initializationVersion: 0,
     variableId: null as string | null,
+    visualizeStep: null as number | null,
+    temporalRangeDraft: null as {
+      range: [number, number];
+      min: number;
+      max: number;
+    } | null,
     geoJson: null as unknown,
     temporalRange: [1, new Date().getFullYear()] as [number, number],
     timeSeriesRequestStatus: { ...LOADING_STATUS },
@@ -152,6 +158,10 @@ export const useDatasetStore = defineStore("dataset", {
         previous?.release_id !== metadata?.release_id ||
         previous?.declaration_digest !== metadata?.declaration_digest;
       this.metadata = metadata;
+      if (changedSource) {
+        this.visualizeStep = null;
+        this.temporalRangeDraft = null;
+      }
       if (changedDataset) {
         // Persistence is dataset-scoped; the bridge restores the new area's
         // saved geometry after selecting its metadata.

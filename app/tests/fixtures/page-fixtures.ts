@@ -92,6 +92,7 @@ export function createAppStore(overrides: Record<string, unknown> = {}) {
 
 export function createAnalysisStore(overrides: Record<string, unknown> = {}) {
   const store = reactive({
+    formDrafts: {} as Record<string, unknown>,
     requestData: null as unknown,
     response: null as unknown,
     summaryStatistics: [] as unknown[],

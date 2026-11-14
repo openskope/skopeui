@@ -3,6 +3,18 @@ import { useDatasetStore } from "@/stores/dataset";
 import { formatStats } from "@/store/stats";
 import { yearOfTimestep } from "@/utils/timeAxis";
 
+export type AnalysisFormDraft = {
+  zonalStatistic: string;
+  smoothingOption: string;
+  smoothingTimeStep: number;
+  transformOption: string;
+  zScoreMovingIntervalTimeSteps: number;
+  timeRange: {
+    lb: { year: number; month: number };
+    ub: { year: number; month: number };
+  };
+};
+
 const EMPTY_RESPONSE = {
   area: 0,
   n_cells: 1,
@@ -16,6 +28,7 @@ const EMPTY_RESPONSE = {
 export const useAnalysisStore = defineStore("analysis", {
   state: () => ({
     response: { ...EMPTY_RESPONSE } as any,
+    formDrafts: {} as Record<string, AnalysisFormDraft>,
     // Only analysis choices are stored here; dataset, geometry and range
     // always come from the active dataset selection.
     requestOptions: null as Record<string, unknown> | null,

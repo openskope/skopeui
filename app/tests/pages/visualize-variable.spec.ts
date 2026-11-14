@@ -31,9 +31,18 @@ vi.mock("vue-router", () => ({
 vi.mock("@/components/dataset/Map.client.vue", () => ({
   default: {
     name: "MapStub",
-    props: ["mapEngine", "displayRaster"],
+    props: ["mapEngine", "displayRaster", "step"],
     template:
-      '<div data-test="map" :data-map-engine="mapEngine" :data-display-raster="String(displayRaster)">map</div>',
+      '<div data-test="map" :data-map-engine="mapEngine" :data-display-raster="String(displayRaster)">map<slot name="footer" /></div>',
+  },
+}));
+
+vi.mock("@/components/dataset/RasterPlaybackControls.vue", () => ({
+  default: {
+    name: "RasterPlaybackControlsStub",
+    props: ["stepSelected", "isPlaying", "canPlay", "isStepLoading"],
+    emits: ["step-selected", "toggle-playback"],
+    template: '<div data-test="map-playback" />',
   },
 }));
 
@@ -131,9 +140,73 @@ describe("route /dataset/:id/visualize/:variable", () => {
     expect(page.findComponent({ name: "MapStub" }).exists()).toBe(true);
     expect(map.attributes("data-map-engine")).toBe("maplibre");
     expect(map.attributes("data-display-raster")).toBe("true");
+    expect(map.find('[data-test="map-playback"]').exists()).toBe(true);
     expect(page.findComponent({ name: "TimeSeriesPlotStub" }).exists()).toBe(
       true,
     );
+  });
+
+  it("[behavior] map controls select a frame and reflect when it is ready", async () => {
+    const wrapper = await mountWithSuspense(VisualizePage, {
+      global: { stubs: layoutStubs },
+    });
+    await flushPromises();
+    const map = wrapper.findComponent({ name: "MapStub" });
+    const controls = wrapper.findComponent({
+      name: "RasterPlaybackControlsStub",
+    });
+    controls.vm.$emit("step-selected", 2);
+    await nextTick();
+    expect(map.props("step")).toBe(2);
+    expect(controls.props("isStepLoading")).toBe(true);
+    map.vm.$emit("step-ready", 2);
+    await nextTick();
+    expect(controls.props("stepSelected")).toBe(2);
+    expect(controls.props("isStepLoading")).toBe(false);
+    wrapper.unmount();
+  });
+
+  it("[behavior] restores the last selected map year on return", async () => {
+    datasetStore.metadata = {
+      ...datasetStore.metadata,
+      time: {
+        kind: "regular",
+        origin: "0001",
+        end: "0003",
+        step: "P1Y",
+        count: 3,
+      },
+    };
+    const mountPage = () =>
+      mountWithSuspense(VisualizePage, { global: { stubs: layoutStubs } });
+    const first = await mountPage();
+    await flushPromises();
+    first
+      .findComponent({ name: "RasterPlaybackControlsStub" })
+      .vm.$emit("step-selected", 2);
+    await nextTick();
+    first.unmount();
+    expect(datasetStore.visualizeStep).toBe(2);
+    const second = await mountPage();
+    await flushPromises();
+    expect(second.findComponent({ name: "MapStub" }).props("step")).toBe(2);
+    second.unmount();
+  });
+
+  it("[behavior] offers an edit-area link that returns to visualize", async () => {
+    const wrapper = await mountWithSuspense(VisualizePage, {
+      global: { stubs: layoutStubs },
+    });
+    await flushPromises();
+    const edit = wrapper
+      .findAll("button")
+      .find((button) => button.text().includes("Edit study area"))!;
+    expect(JSON.parse(edit.attributes("data-to")!)).toEqual({
+      name: "dataset-id",
+      params: { id: "paleocar" },
+      query: { returnTo: "visualize" },
+    });
+    wrapper.unmount();
   });
 
   it("[behavior] drops the analyze link instead of throwing while leaving", async () => {
