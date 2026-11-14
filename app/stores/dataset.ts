@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { toISODate } from "@/store/stats";
 import type { Dataset, Variable } from "@/types/metadata";
+import { useAnalysisStore } from "@/stores/analysis";
+import { extractionGeometry, stableJson } from "@/utils/extractionIdentity";
 import { timeSpan } from "@/utils/timeAxis";
 
 const DEFAULT_MAX_PROCESSING_TIME = 20000;
@@ -48,24 +50,42 @@ export const useDatasetStore = defineStore("dataset", {
     },
     hasData: false,
     metadata: null as Dataset | null,
-    variable: { id: null } as DatasetVariable,
+    initializationVersion: 0,
+    variableId: null as string | null,
+    visualizeStep: null as number | null,
+    temporalRangeDraft: null as {
+      range: [number, number];
+      min: number;
+      max: number;
+    } | null,
     geoJson: null as unknown,
-    hasGeoJson: false,
     temporalRange: [1, new Date().getFullYear()] as [number, number],
-    temporalRangeMin: 1,
-    temporalRangeMax: new Date().getFullYear(),
     timeSeriesRequestStatus: { ...LOADING_STATUS },
-    minYear: 1,
-    maxYear: new Date().getFullYear(),
-    canHandleTimeSeriesRequest: false,
     // The API's area: the selected shape, measured in the dataset's CRS. Both
     // are 0 until a time series comes back.
     areaInSquareKm: 0,
     numberOfCells: 0,
-    timeSeriesRequestData: {} as Record<string, unknown>,
-    jobIds: {} as Record<string, string>,
   }),
   getters: {
+    variable: (state): DatasetVariable =>
+      state.metadata?.variables.find(
+        (variable) => variable.id === state.variableId,
+      ) ?? { id: null },
+    hasGeoJson: (state) => state.geoJson != null,
+    temporalRangeMin: (state) => state.temporalRange[0],
+    temporalRangeMax: (state) => state.temporalRange[1],
+    minYear: (state) =>
+      state.metadata?.time ? timeSpan(state.metadata.time)[0] : 1,
+    maxYear: (state) =>
+      state.metadata?.time
+        ? timeSpan(state.metadata.time)[1]
+        : new Date().getFullYear(),
+    canHandleTimeSeriesRequest(): boolean {
+      return !!this.metadata && this.hasGeoJson && this.variable.id != null;
+    },
+    timeSeriesRequestData(): Record<string, any> {
+      return this.defaultApiRequestData;
+    },
     timeseriesTrace: (state) => {
       if (!state.hasData) return null;
       return {
@@ -78,14 +98,12 @@ export const useDatasetStore = defineStore("dataset", {
       const metadataId = state.metadata?.id;
       return metadataId ? studyAreaKey(metadataId) : "skope:geometry";
     },
-    defaultApiRequestData: (state) => {
-      const metadata = state.metadata;
-      const variable = state.variable;
-      const [minYear, maxYear] = state.temporalRange;
+    defaultApiRequestData(): Record<string, any> {
+      const [minYear, maxYear] = this.temporalRange;
       return {
-        dataset_id: metadata?.id,
-        variable_id: variable?.id,
-        selected_area: state.geoJson,
+        dataset_id: this.metadata?.id,
+        variable_id: this.variable.id,
+        selected_area: this.geoJson,
         time_range: {
           gte: toISODate(minYear),
           lte: toISODate(maxYear),
@@ -103,54 +121,77 @@ export const useDatasetStore = defineStore("dataset", {
     },
   },
   actions: {
-    setVariable(variableId: string) {
-      const variables = this.metadata?.variables;
-      if (variables) {
-        const variable = variables.find((v) => v.id === variableId);
-        if (variable) this.variable = variable;
-      } else {
-        this.variable = { id: variableId };
-      }
-      this.timeSeriesRequestData = this.defaultApiRequestData;
+    // Each source transition invalidates both presentations. Extraction jobs
+    // have their own identity and are retired by the extraction store.
+    invalidateResults() {
+      this.clearTimeSeries();
+      useAnalysisStore().clear();
+    },
+    setVariable(variableId: string | null) {
+      if (this.variableId === variableId) return;
+      this.variableId = variableId;
+      this.invalidateResults();
     },
     setTemporalRange(temporalRange: [number, number]) {
-      this.temporalRange = temporalRange;
-      this.temporalRangeMin = temporalRange[0];
-      this.temporalRangeMax = temporalRange[1];
-      this.timeSeriesRequestData = this.defaultApiRequestData;
+      if (
+        this.temporalRange[0] === temporalRange[0] &&
+        this.temporalRange[1] === temporalRange[1]
+      )
+        return;
+      this.temporalRange = [...temporalRange];
+      // The original extraction remains reusable for a different range.
+      useAnalysisStore().clear();
+    },
+    beginInitialization() {
+      const version = ++this.initializationVersion;
+      return () => version === this.initializationVersion;
     },
     setMetadata(metadata: Dataset | null) {
+      // A newer selection (including clearing it) supersedes pending loads.
+      this.initializationVersion++;
+      const previous = this.metadata;
+      if (stableJson(previous) === stableJson(metadata)) return;
+      const previousVariableId = this.variable.id;
+      const changedDataset = previous?.id !== metadata?.id;
+      const changedSource =
+        changedDataset ||
+        previous?.release_id !== metadata?.release_id ||
+        previous?.declaration_digest !== metadata?.declaration_digest;
       this.metadata = metadata;
-      // Without metadata there's no dataset to extract from. The landing page
-      // clears it while the page being left can still send a request.
-      this.canHandleTimeSeriesRequest =
-        !!metadata && this.hasGeoJson && !!this.variable?.id;
-      if (metadata?.time) {
-        [this.minYear, this.maxYear] = timeSpan(metadata.time);
-        this.temporalRange = [this.minYear, this.maxYear];
-        this.temporalRangeMin = this.minYear;
-        this.temporalRangeMax = this.maxYear;
+      if (changedSource) {
+        this.visualizeStep = null;
+        this.temporalRangeDraft = null;
       }
-      this.timeSeriesRequestData = this.defaultApiRequestData;
+      if (changedDataset) {
+        // Persistence is dataset-scoped; the bridge restores the new area's
+        // saved geometry after selecting its metadata.
+        this.geoJson = null;
+        this.variableId = null;
+      }
+      if (metadata) {
+        if (this.variableId == null) {
+          this.variableId =
+            metadata.default_variable ?? metadata.variables[0]?.id ?? null;
+        }
+        if (changedSource && metadata.time)
+          this.temporalRange = timeSpan(metadata.time);
+      } else {
+        this.variableId = null;
+        this.temporalRange = [1, new Date().getFullYear()];
+      }
+      if (changedSource || previousVariableId !== this.variable.id || !metadata)
+        this.invalidateResults();
     },
     setGeoJson(geoJson: unknown) {
+      if (stableJson(this.geoJson) === stableJson(geoJson)) return;
+      const changedGeometry =
+        stableJson(extractionGeometry(this.geoJson)) !==
+        stableJson(extractionGeometry(geoJson));
       this.geoJson = geoJson;
-      this.hasGeoJson = geoJson != null;
-      this.canHandleTimeSeriesRequest =
-        !!this.metadata && this.hasGeoJson && !!this.variable?.id;
-      this.timeSeriesRequestData = this.defaultApiRequestData;
+      if (changedGeometry) this.invalidateResults();
     },
     clearGeoJson() {
-      this.geoJson = null;
-      this.hasGeoJson = false;
-      this.canHandleTimeSeriesRequest = false;
-      this.timeSeriesRequestData = this.defaultApiRequestData;
-    },
-    setJobId(varId: string, jobId: string) {
-      this.jobIds[varId] = jobId;
-    },
-    clearJobIds() {
-      this.jobIds = {};
+      this.setGeoJson(null);
     },
     setTimeSeriesLoading() {
       this.timeSeriesRequestStatus = { ...LOADING_STATUS };

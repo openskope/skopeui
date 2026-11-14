@@ -121,6 +121,21 @@ describe("TimeSeriesPlot range submission", () => {
     wrapper.unmount();
   });
 
+  it("keeps an unsubmitted time range when moving between steps", async () => {
+    const first = mountPlot();
+    await first.find(".time-series-range").trigger("click");
+    await first.find(".time-series-range input").setValue("1600");
+    first.unmount();
+    const second = mountPlot();
+    await flushPromises();
+    expect(
+      (second.find(".time-series-range input").element as HTMLInputElement)
+        .value,
+    ).toBe("1600");
+    expect(useDatasetStore().temporalRange).toEqual([1500, 1800]);
+    second.unmount();
+  });
+
   it("applies a valid draft on Enter without requiring blur first", async () => {
     const store = useDatasetStore();
     const wrapper = mountPlot();
@@ -167,9 +182,14 @@ describe("TimeSeriesPlot typed timestep", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     const store = useDatasetStore();
-    store.metadata = {
-      time: { kind: "regular", origin: "1001", end: "2000", step: "P1Y" },
-    } as any;
+    store.setMetadata({
+      ...metadataFixture.datasets[0],
+      time: {
+        ...metadataFixture.datasets[0].time,
+        origin: "1001",
+        end: "2000",
+      },
+    } as any);
     store.setTemporalRange([1500, 1600]);
   });
 
@@ -291,7 +311,13 @@ describe("TimeSeriesPlot axis labels", () => {
 
   async function layoutFor(title: string, unit: string) {
     const store = useDatasetStore();
-    store.variable = { id: "v", title, unit } as any;
+    store.setMetadata({
+      ...metadataFixture.datasets[0],
+      default_variable: "v",
+      variables: [
+        { ...metadataFixture.datasets[0].variables[0], id: "v", title, unit },
+      ],
+    } as any);
     const wrapper = mountPlot();
     await flushPromises();
     return wrapper.findComponent({ name: "PlotlyStub" }).props("layout");

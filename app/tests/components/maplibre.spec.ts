@@ -262,6 +262,25 @@ describe("MapLibre", () => {
     vi.clearAllMocks();
   });
 
+  it("[behavior] discards drawing tools that finish loading after navigation", async () => {
+    let finishLoading!: (value: any) => void;
+    vi.mocked(createGeomanInstance).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishLoading = resolve;
+        }),
+    );
+    const wrapper = mount(MapLibre, { global: { stubs: uiStubs } });
+    await flushPromises();
+    expect(createGeomanInstance).toHaveBeenCalled();
+    wrapper.unmount();
+    finishLoading(mocks.geomanInstance);
+    await flushPromises();
+    expect(mocks.geomanInstance.destroy).toHaveBeenCalledOnce();
+    expect(mocks.geomanInstance.features.deleteAll).not.toHaveBeenCalled();
+    expect(wrapper.emitted("mapReady")).toBeUndefined();
+  });
+
   it.each(["dataset-id", "dataset-id-visualize-variable"])(
     "[behavior] starts on the default basemap on %s",
     async (routeName) => {

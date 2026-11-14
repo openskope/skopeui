@@ -9,7 +9,7 @@
           color="accent"
           variant="flat"
         >
-          Visualize Data
+          {{ returnToAnalysis ? "Return to analysis" : "Visualize Data" }}
           <v-icon size="small" class="ml-2"> mdi-chevron-right </v-icon>
         </v-btn>
       </SubHeader>
@@ -87,12 +87,19 @@ const confirmGeometry = computed({
     shouldConfirmGeometry.value = value;
   },
 });
+const returnToAnalysis = computed(() => route.query?.returnTo === "analyze");
+
 // No link without both params: the router throws mid-render otherwise.
 const visualizeLocation = computed(() => {
   const id = route.params.id;
   const variable = (datasetStore.variable as any)?.id;
   if (!id || !variable) return undefined;
-  return { name: "dataset-id-visualize-variable", params: { id, variable } };
+  return {
+    name: returnToAnalysis.value
+      ? "dataset-id-analyze-variable"
+      : "dataset-id-visualize-variable",
+    params: { id, variable },
+  };
 });
 
 await useAsyncData(

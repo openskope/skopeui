@@ -33,18 +33,18 @@ export function createDatasetStore(overrides: Record<string, unknown> = {}) {
     minYear: 1,
     maxYear: 3,
     canHandleTimeSeriesRequest: true,
-    timeSeriesRequestData: { dataset_id: "paleocar", variable_id: "tasmax" },
+    timeSeriesRequestData: {
+      dataset_id: "paleocar",
+      variable_id: "tasmax",
+      selected_area: { type: "FeatureCollection", features: [] },
+    },
     timeSeriesRequestStatus: { status: "idle", messages: [] },
-    jobIds: {} as Record<string, string>,
     defaultApiRequestData: {
       dataset_id: "paleocar",
       variable_id: "tasmax",
       selected_area: { type: "FeatureCollection", features: [] },
       time_range: { gte: "0001-01-01", lte: "0003-01-01" },
     },
-    setJobId: vi.fn((varId: string, jobId: string) => {
-      (store as any).jobIds[varId] = jobId;
-    }),
     clearTimeSeries: vi.fn(),
     setMetadata: vi.fn((value: unknown) => {
       (store as any).metadata = value;
@@ -92,11 +92,11 @@ export function createAppStore(overrides: Record<string, unknown> = {}) {
 
 export function createAnalysisStore(overrides: Record<string, unknown> = {}) {
   const store = reactive({
+    formDrafts: {} as Record<string, unknown>,
     requestData: null as unknown,
     response: null as unknown,
     summaryStatistics: [] as unknown[],
     timeseries: [] as unknown[],
-    setGeoJson: vi.fn(),
     setDefaultRequestData: vi.fn((value: unknown) => {
       (store as any).requestData = value;
     }),

@@ -138,10 +138,12 @@ describe("stores", () => {
   it("analysis store reads the response and keeps the request when cleared", () => {
     const store = useAnalysisStore();
 
-    store.setDefaultRequestData({ dataset_id: "paleocar" });
-    store.setGeoJson({ type: "FeatureCollection", features: [] });
-    expect(store.requestData).toEqual({
-      dataset_id: "paleocar",
+    useDatasetStore().setMetadata(metadataFixture.datasets[0] as Dataset);
+    store.setDefaultRequestData({ zonal_statistic: "median" });
+    useDatasetStore().setGeoJson({ type: "FeatureCollection", features: [] });
+    expect(store.requestData).toMatchObject({
+      dataset_id: "paleocar_v3",
+      zonal_statistic: "median",
       selected_area: { type: "FeatureCollection", features: [] },
     });
 
@@ -163,6 +165,6 @@ describe("stores", () => {
     store.clear();
     expect(store.timeseries).toEqual([]);
     expect(store.summaryStatistics).toEqual([]);
-    expect((store.requestData as any).dataset_id).toBe("paleocar");
+    expect(store.requestData.dataset_id).toBe("paleocar_v3");
   });
 });

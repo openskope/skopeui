@@ -8,7 +8,11 @@
     @map-ready="emit('mapReady', $event)"
     @step-ready="emit('stepReady', $event)"
     @step-error="emit('stepError', $event)"
-  />
+  >
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+  </component>
 </template>
 
 <script setup lang="ts">

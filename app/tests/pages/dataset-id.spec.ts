@@ -15,6 +15,7 @@ import {
 import DatasetIdPage from "@/pages/dataset/[id]/index.vue";
 
 let routeParams = { id: "paleocar" };
+let routeQuery: Record<string, string> = {};
 let datasetStore: any;
 let appStore: any;
 let legacyActions: any;
@@ -22,6 +23,7 @@ let legacyActions: any;
 vi.mock("vue-router", () => ({
   useRoute: () => ({
     params: routeParams,
+    query: routeQuery,
   }),
 }));
 
@@ -71,8 +73,9 @@ const layoutStubs = {
   "v-card-actions": { template: "<div><slot /></div>" },
   "v-icon": { template: "<i><slot /></i>" },
   "v-btn": {
-    props: ["disabled"],
-    template: '<button data-test="btn" :disabled="disabled"><slot /></button>',
+    props: ["disabled", "to"],
+    template:
+      '<button data-test="btn" :disabled="disabled" :data-to="to && JSON.stringify(to)"><slot /></button>',
   },
 };
 
@@ -113,6 +116,26 @@ describe("route /dataset/:id", () => {
       expect(map.attributes("data-step")).toBe(String(firstYear));
     },
   );
+
+  it("[behavior] returns directly to analysis after editing its study area", async () => {
+    routeQuery = { returnTo: "analyze" };
+    try {
+      const wrapper = await mountWithSuspense(DatasetIdPage, {
+        global: { stubs: layoutStubs },
+      });
+      await flushPromises();
+      const next = wrapper
+        .findAll("button")
+        .find((button) => button.text().includes("Return to analysis"))!;
+      expect(JSON.parse(next.attributes("data-to")!)).toMatchObject({
+        name: "dataset-id-analyze-variable",
+        params: { id: "paleocar", variable: "tasmax" },
+      });
+      wrapper.unmount();
+    } finally {
+      routeQuery = {};
+    }
+  });
 
   it("[behavior] enables Visualize button only when study area is valid", async () => {
     const wrapper = await mountWithSuspense(DatasetIdPage, {

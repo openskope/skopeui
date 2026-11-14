@@ -18,6 +18,7 @@ const routeParams = { id: "paleocar", variable: "tasmax" };
 let analysisStore: any;
 let datasetStore: any;
 let legacyActions: any;
+let extractionStore: any;
 let messagesStore: any;
 
 vi.mock("vue-router", () => ({
@@ -69,6 +70,10 @@ vi.mock("@/stores/messages", () => ({
   useMessagesStore: () => messagesStore,
 }));
 
+vi.mock("@/stores/extraction", () => ({
+  useExtractionStore: () => extractionStore,
+}));
+
 vi.mock("@/composables/useLegacyStoreActions", () => ({
   useLegacyStoreActions: () => legacyActions,
 }));
@@ -78,13 +83,26 @@ const layoutStubs = {
   "v-row": { template: "<div><slot /></div>" },
   "v-col": { template: "<div><slot /></div>" },
   "v-form": {
+    methods: { validate: async () => ({ valid: true }) },
     props: ["modelValue"],
     emits: ["update:modelValue"],
     template: '<form data-test="analysis-form"><slot /></form>',
   },
   "v-data-table": { template: '<div data-test="stats-table"></div>' },
-  "v-select": { template: '<div data-test="select"></div>' },
-  "v-text-field": { template: '<input data-test="input" />' },
+  "v-select": {
+    props: ["modelValue", "items", "label"],
+    emits: ["update:modelValue"],
+    template: `<select data-test="select" :aria-label="label" :value="modelValue"
+      @change="$emit('update:modelValue', $event.target.value)">
+      <option v-for="item in items" :key="item.id" :value="item.id">{{ item.label }}</option>
+    </select>`,
+  },
+  "v-text-field": {
+    props: ["modelValue", "label"],
+    emits: ["update:modelValue"],
+    template: `<input data-test="input" :aria-label="label" :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)" />`,
+  },
   "v-icon": { template: "<i><slot /></i>" },
   "v-btn": {
     props: ["to"],
@@ -121,12 +139,10 @@ describe("route /dataset/:id/analyze/:variable", () => {
     legacyActions = {
       initializeDataset: vi.fn(async () => true),
       initializeDatasetGeoJson: vi.fn(),
-      resolveTimeSeries: vi.fn(
-        async (_jobId: string | undefined, _data: any) => ({
-          newJobId: "test-job-id",
-          response: timeSeriesResponseFixture,
-        }),
-      ),
+    };
+    extractionStore = {
+      beginRequest: () => () => true,
+      resolveTimeSeries: vi.fn(async () => timeSeriesResponseFixture),
     };
   });
 
@@ -157,7 +173,7 @@ describe("route /dataset/:id/analyze/:variable", () => {
 
     await flushPromises();
     // The first analysis runs on mount; Update must run another.
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(1);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(1);
 
     const updateButton = page
       .findAll('[data-test="action-btn"]')
@@ -173,17 +189,57 @@ describe("route /dataset/:id/analyze/:variable", () => {
       zonal_statistic: "mean",
       time_range: { gte: "0001-01-01", lte: "0003-01-01" },
     });
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(2);
-    expect(legacyActions.resolveTimeSeries).toHaveBeenLastCalledWith(
-      "test-job-id",
-      request,
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(2);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenLastCalledWith(request);
+  });
+
+  it("[behavior] restores unsubmitted analysis edits after leaving and returning", async () => {
+    const mountPage = () =>
+      mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
+    const first = await mountPage();
+    await flushPromises();
+    await first
+      .find('[aria-label="Select a smoothing option"]')
+      .setValue("centeredAverage");
+    await first.find('[aria-label="Smoothing window"]').setValue("19");
+    await first
+      .find('[aria-label="Select a transformation option"]')
+      .setValue("zscoreMoving");
+    await first.find('[aria-label="Transform window"]').setValue("37");
+    expect(analysisStore.setRequestData).not.toHaveBeenCalled();
+    first.unmount();
+    expect(analysisStore.formDrafts["paleocar:tasmax"].smoothingOption).toBe(
+      "centeredAverage",
     );
+
+    const second = await mountPage();
+    await flushPromises();
+    expect(
+      (
+        second.find('[aria-label="Select a smoothing option"]')
+          .element as HTMLSelectElement
+      ).value,
+    ).toBe("centeredAverage");
+    expect(
+      (
+        second.find('[aria-label="Smoothing window"]')
+          .element as HTMLInputElement
+      ).value,
+    ).toBe("19");
+    expect(
+      (
+        second.find('[aria-label="Transform window"]')
+          .element as HTMLInputElement
+      ).value,
+    ).toBe("37");
+    expect(analysisStore.setRequestData).not.toHaveBeenCalled();
+    second.unmount();
   });
 
   it("[behavior] shows the API's reason for a 422 as a warning", async () => {
     const reason =
       "The z-score's reference period [0450, 0500] has 0 time steps with values; it needs at least 2. Choose other years.";
-    legacyActions.resolveTimeSeries.mockRejectedValueOnce(
+    extractionStore.resolveTimeSeries.mockRejectedValueOnce(
       Object.assign(new Error("Request failed with status 422"), {
         response: { status: 422, data: { detail: reason } },
       }),
@@ -204,14 +260,14 @@ describe("route /dataset/:id/analyze/:variable", () => {
     await mountWithSuspense(AnalyzePage, { global: { stubs: layoutStubs } });
     await flushPromises();
     expect(analysisStore.setDefaultRequestData).not.toHaveBeenCalled();
-    expect(legacyActions.resolveTimeSeries).not.toHaveBeenCalled();
+    expect(extractionStore.resolveTimeSeries).not.toHaveBeenCalled();
 
     datasetStore.metadata = metadata;
     await flushPromises();
 
     expect(legacyActions.initializeDatasetGeoJson).toHaveBeenCalled();
     expect(analysisStore.setDefaultRequestData).toHaveBeenCalledTimes(1);
-    expect(legacyActions.resolveTimeSeries).toHaveBeenCalledTimes(1);
+    expect(extractionStore.resolveTimeSeries).toHaveBeenCalledTimes(1);
     expect(datasetStore.setAreaSummary).toHaveBeenCalledWith(
       timeSeriesResponseFixture.n_cells,
       timeSeriesResponseFixture.area,

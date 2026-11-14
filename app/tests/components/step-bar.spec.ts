@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import StepBar from "@/components/StepBar.vue";
+import metadataFixture from "@/tests/fixtures/metadata-1.0.0.json";
 import { useDatasetStore } from "@/stores/dataset";
 
 const route = vi.hoisted(() => ({
@@ -61,6 +62,7 @@ describe("StepBar", () => {
     route.name = "dataset-id-visualize-variable";
     route.params = { id: "paleocar_v3", variable: "ppt_annual" };
     const datasetStore = useDatasetStore();
+    datasetStore.setMetadata(metadataFixture.datasets[0] as any);
     datasetStore.setVariable("ppt_annual");
     datasetStore.setGeoJson({
       type: "Feature",

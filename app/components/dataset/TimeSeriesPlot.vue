@@ -1,9 +1,5 @@
 <template>
-  <v-card
-    variant="outlined"
-    class="time-series-card"
-    :style="{ '--plot-center-offset': `${(MARGIN_LEFT - MARGIN_RIGHT) / 2}px` }"
-  >
+  <v-card variant="outlined" class="time-series-card">
     <PanelHeader>
       <AreaReadout v-if="showArea" />
       <v-form
@@ -100,10 +96,7 @@
       </v-text-field>
     </PanelHeader>
 
-    <div
-      class="time-series-plot-shell"
-      :class="{ 'time-series-plot-shell--last': !showStepControls }"
-    >
+    <div class="time-series-plot-shell">
       <div
         v-if="timeSeriesRequestStatus.status === 'loading'"
         class="timeseries-loading-overlay"
@@ -144,90 +137,6 @@
         />
       </client-only>
     </div>
-
-    <!-- Playback stays centered on the plotting area. -->
-    <div v-if="showStepControls" class="time-series-step-controls">
-      <div class="time-series-transport">
-        <v-tooltip
-          location="top"
-          text="Go to the first timestep of the defined temporal range"
-        >
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              size="small"
-              v-bind="props"
-              color="accent"
-              @click="gotoFirstStep"
-            >
-              <v-icon>mdi-skip-previous</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip location="top" text="Previous timestep">
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              size="small"
-              v-bind="props"
-              color="accent"
-              @click="previousStep"
-            >
-              <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-btn
-          v-if="showPlaybackControl"
-          icon
-          size="small"
-          color="accent"
-          :disabled="!canPlay"
-          :aria-label="isPlaying ? 'Pause playback' : 'Play years'"
-          :title="isPlaying ? 'Pause playback' : 'Play years'"
-          :aria-pressed="!!isPlaying"
-          data-test="playback"
-          @click="emit('toggle-playback')"
-        >
-          <v-progress-circular
-            v-if="isStepLoading"
-            indeterminate
-            size="18"
-            width="2"
-          />
-          <v-icon v-else>{{ isPlaying ? "mdi-pause" : "mdi-play" }}</v-icon>
-        </v-btn>
-        <v-tooltip location="top" text="Next timestep">
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              size="small"
-              v-bind="props"
-              color="accent"
-              @click="nextStep"
-            >
-              <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip
-          location="top"
-          text="Go to the last timestep of the defined temporal range"
-        >
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              size="small"
-              v-bind="props"
-              color="accent"
-              @click="gotoLastStep"
-            >
-              <v-icon>mdi-skip-next</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-      </div>
-    </div>
   </v-card>
 </template>
 
@@ -238,6 +147,7 @@ import {
   watch,
   onMounted,
   onUnmounted,
+  onBeforeUnmount,
   nextTick,
   defineAsyncComponent,
 } from "vue";
@@ -249,16 +159,12 @@ import { PLOT_COLORS } from "@/utils/colors";
 import {
   axisYears,
   resolveTemporalLabels,
-  stepAlongAxis,
   stepFromText,
 } from "@/utils/timeAxis";
 
 const props = defineProps<{
   stepSelected?: number | null;
   showStepControls?: boolean;
-  showPlaybackControl?: boolean;
-  isPlaying?: boolean;
-  canPlay?: boolean;
   isStepLoading?: boolean;
   /** Show the API's area and cell count (analyze; visualize shows it on the map). */
   showArea?: boolean;
@@ -269,7 +175,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "step-selected", step: number): void;
   (e: "selected-temporal-range", range: [number, number]): void;
-  (e: "toggle-playback" | "pause-playback"): void;
+  (e: "pause-playback"): void;
 }>();
 
 // Lazy-load PlotlyClient to avoid SSR issues
@@ -556,34 +462,6 @@ function resetTemporalRange() {
   setTemporalRange();
 }
 
-function gotoFirstStep() {
-  if (variable.value === null) return;
-  setStep(temporalRangeMin.value);
-}
-
-function gotoLastStep() {
-  if (variable.value === null) return;
-  setStep(temporalRangeMax.value);
-}
-
-function stepBy(delta: number) {
-  if (variable.value === null || props.stepSelected == null) return;
-  setStep(
-    stepAlongAxis(axis.value, props.stepSelected, delta, [
-      temporalRangeMin.value,
-      temporalRangeMax.value,
-    ]),
-  );
-}
-
-function nextStep() {
-  stepBy(1);
-}
-
-function previousStep() {
-  stepBy(-1);
-}
-
 // The timestep typed in the header, applied on Enter or when the field loses
 // focus. A timestep outside the range on screen is rejected, with
 // a message that says which ones are allowed.
@@ -685,8 +563,27 @@ onUnmounted(() => {
 defineExpose({ getTimeSeriesPlotImage });
 
 onMounted(() => {
-  localTemporalRangeMin.value = selectedTemporalRange.value[0];
-  localTemporalRangeMax.value = selectedTemporalRange.value[1];
+  const draft = datasetStore.temporalRangeDraft;
+  const [min, max] = selectedTemporalRange.value;
+  if (draft && draft.range[0] === min && draft.range[1] === max) {
+    localTemporalRangeMin.value = draft.min;
+    localTemporalRangeMax.value = draft.max;
+    isTemporalRangeEditable.value = true;
+  } else {
+    localTemporalRangeMin.value = min;
+    localTemporalRangeMax.value = max;
+  }
+});
+
+onBeforeUnmount(() => {
+  datasetStore.temporalRangeDraft =
+    isTemporalRangeEditable.value && hasTemporalRangeChanges.value
+      ? {
+          range: [...selectedTemporalRange.value],
+          min: localTemporalRangeMin.value,
+          max: localTemporalRangeMax.value,
+        }
+      : null;
 });
 
 watch(
@@ -766,29 +663,8 @@ watch(
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
-  min-height: calc(var(--plot-min-height) + 16px);
-  padding: 16px 16px 0;
-}
-
-.time-series-plot-shell--last {
   min-height: calc(var(--plot-min-height) + 32px);
-  padding-bottom: 16px;
-}
-
-/* Its bottom padding matches the map card's, so the buttons end level with
-   the map. */
-.time-series-step-controls {
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  gap: 4px;
-  /* Plotly's y-axis margin moves the plotting area's center to the right.
-     Use that same center for the playback controls. */
-  padding: 8px calc(16px - var(--plot-center-offset)) 16px
-    calc(16px + var(--plot-center-offset));
+  padding: 16px;
 }
 
 .time-series-current-year {
@@ -828,13 +704,6 @@ watch(
   opacity: 1;
 }
 
-.time-series-transport {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
 .timeseries-loading-overlay {
   position: absolute;
   inset: 0;
@@ -860,8 +729,7 @@ watch(
 }
 
 @media (max-width: 599px) {
-  .time-series-range > .v-btn,
-  .time-series-transport > .v-btn {
+  .time-series-range > .v-btn {
     min-width: 44px;
     min-height: 44px;
   }

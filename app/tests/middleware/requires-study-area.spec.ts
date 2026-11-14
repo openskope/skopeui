@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 
 import { useDatasetStore } from "@/stores/dataset";
+import metadataFixture from "@/tests/fixtures/metadata-1.0.0.json";
 import { useMessagesStore } from "@/stores/messages";
 
 const navigateTo = vi.fn((location: unknown) => location);
@@ -57,7 +58,7 @@ describe("requires-study-area middleware", () => {
 
   it("lets the page open with an area already in the store", () => {
     const store = useDatasetStore();
-    store.setMetadata({ id: "paleocar_v3" } as any);
+    store.setMetadata(metadataFixture.datasets[0] as any);
     store.setGeoJson(area);
 
     expect((requiresStudyArea as any)(visualize)).toBeUndefined();

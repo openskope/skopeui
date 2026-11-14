@@ -9,13 +9,13 @@
         location="bottom"
         text="View the SKOPE user guide (opens in a new tab)"
       >
-        <template #activator="{ props }">
+        <template #activator="{ props: tooltipProps }">
           <v-btn
             icon
             size="x-small"
             href="https://www.openskope.org/skope-users-guide/"
             target="_blank"
-            v-bind="props"
+            v-bind="tooltipProps"
           >
             <v-icon>mdi-help-circle-outline</v-icon>
           </v-btn>
@@ -36,8 +36,8 @@
         variant="outlined"
       />
     </v-col>
-    <v-col cols="auto" class="ml-auto" align="end">
-      <!-- slot for the next nav button -->
+    <v-col cols="12" sm="auto" class="ml-auto sub-header-actions">
+      <!-- Keep workflow actions visible and let them wrap on narrow screens. -->
       <slot />
     </v-col>
   </v-row>
@@ -72,6 +72,13 @@ const variable = computed({
 </script>
 
 <style scoped>
+.sub-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* Same height with or without the variable select (a compact field is 40px),
    so the panels below start at the same place on every page. The top margin
    matches the gap below so the header sits centered between the step bar and

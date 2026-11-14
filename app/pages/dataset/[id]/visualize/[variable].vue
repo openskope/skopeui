@@ -4,6 +4,14 @@
     <template v-else>
       <SubHeader :select-variable="true">
         <v-btn
+          :to="editAreaLocation"
+          variant="outlined"
+          color="secondary"
+          prepend-icon="mdi-vector-polygon"
+        >
+          Edit study area
+        </v-btn>
+        <v-btn
           :disabled="!hasValidStudyArea"
           :to="analyzeLocation"
           color="accent"
@@ -27,7 +35,18 @@
             map-engine="maplibre"
             @step-ready="frameReady"
             @step-error="frameFailed"
-          />
+          >
+            <template #footer>
+              <RasterPlaybackControls
+                :step-selected="stepSelected"
+                :is-playing="isPlaying"
+                :can-play="canPlay"
+                :is-step-loading="isStepLoading"
+                @step-selected="setStep"
+                @toggle-playback="togglePlay"
+              />
+            </template>
+          </Map>
         </v-col>
         <!-- time series plot -->
         <v-col
@@ -38,14 +57,10 @@
         >
           <TimeSeriesPlot
             :show-step-controls="true"
-            :show-playback-control="true"
-            :is-playing="isPlaying"
-            :can-play="canPlay"
             :is-step-loading="isStepLoading"
             :traces="traces"
             :step-selected="stepSelected"
             @step-selected="setStep"
-            @toggle-playback="togglePlay"
             @pause-playback="pause"
           />
         </v-col>
@@ -55,17 +70,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, onUnmounted } from "vue";
+import { computed, watch, onMounted, onUnmounted, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import Map from "@/components/dataset/Map.client.vue";
+import RasterPlaybackControls from "@/components/dataset/RasterPlaybackControls.vue";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { axisYears, yearOfTimestep } from "@/utils/timeAxis";
+import { axisYears } from "@/utils/timeAxis";
 import { useRasterPlayback } from "@/composables/useRasterPlayback";
 import { useAppStore } from "@/stores/app";
 import { useDatasetStore } from "@/stores/dataset";
 import { useMessagesStore } from "@/stores/messages";
+import { useTimeSeriesRequest } from "@/composables/useTimeSeriesRequest";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 
 definePageMeta({
@@ -75,10 +92,12 @@ definePageMeta({
 });
 
 const route = useRoute();
+const workflowDatasetId = String(route.params.id);
 const appStore = useAppStore();
 const datasetStore = useDatasetStore();
 const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
+const { run: requestTimeSeries } = useTimeSeriesRequest("visualize");
 
 const playbackYears = computed(() =>
   datasetStore.metadata?.time ? axisYears(datasetStore.metadata.time) : [],
@@ -123,11 +142,18 @@ function frameFailed(step: number) {
   );
 }
 let stopTimeSeriesWatch: (() => void) | null = null;
-let isUnmounted = false;
 
 const hasValidStudyArea = computed(() => datasetStore.hasGeoJson);
-// No link while leaving the page: a link without its params makes the router
-// throw mid-render, which left every page blank.
+// Omit navigation targets while their route parameters are unavailable.
+const editAreaLocation = computed(() =>
+  route.params.id
+    ? {
+        name: "dataset-id",
+        params: { id: route.params.id },
+        query: { returnTo: "visualize" },
+      }
+    : undefined,
+);
 const analyzeLocation = computed(() => {
   const { id, variable } = route.params;
   if (!id || !variable) return undefined;
@@ -149,62 +175,7 @@ async function updateTimeSeries(data: any) {
     datasetStore.setTimeSeriesNoArea();
     return;
   }
-  datasetStore.setTimeSeriesLoading();
-  try {
-    const varId = route.params.variable as string;
-    const jobId = datasetStore.jobIds?.[varId];
-    const { newJobId, response } = await legacyActions.resolveTimeSeries(
-      jobId,
-      data,
-    );
-    datasetStore.setJobId(varId, newJobId);
-    // Left for another page meanwhile: its status and messages are its own.
-    if (isUnmounted) return;
-    const originalSeries = response.series[0];
-    const timeSeries = {
-      x: originalSeries.timesteps.map(yearOfTimestep),
-      y: originalSeries.values,
-      options: originalSeries.options,
-    };
-    datasetStore.setTimeSeries({
-      timeSeries,
-      numberOfCells: response.n_cells,
-      area: response.area,
-    });
-    datasetStore.setTimeSeriesLoaded();
-  } catch (e: any) {
-    if (isUnmounted) return;
-    datasetStore.clearTimeSeries();
-    if (e.response) {
-      const { status, data: responseData } = e.response;
-      const detail = Array.isArray(responseData.detail)
-        ? responseData.detail
-        : [{ msg: responseData.detail }];
-      if (status === 504) {
-        datasetStore.setTimeSeriesTimeout();
-        messageStore.error(
-          "This area took too long to process. Try a smaller one on the Select Area step.",
-        );
-      } else if (status >= 500) {
-        datasetStore.setTimeSeriesServerError(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") ||
-            "Server error. Please try again.",
-        );
-      } else if (status >= 400) {
-        datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") || "Bad request.",
-        );
-      }
-    } else {
-      const msg =
-        e.message ||
-        "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
-      datasetStore.setTimeSeriesServerError([{ msg }]);
-      messageStore.error(msg);
-    }
-  }
+  await requestTimeSeries(data);
 }
 
 async function loadTimeSeries() {
@@ -220,7 +191,15 @@ await useAsyncData(
       route.params.id as string,
       route.params.variable as string,
     );
-    selectStep(datasetStore.temporalRangeMin);
+    const savedStep = datasetStore.visualizeStep;
+    selectStep(
+      savedStep != null &&
+        savedStep >= datasetStore.temporalRangeMin &&
+        savedStep <= datasetStore.temporalRangeMax &&
+        playbackYears.value.includes(savedStep)
+        ? savedStep
+        : datasetStore.temporalRangeMin,
+    );
     return true;
   },
   { server: false },
@@ -243,10 +222,15 @@ onMounted(() => {
   appStore.setVisited();
 });
 
+onBeforeUnmount(() => {
+  if (datasetStore.metadata?.id === workflowDatasetId) {
+    datasetStore.visualizeStep = requestedStep.value;
+  }
+});
+
 onUnmounted(() => {
   clearTimeout(frameTimeout);
   document.removeEventListener("visibilitychange", pauseWhenHidden);
-  isUnmounted = true;
   stopTimeSeriesWatch?.();
 });
 

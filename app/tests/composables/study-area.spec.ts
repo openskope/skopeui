@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
+import { useExtractionStore } from "@/stores/extraction";
 import { useAnalysisStore } from "@/stores/analysis";
 import { useDatasetStore } from "@/stores/dataset";
 
@@ -14,7 +15,8 @@ const area = {
 function withResults() {
   const dataset = useDatasetStore();
   const analysis = useAnalysisStore();
-  dataset.setJobId("ppt_annual", "old-job");
+  dataset.setGeoJson({ type: "Point", coordinates: [0, 0] });
+  useExtractionStore().jobIds["old-area"] = "old-job";
   dataset.setTimeSeries({
     timeSeries: { x: [103], y: [1] },
     numberOfCells: 1,
@@ -41,7 +43,7 @@ describe("changing the study area", () => {
 
     useLegacyStoreActions().saveGeoJson(area);
 
-    expect(dataset.jobIds).toEqual({});
+    expect(useExtractionStore().jobIds).toEqual({});
     expect(dataset.hasData).toBe(false);
     expect(dataset.timeSeriesRequestStatus.status).not.toBe("success");
     expect(analysis.timeseries).toEqual([]);
@@ -53,7 +55,7 @@ describe("changing the study area", () => {
 
     useLegacyStoreActions().clearGeoJson();
 
-    expect(dataset.jobIds).toEqual({});
+    expect(useExtractionStore().jobIds).toEqual({});
     expect(dataset.hasData).toBe(false);
     expect(analysis.timeseries).toEqual([]);
   });

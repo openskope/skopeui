@@ -3,6 +3,22 @@
     <LoadingSpinner v-if="isLoadingMetadata" />
     <template v-else>
       <SubHeader :select-variable="true">
+        <v-btn
+          :to="visualizeLocation"
+          variant="outlined"
+          color="secondary"
+          prepend-icon="mdi-chevron-left"
+        >
+          Back to visualize
+        </v-btn>
+        <v-btn
+          :to="editAreaLocation"
+          variant="outlined"
+          color="secondary"
+          prepend-icon="mdi-vector-polygon"
+        >
+          Edit study area
+        </v-btn>
         <v-btn color="accent" variant="flat" @click="exportData">
           Download
           <v-icon class="ml-2" size="small">mdi-download</v-icon>
@@ -144,14 +160,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onBeforeUnmount } from "vue";
 import { useMounted, whenever } from "@vueuse/core";
 import { useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
 import TimeSeriesPlot from "@/components/dataset/TimeSeriesPlot.vue";
 import SubHeader from "@/components/dataset/SubHeader.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { toISODate, extractYear } from "@/store/stats";
+import { toISODate } from "@/store/stats";
 import {
   buildReadme,
   DEFAULT_CENTERED_SMOOTHING_WIDTH,
@@ -160,7 +176,7 @@ import {
 } from "@/store/modules/constants";
 import { useAnalysisStore } from "@/stores/analysis";
 import { useDatasetStore } from "@/stores/dataset";
-import { useMessagesStore } from "@/stores/messages";
+import { useTimeSeriesRequest } from "@/composables/useTimeSeriesRequest";
 import { useLegacyStoreActions } from "@/composables/useLegacyStoreActions";
 import _ from "lodash";
 import JSZip from "jszip";
@@ -169,11 +185,28 @@ import Papa from "papaparse";
 definePageMeta({ layout: "default", middleware: ["requires-study-area"] });
 
 const route = useRoute();
+// Capture the route key before navigation changes the reactive route object.
+const draftKey = `${route.params.id}:${route.params.variable}`;
+const visualizeLocation = computed(() => {
+  const { id, variable } = route.params;
+  return id && variable
+    ? { name: "dataset-id-visualize-variable", params: { id, variable } }
+    : undefined;
+});
+const editAreaLocation = computed(() =>
+  route.params.id
+    ? {
+        name: "dataset-id",
+        params: { id: route.params.id },
+        query: { returnTo: "analyze" },
+      }
+    : undefined,
+);
 const { mdAndDown } = useDisplay();
 const analysisStore = useAnalysisStore();
 const datasetStore = useDatasetStore();
-const messageStore = useMessagesStore();
 const legacyActions = useLegacyStoreActions();
+const { run: requestTimeSeries } = useTimeSeriesRequest("analyze");
 const { $download } = useNuxtApp() as any;
 
 const plot = ref<any>(null);
@@ -351,62 +384,7 @@ async function retrieveAnalysis(data: any) {
     return;
   }
   if (Object.values(data).some((v) => v == undefined)) return;
-  datasetStore.setGeoJson(data.selected_area);
-  datasetStore.setTemporalRange([
-    extractYear(data.time_range.gte),
-    extractYear(data.time_range.lte),
-  ]);
-  datasetStore.setTimeSeriesLoading();
-  try {
-    const varId = route.params.variable as string;
-    const jobId = datasetStore.jobIds?.[varId];
-    const { newJobId, response } = await legacyActions.resolveTimeSeries(
-      jobId,
-      data,
-    );
-    datasetStore.setJobId(varId, newJobId);
-    analysisStore.setResponse(response);
-    datasetStore.setAreaSummary(response.n_cells, response.area);
-    datasetStore.setTimeSeriesLoaded();
-  } catch (e: any) {
-    if (e.response) {
-      const { status, data: responseData } = e.response;
-      const detail = Array.isArray(responseData.detail)
-        ? responseData.detail
-        : [{ msg: responseData.detail }];
-      if (status === 504) {
-        datasetStore.setTimeSeriesTimeout();
-        messageStore.error(
-          "This area took too long to process. Try a smaller one on the Select Area step.",
-        );
-      } else if (status >= 500) {
-        datasetStore.setTimeSeriesServerError(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") ||
-            "Server error. Please try again.",
-        );
-      } else if (status === 422) {
-        // The API can't compute these options and says why: the user can
-        // choose others.
-        datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.warning(
-          detail.map((d: any) => d.msg).join(" ") ||
-            "These options can't be computed. Please choose others.",
-        );
-      } else if (status >= 400) {
-        datasetStore.setTimeSeriesBadRequest(detail);
-        messageStore.error(
-          detail.map((d: any) => d.msg).join(" ") || "Bad request.",
-        );
-      }
-    } else {
-      const msg =
-        e.message ||
-        "An unknown error occurred while retrieving analysis results. Please go back to the Select Area and try again.";
-      datasetStore.setTimeSeriesServerError([{ msg }]);
-      messageStore.error(msg);
-    }
-  }
+  await requestTimeSeries(data);
 }
 
 function initializeRequestData() {
@@ -567,16 +545,18 @@ watch(
     if (!data) return;
     await initializeFormData(data);
     await retrieveAnalysis(data as any);
-    if (hasTransformOption.value) {
-      yAxisLabel.value =
-        (
-          transformItems.value.find(
-            (x: any) => x.id === transformOption.value,
-          ) as any
-        )?.label ?? null;
-    } else {
-      yAxisLabel.value = "";
-    }
+    // Label the requested result independently of unsubmitted form edits.
+    const appliedTransform = data.transform
+      ? transformOptions.find((option: any) =>
+          option.matches(data.transform, data.time_range),
+        )
+      : undefined;
+    yAxisLabel.value =
+      appliedTransform && appliedTransform.id !== "none"
+        ? (transformItems.value.find(
+            (option: any) => option.id === appliedTransform.id,
+          )?.label ?? null)
+        : "";
   },
 );
 
@@ -602,12 +582,38 @@ whenever(
   () => isMounted.value && datasetStore.metadata != null,
   async () => {
     legacyActions.initializeDatasetGeoJson();
-    analysisStore.setGeoJson(datasetStore.geoJson as any);
     const requestData = initializeRequestData();
     await initializeFormData(requestData);
+    const draft = analysisStore.formDrafts?.[draftKey];
+    if (draft) {
+      zonalStatistic.value = draft.zonalStatistic;
+      smoothingOption.value = draft.smoothingOption;
+      smoothingTimeStep.value = draft.smoothingTimeStep;
+      transformOption.value = draft.transformOption;
+      zScoreMovingIntervalTimeSteps.value = draft.zScoreMovingIntervalTimeSteps;
+      timeRange.value = {
+        lb: { ...draft.timeRange.lb },
+        ub: { ...draft.timeRange.ub },
+      };
+    }
   },
   { once: true },
 );
+// Keep raw form input, including inactive windows and unsubmitted edits,
+// separate from the validated options used to request analysis.
+onBeforeUnmount(() => {
+  analysisStore.formDrafts[draftKey] = {
+    zonalStatistic: zonalStatistic.value,
+    smoothingOption: smoothingOption.value,
+    smoothingTimeStep: smoothingTimeStep.value,
+    transformOption: transformOption.value,
+    zScoreMovingIntervalTimeSteps: zScoreMovingIntervalTimeSteps.value,
+    timeRange: {
+      lb: { ...timeRange.value.lb },
+      ub: { ...timeRange.value.ub },
+    },
+  };
+});
 </script>
 
 <style scoped>
