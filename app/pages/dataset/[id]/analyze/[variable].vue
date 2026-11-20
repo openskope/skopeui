@@ -40,7 +40,6 @@
           <TimeSeriesPlot
             ref="plot"
             :show-area="true"
-            :show-step-controls="false"
             :traces="traces"
             :y-axis-label="yAxisLabel"
             @plot-ready="isPlotReady = $event"

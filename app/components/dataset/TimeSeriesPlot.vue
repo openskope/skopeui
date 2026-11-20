@@ -54,48 +54,6 @@
         </v-btn>
         <span class="time-series-range-steps">{{ timeStepsLabel }}</span>
       </v-form>
-      <v-text-field
-        v-if="showStepControls"
-        v-model="stepDraft"
-        class="time-series-current-year"
-        :style="{ '--current-year-accent': PLOT_COLORS.plotAccent }"
-        :label="temporalLabels.current"
-        density="compact"
-        variant="outlined"
-        base-color="primary"
-        color="primary"
-        :hint="isStepLoading ? 'Loading map…' : 'Shown on map'"
-        persistent-hint
-        :hide-details="false"
-        :error="isStepDraftInvalid"
-        :error-messages="
-          isStepMessageVisible
-            ? [`Use ${temporalRangeMin}–${temporalRangeMax}.`]
-            : []
-        "
-        type="text"
-        inputmode="numeric"
-        title="Displayed year: type a year and press Enter"
-        :aria-label="temporalLabels.current"
-        :aria-invalid="isStepDraftInvalid"
-        data-test="current-step"
-        @focus="focusStepDraft"
-        @input="hideStepMessage"
-        @keydown.enter.prevent="applyStepDraft"
-        @keydown.esc.prevent="resetStepDraft"
-        @blur="applyStepDraftOnBlur"
-      >
-        <template #prepend-inner>
-          <v-icon :color="PLOT_COLORS.plotAccent" size="12" aria-hidden="true">
-            mdi-circle
-          </v-icon>
-        </template>
-        <template #message="{ message }">
-          <span :data-test="isStepMessageVisible ? 'step-message' : undefined">
-            {{ message }}
-          </span>
-        </template>
-      </v-text-field>
     </PanelHeader>
 
     <div ref="plotShell" class="time-series-plot-shell">
@@ -165,16 +123,10 @@ import PanelHeader from "@/components/dataset/PanelHeader.vue";
 import { useDatasetStore } from "@/stores/dataset";
 import { wrapPlotTitle, wrapPlotLabel } from "@/utils/plotTitle";
 import { PLOT_COLORS } from "@/utils/colors";
-import {
-  axisYears,
-  resolveTemporalLabels,
-  stepFromText,
-} from "@/utils/timeAxis";
+import { resolveTemporalLabels } from "@/utils/timeAxis";
 
 const props = defineProps<{
   stepSelected?: number | null;
-  showStepControls?: boolean;
-  isStepLoading?: boolean;
   /** Show the API's area and cell count (analyze; visualize shows it on the map). */
   showArea?: boolean;
   traces?: any[];
@@ -252,9 +204,6 @@ const temporalRangeMin = computed(() => datasetStore.temporalRangeMin);
 const temporalRangeMax = computed(() => datasetStore.temporalRangeMax);
 const timeSeriesRequestStatus = computed(
   () => datasetStore.timeSeriesRequestStatus,
-);
-const axis = computed(() =>
-  datasetStore.metadata ? axisYears(datasetStore.metadata.time) : [],
 );
 const minStep = computed(() => datasetStore.minYear);
 const maxStep = computed(() => datasetStore.maxYear);
@@ -464,73 +413,6 @@ function resetTemporalRange() {
   setTemporalRange();
 }
 
-// The timestep typed in the header, applied on Enter or when the field loses
-// focus. A timestep outside the range on screen is rejected, with
-// a message that says which ones are allowed.
-const STEP_MESSAGE_LINGER = 4_000;
-const stepDraft = ref("");
-const isStepDraftInvalid = ref(false);
-const isStepMessageVisible = ref(false);
-let stepMessageTimer: ReturnType<typeof setTimeout> | null = null;
-
-function focusStepDraft(event: FocusEvent) {
-  emit("pause-playback");
-  (event.target as HTMLInputElement).select();
-}
-
-function currentStepText() {
-  return props.stepSelected == null ? "" : String(props.stepSelected);
-}
-
-function clearStepMessageTimer() {
-  if (stepMessageTimer != null) clearTimeout(stepMessageTimer);
-  stepMessageTimer = null;
-}
-
-function hideStepMessage() {
-  clearStepMessageTimer();
-  isStepDraftInvalid.value = false;
-  isStepMessageVisible.value = false;
-}
-
-function resetStepDraft() {
-  hideStepMessage();
-  stepDraft.value = currentStepText();
-}
-
-/** Selects the timestep the draft names; false if it names none in range. */
-function commitStepDraft() {
-  const step = stepFromText(axis.value, stepDraft.value, [
-    temporalRangeMin.value,
-    temporalRangeMax.value,
-  ]);
-  if (step === null) return false;
-  hideStepMessage();
-  stepDraft.value = String(step);
-  if (step !== props.stepSelected) setStep(step);
-  return true;
-}
-
-function applyStepDraft() {
-  if (commitStepDraft()) return;
-  clearStepMessageTimer();
-  isStepDraftInvalid.value = true;
-  isStepMessageVisible.value = true;
-}
-
-// Leaving the field puts the current timestep back, so it never shows one the
-// plot isn't on; the message stays a moment to say why.
-function applyStepDraftOnBlur() {
-  if (stepDraft.value === currentStepText() || commitStepDraft()) return;
-  stepDraft.value = currentStepText();
-  isStepDraftInvalid.value = false;
-  isStepMessageVisible.value = true;
-  clearStepMessageTimer();
-  stepMessageTimer = setTimeout(hideStepMessage, STEP_MESSAGE_LINGER);
-}
-
-watch(() => props.stepSelected, resetStepDraft, { immediate: true });
-
 async function getTimeSeriesPlotImage(expectedTraces?: ExportTrace[]) {
   const plotlyApi = plotImageApi;
   if (!plotlyApi) throw new Error("The plot is not ready for export.");
@@ -550,7 +432,6 @@ watch(
 
 onUnmounted(() => {
   clearProgressiveMessages();
-  clearStepMessageTimer();
 });
 
 defineExpose({ getTimeSeriesPlotImage });
@@ -687,8 +568,7 @@ watch(
 
 /* Always reserve two lines for validation, including while the field is
    valid. Short messages fit here without moving the toolbar or plot. */
-.time-series-range-field .v-input__details,
-.time-series-current-year .v-input__details {
+.time-series-range-field .v-input__details {
   min-height: 36px;
 }
 
@@ -708,43 +588,6 @@ watch(
   flex-direction: column;
   min-height: calc(var(--plot-min-height) + 32px);
   padding: 16px;
-}
-
-.time-series-current-year {
-  flex: 0 0 120px;
-  width: 120px;
-  margin-left: auto;
-  align-self: flex-start;
-}
-
-/* A distinct current-frame readout, tied to the plot cursor by its marker.
-   Label and helper text explain the meaning independently of color. */
-.time-series-current-year .v-field {
-  background-color: rgb(var(--v-theme-panel));
-  background-color: color-mix(
-    in srgb,
-    var(--current-year-accent) 8%,
-    rgb(var(--v-theme-surface))
-  );
-}
-
-.time-series-current-year input {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.time-series-current-year .v-field-label,
-.time-series-current-year .v-field__prepend-inner > .v-icon {
-  opacity: 1;
-}
-
-.time-series-current-year .v-field__outline {
-  --v-field-border-opacity: 0.65;
-}
-
-.time-series-current-year:not(.v-input--error) .v-messages {
-  color: rgb(var(--v-theme-muted));
-  opacity: 1;
 }
 
 .timeseries-loading-overlay {

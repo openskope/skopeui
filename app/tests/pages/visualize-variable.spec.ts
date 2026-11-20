@@ -28,7 +28,16 @@ vi.mock("@/components/dataset/Map.client.vue", () => ({
     name: "MapStub",
     props: ["displayRaster", "step", "preloadStep"],
     template:
-      '<div data-test="map" :data-display-raster="String(displayRaster)">map<slot name="footer" /></div>',
+      '<div data-test="map" :data-display-raster="String(displayRaster)">map<slot name="header-end" /><slot name="footer" /></div>',
+  },
+}));
+
+vi.mock("@/components/dataset/CurrentYearField.vue", () => ({
+  default: {
+    name: "CurrentYearFieldStub",
+    props: ["stepSelected", "isStepLoading"],
+    emits: ["step-selected", "pause-playback"],
+    template: '<div data-test="current-year-field" />',
   },
 }));
 
@@ -162,6 +171,25 @@ describe("route /dataset/:id/visualize/:variable", () => {
     await nextTick();
     expect(controls.props("stepSelected")).toBe(2);
     expect(controls.props("isStepLoading")).toBe(false);
+    wrapper.unmount();
+  });
+
+  it("[behavior] selects a year from the map header and updates it when ready", async () => {
+    const wrapper = await mountWithSuspense(VisualizePage, {
+      global: { stubs: layoutStubs },
+    });
+    await flushPromises();
+    const map = wrapper.findComponent({ name: "MapStub" });
+    const field = map.findComponent({ name: "CurrentYearFieldStub" });
+    expect(field.exists()).toBe(true);
+    field.vm.$emit("step-selected", 2);
+    await nextTick();
+    expect(map.props("step")).toBe(2);
+    expect(field.props("isStepLoading")).toBe(true);
+    map.vm.$emit("step-ready", 2);
+    await nextTick();
+    expect(field.props("stepSelected")).toBe(2);
+    expect(field.props("isStepLoading")).toBe(false);
     wrapper.unmount();
   });
 

@@ -171,91 +171,6 @@ describe("TimeSeriesPlot range submission", () => {
   });
 });
 
-describe("TimeSeriesPlot step controls", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-  });
-
-  it("shows the current timestep in the header, outside the range form", async () => {
-    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
-    await flushPromises();
-    const field = wrapper.find('[data-test="current-step"]');
-    expect((field.element as HTMLInputElement).value).toBe("1500");
-    expect(field.element.closest(".panel-header")).not.toBeNull();
-    expect(field.element.closest(".time-series-range")).toBeNull();
-    expect(wrapper.find(".time-series-step-controls input").exists()).toBe(
-      false,
-    );
-  });
-
-  it("pauses playback when editing the current year", async () => {
-    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
-    await flushPromises();
-    await wrapper.find('[data-test="current-step"]').trigger("focus");
-    expect(wrapper.emitted("pause-playback")).toHaveLength(1);
-  });
-});
-
-describe("TimeSeriesPlot typed timestep", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    const store = useDatasetStore();
-    store.setMetadata({
-      ...metadataFixture.datasets[0],
-      time: {
-        ...metadataFixture.datasets[0]!.time,
-        origin: "1001",
-        end: "2000",
-      },
-    } as any);
-    store.setTemporalRange([1500, 1600]);
-  });
-
-  async function typeStep(text: string) {
-    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1550 });
-    await flushPromises();
-    const field = wrapper.find('[data-test="current-step"]');
-    await field.setValue(text);
-    return { wrapper, field };
-  }
-
-  it("selects a typed timestep on Enter", async () => {
-    const { wrapper, field } = await typeStep("1575");
-    await field.trigger("keydown", { key: "Enter" });
-    expect(wrapper.emitted("step-selected")).toEqual([[1575]]);
-  });
-
-  it("rejects a timestep outside the range and says which are allowed", async () => {
-    const { wrapper, field } = await typeStep("1700");
-    await field.trigger("keydown", { key: "Enter" });
-    expect(wrapper.emitted("step-selected")).toBeUndefined();
-    expect(field.attributes("aria-invalid")).toBe("true");
-    expect((field.element as HTMLInputElement).value).toBe("1700");
-    expect(wrapper.find('[data-test="step-message"]').text()).toBe(
-      "Use 1500–1600.",
-    );
-  });
-
-  it("puts the current timestep back when left with a rejected one", async () => {
-    vi.useFakeTimers();
-    const { wrapper, field } = await typeStep("abc");
-    await field.trigger("blur");
-    expect((field.element as HTMLInputElement).value).toBe("1550");
-    expect(wrapper.find('[data-test="step-message"]').exists()).toBe(true);
-    vi.advanceTimersByTime(4_000);
-    await flushPromises();
-    expect(wrapper.find('[data-test="step-message"]').exists()).toBe(false);
-    vi.useRealTimers();
-  });
-
-  it("puts the current timestep back on Escape", async () => {
-    const { wrapper, field } = await typeStep("1575");
-    await field.trigger("keydown", { key: "Escape" });
-    expect((field.element as HTMLInputElement).value).toBe("1550");
-    expect(wrapper.emitted("step-selected")).toBeUndefined();
-  });
-});
-
 describe("TimeSeriesPlot timeline bounds", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -317,20 +232,14 @@ describe("TimeSeriesPlot axis labels", () => {
   it("labels an annual axis Year and uses Time for unsupported precisions", async () => {
     const store = useDatasetStore();
     store.setMetadata(metadataFixture.datasets[0] as any);
-    const wrapper = mountPlot({ showStepControls: true, stepSelected: 1500 });
+    const wrapper = mountPlot({ stepSelected: 1500 });
     await flushPromises();
     const layout = () =>
       wrapper.findComponent({ name: "PlotlyStub" }).props("layout");
     expect(layout().xaxis.title.text).toBe("Year");
-    expect(
-      wrapper.find('[data-test="current-step"]').attributes("aria-label"),
-    ).toBe("Current year");
     store.metadata!.time.precision = "month";
     await flushPromises();
     expect(layout().xaxis.title.text).toBe("Time");
-    expect(
-      wrapper.find('[data-test="current-step"]').attributes("aria-label"),
-    ).toBe("Current time");
   });
 
   async function layoutFor(title: string, unit: string) {
