@@ -60,7 +60,7 @@ export function createMapPreview(metadata: () => PreviewMetadata) {
       style: createBasemapStyle(basemap, DEFAULT_BASEMAP_ID),
       interactive: false,
       minZoom: 2,
-      attributionControl: { compact: true },
+      attributionControl: false,
       ...("bbox" in viewport
         ? { bounds: viewport.bbox, fitBoundsOptions: { padding: 20 } }
         : {

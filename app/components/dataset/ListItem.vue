@@ -163,7 +163,6 @@ const absoluteUrl = computed(() => `/dataset/${props.dataset.id}`);
   position: absolute;
   inset: 0;
 }
-/* MapLibre's attribution controls sit above this link at z-index 2. */
 .list-item-map-link {
   position: absolute;
   inset: 0;
