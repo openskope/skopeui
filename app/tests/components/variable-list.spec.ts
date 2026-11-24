@@ -13,7 +13,7 @@ function mountList(variables: Variable[]) {
     props: { variables },
     global: {
       stubs: {
-        "v-chip": { template: "<span><slot /></span>" },
+        "v-icon": { template: '<span aria-hidden="true" />' },
       },
     },
   });

@@ -39,6 +39,19 @@ Purpose: verify integrated browser behavior with real backend data.
 - Maintainers use the [engineering checklist](../../docs/staging-maintainer-checklist.md)
   for deployment prerequisites, controlled recovery checks, and release records.
 
+#### Variable Disclosures
+
+Check the variable groups on the landing page and in the dataset metadata dialog:
+
+- Tab to each category and confirm visible focus; Enter and Space toggle its
+  variable list without moving focus.
+- Confirm the accessibility tree exposes the category, variable count, and
+  expanded or collapsed state; the decorative chevron is hidden.
+- At a 320px viewport with text enlarged to 200%, confirm category labels remain
+  readable and counts wrap below them when needed, without horizontal overflow.
+- Confirm category labels, counts, and variable titles remain readable in the
+  default, hover, and expanded states.
+
 ## Route Matrix (Must Pass)
 
 | Route                              | Smoke assertions                                                            | Core behavior assertion                                                    |
