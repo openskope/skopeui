@@ -62,7 +62,7 @@
 }
 .skope-footer .skope-footer__action:hover {
   color: inherit;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--skope-footer-action-hover-background);
   text-decoration: none;
 }
 .skope-footer :is(a, button):focus-visible {
