@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/openskope/openskope.github.io.git",
+  "revision": "27915871a8b1eeaaccaa5bdf0f349319fa044b14",
+  "source_directory": "shared/web",
+  "files": {
+    "footer.json": "95ef846f9c6e9ca187494e3472406191bffb909e609601c313555e16581720b2",
+    "tokens.json": "300e161a378099cb2afc9ce7a2da0d14b69be304663d4e9260799ccf86e05b89",
+    "footer.css": "1d60cef13096d69ad42e3bb714d7c8eb19ef66359438f2c5429c7358458defc4",
+    "application-policy.json": "ed0f73d03f34a40d5e5ec8d11d4a0106c68f52cec8cae5ce2dac19f6d97b6a4b",
+    "CITATION.cff": "44dae00121b86108d7c4f0976c98a42932c0e554c7af2ba97504c736e0a82f30"
+  }
+}

@@ -14,6 +14,22 @@ SkopeUI is a Nuxt 4 frontend for paleoclimate dataset discovery, study-area sele
 - Preserve the study-area guard on the visualize and analyze routes (`middleware/requires-study-area.ts`): without an area they redirect to the select-area page.
 - Raster work uses MapLibre with the `skope-api` tile gateway. Do not add direct storage coupling or restore GeoServer/WMS paths.
 
+## Shared content and styling
+
+- The static website (`openskope/openskope.github.io`) owns reusable, shareable
+  project content and styling. Consume its reviewed `shared/web/` bundle through
+  `make deps-web-assets`; do not independently edit imported content or styles.
+- `app/web-assets.lock.json` pins the full source commit and file checksums.
+  `app/vendor/web-assets/` and the root `CITATION.cff` are imported copies.
+  Normal builds verify local files without fetching the website or a moving
+  upstream branch.
+- The app owns application behavior, including state, data interaction, dialogs
+  and consent enforcement. Shared citation/terms text does not own that behavior.
+- Keep the dependency one-way: website source to app bundle. Never require the
+  website build to consume app source or app build artifacts. Coordinate changes
+  to shared schemas and CSS classes with both rendering adapters.
+- See [shared web assets](docs/shared-web-assets.md) for updates and validation.
+
 ## Fonts
 
 Follow [font maintenance](docs/fonts.md). Keep Bitter branding and Source Sans 3

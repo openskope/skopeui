@@ -4,10 +4,10 @@ cff-version: 1.2.0
 message: "If you use the SKOPE application, please cite it as below."
 authors:
 - family-names: "Bocinsky"
-  given-names: "Kyle"  
+  given-names: "Kyle"
   orcid: "https://orcid.org/0000-0003-1862-3428"
 - family-names: "Gillreath-Brown"
-  given-names: "Andrew" 
+  given-names: "Andrew"
   orcid: "https://orcid.org/0000-0002-2272-5542"
 - family-names: "Kintigh"
   given-names: "Keith"
@@ -32,7 +32,7 @@ title: "Synthesizing Knowledge of Past Environments (SKOPE) Web Application"
 doi: "10.5281/zenodo.8415956"
 abstract: >
   SKOPE (Synthesizing Knowledge of Past Environments) is an online resource for paleoenvironmental data and models. It enables scholars to easily discover, explore, visualize, and synthesize knowledge of environments in the recent or remote past. Given a location and temporal interval, SKOPE offers access to diverse sources of long-term, high-resolution environmental data. SKOPE builds on vast amounts of prior data collection and previous research, transforming those into readily usable environmental knowledge.
-  
+
   The initial prototype of the SKOPE application was developed with contributions from Adam Brin, Johnathan Rush, Sarah Oas, Jeffrey Terstriep, Xingchen Hong, and Shaowen Wang.
 repository-code: 'https://github.com/openskope/skopeui'
 url: 'https://app.openskope.org'

@@ -111,6 +111,13 @@ utility files. Application state lives in the Pinia stores under `app/stores/`.
 
 The GitHub Actions workflow runs the test suite and builds the production image for pushes and pull requests against `main`. Run `make config ENVIRONMENT=staging` to check the staging runtime settings and `make build ENVIRONMENT=staging` to validate the deployable image before merging an upgrade.
 
+## Shared content and styling
+
+The website owns reusable project content and footer styling. This app consumes
+a commit-pinned local bundle, including canonical citation metadata and terms;
+it retains all dialog and consent behavior. See [shared web assets](docs/shared-web-assets.md)
+for updating the pin, source access, ownership and verification.
+
 ## Self-hosted fonts
 
 Bitter branding and Source Sans 3 body/control fonts are bundled locally with

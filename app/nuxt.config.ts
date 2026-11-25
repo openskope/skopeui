@@ -1,3 +1,4 @@
+import webTokens from "./vendor/web-assets/tokens.json";
 import { THEME_COLORS } from "./utils/colors";
 
 export default defineNuxtConfig({
@@ -15,7 +16,7 @@ export default defineNuxtConfig({
   },
 
   plugins: ["~/plugins/download.client.ts"],
-  css: ["~/assets/style/fonts.css"],
+  css: ["~/assets/style/fonts.css", "~/vendor/web-assets/footer.css"],
 
   modules: [
     "@pinia/nuxt",
@@ -28,6 +29,17 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "skopeui",
+      style: [
+        {
+          key: "skope-web-tokens",
+          textContent:
+            ":root {" +
+            Object.entries(webTokens.css_variables)
+              .map(([name, value]) => `${name}: ${value};`)
+              .join("\n") +
+            "}",
+        },
+      ],
       htmlAttrs: { lang: "en" },
       meta: [
         { charset: "utf-8" },

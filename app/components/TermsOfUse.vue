@@ -8,45 +8,19 @@
       max-width="600"
     >
       <template #activator="{ props }">
-        <v-btn
-          style="font-weight: bold"
-          color="white"
-          class="text-body-1"
-          variant="plain"
+        <button
+          type="button"
+          class="skope-footer__action skope-footer__dialog-trigger"
           v-bind="props"
         >
-          Terms of Use
-        </v-btn>
+          {{ footer.labels.terms }}
+        </button>
       </template>
       <v-card>
         <v-card-title><h2 :id="titleId">Terms of Use</h2></v-card-title>
         <v-card-text>
-          <p class="text-body-1">
-            By using the SKOPE application, you assume any risk associated with
-            its use. You are solely responsible for any damage or loss you may
-            incur resulting from your reliance on or use of information provided
-            by SKOPE.
-          </p>
-
-          <h2>Citation</h2>
-          <p class="text-body-1">
-            Use of data, graphics, or other information provided by SKOPE should
-            be accompanied by a citation of the original data source provided by
-            SKOPE in the dataset metadata and of the SKOPE web application
-            itself.
-          </p>
-
-          <CitationText label="Example citation" :text="citationText" />
-          <CitationText label="BibTeX" :text="citationBibTex" />
-
-          <h2>Contact us</h2>
-          <p class="text-body-1">
-            Feedback is welcome! Use Contact in the top navigation or send an
-            email to
-            <a href="mailto:skope-team@googlegroups.com">
-              skope-team@googlegroups.com
-            </a>
-          </p>
+          <p class="text-body-1">{{ policy.terms }}</p>
+          <ApplicationCitation />
         </v-card-text>
         <v-card-actions class="terms-actions">
           <v-btn
@@ -68,9 +42,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, useId } from "vue";
-import CitationText from "@/components/CitationText.vue";
-import citationText from "@/generated/citation.txt?raw";
-import citationBibTex from "@/generated/citation.bib?raw";
+import ApplicationCitation from "@/components/ApplicationCitation.vue";
+import footer from "@/vendor/web-assets/footer.json";
+import policy from "@/vendor/web-assets/application-policy.json";
 import { usePersistenceStorage } from "@/composables/usePersistenceStorage";
 
 const persistenceStorage = usePersistenceStorage();

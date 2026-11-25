@@ -7,15 +7,13 @@
       max-width="800"
     >
       <template #activator="{ props }">
-        <v-btn
-          style="font-weight: bold"
-          color="white"
-          class="text-body-1"
-          variant="plain"
+        <button
+          type="button"
+          class="skope-footer__action skope-footer__dialog-trigger"
           v-bind="props"
         >
-          Cite SKOPE
-        </v-btn>
+          {{ footer.labels.citation }}
+        </button>
       </template>
       <v-card>
         <v-card-title class="d-flex align-center ga-2">
@@ -30,25 +28,7 @@
           />
         </v-card-title>
         <v-card-text>
-          <h2>Citation</h2>
-          <p class="text-body-1 px-2">
-            Use of data, graphics, or other information provided by SKOPE should
-            be accompanied by a citation of the original data source provided by
-            SKOPE in the dataset metadata and of the SKOPE web application
-            itself.
-          </p>
-
-          <CitationText label="Example citation" :text="citationText" />
-          <CitationText label="BibTeX" :text="citationBibTex" />
-
-          <h2>Contact us</h2>
-          <p class="text-body-1 px-2">
-            Feedback is welcome! Use Contact in the top navigation or send an
-            email to
-            <a href="mailto:skope-team@googlegroups.com">
-              skope-team@googlegroups.com
-            </a>
-          </p>
+          <ApplicationCitation />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -56,9 +36,8 @@
 </template>
 <script setup lang="ts">
 import { ref, useId } from "vue";
-import CitationText from "@/components/CitationText.vue";
-import citationText from "@/generated/citation.txt?raw";
-import citationBibTex from "@/generated/citation.bib?raw";
+import ApplicationCitation from "@/components/ApplicationCitation.vue";
+import footer from "@/vendor/web-assets/footer.json";
 
 const showCitation = ref(false);
 const titleId = useId();

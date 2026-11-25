@@ -1,3 +1,5 @@
+import webTokens from "../vendor/web-assets/tokens.json";
+
 // Every color SKOPE UI uses, in one place. The page reads them through the
 // Vuetify theme (`color="accent"`, `rgb(var(--v-theme-accent))`); the maps and
 // the plot, which draw outside Vuetify, import them from here.
@@ -8,7 +10,7 @@ export const PALETTE = {
   maroon: "#800000",
   terracotta: "#A85A43",
   teal: "#00546B",
-  mutedTeal: "#527E7E",
+  mutedTeal: webTokens.css_variables["--skope-footer-background"],
   lightTeal: "#6DB1BF",
   mustard: "#B8860B",
 };

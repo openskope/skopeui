@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "copyright": {
+    "start_year": 2016,
+    "holder": "Synthesizing Knowledge of Past Environments (SKOPE)"
+  },
+  "acknowledgments": [
+    [
+      {
+        "text": "This material is based upon work supported by the National Science Foundation under Grant Nos. SMA 1439591 and 1637189 to Arizona State University, SMA 1439603 and 1637155 to the University of Illinois at Urbana-Champaign, and SMA 1439516 and 1637171 to Washington State University."
+      }
+    ],
+    [
+      {
+        "text": "This research was enabled in part by support provided by "
+      },
+      {
+        "text": "Research Computing Services at the University of Victoria",
+        "href": "https://www.uvic.ca/systems/researchcomputing/"
+      },
+      {
+        "text": " and the "
+      },
+      {
+        "text": "Digital Research Alliance of Canada",
+        "href": "https://alliancecan.ca/"
+      },
+      {
+        "text": ". Computing resources are provided through the Alliance’s Research Platforms and Portals program."
+      }
+    ]
+  ],
+  "labels": {
+    "citation": "Cite SKOPE",
+    "terms": "Terms of Use",
+    "build": "Build:",
+    "source": "Source code"
+  },
+  "content_links": {
+    "citation": "/cite-skope/",
+    "terms": "/terms-of-use/"
+  }
+}

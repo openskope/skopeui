@@ -1,0 +1,76 @@
+/* Authoritative shared footer. Keep framework-specific layout outside this file. */
+.skope-footer {
+  box-sizing: border-box;
+  padding: var(--skope-footer-padding);
+  background: var(--skope-footer-background);
+  color: var(--skope-footer-color);
+  font-family: var(--skope-footer-font-family);
+  font-size: var(--skope-footer-font-size);
+  line-height: var(--skope-footer-line-height);
+  text-align: center;
+}
+.skope-footer .skope-footer__inner {
+  width: 100%;
+  max-width: var(--skope-footer-max-width);
+  margin-inline: auto;
+}
+.skope-footer .skope-footer__acknowledgments p {
+  margin: 0;
+  padding: var(--skope-footer-credit-padding);
+  font-size: var(--skope-footer-credit-font-size);
+  line-height: var(--skope-footer-credit-line-height);
+  letter-spacing: var(--skope-footer-credit-spacing);
+}
+.skope-footer .skope-footer__acknowledgments p + p {
+  padding-top: 0;
+}
+.skope-footer .skope-footer__acknowledgments a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.skope-footer .skope-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--skope-footer-divider);
+}
+.skope-footer .skope-footer__action {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--skope-footer-action-height);
+  padding: var(--skope-footer-action-padding);
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--skope-footer-action-font-size);
+  font-weight: 500;
+  line-height: inherit;
+  letter-spacing: var(--skope-footer-action-spacing);
+  text-decoration: none;
+  cursor: pointer;
+}
+.skope-footer .skope-footer__dialog-trigger {
+  font-weight: 700;
+}
+.skope-footer .skope-footer__action:hover {
+  color: inherit;
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+.skope-footer :is(a, button):focus-visible {
+  outline: 3px solid var(--skope-footer-color);
+  outline-offset: 2px;
+}
+.skope-footer .skope-footer__icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}

@@ -10,6 +10,8 @@ SKOPE_API_HOST_URL ?= $(or $(API_BASE_OVERRIDE),$(API_URL_$(ENVIRONMENT)))
 # Resolve lazily so target-specific deploy/test environments select their own URL.
 override NUXT_PUBLIC_API_BASE = $(SKOPE_API_HOST_URL)
 export NUXT_PUBLIC_API_BASE
+export WEB_ASSETS_REVISION
+export WEB_ASSETS_SOURCE ?= https://github.com/openskope/openskope.github.io.git
 export FONT_UPDATE_LOCK
 export SKOPE_BUILD_ID ?= $(shell git describe --tags --always --dirty)
 
@@ -30,7 +32,7 @@ CFFCONVERT_IMAGE := ghcr.io/scicodes/cffconvert:v2026.09
 
 .PHONY: help check-environment citations config build buildprod deploy \
 	deploy-dev deploy-staging deploy-production down restart logs ps lint format \
-	fonts test typecheck clean
+	fonts deps-web-assets citation-source-check test typecheck clean
 
 help: ##- Show available targets
 	@echo "usage: make [target] [ENVIRONMENT=dev|staging|prod]"
@@ -45,7 +47,10 @@ check-environment:
 	esac
 	@test -n "$(SKOPE_API_HOST_URL)" || { echo "No API URL configured for $(ENVIRONMENT)" 1>&2; exit 2; }
 
-$(CITATION_TXT_FILE) $(CITATION_BIB_FILE) &: CITATION.cff
+citation-source-check:
+	@cmp -s CITATION.cff app/vendor/web-assets/CITATION.cff || { echo "CITATION.cff differs from the pinned bundle; use make deps-web-assets" >&2; exit 1; }
+
+$(CITATION_TXT_FILE) $(CITATION_BIB_FILE) &: CITATION.cff app/vendor/web-assets/CITATION.cff | citation-source-check
 	mkdir -p app/generated
 	rm -f $(CITATION_TXT_FILE) $(CITATION_BIB_FILE)
 	docker run --rm -i $(CFFCONVERT_IMAGE) -i /dev/stdin -f apalike < CITATION.cff > $(CITATION_TXT_FILE)
@@ -114,3 +119,10 @@ fonts: check-environment citations ##- Restore self-hosted fonts and verify thei
 	$(TEST_COMPOSE) build web
 	@trap '$(TEST_COMPOSE) down --remove-orphans' EXIT INT TERM; \
 		$(TEST_COMPOSE) run --rm --user "$$(id -u):$$(id -g)" -e HOME=/tmp -e FONT_UPDATE_LOCK web node scripts/fetch-fonts.mjs
+
+deps-web-assets: override ENVIRONMENT=dev
+deps-web-assets: check-environment ##- Import shared web content/styles from an exact website commit
+	@$(TEST_COMPOSE) config --quiet
+	$(TEST_COMPOSE) build web
+	@trap '$(TEST_COMPOSE) down --remove-orphans' EXIT INT TERM; \
+		sh scripts/import-web-assets.sh $(TEST_COMPOSE) run --rm --no-deps -T --user "$$(id -u):$$(id -g)" -e HOME=/tmp
