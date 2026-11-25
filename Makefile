@@ -10,6 +10,7 @@ SKOPE_API_HOST_URL ?= $(or $(API_BASE_OVERRIDE),$(API_URL_$(ENVIRONMENT)))
 # Resolve lazily so target-specific deploy/test environments select their own URL.
 override NUXT_PUBLIC_API_BASE = $(SKOPE_API_HOST_URL)
 export NUXT_PUBLIC_API_BASE
+export FONT_UPDATE_LOCK
 export SKOPE_BUILD_ID ?= $(shell git describe --tags --always --dirty)
 
 COMPOSE = docker compose --project-name $(COMPOSE_PROJECT_NAME) \
@@ -29,7 +30,7 @@ CFFCONVERT_IMAGE := ghcr.io/scicodes/cffconvert:v2026.09
 
 .PHONY: help check-environment citations config build buildprod deploy \
 	deploy-dev deploy-staging deploy-production down restart logs ps lint format \
-	test typecheck clean
+	fonts test typecheck clean
 
 help: ##- Show available targets
 	@echo "usage: make [target] [ENVIRONMENT=dev|staging|prod]"
@@ -106,3 +107,10 @@ test typecheck: check-environment citations
 
 clean: ##- Remove generated local build inputs
 	rm -f $(CITATION_TXT_FILE) $(CITATION_BIB_FILE)
+
+fonts: override ENVIRONMENT=dev
+fonts: check-environment citations ##- Restore self-hosted fonts and verify their pinned checksums
+	@$(TEST_COMPOSE) config --quiet
+	$(TEST_COMPOSE) build web
+	@trap '$(TEST_COMPOSE) down --remove-orphans' EXIT INT TERM; \
+		$(TEST_COMPOSE) run --rm --user "$$(id -u):$$(id -g)" -e HOME=/tmp -e FONT_UPDATE_LOCK web node scripts/fetch-fonts.mjs

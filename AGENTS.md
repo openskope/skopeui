@@ -14,6 +14,13 @@ SkopeUI is a Nuxt 4 frontend for paleoclimate dataset discovery, study-area sele
 - Preserve the study-area guard on the visualize and analyze routes (`middleware/requires-study-area.ts`): without an area they redirect to the select-area page.
 - Raster work uses MapLibre with the `skope-api` tile gateway. Do not add direct storage coupling or restore GeoServer/WMS paths.
 
+## Fonts
+
+Follow [font maintenance](docs/fonts.md). Keep Bitter branding and Source Sans 3
+body/control fonts aligned with the website. Font metadata and checksums live in
+`app/fonts.lock.json`; builds/type checks verify local files without network font
+fetches. Use `make fonts` for restores and review any deliberate hash update.
+
 ## Validation
 
 Use `make test` for full Nuxt type checking and the Vitest suite. Use `make typecheck` for the type check alone; it includes Vue templates and TypeScript tests. Use `make build ENVIRONMENT=staging` to validate the deployable Nuxt image and `make config ENVIRONMENT=staging` to inspect resolved Compose configuration.

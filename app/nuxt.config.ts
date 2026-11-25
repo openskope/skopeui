@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   },
 
   plugins: ["~/plugins/download.client.ts"],
+  css: ["~/assets/style/fonts.css"],
 
   modules: [
     "@pinia/nuxt",
@@ -34,16 +35,6 @@ export default defineNuxtConfig({
         {
           name: "description",
           content: "Skope dataset discovery, visualization, and analysis.",
-        },
-      ],
-      link: [
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css?family=Bitter:400,700",
         },
       ],
     },
@@ -87,7 +78,10 @@ export default defineNuxtConfig({
 
   vuetify: {
     // Keep Nuxt useLayout distinct from Vuetify useVLayout.
-    moduleOptions: { prefixComposables: true },
+    moduleOptions: {
+      prefixComposables: true,
+      styles: { configFile: "assets/style/vuetify-settings.scss" },
+    },
     vuetifyOptions: {
       // Eager tooltip roots expose empty tooltip roles while their content is
       // hidden. Mount the overlay when opened and remove it after closing.

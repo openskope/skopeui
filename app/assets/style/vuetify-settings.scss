@@ -1,0 +1,13 @@
+// Compile component typography with the same font as the website and app body.
+@forward "vuetify/settings" with (
+  $body-font-family: (
+    "Source Sans 3",
+    Arial,
+    sans-serif,
+  ),
+  $heading-font-family: (
+    "Source Sans 3",
+    Arial,
+    sans-serif,
+  )
+);

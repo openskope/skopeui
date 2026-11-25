@@ -112,7 +112,7 @@ function toggleNavigationDrawer() {
 
 // Explicit typography also covers buttons rendered by the two child components.
 .header-actions :deep(.v-btn) {
-  font-family: "Roboto", sans-serif;
+  font-family: "Source Sans 3", sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;

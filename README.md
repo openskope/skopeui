@@ -111,6 +111,11 @@ utility files. Application state lives in the Pinia stores under `app/stores/`.
 
 The GitHub Actions workflow runs the test suite and builds the production image for pushes and pull requests against `main`. Run `make config ENVIRONMENT=staging` to check the staging runtime settings and `make build ENVIRONMENT=staging` to validate the deployable image before merging an upgrade.
 
+## Self-hosted fonts
+
+Bitter branding and Source Sans 3 body/control fonts are bundled locally with
+licenses, Unicode subsets and content-hashed asset URLs. See [font maintenance](docs/fonts.md).
+
 ## Maintenance
 
 The Docker build follows the active Node LTS image and enforces the supported engine ranges in `app/package.json`. When LTS moves outside those ranges, CI fails until the new runtime and dependencies are reviewed. Rebuild regularly to receive base-image updates. Production contains only the Node runtime, required system packages, and Nuxt's built output; npm is available in the development image.
